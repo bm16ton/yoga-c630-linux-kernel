@@ -54,6 +54,7 @@
  */
 
 #include <linux/linkage.h>
+#include <linux/cfi_types.h>
 
 #define DIGEST_PTR	%rdi	/* 1st arg */
 #define DATA_PTR	%rsi	/* 2nd arg */
@@ -93,7 +94,11 @@
  */
 .text
 .align 32
+<<<<<<< HEAD
+SYM_TYPED_FUNC_START(sha1_ni_transform)
+=======
 SYM_FUNC_START(sha1_ni_transform)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	push		%rbp
 	mov		%rsp, %rbp
 	sub		$FRAME_SIZE, %rsp

@@ -1,0 +1,1 @@
+cmd_sound/firewire/fireworks/snd-fireworks.mod := printf '%s\n'   fireworks_transaction.o fireworks_command.o fireworks_stream.o fireworks_proc.o fireworks_midi.o fireworks_pcm.o fireworks_hwdep.o fireworks.o | awk '!x[$$0]++ { print("sound/firewire/fireworks/"$$0) }' > sound/firewire/fireworks/snd-fireworks.mod

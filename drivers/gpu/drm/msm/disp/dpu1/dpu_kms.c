@@ -779,7 +779,7 @@ static int _dpu_kms_drm_obj_init(struct dpu_kms *dpu_kms)
 			  catalog->sspp[i].features & BIT(DPU_SSPP_CURSOR));
 
 		plane = dpu_plane_init(dev, catalog->sspp[i].id, type,
-				       (1UL << max_crtc_count) - 1, 0);
+				       (1UL << max_crtc_count) - 1);
 		if (IS_ERR(plane)) {
 			DPU_ERROR("dpu_plane_init failed\n");
 			ret = PTR_ERR(plane);
@@ -897,12 +897,18 @@ static void dpu_kms_mdp_snapshot(struct msm_disp_state *disp_state, struct msm_k
 	int i;
 	struct dpu_kms *dpu_kms;
 	const struct dpu_mdss_cfg *cat;
+<<<<<<< HEAD
+=======
 	struct dpu_hw_mdp *top;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dpu_kms = to_dpu_kms(kms);
 
 	cat = dpu_kms->catalog;
+<<<<<<< HEAD
+=======
 	top = dpu_kms->hw_mdp;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pm_runtime_get_sync(&dpu_kms->pdev->dev);
 

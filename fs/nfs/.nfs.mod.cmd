@@ -1,0 +1,1 @@
+cmd_fs/nfs/nfs.mod := printf '%s\n'   client.o dir.o file.o getroot.o inode.o super.o io.o direct.o pagelist.o read.o symlink.o unlink.o write.o namespace.o mount_clnt.o nfstrace.o export.o sysfs.o fs_context.o sysctl.o fscache.o | awk '!x[$$0]++ { print("fs/nfs/"$$0) }' > fs/nfs/nfs.mod

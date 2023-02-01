@@ -11,6 +11,19 @@
 	model = "Renesas Spider CPU board";
 	compatible = "renesas,spider-cpu", "renesas,r8a779f0";
 
+<<<<<<< HEAD
+	aliases {
+		serial0 = &scif3;
+		serial1 = &scif0;
+	};
+
+	chosen {
+		bootargs = "ignore_loglevel rw root=/dev/nfs ip=on";
+		stdout-path = "serial0:115200n8";
+	};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memory@48000000 {
 		device_type = "memory";
 		/* first 128MB is reserved for secure area. */
@@ -21,6 +34,27 @@
 		device_type = "memory";
 		reg = <0x4 0x80000000 0x0 0x80000000>;
 	};
+<<<<<<< HEAD
+
+	reg_1p8v: regulator-1p8v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-1.8V";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+
+	reg_3p3v: regulator-3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &extal_clk {
@@ -46,6 +80,30 @@
 	};
 };
 
+<<<<<<< HEAD
+/*
+ * This board also has a microSD slot which we will not support upstream
+ * because we cannot directly switch voltages in software.
+ */
+&mmc0 {
+	pinctrl-0 = <&mmc_pins>;
+	pinctrl-1 = <&mmc_pins>;
+	pinctrl-names = "default", "state_uhs";
+
+	vmmc-supply = <&reg_3p3v>;
+	vqmmc-supply = <&reg_1p8v>;
+	mmc-hs200-1_8v;
+	mmc-hs400-1_8v;
+	bus-width = <8>;
+	no-sd;
+	no-sdio;
+	non-removable;
+	full-pwr-cycle-in-suspend;
+	status = "okay";
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &pfc {
 	pinctrl-0 = <&scif_clk_pins>;
 	pinctrl-names = "default";
@@ -55,6 +113,15 @@
 		function = "i2c4";
 	};
 
+<<<<<<< HEAD
+	mmc_pins: mmc {
+		groups = "mmc_data8", "mmc_ctrl", "mmc_ds";
+		function = "mmc";
+		power-source = <1800>;
+	};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	scif0_pins: scif0 {
 		groups = "scif0_data", "scif0_ctrl";
 		function = "scif0";

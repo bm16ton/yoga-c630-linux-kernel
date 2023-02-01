@@ -1,0 +1,1 @@
+cmd_drivers/media/common/cx2341x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/common/cx2341x.ko drivers/media/common/cx2341x.o drivers/media/common/cx2341x.mod.o;  true

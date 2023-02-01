@@ -1,0 +1,21 @@
+!<thin>
+//                                              154       `
+hisi-reboot.o/
+msm-poweroff.o/
+qcom-pon.o/
+regulator-poweroff.o/
+vexpress-poweroff.o/
+xgene-reboot.o/
+syscon-reboot.o/
+syscon-poweroff.o/
+reboot-mode.o/
+
+/0              0           0     0     644     6384      `
+/15             0           0     0     644     4832      `
+/31             0           0     0     644     6648      `
+/43             0           0     0     644     6936      `
+/65             0           0     0     644     7904      `
+/86             0           0     0     644     4952      `
+/102            0           0     0     644     5456      `
+/119            0           0     0     644     6112      `
+/138            0           0     0     644     8456      `

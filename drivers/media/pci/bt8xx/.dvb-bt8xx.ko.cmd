@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/bt8xx/dvb-bt8xx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/bt8xx/dvb-bt8xx.ko drivers/media/pci/bt8xx/dvb-bt8xx.o drivers/media/pci/bt8xx/dvb-bt8xx.mod.o;  true

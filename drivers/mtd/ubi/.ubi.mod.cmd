@@ -1,0 +1,1 @@
+cmd_drivers/mtd/ubi/ubi.mod := printf '%s\n'   vtbl.o vmt.o upd.o build.o cdev.o kapi.o eba.o io.o wl.o attach.o misc.o debug.o block.o | awk '!x[$$0]++ { print("drivers/mtd/ubi/"$$0) }' > drivers/mtd/ubi/ubi.mod

@@ -280,19 +280,31 @@ static u32 rk_mk_pte(phys_addr_t page, int prot)
  *  11:9 - Page address bit 34:32
  *   8:4 - Page address bit 39:35
  *     3 - Security
+<<<<<<< HEAD
+ *     2 - Writable
+ *     1 - Readable
+ *     0 - 1 if Page @ Page address is valid
+ */
+=======
  *     2 - Readable
  *     1 - Writable
  *     0 - 1 if Page @ Page address is valid
  */
 #define RK_PTE_PAGE_READABLE_V2      BIT(2)
 #define RK_PTE_PAGE_WRITABLE_V2      BIT(1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static u32 rk_mk_pte_v2(phys_addr_t page, int prot)
 {
 	u32 flags = 0;
 
+<<<<<<< HEAD
+	flags |= (prot & IOMMU_READ) ? RK_PTE_PAGE_READABLE : 0;
+	flags |= (prot & IOMMU_WRITE) ? RK_PTE_PAGE_WRITABLE : 0;
+=======
 	flags |= (prot & IOMMU_READ) ? RK_PTE_PAGE_READABLE_V2 : 0;
 	flags |= (prot & IOMMU_WRITE) ? RK_PTE_PAGE_WRITABLE_V2 : 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return rk_mk_dte_v2(page) | flags;
 }
@@ -1299,8 +1311,6 @@ static int rk_iommu_probe(struct platform_device *pdev)
 	 */
 	if (!dma_dev)
 		dma_dev = &pdev->dev;
-
-	bus_set_iommu(&platform_bus_type, &rk_iommu_ops);
 
 	pm_runtime_enable(dev);
 

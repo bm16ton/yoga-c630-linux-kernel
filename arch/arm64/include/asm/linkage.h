@@ -38,5 +38,12 @@
 #define SYM_FUNC_START_WEAK_NOALIGN(name)		\
 	SYM_START(name, SYM_L_WEAK, SYM_A_NONE)		\
 	bti c ;
+<<<<<<< HEAD
+
+#define SYM_TYPED_FUNC_START(name)				\
+	SYM_TYPED_START(name, SYM_L_GLOBAL, SYM_A_ALIGN)	\
+	bti c ;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

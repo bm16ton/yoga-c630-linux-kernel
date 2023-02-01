@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/simplefb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/fbdev/simplefb.ko drivers/video/fbdev/simplefb.o drivers/video/fbdev/simplefb.mod.o;  true

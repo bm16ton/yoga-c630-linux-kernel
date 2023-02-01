@@ -223,22 +223,38 @@ enum {
 	IOU_POLL_DONE = 0,
 	IOU_POLL_NO_ACTION = 1,
 	IOU_POLL_REMOVE_POLL_USE_RES = 2,
+<<<<<<< HEAD
+	IOU_POLL_REISSUE = 3,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*
  * All poll tw should go through this. Checks for poll events, manages
  * references, does rewait, etc.
  *
+<<<<<<< HEAD
+ * Returns a negative error on failure. IOU_POLL_NO_ACTION when no action
+ * require, which is either spurious wakeup or multishot CQE is served.
+ * IOU_POLL_DONE when it's done with the request, then the mask is stored in
+ * req->cqe.res. IOU_POLL_REMOVE_POLL_USE_RES indicates to remove multishot
+ * poll and that the result is stored in req->cqe.
+=======
  * Returns a negative error on failure. IOU_POLL_NO_ACTION when no action require,
  * which is either spurious wakeup or multishot CQE is served.
  * IOU_POLL_DONE when it's done with the request, then the mask is stored in req->cqe.res.
  * IOU_POLL_REMOVE_POLL_USE_RES indicates to remove multishot poll and that the result
  * is stored in req->cqe.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 static int io_poll_check_events(struct io_kiocb *req, bool *locked)
 {
 	struct io_ring_ctx *ctx = req->ctx;
+<<<<<<< HEAD
+	int v;
+=======
 	int v, ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* req->task == current here, checking PF_EXITING is safe */
 	if (unlikely(req->task->flags & PF_EXITING))
@@ -274,10 +290,26 @@ static int io_poll_check_events(struct io_kiocb *req, bool *locked)
 		if (!req->cqe.res) {
 			struct poll_table_struct pt = { ._key = req->apoll_events };
 			req->cqe.res = vfs_poll(req->file, &pt) & req->apoll_events;
+<<<<<<< HEAD
+			/*
+			 * We got woken with a mask, but someone else got to
+			 * it first. The above vfs_poll() doesn't add us back
+			 * to the waitqueue, so if we get nothing back, we
+			 * should be safe and attempt a reissue.
+			 */
+			if (unlikely(!req->cqe.res)) {
+				/* Multishot armed need not reissue */
+				if (!(req->apoll_events & EPOLLONESHOT))
+					continue;
+				return IOU_POLL_REISSUE;
+			}
+		}
+=======
 		}
 
 		if ((unlikely(!req->cqe.res)))
 			continue;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (req->apoll_events & EPOLLONESHOT)
 			return IOU_POLL_DONE;
 		if (io_is_uring_fops(req->file))
@@ -294,7 +326,11 @@ static int io_poll_check_events(struct io_kiocb *req, bool *locked)
 				return IOU_POLL_REMOVE_POLL_USE_RES;
 			}
 		} else {
+<<<<<<< HEAD
+			int ret = io_poll_issue(req, locked);
+=======
 			ret = io_poll_issue(req, locked);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (ret == IOU_STOP_MULTISHOT)
 				return IOU_POLL_REMOVE_POLL_USE_RES;
 			if (ret < 0)
@@ -325,6 +361,14 @@ static void io_poll_task_func(struct io_kiocb *req, bool *locked)
 	if (ret == IOU_POLL_DONE) {
 		struct io_poll *poll = io_kiocb_to_cmd(req, struct io_poll);
 		req->cqe.res = mangle_poll(req->cqe.res & poll->events);
+<<<<<<< HEAD
+	} else if (ret == IOU_POLL_REISSUE) {
+		io_poll_remove_entries(req);
+		io_poll_tw_hash_eject(req, locked);
+		io_req_task_submit(req, locked);
+		return;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (ret != IOU_POLL_REMOVE_POLL_USE_RES) {
 		req->cqe.res = ret;
 		req_set_fail(req);
@@ -350,7 +394,11 @@ static void io_apoll_task_func(struct io_kiocb *req, bool *locked)
 
 	if (ret == IOU_POLL_REMOVE_POLL_USE_RES)
 		io_req_complete_post(req);
+<<<<<<< HEAD
+	else if (ret == IOU_POLL_DONE || ret == IOU_POLL_REISSUE)
+=======
 	else if (ret == IOU_POLL_DONE)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		io_req_task_submit(req, locked);
 	else
 		io_req_complete_failed(req, ret);
@@ -429,6 +477,17 @@ static int io_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
 		return 0;
 
 	if (io_poll_get_ownership(req)) {
+<<<<<<< HEAD
+		/*
+		 * If we trigger a multishot poll off our own wakeup path,
+		 * disable multishot as there is a circular dependency between
+		 * CQ posting and triggering the event.
+		 */
+		if (mask & EPOLL_URING_WAKE)
+			poll->events |= EPOLLONESHOT;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* optional, saves extra locking for removal in tw handler */
 		if (mask && poll->events & EPOLLONESHOT) {
 			list_del_init(&poll->wait.entry);
@@ -541,6 +600,17 @@ static bool io_poll_can_finish_inline(struct io_kiocb *req,
 	return pt->owning || io_poll_get_ownership(req);
 }
 
+<<<<<<< HEAD
+static void io_poll_add_hash(struct io_kiocb *req)
+{
+	if (req->flags & REQ_F_HASH_LOCKED)
+		io_poll_req_insert_locked(req);
+	else
+		io_poll_req_insert(req);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Returns 0 when it's handed over for polling. The caller owns the requests if
  * it returns non-zero, but otherwise should not touch it. Negative values
@@ -599,18 +669,29 @@ static int __io_arm_poll_handler(struct io_kiocb *req,
 
 	if (mask &&
 	   ((poll->events & (EPOLLET|EPOLLONESHOT)) == (EPOLLET|EPOLLONESHOT))) {
+<<<<<<< HEAD
+		if (!io_poll_can_finish_inline(req, ipt)) {
+			io_poll_add_hash(req);
+			return 0;
+		}
+=======
 		if (!io_poll_can_finish_inline(req, ipt))
 			return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		io_poll_remove_entries(req);
 		ipt->result_mask = mask;
 		/* no one else has access to the req, forget about the ref */
 		return 1;
 	}
 
+<<<<<<< HEAD
+	io_poll_add_hash(req);
+=======
 	if (req->flags & REQ_F_HASH_LOCKED)
 		io_poll_req_insert_locked(req);
 	else
 		io_poll_req_insert(req);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (mask && (poll->events & EPOLLET) &&
 	    io_poll_can_finish_inline(req, ipt)) {
@@ -909,7 +990,11 @@ int io_poll_add_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	if (sqe->buf_index || sqe->off || sqe->addr)
 		return -EINVAL;
 	flags = READ_ONCE(sqe->len);
+<<<<<<< HEAD
+	if (flags & ~IORING_POLL_ADD_MULTI)
+=======
 	if (flags & ~(IORING_POLL_ADD_MULTI|IORING_POLL_ADD_LEVEL))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 	if ((flags & IORING_POLL_ADD_MULTI) && (req->flags & REQ_F_CQE_SKIP))
 		return -EINVAL;

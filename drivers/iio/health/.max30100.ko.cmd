@@ -1,0 +1,1 @@
+cmd_drivers/iio/health/max30100.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/health/max30100.ko drivers/iio/health/max30100.o drivers/iio/health/max30100.mod.o;  true

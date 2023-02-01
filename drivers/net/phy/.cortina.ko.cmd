@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/cortina.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/cortina.ko drivers/net/phy/cortina.o drivers/net/phy/cortina.mod.o;  true

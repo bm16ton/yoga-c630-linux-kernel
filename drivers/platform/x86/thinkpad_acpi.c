@@ -5572,6 +5572,7 @@ static enum led_brightness light_sysfs_get(struct led_classdev *led_cdev)
 static struct tpacpi_led_classdev tpacpi_led_thinklight = {
 	.led_classdev = {
 		.name		= "tpacpi::thinklight",
+		.max_brightness	= 1,
 		.brightness_set_blocking = &light_sysfs_set,
 		.brightness_get	= &light_sysfs_get,
 	}
@@ -7633,9 +7634,9 @@ static int __init volume_create_alsa_mixer(void)
 	data = card->private_data;
 	data->card = card;
 
-	strlcpy(card->driver, TPACPI_ALSA_DRVNAME,
+	strscpy(card->driver, TPACPI_ALSA_DRVNAME,
 		sizeof(card->driver));
-	strlcpy(card->shortname, TPACPI_ALSA_SHRTNAME,
+	strscpy(card->shortname, TPACPI_ALSA_SHRTNAME,
 		sizeof(card->shortname));
 	snprintf(card->mixername, sizeof(card->mixername), "ThinkPad EC %s",
 		 (thinkpad_id.ec_version_str) ?
@@ -10285,12 +10286,21 @@ static struct ibm_struct proxsensor_driver_data = {
 
 #define DYTC_MODE_AMT_ENABLE   0x1 /* Enable AMT (in balanced mode) */
 #define DYTC_MODE_AMT_DISABLE  0xF /* Disable AMT (in other modes) */
+<<<<<<< HEAD
 
 #define DYTC_MODE_MMC_PERFORM  2  /* High power mode aka performance */
 #define DYTC_MODE_MMC_LOWPOWER 3  /* Low power mode */
 #define DYTC_MODE_MMC_BALANCE  0xF  /* Default mode aka balanced */
 #define DYTC_MODE_MMC_DEFAULT  0  /* Default mode from MMC_GET, aka balanced */
 
+=======
+
+#define DYTC_MODE_MMC_PERFORM  2  /* High power mode aka performance */
+#define DYTC_MODE_MMC_LOWPOWER 3  /* Low power mode */
+#define DYTC_MODE_MMC_BALANCE  0xF  /* Default mode aka balanced */
+#define DYTC_MODE_MMC_DEFAULT  0  /* Default mode from MMC_GET, aka balanced */
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define DYTC_MODE_PSC_LOWPOWER 3  /* Low power mode */
 #define DYTC_MODE_PSC_BALANCE  5  /* Default mode aka balanced */
 #define DYTC_MODE_PSC_PERFORM  7  /* High power mode aka performance */
@@ -10314,9 +10324,15 @@ static DEFINE_MUTEX(dytc_mutex);
 static int dytc_capabilities;
 static bool dytc_mmc_get_available;
 
-static int convert_dytc_to_profile(int dytcmode, enum platform_profile_option *profile)
+static int convert_dytc_to_profile(int funcmode, int dytcmode,
+		enum platform_profile_option *profile)
 {
+<<<<<<< HEAD
+	switch (funcmode) {
+	case DYTC_FUNCTION_MMC:
+=======
 	if (dytc_capabilities & BIT(DYTC_FC_MMC)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		switch (dytcmode) {
 		case DYTC_MODE_MMC_LOWPOWER:
 			*profile = PLATFORM_PROFILE_LOW_POWER;
@@ -10332,8 +10348,12 @@ static int convert_dytc_to_profile(int dytcmode, enum platform_profile_option *p
 			return -EINVAL;
 		}
 		return 0;
+<<<<<<< HEAD
+	case DYTC_FUNCTION_PSC:
+=======
 	}
 	if (dytc_capabilities & BIT(DYTC_FC_PSC)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		switch (dytcmode) {
 		case DYTC_MODE_PSC_LOWPOWER:
 			*profile = PLATFORM_PROFILE_LOW_POWER;
@@ -10347,6 +10367,17 @@ static int convert_dytc_to_profile(int dytcmode, enum platform_profile_option *p
 		default: /* Unknown mode */
 			return -EINVAL;
 		}
+<<<<<<< HEAD
+		return 0;
+	case DYTC_FUNCTION_AMT:
+		/* For now return balanced. It's the closest we have to 'auto' */
+		*profile =  PLATFORM_PROFILE_BALANCED;
+		return 0;
+	default:
+		/* Unknown function */
+		return -EOPNOTSUPP;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return 0;
 }
@@ -10471,6 +10502,7 @@ static int dytc_profile_set(struct platform_profile_handler *pprof,
 	err = convert_profile_to_dytc(profile, &perfmode);
 	if (err)
 		goto unlock;
+<<<<<<< HEAD
 
 	if (dytc_capabilities & BIT(DYTC_FC_MMC)) {
 		if (profile == PLATFORM_PROFILE_BALANCED) {
@@ -10495,6 +10527,33 @@ static int dytc_profile_set(struct platform_profile_handler *pprof,
 		err = dytc_command(DYTC_SET_COMMAND(DYTC_FUNCTION_PSC, perfmode, 1), &output);
 		if (err)
 			goto unlock;
+
+=======
+
+	if (dytc_capabilities & BIT(DYTC_FC_MMC)) {
+		if (profile == PLATFORM_PROFILE_BALANCED) {
+			/*
+			 * To get back to balanced mode we need to issue a reset command.
+			 * Note we still need to disable CQL mode before hand and re-enable
+			 * it afterwards, otherwise dytc_lapmode gets reset to 0 and stays
+			 * stuck at 0 for aprox. 30 minutes.
+			 */
+			err = dytc_cql_command(DYTC_CMD_RESET, &output);
+			if (err)
+				goto unlock;
+		} else {
+			/* Determine if we are in CQL mode. This alters the commands we do */
+			err = dytc_cql_command(DYTC_SET_COMMAND(DYTC_FUNCTION_MMC, perfmode, 1),
+						&output);
+			if (err)
+				goto unlock;
+		}
+	}
+	if (dytc_capabilities & BIT(DYTC_FC_PSC)) {
+		err = dytc_command(DYTC_SET_COMMAND(DYTC_FUNCTION_PSC, perfmode, 1), &output);
+		if (err)
+			goto unlock;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* system supports AMT, activate it when on balanced */
 		if (dytc_capabilities & BIT(DYTC_FC_AMT))
 			dytc_control_amt(profile == PLATFORM_PROFILE_BALANCED);
@@ -10510,7 +10569,11 @@ static void dytc_profile_refresh(void)
 {
 	enum platform_profile_option profile;
 	int output, err = 0;
+<<<<<<< HEAD
+	int perfmode, funcmode;
+=======
 	int perfmode;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_lock(&dytc_mutex);
 	if (dytc_capabilities & BIT(DYTC_FC_MMC)) {
@@ -10525,8 +10588,9 @@ static void dytc_profile_refresh(void)
 	if (err)
 		return;
 
+	funcmode = (output >> DYTC_GET_FUNCTION_BIT) & 0xF;
 	perfmode = (output >> DYTC_GET_MODE_BIT) & 0xF;
-	convert_dytc_to_profile(perfmode, &profile);
+	convert_dytc_to_profile(funcmode, perfmode, &profile);
 	if (profile != dytc_current_profile) {
 		dytc_current_profile = profile;
 		platform_profile_notify();
@@ -10812,6 +10876,7 @@ static int dprc_command(int command, int *output)
 	 */
 	if (*output & METHOD_ERR)
 		return -ENODEV;
+<<<<<<< HEAD
 
 	return 0;
 }
@@ -10820,6 +10885,16 @@ static int get_wwan_antenna(int *wwan_antennatype)
 {
 	int output, err;
 
+=======
+
+	return 0;
+}
+
+static int get_wwan_antenna(int *wwan_antennatype)
+{
+	int output, err;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Get current Antenna type */
 	err = dprc_command(DPRC_GET_WWAN_ANTENNA_TYPE, &output);
 	if (err)
@@ -11725,7 +11800,7 @@ static int __init thinkpad_acpi_module_init(void)
 		tp_features.quirks = dmi_id->driver_data;
 
 	/* Device initialization */
-	tpacpi_pdev = platform_device_register_simple(TPACPI_DRVR_NAME, -1,
+	tpacpi_pdev = platform_device_register_simple(TPACPI_DRVR_NAME, PLATFORM_DEVID_NONE,
 							NULL, 0);
 	if (IS_ERR(tpacpi_pdev)) {
 		ret = PTR_ERR(tpacpi_pdev);
@@ -11736,7 +11811,7 @@ static int __init thinkpad_acpi_module_init(void)
 	}
 	tpacpi_sensors_pdev = platform_device_register_simple(
 						TPACPI_HWMON_DRVR_NAME,
-						-1, NULL, 0);
+						PLATFORM_DEVID_NONE, NULL, 0);
 	if (IS_ERR(tpacpi_sensors_pdev)) {
 		ret = PTR_ERR(tpacpi_sensors_pdev);
 		tpacpi_sensors_pdev = NULL;

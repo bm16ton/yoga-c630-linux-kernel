@@ -4,6 +4,10 @@
  */
 
 #include "display/intel_audio_regs.h"
+<<<<<<< HEAD
+#include "display/intel_backlight_regs.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "display/intel_dmc_regs.h"
 #include "display/vlv_dsi_pll_regs.h"
 #include "gt/intel_gt_regs.h"

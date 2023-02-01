@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/microchip/wilc1000/wilc1000.mod := printf '%s\n'   cfg80211.o netdev.o mon.o hif.o wlan_cfg.o wlan.o | awk '!x[$$0]++ { print("drivers/net/wireless/microchip/wilc1000/"$$0) }' > drivers/net/wireless/microchip/wilc1000/wilc1000.mod

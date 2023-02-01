@@ -1,0 +1,10 @@
+drivers/net/wireless/realtek/rtw88/rtw88_core.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8822b.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8822be.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8822c.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8822ce.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8723d.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8723de.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8821c.ko
+drivers/net/wireless/realtek/rtw88/rtw88_8821ce.ko
+drivers/net/wireless/realtek/rtw88/rtw88_pci.ko

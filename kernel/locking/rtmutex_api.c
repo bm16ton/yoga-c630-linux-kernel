@@ -267,7 +267,11 @@ void __sched rt_mutex_init_proxy_locked(struct rt_mutex_base *lock,
 void __sched rt_mutex_proxy_unlock(struct rt_mutex_base *lock)
 {
 	debug_rt_mutex_proxy_unlock(lock);
+<<<<<<< HEAD
+	rt_mutex_clear_owner(lock);
+=======
 	rt_mutex_set_owner(lock, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -382,7 +386,11 @@ int __sched rt_mutex_wait_proxy_lock(struct rt_mutex_base *lock,
 	 * try_to_take_rt_mutex() sets the waiter bit unconditionally. We might
 	 * have to fix that up.
 	 */
+<<<<<<< HEAD
+	fixup_rt_mutex_waiters(lock, true);
+=======
 	fixup_rt_mutex_waiters(lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	raw_spin_unlock_irq(&lock->wait_lock);
 
 	return ret;
@@ -438,7 +446,11 @@ bool __sched rt_mutex_cleanup_proxy_lock(struct rt_mutex_base *lock,
 	 * try_to_take_rt_mutex() sets the waiter bit unconditionally. We might
 	 * have to fix that up.
 	 */
+<<<<<<< HEAD
+	fixup_rt_mutex_waiters(lock, false);
+=======
 	fixup_rt_mutex_waiters(lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	raw_spin_unlock_irq(&lock->wait_lock);
 

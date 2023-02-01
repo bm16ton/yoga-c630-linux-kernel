@@ -1,0 +1,1 @@
+cmd_drivers/remoteproc/qcom_sysmon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/remoteproc/qcom_sysmon.ko drivers/remoteproc/qcom_sysmon.o drivers/remoteproc/qcom_sysmon.mod.o;  true

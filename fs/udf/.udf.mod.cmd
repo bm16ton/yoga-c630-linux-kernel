@@ -1,0 +1,1 @@
+cmd_fs/udf/udf.mod := printf '%s\n'   balloc.o dir.o file.o ialloc.o inode.o lowlevel.o namei.o partition.o super.o truncate.o symlink.o directory.o misc.o udftime.o unicode.o | awk '!x[$$0]++ { print("fs/udf/"$$0) }' > fs/udf/udf.mod

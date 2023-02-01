@@ -162,6 +162,8 @@ static int init_sdei_scs(void)
 	return err;
 }
 
+<<<<<<< HEAD
+=======
 static bool on_sdei_normal_stack(unsigned long sp, unsigned long size,
 				 struct stack_info *info)
 {
@@ -194,6 +196,7 @@ bool _on_sdei_stack(unsigned long sp, unsigned long size, struct stack_info *inf
 	return false;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned long sdei_arch_get_entry_point(int conduit)
 {
 	/*

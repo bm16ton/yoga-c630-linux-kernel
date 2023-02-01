@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/rtq6056.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/rtq6056.ko drivers/iio/adc/rtq6056.o drivers/iio/adc/rtq6056.mod.o;  true

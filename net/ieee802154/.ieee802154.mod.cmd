@@ -1,0 +1,1 @@
+cmd_net/ieee802154/ieee802154.mod := printf '%s\n'   netlink.o nl-mac.o nl-phy.o nl_policy.o core.o header_ops.o sysfs.o nl802154.o trace.o | awk '!x[$$0]++ { print("net/ieee802154/"$$0) }' > net/ieee802154/ieee802154.mod

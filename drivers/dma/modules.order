@@ -1,0 +1,10 @@
+drivers/dma/qcom/gpi.ko
+drivers/dma/qcom/hdma_mgmt.ko
+drivers/dma/qcom/hdma.ko
+drivers/dma/sun6i-dma.ko
+drivers/dma/fsl-edma.ko
+drivers/dma/fsl-edma-common.ko
+drivers/dma/fsl-qdma.ko
+drivers/dma/k3dma.ko
+drivers/dma/pl330.ko
+drivers/dma/xgene-dma.ko

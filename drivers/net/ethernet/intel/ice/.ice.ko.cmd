@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/ice/ice.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/intel/ice/ice.ko drivers/net/ethernet/intel/ice/ice.o drivers/net/ethernet/intel/ice/ice.mod.o;  true

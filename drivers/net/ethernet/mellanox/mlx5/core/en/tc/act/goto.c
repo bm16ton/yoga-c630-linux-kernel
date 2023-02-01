@@ -12,6 +12,10 @@ validate_goto_chain(struct mlx5e_priv *priv,
 		    const struct flow_action_entry *act,
 		    struct netlink_ext_ack *extack)
 {
+<<<<<<< HEAD
+	struct mlx5e_tc_table *tc = mlx5e_fs_get_tc(priv->fs);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool is_esw = mlx5e_is_eswitch_flow(flow);
 	bool ft_flow = mlx5e_is_ft_flow(flow);
 	u32 dest_chain = act->chain_index;
@@ -21,7 +25,11 @@ validate_goto_chain(struct mlx5e_priv *priv,
 	u32 max_chain;
 
 	esw = priv->mdev->priv.eswitch;
+<<<<<<< HEAD
+	chains = is_esw ? esw_chains(esw) : mlx5e_nic_chains(tc);
+=======
 	chains = is_esw ? esw_chains(esw) : mlx5e_nic_chains(priv->fs->tc);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	max_chain = mlx5_chains_get_chain_range(chains);
 	reformat_and_fwd = is_esw ?
 			   MLX5_CAP_ESW_FLOWTABLE_FDB(priv->mdev, reformat_and_fwd_to_table) :

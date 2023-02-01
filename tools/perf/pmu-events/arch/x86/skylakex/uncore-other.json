@@ -1089,7 +1089,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x01",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1101,7 +1104,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x02",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1113,7 +1119,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x04",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1125,7 +1134,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x08",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1196,7 +1208,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x01",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -1208,7 +1223,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x02",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -1220,7 +1238,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x04",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -1232,7 +1253,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x08",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -1974,6 +1998,21 @@
         "Unit": "UPI LL"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "Valid data FLITs transmitted via any slot",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x2",
+        "EventName": "UNC_UPI_TxL_FLITS.ALL_DATA",
+        "PerPkg": "1",
+        "UMask": "0x0F",
+        "Unit": "UPI LL"
+    },
+    {
+        "BriefDescription": "UPI interconnect send bandwidth for payload. Derived from unc_upi_txl_flits.all_data",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x2",
+        "EventName": "UPI_DATA_BANDWIDTH_TX",
+=======
         "BriefDescription": "UPI interconnect send bandwidth for payload. Derived from unc_upi_txl_flits.all_data",
         "Counter": "0,1,2,3",
         "EventCode": "0x2",
@@ -1988,6 +2027,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x2",
         "EventName": "UNC_UPI_TxL_FLITS.ALL_DATA",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "PerPkg": "1",
         "ScaleUnit": "7.11E-06Bytes",
         "UMask": "0xf",

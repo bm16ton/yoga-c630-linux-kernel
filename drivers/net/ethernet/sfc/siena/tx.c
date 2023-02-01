@@ -336,7 +336,11 @@ netdev_tx_t efx_siena_hard_start_xmit(struct sk_buff *skb,
 		 * previous packets out.
 		 */
 		if (!netdev_xmit_more())
+<<<<<<< HEAD
+			efx_tx_send_pending(efx_get_tx_channel(efx, index));
+=======
 			efx_tx_send_pending(tx_queue->channel);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return NETDEV_TX_OK;
 	}
 

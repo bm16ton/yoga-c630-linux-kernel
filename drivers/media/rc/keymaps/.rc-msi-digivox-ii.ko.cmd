@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-msi-digivox-ii.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-msi-digivox-ii.ko drivers/media/rc/keymaps/rc-msi-digivox-ii.o drivers/media/rc/keymaps/rc-msi-digivox-ii.mod.o;  true

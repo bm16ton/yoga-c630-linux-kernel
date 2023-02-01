@@ -1,0 +1,1 @@
+cmd_drivers/scsi/lpfc/lpfc.mod := printf '%s\n'   lpfc_mem.o lpfc_sli.o lpfc_ct.o lpfc_els.o lpfc_hbadisc.o lpfc_init.o lpfc_mbox.o lpfc_nportdisc.o lpfc_scsi.o lpfc_attr.o lpfc_vport.o lpfc_debugfs.o lpfc_bsg.o lpfc_nvme.o lpfc_nvmet.o lpfc_vmid.o | awk '!x[$$0]++ { print("drivers/scsi/lpfc/"$$0) }' > drivers/scsi/lpfc/lpfc.mod

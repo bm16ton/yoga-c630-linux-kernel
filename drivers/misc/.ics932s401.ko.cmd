@@ -1,0 +1,1 @@
+cmd_drivers/misc/ics932s401.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/ics932s401.ko drivers/misc/ics932s401.o drivers/misc/ics932s401.mod.o;  true

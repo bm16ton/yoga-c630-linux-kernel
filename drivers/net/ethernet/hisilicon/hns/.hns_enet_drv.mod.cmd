@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns/hns_enet_drv.mod := printf '%s\n'   hns_enet.o hns_ethtool.o | awk '!x[$$0]++ { print("drivers/net/ethernet/hisilicon/hns/"$$0) }' > drivers/net/ethernet/hisilicon/hns/hns_enet_drv.mod

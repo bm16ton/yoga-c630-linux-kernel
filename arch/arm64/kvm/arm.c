@@ -666,11 +666,15 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
 
 	kvm_vcpu_halt(vcpu);
 	vcpu_clear_flag(vcpu, IN_WFIT);
+<<<<<<< HEAD
+=======
 	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	preempt_disable();
 	vgic_v4_load(vcpu);
 	preempt_enable();
+<<<<<<< HEAD
 }
 
 static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
@@ -706,6 +710,43 @@ static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
 	return 1;
 }
 
+=======
+}
+
+static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
+{
+	if (!kvm_arm_vcpu_suspended(vcpu))
+		return 1;
+
+	kvm_vcpu_wfi(vcpu);
+
+	/*
+	 * The suspend state is sticky; we do not leave it until userspace
+	 * explicitly marks the vCPU as runnable. Request that we suspend again
+	 * later.
+	 */
+	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+
+	/*
+	 * Check to make sure the vCPU is actually runnable. If so, exit to
+	 * userspace informing it of the wakeup condition.
+	 */
+	if (kvm_arch_vcpu_runnable(vcpu)) {
+		memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_WAKEUP;
+		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+		return 0;
+	}
+
+	/*
+	 * Otherwise, we were unblocked to process a different event, such as a
+	 * pending signal. Return 1 and allow kvm_arch_vcpu_ioctl_run() to
+	 * process the event.
+	 */
+	return 1;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * check_vcpu_requests - check and handle pending vCPU requests
  * @vcpu:	the VCPU pointer
@@ -2004,6 +2045,7 @@ static int init_hyp_mode(void)
 		struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
 		char *stack_page = (char *)per_cpu(kvm_arm_hyp_stack_page, cpu);
 		unsigned long hyp_addr;
+<<<<<<< HEAD
 
 		/*
 		 * Allocate a contiguous HYP private VA range for the stack
@@ -2017,6 +2059,21 @@ static int init_hyp_mode(void)
 		}
 
 		/*
+=======
+
+		/*
+		 * Allocate a contiguous HYP private VA range for the stack
+		 * and guard page. The allocation is also aligned based on
+		 * the order of its size.
+		 */
+		err = hyp_alloc_private_va_range(PAGE_SIZE * 2, &hyp_addr);
+		if (err) {
+			kvm_err("Cannot allocate hyp stack guard page\n");
+			goto out_err;
+		}
+
+		/*
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * Since the stack grows downwards, map the stack to the page
 		 * at the higher address and leave the lower guard page
 		 * unbacked.
@@ -2084,6 +2141,7 @@ out_err:
 }
 
 static void _kvm_host_prot_finalize(void *arg)
+<<<<<<< HEAD
 {
 	int *err = arg;
 
@@ -2106,6 +2164,30 @@ static int pkvm_drop_host_privileges(void)
 
 static int finalize_hyp_mode(void)
 {
+=======
+{
+	int *err = arg;
+
+	if (WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize)))
+		WRITE_ONCE(*err, -EINVAL);
+}
+
+static int pkvm_drop_host_privileges(void)
+{
+	int ret = 0;
+
+	/*
+	 * Flip the static key upfront as that may no longer be possible
+	 * once the host stage 2 is installed.
+	 */
+	static_branch_enable(&kvm_protected_mode_initialized);
+	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
+	return ret;
+}
+
+static int finalize_hyp_mode(void)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!is_protected_kvm_enabled())
 		return 0;
 
@@ -2114,7 +2196,11 @@ static int finalize_hyp_mode(void)
 	 * at, which would end badly once inaccessible.
 	 */
 	kmemleak_free_part(__hyp_bss_start, __hyp_bss_end - __hyp_bss_start);
+<<<<<<< HEAD
+	kmemleak_free_part_phys(hyp_mem_base, hyp_mem_size);
+=======
 	kmemleak_free_part(__va(hyp_mem_base), hyp_mem_size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return pkvm_drop_host_privileges();
 }
 
@@ -2270,6 +2356,16 @@ static int __init early_kvm_mode_cfg(char *arg)
 	if (!arg)
 		return -EINVAL;
 
+	if (strcmp(arg, "none") == 0) {
+		kvm_mode = KVM_MODE_NONE;
+		return 0;
+	}
+
+	if (!is_hyp_mode_available()) {
+		pr_warn_once("KVM is not available. Ignoring kvm-arm.mode\n");
+		return 0;
+	}
+
 	if (strcmp(arg, "protected") == 0) {
 		if (!is_kernel_in_hyp_mode())
 			kvm_mode = KVM_MODE_PROTECTED;
@@ -2283,11 +2379,14 @@ static int __init early_kvm_mode_cfg(char *arg)
 		kvm_mode = KVM_MODE_DEFAULT;
 		return 0;
 	}
+<<<<<<< HEAD
+=======
 
 	if (strcmp(arg, "none") == 0) {
 		kvm_mode = KVM_MODE_NONE;
 		return 0;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return -EINVAL;
 }

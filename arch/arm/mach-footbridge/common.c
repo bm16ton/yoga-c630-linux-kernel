@@ -195,11 +195,13 @@ static void __init __fb_init_irq(void)
 void __init footbridge_init_irq(void)
 {
 	set_handle_irq(dc21285_handle_irq);
+<<<<<<< HEAD
+=======
 
 	__fb_init_irq();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	if (!footbridge_cfn_mode())
-		return;
+	__fb_init_irq();
 
 	if (machine_is_ebsa285())
 		/* The following is dependent on which slot
@@ -221,21 +223,13 @@ void __init footbridge_init_irq(void)
  * commented out since there is a "No Fix" problem with it.  Not mapping
  * it means that we have extra bullet protection on our feet.
  */
-static struct map_desc fb_common_io_desc[] __initdata = {
+static struct map_desc ebsa285_host_io_desc[] __initdata = {
 	{
 		.virtual	= ARMCSR_BASE,
 		.pfn		= __phys_to_pfn(DC21285_ARMCSR_BASE),
 		.length		= ARMCSR_SIZE,
 		.type		= MT_DEVICE,
-	}
-};
-
-/*
- * The mapping when the footbridge is in host mode.  We don't map any of
- * this when we are in add-in mode.
- */
-static struct map_desc ebsa285_host_io_desc[] __initdata = {
-#if defined(CONFIG_ARCH_FOOTBRIDGE) && defined(CONFIG_FOOTBRIDGE_HOST)
+	},
 	{
 		.virtual	= PCIMEM_BASE,
 		.pfn		= __phys_to_pfn(DC21285_PCI_MEM),
@@ -257,26 +251,12 @@ static struct map_desc ebsa285_host_io_desc[] __initdata = {
 		.length		= PCIIACK_SIZE,
 		.type		= MT_DEVICE,
 	},
-#endif
 };
 
 void __init footbridge_map_io(void)
 {
-	/*
-	 * Set up the common mapping first; we need this to
-	 * determine whether we're in host mode or not.
-	 */
-	iotable_init(fb_common_io_desc, ARRAY_SIZE(fb_common_io_desc));
-
-	/*
-	 * Now, work out what we've got to map in addition on this
-	 * platform.
-	 */
-	if (footbridge_cfn_mode()) {
-		iotable_init(ebsa285_host_io_desc, ARRAY_SIZE(ebsa285_host_io_desc));
-		pci_map_io_early(__phys_to_pfn(DC21285_PCI_IO));
-	}
-
+	iotable_init(ebsa285_host_io_desc, ARRAY_SIZE(ebsa285_host_io_desc));
+	pci_map_io_early(__phys_to_pfn(DC21285_PCI_IO));
 	vga_base = PCIMEM_BASE;
 }
 
@@ -306,6 +286,8 @@ void footbridge_restart(enum reboot_mode mode, const char *cmd)
 		*CSR_SA110_CNTL |= (1 << 13);
 	}
 }
+<<<<<<< HEAD
+=======
 
 #ifdef CONFIG_FOOTBRIDGE_ADDIN
 
@@ -352,3 +334,4 @@ phys_addr_t dma_to_phys(struct device *dev, dma_addr_t dev_addr)
 {
 	return dev_addr - (fb_bus_sdram_offset() - PHYS_OFFSET);
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

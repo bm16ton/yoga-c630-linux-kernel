@@ -1447,7 +1447,11 @@ error_handler_free:
 	return ret;
 }
 
+<<<<<<< HEAD
+static void ov13b10_remove(struct i2c_client *client)
+=======
 static int ov13b10_remove(struct i2c_client *client)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct ov13b10 *ov13b = to_ov13b10(sd);
@@ -1457,8 +1461,11 @@ static int ov13b10_remove(struct i2c_client *client)
 	ov13b10_free_controls(ov13b);
 
 	pm_runtime_disable(&client->dev);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct dev_pm_ops ov13b10_pm_ops = {

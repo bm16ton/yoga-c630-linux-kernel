@@ -1,0 +1,1 @@
+cmd_drivers/iio/chemical/atlas-ezo-sensor.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/chemical/atlas-ezo-sensor.ko drivers/iio/chemical/atlas-ezo-sensor.o drivers/iio/chemical/atlas-ezo-sensor.mod.o;  true

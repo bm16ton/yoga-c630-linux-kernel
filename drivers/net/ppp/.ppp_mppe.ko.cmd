@@ -1,0 +1,1 @@
+cmd_drivers/net/ppp/ppp_mppe.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ppp/ppp_mppe.ko drivers/net/ppp/ppp_mppe.o drivers/net/ppp/ppp_mppe.mod.o;  true

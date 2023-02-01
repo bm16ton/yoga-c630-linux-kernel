@@ -1,0 +1,10 @@
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce.ko
+drivers/crypto/chelsio/chcr.ko
+drivers/crypto/cavium/cpt/cptpf.ko
+drivers/crypto/cavium/cpt/cptvf.ko
+drivers/crypto/cavium/nitrox/n5pf.ko
+drivers/crypto/marvell/cesa/marvell-cesa.ko
+drivers/crypto/qce/qcrypto.ko
+drivers/crypto/qcom-rng.ko
+drivers/crypto/inside-secure/crypto_safexcel.ko
+drivers/crypto/amlogic/amlogic-gxl-crypto.ko

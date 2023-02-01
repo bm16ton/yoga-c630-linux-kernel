@@ -830,7 +830,7 @@ struct spi_device *spi_new_device(struct spi_controller *ctlr,
 	proxy->max_speed_hz = chip->max_speed_hz;
 	proxy->mode = chip->mode;
 	proxy->irq = chip->irq;
-	strlcpy(proxy->modalias, chip->modalias, sizeof(proxy->modalias));
+	strscpy(proxy->modalias, chip->modalias, sizeof(proxy->modalias));
 	proxy->dev.platform_data = (void *) chip->platform_data;
 	proxy->controller_data = chip->controller_data;
 	proxy->controller_state = NULL;
@@ -1087,9 +1087,9 @@ static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
 }
 
 #ifdef CONFIG_HAS_DMA
-int spi_map_buf(struct spi_controller *ctlr, struct device *dev,
-		struct sg_table *sgt, void *buf, size_t len,
-		enum dma_data_direction dir)
+static int spi_map_buf_attrs(struct spi_controller *ctlr, struct device *dev,
+			     struct sg_table *sgt, void *buf, size_t len,
+			     enum dma_data_direction dir, unsigned long attrs)
 {
 	const bool vmalloced_buf = is_vmalloc_addr(buf);
 	unsigned int max_seg_size = dma_get_max_seg_size(dev);
@@ -1155,28 +1155,39 @@ int spi_map_buf(struct spi_controller *ctlr, struct device *dev,
 		sg = sg_next(sg);
 	}
 
-	ret = dma_map_sg(dev, sgt->sgl, sgt->nents, dir);
-	if (!ret)
-		ret = -ENOMEM;
+	ret = dma_map_sgtable(dev, sgt, dir, attrs);
 	if (ret < 0) {
 		sg_free_table(sgt);
 		return ret;
 	}
 
-	sgt->nents = ret;
-
 	return 0;
+}
+
+int spi_map_buf(struct spi_controller *ctlr, struct device *dev,
+		struct sg_table *sgt, void *buf, size_t len,
+		enum dma_data_direction dir)
+{
+	return spi_map_buf_attrs(ctlr, dev, sgt, buf, len, dir, 0);
+}
+
+static void spi_unmap_buf_attrs(struct spi_controller *ctlr,
+				struct device *dev, struct sg_table *sgt,
+				enum dma_data_direction dir,
+				unsigned long attrs)
+{
+	if (sgt->orig_nents) {
+		dma_unmap_sgtable(dev, sgt, dir, attrs);
+		sg_free_table(sgt);
+		sgt->orig_nents = 0;
+		sgt->nents = 0;
+	}
 }
 
 void spi_unmap_buf(struct spi_controller *ctlr, struct device *dev,
 		   struct sg_table *sgt, enum dma_data_direction dir)
 {
-	if (sgt->orig_nents) {
-		dma_unmap_sg(dev, sgt->sgl, sgt->orig_nents, dir);
-		sg_free_table(sgt);
-		sgt->orig_nents = 0;
-		sgt->nents = 0;
-	}
+	spi_unmap_buf_attrs(ctlr, dev, sgt, dir, 0);
 }
 
 static int __spi_map_msg(struct spi_controller *ctlr, struct spi_message *msg)
@@ -1203,29 +1214,37 @@ static int __spi_map_msg(struct spi_controller *ctlr, struct spi_message *msg)
 		rx_dev = ctlr->dev.parent;
 
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
+		/* The sync is done before each transfer. */
+		unsigned long attrs = DMA_ATTR_SKIP_CPU_SYNC;
+
 		if (!ctlr->can_dma(ctlr, msg->spi, xfer))
 			continue;
 
 		if (xfer->tx_buf != NULL) {
-			ret = spi_map_buf(ctlr, tx_dev, &xfer->tx_sg,
-					  (void *)xfer->tx_buf, xfer->len,
-					  DMA_TO_DEVICE);
+			ret = spi_map_buf_attrs(ctlr, tx_dev, &xfer->tx_sg,
+						(void *)xfer->tx_buf,
+						xfer->len, DMA_TO_DEVICE,
+						attrs);
 			if (ret != 0)
 				return ret;
 		}
 
 		if (xfer->rx_buf != NULL) {
-			ret = spi_map_buf(ctlr, rx_dev, &xfer->rx_sg,
-					  xfer->rx_buf, xfer->len,
-					  DMA_FROM_DEVICE);
+			ret = spi_map_buf_attrs(ctlr, rx_dev, &xfer->rx_sg,
+						xfer->rx_buf, xfer->len,
+						DMA_FROM_DEVICE, attrs);
 			if (ret != 0) {
-				spi_unmap_buf(ctlr, tx_dev, &xfer->tx_sg,
-					      DMA_TO_DEVICE);
+				spi_unmap_buf_attrs(ctlr, tx_dev,
+						&xfer->tx_sg, DMA_TO_DEVICE,
+						attrs);
+
 				return ret;
 			}
 		}
 	}
 
+	ctlr->cur_rx_dma_dev = rx_dev;
+	ctlr->cur_tx_dma_dev = tx_dev;
 	ctlr->cur_msg_mapped = true;
 
 	return 0;
@@ -1233,12 +1252,15 @@ static int __spi_map_msg(struct spi_controller *ctlr, struct spi_message *msg)
 
 static int __spi_unmap_msg(struct spi_controller *ctlr, struct spi_message *msg)
 {
+	struct device *rx_dev = ctlr->cur_rx_dma_dev;
+	struct device *tx_dev = ctlr->cur_tx_dma_dev;
 	struct spi_transfer *xfer;
-	struct device *tx_dev, *rx_dev;
 
 	if (!ctlr->cur_msg_mapped || !ctlr->can_dma)
 		return 0;
 
+<<<<<<< HEAD
+=======
 	if (ctlr->dma_tx)
 		tx_dev = ctlr->dma_tx->device->dev;
 	else if (ctlr->dma_map_dev)
@@ -1253,17 +1275,53 @@ static int __spi_unmap_msg(struct spi_controller *ctlr, struct spi_message *msg)
 	else
 		rx_dev = ctlr->dev.parent;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
+		/* The sync has already been done after each transfer. */
+		unsigned long attrs = DMA_ATTR_SKIP_CPU_SYNC;
+
 		if (!ctlr->can_dma(ctlr, msg->spi, xfer))
 			continue;
 
-		spi_unmap_buf(ctlr, rx_dev, &xfer->rx_sg, DMA_FROM_DEVICE);
-		spi_unmap_buf(ctlr, tx_dev, &xfer->tx_sg, DMA_TO_DEVICE);
+		spi_unmap_buf_attrs(ctlr, rx_dev, &xfer->rx_sg,
+				    DMA_FROM_DEVICE, attrs);
+		spi_unmap_buf_attrs(ctlr, tx_dev, &xfer->tx_sg,
+				    DMA_TO_DEVICE, attrs);
 	}
 
 	ctlr->cur_msg_mapped = false;
 
 	return 0;
+}
+
+static void spi_dma_sync_for_device(struct spi_controller *ctlr,
+				    struct spi_transfer *xfer)
+{
+	struct device *rx_dev = ctlr->cur_rx_dma_dev;
+	struct device *tx_dev = ctlr->cur_tx_dma_dev;
+
+	if (!ctlr->cur_msg_mapped)
+		return;
+
+	if (xfer->tx_sg.orig_nents)
+		dma_sync_sgtable_for_device(tx_dev, &xfer->tx_sg, DMA_TO_DEVICE);
+	if (xfer->rx_sg.orig_nents)
+		dma_sync_sgtable_for_device(rx_dev, &xfer->rx_sg, DMA_FROM_DEVICE);
+}
+
+static void spi_dma_sync_for_cpu(struct spi_controller *ctlr,
+				 struct spi_transfer *xfer)
+{
+	struct device *rx_dev = ctlr->cur_rx_dma_dev;
+	struct device *tx_dev = ctlr->cur_tx_dma_dev;
+
+	if (!ctlr->cur_msg_mapped)
+		return;
+
+	if (xfer->rx_sg.orig_nents)
+		dma_sync_sgtable_for_cpu(rx_dev, &xfer->rx_sg, DMA_FROM_DEVICE);
+	if (xfer->tx_sg.orig_nents)
+		dma_sync_sgtable_for_cpu(tx_dev, &xfer->tx_sg, DMA_TO_DEVICE);
 }
 #else /* !CONFIG_HAS_DMA */
 static inline int __spi_map_msg(struct spi_controller *ctlr,
@@ -1276,6 +1334,16 @@ static inline int __spi_unmap_msg(struct spi_controller *ctlr,
 				  struct spi_message *msg)
 {
 	return 0;
+}
+
+static void spi_dma_sync_for_device(struct spi_controller *ctrl,
+				    struct spi_transfer *xfer)
+{
+}
+
+static void spi_dma_sync_for_cpu(struct spi_controller *ctrl,
+				 struct spi_transfer *xfer)
+{
 }
 #endif /* !CONFIG_HAS_DMA */
 
@@ -1514,7 +1582,8 @@ static int spi_transfer_one_message(struct spi_controller *ctlr,
 	struct spi_statistics __percpu *statm = ctlr->pcpu_statistics;
 	struct spi_statistics __percpu *stats = msg->spi->pcpu_statistics;
 
-	spi_set_cs(msg->spi, true, false);
+	xfer = list_first_entry(&msg->transfers, struct spi_transfer, transfer_list);
+	spi_set_cs(msg->spi, !xfer->cs_off, false);
 
 	SPI_STATISTICS_INCREMENT_FIELD(statm, messages);
 	SPI_STATISTICS_INCREMENT_FIELD(stats, messages);
@@ -1534,8 +1603,11 @@ static int spi_transfer_one_message(struct spi_controller *ctlr,
 			reinit_completion(&ctlr->xfer_completion);
 
 fallback_pio:
+			spi_dma_sync_for_device(ctlr, xfer);
 			ret = ctlr->transfer_one(ctlr, msg->spi, xfer);
 			if (ret < 0) {
+				spi_dma_sync_for_cpu(ctlr, xfer);
+
 				if (ctlr->cur_msg_mapped &&
 				   (xfer->error & SPI_TRANS_FAIL_NO_START)) {
 					__spi_unmap_msg(ctlr, msg);
@@ -1558,6 +1630,8 @@ fallback_pio:
 				if (ret < 0)
 					msg->status = ret;
 			}
+
+			spi_dma_sync_for_cpu(ctlr, xfer);
 		} else {
 			if (xfer->len)
 				dev_err(&msg->spi->dev,
@@ -1582,10 +1656,15 @@ fallback_pio:
 					 &msg->transfers)) {
 				keep_cs = true;
 			} else {
-				spi_set_cs(msg->spi, false, false);
+				if (!xfer->cs_off)
+					spi_set_cs(msg->spi, false, false);
 				_spi_transfer_cs_change_delay(msg, xfer);
-				spi_set_cs(msg->spi, true, false);
+				if (!list_next_entry(xfer, transfer_list)->cs_off)
+					spi_set_cs(msg->spi, true, false);
 			}
+		} else if (!list_is_last(&xfer->transfer_list, &msg->transfers) &&
+			   xfer->cs_off != list_next_entry(xfer, transfer_list)->cs_off) {
+			spi_set_cs(msg->spi, xfer->cs_off, false);
 		}
 
 		msg->actual_length += xfer->len;
@@ -1666,6 +1745,18 @@ static int __spi_pump_transfer_message(struct spi_controller *ctlr,
 
 	trace_spi_message_start(msg);
 
+<<<<<<< HEAD
+	ret = spi_split_transfers_maxsize(ctlr, msg,
+					  spi_max_transfer_size(msg->spi),
+					  GFP_KERNEL | GFP_DMA);
+	if (ret) {
+		msg->status = ret;
+		spi_finalize_current_message(ctlr);
+		return ret;
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ctlr->prepare_message) {
 		ret = ctlr->prepare_message(ctlr, msg);
 		if (ret) {
@@ -2408,7 +2499,11 @@ struct spi_device *spi_new_ancillary_device(struct spi_device *spi,
 		goto err_out;
 	}
 
+<<<<<<< HEAD
+	strscpy(ancillary->modalias, "dummy", sizeof(ancillary->modalias));
+=======
 	strlcpy(ancillary->modalias, "dummy", sizeof(ancillary->modalias));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Use provided chip-select for ancillary device */
 	ancillary->chip_select = chip_select;
@@ -2804,7 +2899,7 @@ static ssize_t slave_store(struct device *dev, struct device_attribute *attr,
 		if (!spi)
 			return -ENOMEM;
 
-		strlcpy(spi->modalias, name, sizeof(spi->modalias));
+		strscpy(spi->modalias, name, sizeof(spi->modalias));
 
 		rc = spi_add_device(spi);
 		if (rc) {
@@ -2882,7 +2977,10 @@ struct spi_controller *__spi_alloc_controller(struct device *dev,
 		return NULL;
 
 	device_initialize(&ctlr->dev);
+<<<<<<< HEAD
+=======
 	INIT_LIST_HEAD(&ctlr->userspace_devices);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INIT_LIST_HEAD(&ctlr->queue);
 	spin_lock_init(&ctlr->queue_lock);
 	spin_lock_init(&ctlr->bus_lock_spinlock);
@@ -4378,16 +4476,14 @@ static int of_spi_notify(struct notifier_block *nb, unsigned long action,
 		}
 
 		spi = of_register_spi_device(ctlr, rd->dn);
-		
+		put_device(&ctlr->dev);
 
 		if (IS_ERR(spi)) {
 			pr_err("%s: failed to create for '%pOF'\n",
 					__func__, rd->dn);
-			put_device(&ctlr->dev);
 			of_node_clear_flag(rd->dn, OF_POPULATED);
 			return notifier_from_errno(PTR_ERR(spi));
 		}
-		put_device(&ctlr->dev);
 		break;
 
 	case OF_RECONFIG_CHANGE_REMOVE:
@@ -4456,7 +4552,7 @@ static int acpi_spi_notify(struct notifier_block *nb, unsigned long value,
 
 	switch (value) {
 	case ACPI_RECONFIG_DEVICE_ADD:
-		ctlr = acpi_spi_find_controller_by_adev(adev->parent);
+		ctlr = acpi_spi_find_controller_by_adev(acpi_dev_parent(adev));
 		if (!ctlr)
 			break;
 

@@ -21,20 +21,29 @@ enum LED_CTL_MODE {
 };
 
 enum LED_STATE_871x {
+<<<<<<< HEAD
+=======
 	LED_UNKNOWN = 0,
 	RTW_LED_ON = 1,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	RTW_LED_OFF = 2,
 	LED_BLINK_NORMAL = 3,
 	LED_BLINK_SLOWLY = 4,
 	LED_BLINK_SCAN = 6, /*  LED is blinking during scanning period,
 			     * the # of times to blink is depend on time
 			     * for scanning. */
+<<<<<<< HEAD
+	LED_BLINK_TXRX = 9,
+	LED_BLINK_WPS = 10,	/*  LED is blinkg during WPS communication */
+	LED_BLINK_WPS_STOP = 11,
+=======
 	LED_BLINK_StartToBlink = 8,/*  Customzied for Sercomm Printer
 				    * Server case */
 	LED_BLINK_TXRX = 9,
 	LED_BLINK_WPS = 10,	/*  LED is blinkg during WPS communication */
 	LED_BLINK_WPS_STOP = 11,
 	LED_BLINK_RUNTOP = 13, /*  Customized for RunTop */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct led_priv {
@@ -43,8 +52,11 @@ struct led_priv {
 	bool bRegUseLed;
 
 	enum LED_STATE_871x	CurrLedState; /*  Current LED state. */
+<<<<<<< HEAD
+=======
 	enum LED_STATE_871x	BlinkingLedState; /*  Next state for blinking,
 				   * either RTW_LED_ON or RTW_LED_OFF are. */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bool bLedOn; /*  true if LED is ON, false if LED is OFF. */
 
@@ -54,7 +66,10 @@ struct led_priv {
 
 	u32 BlinkTimes; /*  Number of times to toggle led state for blinking. */
 
+<<<<<<< HEAD
+=======
 	bool bLedNoLinkBlinkInProgress;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool bLedLinkBlinkInProgress;
 	bool bLedScanBlinkInProgress;
 	struct delayed_work blink_work;

@@ -1,0 +1,1 @@
+cmd_drivers/net/hamradio/baycom_ser_hdx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/hamradio/baycom_ser_hdx.ko drivers/net/hamradio/baycom_ser_hdx.o drivers/net/hamradio/baycom_ser_hdx.mod.o;  true

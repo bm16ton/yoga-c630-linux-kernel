@@ -154,6 +154,24 @@
 #define MEM_DISCARD(sec) *(.mem##sec)
 #endif
 
+#ifndef CONFIG_HAVE_DYNAMIC_FTRACE_NO_PATCHABLE
+#define KEEP_PATCHABLE		KEEP(*(__patchable_function_entries))
+#define PATCHABLE_DISCARDS
+#else
+#define KEEP_PATCHABLE
+#define PATCHABLE_DISCARDS	*(__patchable_function_entries)
+#endif
+
+#ifndef CONFIG_ARCH_SUPPORTS_CFI_CLANG
+/*
+ * Simply points to ftrace_stub, but with the proper protocol.
+ * Defined by the linker script in linux/vmlinux.lds.h
+ */
+#define	FTRACE_STUB_HACK	ftrace_stub_graph = ftrace_stub;
+#else
+#define FTRACE_STUB_HACK
+#endif
+
 #ifdef CONFIG_FTRACE_MCOUNT_RECORD
 /*
  * The ftrace call sites are logged to a section whose name depends on the
@@ -161,10 +179,13 @@
  * FTRACE_CALLSITE_SECTION. We capture all of them here to avoid header
  * dependencies for FTRACE_CALLSITE_SECTION's definition.
  *
+<<<<<<< HEAD
+=======
  * Need to also make ftrace_stub_graph point to ftrace_stub
  * so that the same stub location may have different protocols
  * and not mess up with C verifiers.
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * ftrace_ops_list_func will be defined as arch_ftrace_ops_list_func
  * as some archs will have a different prototype for that function
  * but ftrace_ops_list_func() will have a single prototype.
@@ -172,13 +193,21 @@
 #define MCOUNT_REC()	. = ALIGN(8);				\
 			__start_mcount_loc = .;			\
 			KEEP(*(__mcount_loc))			\
-			KEEP(*(__patchable_function_entries))	\
+			KEEP_PATCHABLE				\
 			__stop_mcount_loc = .;			\
+<<<<<<< HEAD
+			FTRACE_STUB_HACK			\
+			ftrace_ops_list_func = arch_ftrace_ops_list_func;
+#else
+# ifdef CONFIG_FUNCTION_TRACER
+#  define MCOUNT_REC()	FTRACE_STUB_HACK			\
+=======
 			ftrace_stub_graph = ftrace_stub;	\
 			ftrace_ops_list_func = arch_ftrace_ops_list_func;
 #else
 # ifdef CONFIG_FUNCTION_TRACER
 #  define MCOUNT_REC()	ftrace_stub_graph = ftrace_stub;	\
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ftrace_ops_list_func = arch_ftrace_ops_list_func;
 # else
 #  define MCOUNT_REC()
@@ -346,6 +375,9 @@
 	*(__tracepoints)						\
 	/* implement dynamic printk debug */				\
 	. = ALIGN(8);							\
+	__start___dyndbg_classes = .;					\
+	KEEP(*(__dyndbg_classes))					\
+	__stop___dyndbg_classes = .;					\
 	__start___dyndbg = .;						\
 	KEEP(*(__dyndbg))						\
 	__stop___dyndbg = .;						\
@@ -420,6 +452,22 @@
 	JUMP_TABLE_DATA							\
 	STATIC_CALL_DATA						\
 	__end_ro_after_init = .;
+#endif
+
+/*
+ * .kcfi_traps contains a list KCFI trap locations.
+ */
+#ifndef KCFI_TRAPS
+#ifdef CONFIG_ARCH_USES_CFI_TRAPS
+#define KCFI_TRAPS							\
+	__kcfi_traps : AT(ADDR(__kcfi_traps) - LOAD_OFFSET) {		\
+		__start___kcfi_traps = .;				\
+		KEEP(*(.kcfi_traps))					\
+		__stop___kcfi_traps = .;				\
+	}
+#else
+#define KCFI_TRAPS
+#endif
 #endif
 
 /*
@@ -530,6 +578,8 @@
 		__stop___modver = .;					\
 	}								\
 									\
+	KCFI_TRAPS							\
+									\
 	RO_EXCEPTION_TABLE						\
 	NOTES								\
 	BTF								\
@@ -538,6 +588,8 @@
 	__end_rodata = .;
 
 
+<<<<<<< HEAD
+=======
 /*
  * .text..L.cfi.jumptable.* contain Control-Flow Integrity (CFI)
  * jump table entries.
@@ -553,6 +605,7 @@
 #define TEXT_CFI_JT
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Non-instrumentable text section
  */
@@ -580,7 +633,10 @@
 		*(.text..refcount)					\
 		*(.ref.text)						\
 		*(.text.asan.* .text.tsan.*)				\
+<<<<<<< HEAD
+=======
 		TEXT_CFI_JT						\
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	MEM_KEEP(init.text*)						\
 	MEM_KEEP(exit.text*)						\
 
@@ -1024,6 +1080,7 @@
 
 #define COMMON_DISCARDS							\
 	SANITIZER_DISCARDS						\
+	PATCHABLE_DISCARDS						\
 	*(.discard)							\
 	*(.discard.*)							\
 	*(.modinfo)							\

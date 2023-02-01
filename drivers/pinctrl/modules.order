@@ -1,0 +1,3 @@
+drivers/pinctrl/qcom/pinctrl-sc7180.ko
+drivers/pinctrl/qcom/pinctrl-sc7280.ko
+drivers/pinctrl/pinctrl-axp209.ko

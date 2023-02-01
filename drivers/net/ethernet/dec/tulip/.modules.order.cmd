@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/dec/tulip/modules.order := {   echo drivers/net/ethernet/dec/tulip/dmfe.ko;   echo drivers/net/ethernet/dec/tulip/winbond-840.ko;   echo drivers/net/ethernet/dec/tulip/de2104x.ko;   echo drivers/net/ethernet/dec/tulip/tulip.ko;   echo drivers/net/ethernet/dec/tulip/uli526x.ko; :; } > drivers/net/ethernet/dec/tulip/modules.order

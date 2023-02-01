@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/thunder/nicvf.mod := printf '%s\n'   nicvf_main.o nicvf_queues.o nicvf_ethtool.o | awk '!x[$$0]++ { print("drivers/net/ethernet/cavium/thunder/"$$0) }' > drivers/net/ethernet/cavium/thunder/nicvf.mod

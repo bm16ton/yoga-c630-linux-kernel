@@ -1,0 +1,1 @@
+cmd_drivers/clk/hisilicon/built-in.a := rm -f drivers/clk/hisilicon/built-in.a;  printf "drivers/clk/hisilicon/%s " clk.o clkgate-separated.o clkdivider-hi6220.o clk-hisi-phase.o crg-hi3516cv300.o clk-hi3519.o clk-hi3559a.o clk-hi3660.o clk-hi3670.o crg-hi3798cv200.o clk-hi6220.o reset.o clk-hi6220-stub.o clk-hi3660-stub.o | xargs ar cDPrST drivers/clk/hisilicon/built-in.a

@@ -1,6 +1,12 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 
+<<<<<<< HEAD
+UTS_MACHINE=$1
+CC_VERSION="$2"
+LD=$3
+
+=======
 TARGET=$1
 ARCH=$2
 SMP=$3
@@ -28,6 +34,7 @@ if [ -z "$KBUILD_BUILD_TIMESTAMP" ]; then
 else
 	TIMESTAMP=$KBUILD_BUILD_TIMESTAMP
 fi
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 if test -z "$KBUILD_BUILD_USER"; then
 	LINUX_COMPILE_BY=$(whoami | sed 's/\\/\\\\/')
 else
@@ -39,6 +46,17 @@ else
 	LINUX_COMPILE_HOST=$KBUILD_BUILD_HOST
 fi
 
+<<<<<<< HEAD
+LD_VERSION=$(LC_ALL=C $LD -v | head -n1 |
+		sed -e 's/(compatible with [^)]*)//' -e 's/[[:space:]]*$//')
+
+cat <<EOF
+#define UTS_MACHINE		"${UTS_MACHINE}"
+#define LINUX_COMPILE_BY	"${LINUX_COMPILE_BY}"
+#define LINUX_COMPILE_HOST	"${LINUX_COMPILE_HOST}"
+#define LINUX_COMPILER		"${CC_VERSION}, ${LD_VERSION}"
+EOF
+=======
 UTS_VERSION="#$VERSION"
 CONFIG_FLAGS=""
 if [ -n "$SMP" ] ; then CONFIG_FLAGS="SMP"; fi
@@ -99,3 +117,4 @@ else
    mv -f .tmpcompile $TARGET
 fi
 rm -f .tmpver.1 .tmpver.2
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

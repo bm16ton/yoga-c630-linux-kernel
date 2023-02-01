@@ -25,6 +25,12 @@ static const struct mtk_gate ipu_adl_clks[] = {
 	GATE_IPU_ADL_I(CLK_IPU_ADL_CABGEN, "ipu_adl_cabgen", "dsp_sel", 24),
 };
 
+<<<<<<< HEAD
+static const struct mtk_clk_desc ipu_adl_desc = {
+	.clks = ipu_adl_clks,
+	.num_clks = ARRAY_SIZE(ipu_adl_clks),
+};
+=======
 static int clk_mt8183_ipu_adl_probe(struct platform_device *pdev)
 {
 	struct clk_hw_onecell_data *clk_data;
@@ -37,14 +43,20 @@ static int clk_mt8183_ipu_adl_probe(struct platform_device *pdev)
 
 	return of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_data);
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct of_device_id of_match_clk_mt8183_ipu_adl[] = {
-	{ .compatible = "mediatek,mt8183-ipu_adl", },
-	{}
+	{
+		.compatible = "mediatek,mt8183-ipu_adl",
+		.data = &ipu_adl_desc,
+	}, {
+		/* sentinel */
+	}
 };
 
 static struct platform_driver clk_mt8183_ipu_adl_drv = {
-	.probe = clk_mt8183_ipu_adl_probe,
+	.probe = mtk_clk_simple_probe,
+	.remove = mtk_clk_simple_remove,
 	.driver = {
 		.name = "clk-mt8183-ipu_adl",
 		.of_match_table = of_match_clk_mt8183_ipu_adl,

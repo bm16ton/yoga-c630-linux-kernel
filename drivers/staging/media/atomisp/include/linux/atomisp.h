@@ -740,6 +740,8 @@ enum atomisp_frame_status {
 	ATOMISP_FRAME_STATUS_FLASH_FAILED,
 };
 
+<<<<<<< HEAD
+=======
 /* ISP memories, isp2400 */
 enum atomisp_acc_memory {
 	ATOMISP_ACC_MEMORY_PMEM0 = 0,
@@ -754,6 +756,7 @@ enum atomisp_acc_memory {
 	ATOMISP_ACC_NR_MEMORY
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum atomisp_ext_isp_id {
 	EXT_ISP_CID_ISO = 0,
 	EXT_ISP_CID_CAPTURE_HDR,

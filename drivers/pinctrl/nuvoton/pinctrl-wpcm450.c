@@ -1081,10 +1081,20 @@ static int wpcm450_gpio_register(struct platform_device *pdev,
 
 		girq->num_parents = 0;
 		for (i = 0; i < WPCM450_NUM_GPIO_IRQS; i++) {
+<<<<<<< HEAD
+			int irq;
+
+			irq = fwnode_irq_get(child, i);
+			if (irq < 0)
+				break;
+			if (!irq)
+				continue;
+=======
 			int irq = fwnode_irq_get(child, i);
 
 			if (irq < 0)
 				break;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			girq->parents[i] = irq;
 			girq->num_parents++;

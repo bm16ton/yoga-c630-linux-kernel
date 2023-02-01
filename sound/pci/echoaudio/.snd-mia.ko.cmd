@@ -1,0 +1,1 @@
+cmd_sound/pci/echoaudio/snd-mia.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/echoaudio/snd-mia.ko sound/pci/echoaudio/snd-mia.o sound/pci/echoaudio/snd-mia.mod.o;  true

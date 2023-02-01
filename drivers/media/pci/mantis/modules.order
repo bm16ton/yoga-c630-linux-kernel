@@ -1,0 +1,3 @@
+drivers/media/pci/mantis/mantis_core.ko
+drivers/media/pci/mantis/mantis.ko
+drivers/media/pci/mantis/hopper.ko

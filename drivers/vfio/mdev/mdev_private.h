@@ -13,6 +13,10 @@
 int  mdev_bus_register(void);
 void mdev_bus_unregister(void);
 
+<<<<<<< HEAD
+extern struct bus_type mdev_bus_type;
+extern const struct attribute_group *mdev_device_groups[];
+=======
 struct mdev_parent {
 	struct device *dev;
 	struct mdev_driver *mdev_driver;
@@ -31,6 +35,7 @@ struct mdev_type {
 	struct list_head next;
 	unsigned int type_group_id;
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 extern const struct attribute_group *mdev_device_groups[];
 
@@ -44,6 +49,11 @@ void parent_remove_sysfs_files(struct mdev_parent *parent);
 
 int  mdev_create_sysfs_files(struct mdev_device *mdev);
 void mdev_remove_sysfs_files(struct mdev_device *mdev);
+<<<<<<< HEAD
+
+int mdev_device_create(struct mdev_type *kobj, const guid_t *uuid);
+int  mdev_device_remove(struct mdev_device *dev);
+=======
 
 int mdev_device_create(struct mdev_type *kobj, const guid_t *uuid);
 int  mdev_device_remove(struct mdev_device *dev);
@@ -59,5 +69,6 @@ static inline void mdev_put_parent(struct mdev_parent *parent)
 {
 	kref_put(&parent->ref, mdev_release_parent);
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* MDEV_PRIVATE_H */

@@ -52,6 +52,18 @@ static void move_master_key_secret(struct fscrypt_master_key_secret *dst,
 }
 
 static void fscrypt_free_master_key(struct rcu_head *head)
+<<<<<<< HEAD
+{
+	struct fscrypt_master_key *mk =
+		container_of(head, struct fscrypt_master_key, mk_rcu_head);
+	/*
+	 * The master key secret and any embedded subkeys should have already
+	 * been wiped when the last active reference to the fscrypt_master_key
+	 * struct was dropped; doing it here would be unnecessarily late.
+	 * Nevertheless, use kfree_sensitive() in case anything was missed.
+	 */
+	kfree_sensitive(mk);
+=======
 {
 	struct fscrypt_master_key *mk =
 		container_of(head, struct fscrypt_master_key, mk_rcu_head);
@@ -115,6 +127,64 @@ void fscrypt_put_master_key_activeref(struct fscrypt_master_key *mk)
 
 	/* Drop the structural ref associated with the active refs. */
 	fscrypt_put_master_key(mk);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+}
+
+void fscrypt_put_master_key(struct fscrypt_master_key *mk)
+{
+	if (!refcount_dec_and_test(&mk->mk_struct_refs))
+		return;
+	/*
+	 * No structural references left, so free ->mk_users, and also free the
+	 * fscrypt_master_key struct itself after an RCU grace period ensures
+	 * that concurrent keyring lookups can no longer find it.
+	 */
+	WARN_ON(refcount_read(&mk->mk_active_refs) != 0);
+	key_put(mk->mk_users);
+	mk->mk_users = NULL;
+	call_rcu(&mk->mk_rcu_head, fscrypt_free_master_key);
+}
+
+<<<<<<< HEAD
+void fscrypt_put_master_key_activeref(struct fscrypt_master_key *mk)
+{
+	struct super_block *sb = mk->mk_sb;
+	struct fscrypt_keyring *keyring = sb->s_master_keys;
+	size_t i;
+
+	if (!refcount_dec_and_test(&mk->mk_active_refs))
+		return;
+	/*
+	 * No active references left, so complete the full removal of this
+	 * fscrypt_master_key struct by removing it from the keyring and
+	 * destroying any subkeys embedded in it.
+	 */
+
+	spin_lock(&keyring->lock);
+	hlist_del_rcu(&mk->mk_node);
+	spin_unlock(&keyring->lock);
+
+	/*
+	 * ->mk_active_refs == 0 implies that ->mk_secret is not present and
+	 * that ->mk_decrypted_inodes is empty.
+	 */
+	WARN_ON(is_master_key_secret_present(&mk->mk_secret));
+	WARN_ON(!list_empty(&mk->mk_decrypted_inodes));
+
+	for (i = 0; i <= FSCRYPT_MODE_MAX; i++) {
+		fscrypt_destroy_prepared_key(
+				sb, &mk->mk_direct_keys[i]);
+		fscrypt_destroy_prepared_key(
+				sb, &mk->mk_iv_ino_lblk_64_keys[i]);
+		fscrypt_destroy_prepared_key(
+				sb, &mk->mk_iv_ino_lblk_32_keys[i]);
+	}
+	memzero_explicit(&mk->mk_ino_hash_key,
+			 sizeof(mk->mk_ino_hash_key));
+	mk->mk_ino_hash_key_initialized = false;
+
+	/* Drop the structural ref associated with the active refs. */
+	fscrypt_put_master_key(mk);
 }
 
 static inline bool valid_key_spec(const struct fscrypt_key_specifier *spec)
@@ -124,6 +194,8 @@ static inline bool valid_key_spec(const struct fscrypt_key_specifier *spec)
 	return master_key_spec_len(spec) != 0;
 }
 
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int fscrypt_user_key_instantiate(struct key *key,
 					struct key_preparsed_payload *prep)
 {

@@ -11,12 +11,22 @@
 #include <sound/pcm_params.h>
 #include "sof-priv.h"
 #include "sof-audio.h"
+<<<<<<< HEAD
+#include "ipc3-priv.h"
+=======
 #include "ipc3-ops.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "ops.h"
 
 /* Full volume for default values */
 #define VOL_ZERO_DB	BIT(VOLUME_FWL)
 
+<<<<<<< HEAD
+/* size of tplg ABI in bytes */
+#define SOF_IPC3_TPLG_ABI_SIZE 3
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct sof_widget_data {
 	int ctrl_type;
 	int ipc_cmd;
@@ -263,6 +273,19 @@ static const struct sof_topology_token afe_tokens[] = {
 		offsetof(struct sof_ipc_dai_mtk_afe_params, format)},
 };
 
+<<<<<<< HEAD
+/* ACPDMIC */
+static const struct sof_topology_token acpdmic_tokens[] = {
+	{SOF_TKN_AMD_ACPDMIC_RATE,
+		SND_SOC_TPLG_TUPLE_TYPE_WORD, get_token_u32,
+		offsetof(struct sof_ipc_dai_acpdmic_params, pdm_rate)},
+	{SOF_TKN_AMD_ACPDMIC_CH,
+		SND_SOC_TPLG_TUPLE_TYPE_WORD, get_token_u32,
+		offsetof(struct sof_ipc_dai_acpdmic_params, pdm_ch)},
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Core tokens */
 static const struct sof_topology_token core_tokens[] = {
 	{SOF_TKN_COMP_CORE_ID, SND_SOC_TPLG_TUPLE_TYPE_WORD, get_token_u32,
@@ -297,6 +320,10 @@ static const struct sof_token_info ipc3_token_list[SOF_TOKEN_COUNT] = {
 	[SOF_ESAI_TOKENS] = {"ESAI tokens", esai_tokens, ARRAY_SIZE(esai_tokens)},
 	[SOF_SAI_TOKENS] = {"SAI tokens", sai_tokens, ARRAY_SIZE(sai_tokens)},
 	[SOF_AFE_TOKENS] = {"AFE tokens", afe_tokens, ARRAY_SIZE(afe_tokens)},
+<<<<<<< HEAD
+	[SOF_ACPDMIC_TOKENS] = {"ACPDMIC tokens", acpdmic_tokens, ARRAY_SIZE(acpdmic_tokens)},
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -1117,10 +1144,27 @@ static int sof_link_acp_dmic_load(struct snd_soc_component *scomp, struct snd_so
 	struct snd_soc_tplg_hw_config *hw_config = slink->hw_configs;
 	struct sof_dai_private_data *private = dai->private;
 	u32 size = sizeof(*config);
+<<<<<<< HEAD
+	int ret;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
        /* handle master/slave and inverted clocks */
 	sof_dai_set_format(hw_config, config);
 
+<<<<<<< HEAD
+	config->hdr.size = size;
+
+	/* parse the required set of ACPDMIC tokens based on num_hw_cfgs */
+	ret = sof_update_ipc_object(scomp, &config->acpdmic, SOF_ACPDMIC_TOKENS, slink->tuples,
+				    slink->num_tuples, size, slink->num_hw_configs);
+	if (ret < 0)
+		return ret;
+
+	dev_info(scomp->dev, "ACP_DMIC config ACP%d channel %d rate %d\n",
+		 config->dai_index, config->acpdmic.pdm_ch,
+		 config->acpdmic.pdm_rate);
+=======
 	/* init IPC */
 	memset(&config->acpdmic, 0, sizeof(config->acpdmic));
 	config->hdr.size = size;
@@ -1131,6 +1175,7 @@ static int sof_link_acp_dmic_load(struct snd_soc_component *scomp, struct snd_so
 	dev_info(scomp->dev, "ACP_DMIC config ACP%d channel %d rate %d\n",
 		 config->dai_index, config->acpdmic.tdm_slots,
 		 config->acpdmic.fsync_rate);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dai->number_configs = 1;
 	dai->current_config = 0;
@@ -1201,6 +1246,39 @@ static int sof_link_acp_sp_load(struct snd_soc_component *scomp, struct snd_sof_
 	return 0;
 }
 
+<<<<<<< HEAD
+static int sof_link_acp_hs_load(struct snd_soc_component *scomp, struct snd_sof_dai_link *slink,
+				struct sof_ipc_dai_config *config, struct snd_sof_dai *dai)
+{
+	struct snd_soc_tplg_hw_config *hw_config = slink->hw_configs;
+	struct sof_dai_private_data *private = dai->private;
+	u32 size = sizeof(*config);
+
+	/* Configures the DAI hardware format and inverted clocks */
+	sof_dai_set_format(hw_config, config);
+
+	/* init IPC */
+	memset(&config->acphs, 0, sizeof(config->acphs));
+	config->hdr.size = size;
+
+	config->acphs.fsync_rate = le32_to_cpu(hw_config->fsync_rate);
+	config->acphs.tdm_slots = le32_to_cpu(hw_config->tdm_slots);
+
+	dev_info(scomp->dev, "ACP_HS config ACP%d channel %d rate %d\n",
+		 config->dai_index, config->acphs.tdm_slots,
+		 config->acphs.fsync_rate);
+
+	dai->number_configs = 1;
+	dai->current_config = 0;
+	private->dai_config = kmemdup(config, size, GFP_KERNEL);
+	if (!private->dai_config)
+		return -ENOMEM;
+
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int sof_link_afe_load(struct snd_soc_component *scomp, struct snd_sof_dai_link *slink,
 			     struct sof_ipc_dai_config *config, struct snd_sof_dai *dai)
 {
@@ -1443,8 +1521,13 @@ static int sof_ipc3_widget_setup_comp_dai(struct snd_sof_widget *swidget)
 	if (ret < 0)
 		goto free;
 
+<<<<<<< HEAD
+	dev_dbg(scomp->dev, "dai %s: type %d index %d\n",
+		swidget->widget->name, comp_dai->type, comp_dai->dai_index);
+=======
 	dev_dbg(scomp->dev, "%s dai %s: type %d index %d\n",
 		__func__, swidget->widget->name, comp_dai->type, comp_dai->dai_index);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sof_dbg_comp_config(scomp, &comp_dai->config);
 
 	/* now update DAI config */
@@ -1501,6 +1584,12 @@ static int sof_ipc3_widget_setup_comp_dai(struct snd_sof_widget *swidget)
 		case SOF_DAI_AMD_SP:
 			ret = sof_link_acp_sp_load(scomp, slink, config, dai);
 			break;
+<<<<<<< HEAD
+		case SOF_DAI_AMD_HS:
+			ret = sof_link_acp_hs_load(scomp, slink, config, dai);
+			break;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		case SOF_DAI_AMD_DMIC:
 			ret = sof_link_acp_dmic_load(scomp, slink, config, dai);
 			break;
@@ -1571,8 +1660,12 @@ static int sof_ipc3_route_setup(struct snd_sof_dev *sdev, struct snd_sof_route *
 		sroute->sink_widget->widget->name);
 
 	/* send ipc */
+<<<<<<< HEAD
+	ret = sof_ipc_tx_message(sdev->ipc, &connect, sizeof(connect), &reply, sizeof(reply));
+=======
 	ret = sof_ipc_tx_message(sdev->ipc, connect.hdr.cmd, &connect, sizeof(connect),
 				 &reply, sizeof(reply));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		dev_err(sdev->dev, "%s: route %s -> %s failed\n", __func__,
 			sroute->src_widget->widget->name, sroute->sink_widget->widget->name);
@@ -1585,6 +1678,25 @@ static int sof_ipc3_control_load_bytes(struct snd_sof_dev *sdev, struct snd_sof_
 	struct sof_ipc_ctrl_data *cdata;
 	int ret;
 
+<<<<<<< HEAD
+	if (scontrol->max_size < (sizeof(*cdata) + sizeof(struct sof_abi_hdr))) {
+		dev_err(sdev->dev, "%s: insufficient size for a bytes control: %zu.\n",
+			__func__, scontrol->max_size);
+		return -EINVAL;
+	}
+
+	if (scontrol->priv_size > scontrol->max_size - sizeof(*cdata)) {
+		dev_err(sdev->dev,
+			"%s: bytes data size %zu exceeds max %zu.\n", __func__,
+			scontrol->priv_size, scontrol->max_size - sizeof(*cdata));
+		return -EINVAL;
+	}
+
+	scontrol->ipc_control_data = kzalloc(scontrol->max_size, GFP_KERNEL);
+	if (!scontrol->ipc_control_data)
+		return -ENOMEM;
+
+=======
 	scontrol->ipc_control_data = kzalloc(scontrol->max_size, GFP_KERNEL);
 	if (!scontrol->ipc_control_data)
 		return -ENOMEM;
@@ -1603,6 +1715,7 @@ static int sof_ipc3_control_load_bytes(struct snd_sof_dev *sdev, struct snd_sof_
 		goto err;
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	scontrol->size = sizeof(struct sof_ipc_ctrl_data) + scontrol->priv_size;
 
 	cdata = scontrol->ipc_control_data;
@@ -1637,6 +1750,10 @@ static int sof_ipc3_control_load_bytes(struct snd_sof_dev *sdev, struct snd_sof_
 	return 0;
 err:
 	kfree(scontrol->ipc_control_data);
+<<<<<<< HEAD
+	scontrol->ipc_control_data = NULL;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -1718,7 +1835,11 @@ static int sof_ipc3_control_free(struct snd_sof_dev *sdev, struct snd_sof_contro
 	fcomp.id = scontrol->comp_id;
 
 	/* send IPC to the DSP */
+<<<<<<< HEAD
+	return sof_ipc_tx_message(sdev->ipc, &fcomp, sizeof(fcomp), NULL, 0);
+=======
 	return sof_ipc_tx_message(sdev->ipc, fcomp.hdr.cmd, &fcomp, sizeof(fcomp), NULL, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* send pcm params ipc */
@@ -1770,7 +1891,11 @@ static int sof_ipc3_keyword_detect_pcm_params(struct snd_sof_widget *swidget, in
 	}
 
 	/* send IPC to the DSP */
+<<<<<<< HEAD
+	ret = sof_ipc_tx_message(sdev->ipc, &pcm, sizeof(pcm),
+=======
 	ret = sof_ipc_tx_message(sdev->ipc, pcm.hdr.cmd, &pcm, sizeof(pcm),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 &ipc_params_reply, sizeof(ipc_params_reply));
 	if (ret < 0)
 		dev_err(scomp->dev, "%s: PCM params failed for %s\n", __func__,
@@ -1794,8 +1919,12 @@ static int sof_ipc3_keyword_detect_trigger(struct snd_sof_widget *swidget, int c
 	stream.comp_id = swidget->comp_id;
 
 	/* send IPC to the DSP */
+<<<<<<< HEAD
+	ret = sof_ipc_tx_message(sdev->ipc, &stream, sizeof(stream), &reply, sizeof(reply));
+=======
 	ret = sof_ipc_tx_message(sdev->ipc, stream.hdr.cmd, &stream,
 				 sizeof(stream), &reply, sizeof(reply));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		dev_err(scomp->dev, "%s: Failed to trigger %s\n", __func__, swidget->widget->name);
 
@@ -1923,8 +2052,12 @@ static int sof_ipc3_complete_pipeline(struct snd_sof_dev *sdev, struct snd_sof_w
 	ready.hdr.cmd = SOF_IPC_GLB_TPLG_MSG | SOF_IPC_TPLG_PIPE_COMPLETE;
 	ready.comp_id = swidget->comp_id;
 
+<<<<<<< HEAD
+	ret = sof_ipc_tx_message(sdev->ipc, &ready, sizeof(ready), &reply, sizeof(reply));
+=======
 	ret = sof_ipc_tx_message(sdev->ipc, ready.hdr.cmd, &ready, sizeof(ready), &reply,
 				 sizeof(reply));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		return ret;
 
@@ -1960,7 +2093,11 @@ static int sof_ipc3_widget_free(struct snd_sof_dev *sdev, struct snd_sof_widget 
 		break;
 	}
 
+<<<<<<< HEAD
+	ret = sof_ipc_tx_message(sdev->ipc, &ipc_free, sizeof(ipc_free),
+=======
 	ret = sof_ipc_tx_message(sdev->ipc, ipc_free.hdr.cmd, &ipc_free, sizeof(ipc_free),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 &reply, sizeof(reply));
 	if (ret < 0)
 		dev_err(sdev->dev, "failed to free widget %s\n", swidget->widget->name);
@@ -2024,7 +2161,11 @@ static int sof_ipc3_dai_config(struct snd_sof_dev *sdev, struct snd_sof_widget *
 
 	/* only send the IPC if the widget is set up in the DSP */
 	if (swidget->use_count > 0) {
+<<<<<<< HEAD
+		ret = sof_ipc_tx_message(sdev->ipc, config, config->hdr.size,
+=======
 		ret = sof_ipc_tx_message(sdev->ipc, config->hdr.cmd, config, config->hdr.size,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 &reply, sizeof(reply));
 		if (ret < 0)
 			dev_err(sdev->dev, "Failed to set dai config for %s\n", dai->name);
@@ -2049,7 +2190,11 @@ static int sof_ipc3_widget_setup(struct snd_sof_dev *sdev, struct snd_sof_widget
 		struct sof_dai_private_data *dai_data = dai->private;
 		struct sof_ipc_comp *comp = &dai_data->comp_dai->comp;
 
+<<<<<<< HEAD
+		ret = sof_ipc_tx_message(sdev->ipc, dai_data->comp_dai,
+=======
 		ret = sof_ipc_tx_message(sdev->ipc, comp->hdr.cmd, dai_data->comp_dai,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 comp->hdr.size, &reply, sizeof(reply));
 		break;
 	}
@@ -2058,8 +2203,13 @@ static int sof_ipc3_widget_setup(struct snd_sof_dev *sdev, struct snd_sof_widget
 		struct sof_ipc_pipe_new *pipeline;
 
 		pipeline = swidget->private;
+<<<<<<< HEAD
+		ret = sof_ipc_tx_message(sdev->ipc, pipeline, sizeof(*pipeline),
+					 &reply, sizeof(reply));
+=======
 		ret = sof_ipc_tx_message(sdev->ipc, pipeline->hdr.cmd, pipeline,
 					 sizeof(*pipeline), &reply, sizeof(reply));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 	default:
@@ -2067,7 +2217,11 @@ static int sof_ipc3_widget_setup(struct snd_sof_dev *sdev, struct snd_sof_widget
 		struct sof_ipc_cmd_hdr *hdr;
 
 		hdr = swidget->private;
+<<<<<<< HEAD
+		ret = sof_ipc_tx_message(sdev->ipc, swidget->private, hdr->size,
+=======
 		ret = sof_ipc_tx_message(sdev->ipc, hdr->cmd, swidget->private, hdr->size,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 &reply, sizeof(reply));
 		break;
 	}
@@ -2275,6 +2429,21 @@ static int sof_ipc3_tear_down_all_pipelines(struct snd_sof_dev *sdev, bool verif
 	list_for_each_entry(sroute, &sdev->route_list, list)
 		sroute->setup = false;
 
+<<<<<<< HEAD
+	/*
+	 * before suspending, make sure the refcounts are all zeroed out. There's no way
+	 * to recover at this point but this will help root cause bad sequences leading to
+	 * more issues on resume
+	 */
+	list_for_each_entry(swidget, &sdev->widget_list, list) {
+		if (swidget->use_count != 0) {
+			dev_err(sdev->dev, "%s: widget %s is still in use: count %d\n",
+				__func__, swidget->widget->name, swidget->use_count);
+		}
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -2306,6 +2475,48 @@ static int sof_ipc3_dai_get_clk(struct snd_sof_dev *sdev, struct snd_sof_dai *da
 	return -EINVAL;
 }
 
+<<<<<<< HEAD
+static int sof_ipc3_parse_manifest(struct snd_soc_component *scomp, int index,
+				   struct snd_soc_tplg_manifest *man)
+{
+	u32 size = le32_to_cpu(man->priv.size);
+	u32 abi_version;
+
+	/* backward compatible with tplg without ABI info */
+	if (!size) {
+		dev_dbg(scomp->dev, "No topology ABI info\n");
+		return 0;
+	}
+
+	if (size != SOF_IPC3_TPLG_ABI_SIZE) {
+		dev_err(scomp->dev, "%s: Invalid topology ABI size: %u\n",
+			__func__, size);
+		return -EINVAL;
+	}
+
+	dev_info(scomp->dev,
+		 "Topology: ABI %d:%d:%d Kernel ABI %d:%d:%d\n",
+		 man->priv.data[0], man->priv.data[1], man->priv.data[2],
+		 SOF_ABI_MAJOR, SOF_ABI_MINOR, SOF_ABI_PATCH);
+
+	abi_version = SOF_ABI_VER(man->priv.data[0], man->priv.data[1], man->priv.data[2]);
+
+	if (SOF_ABI_VERSION_INCOMPATIBLE(SOF_ABI_VERSION, abi_version)) {
+		dev_err(scomp->dev, "%s: Incompatible topology ABI version\n", __func__);
+		return -EINVAL;
+	}
+
+	if (IS_ENABLED(CONFIG_SND_SOC_SOF_STRICT_ABI_CHECKS) &&
+	    SOF_ABI_VERSION_MINOR(abi_version) > SOF_ABI_MINOR) {
+		dev_err(scomp->dev, "%s: Topology ABI is more recent than kernel\n", __func__);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* token list for each topology object */
 static enum sof_tokens host_token_list[] = {
 	SOF_CORE_TOKENS,
@@ -2416,4 +2627,8 @@ const struct sof_ipc_tplg_ops ipc3_tplg_ops = {
 	.dai_get_clk = sof_ipc3_dai_get_clk,
 	.set_up_all_pipelines = sof_ipc3_set_up_all_pipelines,
 	.tear_down_all_pipelines = sof_ipc3_tear_down_all_pipelines,
+<<<<<<< HEAD
+	.parse_manifest = sof_ipc3_parse_manifest,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

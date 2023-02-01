@@ -1,0 +1,1 @@
+cmd_drivers/mtd/nand/onenand/onenand.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/nand/onenand/onenand.ko drivers/mtd/nand/onenand/onenand.o drivers/mtd/nand/onenand/onenand.mod.o;  true

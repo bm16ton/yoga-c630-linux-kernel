@@ -343,7 +343,7 @@ static int atmel_ecc_probe(struct i2c_client *client,
 	return ret;
 }
 
-static int atmel_ecc_remove(struct i2c_client *client)
+static void atmel_ecc_remove(struct i2c_client *client)
 {
 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
 
@@ -358,7 +358,11 @@ static int atmel_ecc_remove(struct i2c_client *client)
 		 * accessing the freed memory.
 		 */
 		dev_emerg(&client->dev, "Device is busy, expect memory corruption.\n");
+<<<<<<< HEAD
+		return;
+=======
 		return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
@@ -366,8 +370,6 @@ static int atmel_ecc_remove(struct i2c_client *client)
 	spin_lock(&driver_data.i2c_list_lock);
 	list_del(&i2c_priv->i2c_client_list_node);
 	spin_unlock(&driver_data.i2c_list_lock);
-
-	return 0;
 }
 
 #ifdef CONFIG_OF

@@ -1,0 +1,1 @@
+cmd_sound/firewire/fireface/snd-fireface.mod := printf '%s\n'   ff.o ff-transaction.o ff-midi.o ff-proc.o amdtp-ff.o ff-stream.o ff-pcm.o ff-hwdep.o ff-protocol-former.o ff-protocol-latter.o | awk '!x[$$0]++ { print("sound/firewire/fireface/"$$0) }' > sound/firewire/fireface/snd-fireface.mod

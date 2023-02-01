@@ -400,7 +400,6 @@ unsigned amdgpu_fence_count_emitted(struct amdgpu_ring *ring)
 	/* We are not protected by ring lock when reading the last sequence
 	 * but it's ok to report slightly wrong fence count here.
 	 */
-	amdgpu_fence_process(ring);
 	emitted = 0x100000000ull;
 	emitted -= atomic_read(&ring->fence_drv.last_seq);
 	emitted += READ_ONCE(ring->fence_drv.sync_seq);
@@ -541,6 +540,7 @@ void amdgpu_fence_driver_hw_fini(struct amdgpu_device *adev)
 void amdgpu_fence_driver_isr_toggle(struct amdgpu_device *adev, bool stop)
 {
 	int i;
+<<<<<<< HEAD
 
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
 		struct amdgpu_ring *ring = adev->rings[i];
@@ -558,10 +558,32 @@ void amdgpu_fence_driver_isr_toggle(struct amdgpu_device *adev, bool stop)
 void amdgpu_fence_driver_sw_fini(struct amdgpu_device *adev)
 {
 	unsigned int i, j;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
 		struct amdgpu_ring *ring = adev->rings[i];
 
+<<<<<<< HEAD
+=======
+		if (!ring || !ring->fence_drv.initialized || !ring->fence_drv.irq_src)
+			continue;
+
+		if (stop)
+			disable_irq(adev->irq.irq);
+		else
+			enable_irq(adev->irq.irq);
+	}
+}
+
+void amdgpu_fence_driver_sw_fini(struct amdgpu_device *adev)
+{
+	unsigned int i, j;
+
+	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
+		struct amdgpu_ring *ring = adev->rings[i];
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!ring || !ring->fence_drv.initialized)
 			continue;
 

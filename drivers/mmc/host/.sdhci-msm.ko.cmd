@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/sdhci-msm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/sdhci-msm.ko drivers/mmc/host/sdhci-msm.o drivers/mmc/host/sdhci-msm.mod.o;  true

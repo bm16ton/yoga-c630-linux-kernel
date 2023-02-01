@@ -1,0 +1,3 @@
+drivers/bus/mhi/host/mhi.ko
+drivers/bus/mhi/host/mhi_pci_generic.ko
+drivers/bus/mhi/ep/mhi_ep.ko

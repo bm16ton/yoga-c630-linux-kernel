@@ -22,6 +22,11 @@ enum zone_type {
 
 #define pageblock_order		(MAX_ORDER - 1)
 #define pageblock_nr_pages	BIT(pageblock_order)
+<<<<<<< HEAD
+#define pageblock_align(pfn)	ALIGN((pfn), pageblock_nr_pages)
+#define pageblock_start_pfn(pfn)	ALIGN_DOWN((pfn), pageblock_nr_pages)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct zone {
 	atomic_long_t		managed_pages;

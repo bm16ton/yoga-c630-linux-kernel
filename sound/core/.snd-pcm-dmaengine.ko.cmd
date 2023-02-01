@@ -1,0 +1,1 @@
+cmd_sound/core/snd-pcm-dmaengine.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/core/snd-pcm-dmaengine.ko sound/core/snd-pcm-dmaengine.o sound/core/snd-pcm-dmaengine.mod.o;  true

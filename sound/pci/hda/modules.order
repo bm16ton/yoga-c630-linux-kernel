@@ -1,0 +1,15 @@
+sound/pci/hda/snd-hda-codec.ko
+sound/pci/hda/snd-hda-codec-generic.ko
+sound/pci/hda/snd-hda-codec-realtek.ko
+sound/pci/hda/snd-hda-codec-cmedia.ko
+sound/pci/hda/snd-hda-codec-analog.ko
+sound/pci/hda/snd-hda-codec-idt.ko
+sound/pci/hda/snd-hda-codec-si3054.ko
+sound/pci/hda/snd-hda-codec-cirrus.ko
+sound/pci/hda/snd-hda-codec-ca0110.ko
+sound/pci/hda/snd-hda-codec-ca0132.ko
+sound/pci/hda/snd-hda-codec-conexant.ko
+sound/pci/hda/snd-hda-codec-via.ko
+sound/pci/hda/snd-hda-codec-hdmi.ko
+sound/pci/hda/snd-hda-intel.ko
+sound/pci/hda/snd-hda-tegra.ko

@@ -1,0 +1,1 @@
+cmd_sound/soc/generic/snd-soc-simple-card.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/generic/snd-soc-simple-card.ko sound/soc/generic/snd-soc-simple-card.o sound/soc/generic/snd-soc-simple-card.mod.o;  true

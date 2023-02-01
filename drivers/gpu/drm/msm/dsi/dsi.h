@@ -29,20 +29,7 @@ enum msm_dsi_phy_usecase {
 	MSM_DSI_PHY_SLAVE,
 };
 
-#define DSI_DEV_REGULATOR_MAX	8
 #define DSI_BUS_CLK_MAX		4
-
-/* Regulators for DSI devices */
-struct dsi_reg_entry {
-	char name[32];
-	int enable_load;
-	int disable_load;
-};
-
-struct dsi_reg_config {
-	int num;
-	struct dsi_reg_entry regs[DSI_DEV_REGULATOR_MAX];
-};
 
 struct msm_dsi {
 	struct drm_device *dev;
@@ -71,7 +58,11 @@ struct msm_dsi {
 /* dsi manager */
 struct drm_bridge *msm_dsi_manager_bridge_init(u8 id);
 void msm_dsi_manager_bridge_destroy(struct drm_bridge *bridge);
+<<<<<<< HEAD
+int msm_dsi_manager_ext_bridge_init(u8 id);
+=======
 struct drm_connector *msm_dsi_manager_ext_bridge_init(u8 id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int msm_dsi_manager_cmd_xfer(int id, const struct mipi_dsi_msg *msg);
 bool msm_dsi_manager_cmd_xfer_trigger(int id, u32 dma_base, u32 len);
 int msm_dsi_manager_register(struct msm_dsi *msm_dsi);
@@ -144,7 +135,11 @@ int dsi_calc_clk_rate_v2(struct msm_dsi_host *msm_host, bool is_bonded_dsi);
 int dsi_calc_clk_rate_6g(struct msm_dsi_host *msm_host, bool is_bonded_dsi);
 void msm_dsi_host_snapshot(struct msm_disp_state *disp_state, struct mipi_dsi_host *host);
 void msm_dsi_host_test_pattern_en(struct mipi_dsi_host *host);
+<<<<<<< HEAD
+struct drm_dsc_config *msm_dsi_host_get_dsc_config(struct mipi_dsi_host *host);
+=======
 struct msm_display_dsc_config *msm_dsi_host_get_dsc_config(struct mipi_dsi_host *host);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* dsi phy */
 struct msm_dsi_phy;

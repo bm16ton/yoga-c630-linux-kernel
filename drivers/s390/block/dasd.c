@@ -41,15 +41,6 @@
 
 #define DASD_DIAG_MOD		"dasd_diag_mod"
 
-static unsigned int queue_depth = 32;
-static unsigned int nr_hw_queues = 4;
-
-module_param(queue_depth, uint, 0444);
-MODULE_PARM_DESC(queue_depth, "Default queue depth for new DASD devices");
-
-module_param(nr_hw_queues, uint, 0444);
-MODULE_PARM_DESC(nr_hw_queues, "Default number of hardware queues for new DASD devices");
-
 /*
  * SECTION: exported variables of dasd.c
  */
@@ -68,8 +59,6 @@ MODULE_LICENSE("GPL");
 /*
  * SECTION: prototypes for static functions of dasd.c
  */
-static int  dasd_alloc_queue(struct dasd_block *);
-static void dasd_free_queue(struct dasd_block *);
 static int dasd_flush_block_queue(struct dasd_block *);
 static void dasd_device_tasklet(unsigned long);
 static void dasd_block_tasklet(unsigned long);
@@ -198,21 +187,11 @@ EXPORT_SYMBOL_GPL(dasd_free_block);
  */
 static int dasd_state_new_to_known(struct dasd_device *device)
 {
-	int rc;
-
 	/*
 	 * As long as the device is not in state DASD_STATE_NEW we want to
 	 * keep the reference count > 0.
 	 */
 	dasd_get_device(device);
-
-	if (device->block) {
-		rc = dasd_alloc_queue(device->block);
-		if (rc) {
-			dasd_put_device(device);
-			return rc;
-		}
-	}
 	device->state = DASD_STATE_KNOWN;
 	return 0;
 }
@@ -225,9 +204,6 @@ static int dasd_state_known_to_new(struct dasd_device *device)
 	/* Disable extended error reporting for this device. */
 	dasd_eer_disable(device);
 	device->state = DASD_STATE_NEW;
-
-	if (device->block)
-		dasd_free_queue(device->block);
 
 	/* Give up reference we took in dasd_state_new_to_known. */
 	dasd_put_device(device);
@@ -1591,9 +1567,8 @@ void dasd_generic_handle_state_change(struct dasd_device *device)
 	dasd_schedule_device_bh(device);
 	if (device->block) {
 		dasd_schedule_block_bh(device->block);
-		if (device->block->request_queue)
-			blk_mq_run_hw_queues(device->block->request_queue,
-					     true);
+		if (device->block->gdp)
+			blk_mq_run_hw_queues(device->block->gdp->queue, true);
 	}
 }
 EXPORT_SYMBOL_GPL(dasd_generic_handle_state_change);
@@ -2691,7 +2666,7 @@ static void dasd_block_timeout(struct timer_list *t)
 	dasd_device_remove_stop_bits(block->base, DASD_STOPPED_PENDING);
 	spin_unlock_irqrestore(get_ccwdev_lock(block->base->cdev), flags);
 	dasd_schedule_block_bh(block);
-	blk_mq_run_hw_queues(block->request_queue, true);
+	blk_mq_run_hw_queues(block->gdp->queue, true);
 }
 
 /*
@@ -3239,7 +3214,7 @@ static void dasd_request_done(struct request *req)
 	blk_mq_run_hw_queues(req->q, true);
 }
 
-static struct blk_mq_ops dasd_mq_ops = {
+struct blk_mq_ops dasd_mq_ops = {
 	.queue_rq = do_dasd_request,
 	.complete = dasd_request_done,
 	.timeout = dasd_times_out,
@@ -3247,6 +3222,8 @@ static struct blk_mq_ops dasd_mq_ops = {
 	.exit_hctx = dasd_exit_hctx,
 };
 
+<<<<<<< HEAD
+=======
 /*
  * Allocate and initialize request queue and default I/O scheduler.
  */
@@ -3286,6 +3263,7 @@ static void dasd_free_queue(struct dasd_block *block)
 	}
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int dasd_open(struct block_device *bdev, fmode_t mode)
 {
 	struct dasd_device *base;
@@ -3762,10 +3740,9 @@ int dasd_generic_path_operational(struct dasd_device *device)
 	dasd_schedule_device_bh(device);
 	if (device->block) {
 		dasd_schedule_block_bh(device->block);
-		if (device->block->request_queue)
-			blk_mq_run_hw_queues(device->block->request_queue,
-					     true);
-		}
+		if (device->block->gdp)
+			blk_mq_run_hw_queues(device->block->gdp->queue, true);
+	}
 
 	if (!device->stopped)
 		wake_up(&generic_waitq);
@@ -3916,8 +3893,8 @@ void dasd_generic_space_avail(struct dasd_device *device)
 
 	if (device->block) {
 		dasd_schedule_block_bh(device->block);
-		if (device->block->request_queue)
-			blk_mq_run_hw_queues(device->block->request_queue, true);
+		if (device->block->gdp)
+			blk_mq_run_hw_queues(device->block->gdp->queue, true);
 	}
 	if (!device->stopped)
 		wake_up(&generic_waitq);
@@ -3927,7 +3904,7 @@ EXPORT_SYMBOL_GPL(dasd_generic_space_avail);
 /*
  * clear active requests and requeue them to block layer if possible
  */
-static int dasd_generic_requeue_all_requests(struct dasd_device *device)
+int dasd_generic_requeue_all_requests(struct dasd_device *device)
 {
 	struct list_head requeue_queue;
 	struct dasd_ccw_req *cqr, *n;
@@ -4001,6 +3978,7 @@ static int dasd_generic_requeue_all_requests(struct dasd_device *device)
 	dasd_schedule_device_bh(device);
 	return rc;
 }
+EXPORT_SYMBOL_GPL(dasd_generic_requeue_all_requests);
 
 static void do_requeue_requests(struct work_struct *work)
 {

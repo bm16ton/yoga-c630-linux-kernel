@@ -1,0 +1,1 @@
+cmd_/Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/modules.order := {   echo /Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/ft232h-intf.ko;   echo /Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/spi-ftdi-mpsse.ko; :; } | awk '!x[$$0]++' - > /Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/modules.order

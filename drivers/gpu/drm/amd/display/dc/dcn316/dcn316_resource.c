@@ -885,8 +885,11 @@ static const struct dc_debug_options debug_defaults_drv = {
 			.afmt = true,
 		}
 	},
+<<<<<<< HEAD
+=======
 	.optimize_edp_link_rate = true,
 	.enable_sw_cntl_psr = true,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct dc_debug_options debug_defaults_diags = {
@@ -907,6 +910,15 @@ static const struct dc_debug_options debug_defaults_diags = {
 	.use_max_lb = true
 };
 
+<<<<<<< HEAD
+static const struct dc_panel_config panel_config_defaults = {
+	.ilr = {
+		.optimize_edp_link_rate = true,
+	},
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void dcn31_dpp_destroy(struct dpp **dpp)
 {
 	kfree(TO_DCN20_DPP(*dpp));
@@ -1711,6 +1723,14 @@ static int dcn316_populate_dml_pipes_from_context(
 	return pipe_cnt;
 }
 
+<<<<<<< HEAD
+static void dcn316_get_panel_config_defaults(struct dc_panel_config *panel_config)
+{
+	*panel_config = panel_config_defaults;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct dc_cap_funcs cap_funcs = {
 	.get_dcc_compression_cap = dcn20_get_dcc_compression_cap
 };
@@ -1737,6 +1757,10 @@ static struct resource_funcs dcn316_res_pool_funcs = {
 	.release_post_bldn_3dlut = dcn30_release_post_bldn_3dlut,
 	.update_bw_bounding_box = dcn316_update_bw_bounding_box,
 	.patch_unknown_plane_state = dcn20_patch_unknown_plane_state,
+<<<<<<< HEAD
+	.get_panel_config_defaults = dcn316_get_panel_config_defaults,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static bool dcn316_resource_construct(

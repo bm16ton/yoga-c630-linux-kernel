@@ -568,6 +568,10 @@ static void icl_ctx_workarounds_init(struct intel_engine_cs *engine,
 static void dg2_ctx_gt_tuning_init(struct intel_engine_cs *engine,
 				   struct i915_wa_list *wal)
 {
+<<<<<<< HEAD
+	wa_masked_en(wal, CHICKEN_RASTER_2, TBIMR_FAST_CLIP);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wa_write_clr_set(wal, GEN11_L3SQCREG5, L3_PWM_TIMER_INIT_VAL_MASK,
 			 REG_FIELD_PREP(L3_PWM_TIMER_INIT_VAL_MASK, 0x7f));
 	wa_add(wal,
@@ -680,11 +684,19 @@ static void dg2_ctx_workarounds_init(struct intel_engine_cs *engine,
 		wa_masked_en(wal, GEN11_COMMON_SLICE_CHICKEN3,
 			     GEN12_DISABLE_CPS_AWARE_COLOR_PIPE);
 	}
+<<<<<<< HEAD
 
 	/* Wa_16013271637:dg2 */
 	wa_masked_en(wal, SLICE_COMMON_ECO_CHICKEN1,
 		     MSC_MSAA_REODER_BUF_BYPASS_DISABLE);
 
+=======
+
+	/* Wa_16013271637:dg2 */
+	wa_masked_en(wal, SLICE_COMMON_ECO_CHICKEN1,
+		     MSC_MSAA_REODER_BUF_BYPASS_DISABLE);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Wa_14014947963:dg2 */
 	if (IS_DG2_GRAPHICS_STEP(engine->i915, G10, STEP_B0, STEP_FOREVER) ||
 		IS_DG2_G11(engine->i915) || IS_DG2_G12(engine->i915))
@@ -1097,6 +1109,7 @@ icl_wa_init_mcr(struct intel_gt *gt, struct i915_wa_list *wal)
 
 	GEM_BUG_ON(GRAPHICS_VER(gt->i915) < 11);
 	GEM_BUG_ON(hweight8(sseu->slice_mask) > 1);
+<<<<<<< HEAD
 
 	/*
 	 * Although a platform may have subslices, we need to always steer
@@ -1120,6 +1133,31 @@ icl_wa_init_mcr(struct intel_gt *gt, struct i915_wa_list *wal)
 	__add_mcr_wa(gt, wal, 0, subslice);
 }
 
+=======
+
+	/*
+	 * Although a platform may have subslices, we need to always steer
+	 * reads to the lowest instance that isn't fused off.  When Render
+	 * Power Gating is enabled, grabbing forcewake will only power up a
+	 * single subslice (the "minconfig") if there isn't a real workload
+	 * that needs to be run; this means that if we steer register reads to
+	 * one of the higher subslices, we run the risk of reading back 0's or
+	 * random garbage.
+	 */
+	subslice = __ffs(intel_sseu_get_hsw_subslices(sseu, 0));
+
+	/*
+	 * If the subslice we picked above also steers us to a valid L3 bank,
+	 * then we can just rely on the default steering and won't need to
+	 * worry about explicitly re-steering L3BANK reads later.
+	 */
+	if (gt->info.l3bank_mask & BIT(subslice))
+		gt->steering_table[L3BANK] = NULL;
+
+	__add_mcr_wa(gt, wal, 0, subslice);
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void
 xehp_init_mcr(struct intel_gt *gt, struct i915_wa_list *wal)
 {
@@ -2102,6 +2140,8 @@ rcs_engine_wa_init(struct intel_engine_cs *engine, struct i915_wa_list *wal)
 		/* Wa_1509235366:dg2 */
 		wa_write_or(wal, GEN12_GAMCNTRL_CTRL, INVALIDATION_BROADCAST_MODE_DIS |
 			    GLOBAL_INVALIDATION_MODE);
+<<<<<<< HEAD
+=======
 
 		/*
 		 * The following are not actually "workarounds" but rather
@@ -2109,6 +2149,7 @@ rcs_engine_wa_init(struct intel_engine_cs *engine, struct i915_wa_list *wal)
 		 * performance guide section.
 		 */
 		wa_write_or(wal, XEHP_L3SCQREG7, BLEND_FILL_CACHING_OPT_DIS);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (IS_DG2_GRAPHICS_STEP(i915, G11, STEP_A0, STEP_B0)) {
@@ -2119,6 +2160,16 @@ rcs_engine_wa_init(struct intel_engine_cs *engine, struct i915_wa_list *wal)
 		wa_write_or(wal, LSC_CHICKEN_BIT_0_UDW, DIS_CHAIN_2XSIMD8);
 	}
 
+<<<<<<< HEAD
+	if (IS_DG2_GRAPHICS_STEP(i915, G10, STEP_B0, STEP_FOREVER) ||
+	    IS_DG2_G11(i915) || IS_DG2_G12(i915)) {
+		/* Wa_1509727124:dg2 */
+		wa_masked_en(wal, GEN10_SAMPLER_MODE,
+			     SC_DISABLE_POWER_OPTIMIZATION_EBB);
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_DG2_GRAPHICS_STEP(i915, G10, STEP_A0, STEP_B0) ||
 	    IS_DG2_GRAPHICS_STEP(i915, G11, STEP_A0, STEP_B0)) {
 		/* Wa_14012419201:dg2 */
@@ -2195,6 +2246,8 @@ rcs_engine_wa_init(struct intel_engine_cs *engine, struct i915_wa_list *wal)
 		wa_write_or(wal, XEHP_L3NODEARBCFG, XEHP_LNESPARE);
 	}
 
+<<<<<<< HEAD
+=======
 	if (IS_DG2_GRAPHICS_STEP(i915, G10, STEP_A0, STEP_C0) ||
 	    IS_DG2_G11(i915)) {
 		/* Wa_22012654132:dg2 */
@@ -2204,6 +2257,7 @@ rcs_engine_wa_init(struct intel_engine_cs *engine, struct i915_wa_list *wal)
 		       true);
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Wa_14013202645:dg2 */
 	if (IS_DG2_GRAPHICS_STEP(i915, G10, STEP_B0, STEP_C0) ||
 	    IS_DG2_GRAPHICS_STEP(i915, G11, STEP_A0, STEP_B0))
@@ -2397,7 +2451,11 @@ rcs_engine_wa_init(struct intel_engine_cs *engine, struct i915_wa_list *wal)
 			     FF_DOP_CLOCK_GATE_DISABLE);
 	}
 
+<<<<<<< HEAD
+	if (IS_GRAPHICS_VER(i915, 9, 12)) {
+=======
 	if (HAS_PERCTX_PREEMPT_CTRL(i915)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* FtrPerCtxtPreemptionGranularityControl:skl,bxt,kbl,cfl,cnl,icl,tgl */
 		wa_masked_en(wal,
 			     GEN7_FF_SLICE_CS_CHICKEN1,
@@ -2670,6 +2728,59 @@ ccs_engine_wa_init(struct intel_engine_cs *engine, struct i915_wa_list *wal)
 }
 
 /*
+<<<<<<< HEAD
+ * The bspec performance guide has recommended MMIO tuning settings.  These
+ * aren't truly "workarounds" but we want to program them with the same
+ * workaround infrastructure to ensure that they're automatically added to
+ * the GuC save/restore lists, re-applied at the right times, and checked for
+ * any conflicting programming requested by real workarounds.
+ *
+ * Programming settings should be added here only if their registers are not
+ * part of an engine's register state context.  If a register is part of a
+ * context, then any tuning settings should be programmed in an appropriate
+ * function invoked by __intel_engine_init_ctx_wa().
+ */
+static void
+add_render_compute_tuning_settings(struct drm_i915_private *i915,
+				   struct i915_wa_list *wal)
+{
+	if (IS_PONTEVECCHIO(i915)) {
+		wa_write(wal, XEHPC_L3SCRUB,
+			 SCRUB_CL_DWNGRADE_SHARED | SCRUB_RATE_4B_PER_CLK);
+	}
+
+	if (IS_DG2(i915)) {
+		wa_write_or(wal, XEHP_L3SCQREG7, BLEND_FILL_CACHING_OPT_DIS);
+		wa_write_clr_set(wal, RT_CTRL, STACKID_CTRL, STACKID_CTRL_512);
+
+		/*
+		 * This is also listed as Wa_22012654132 for certain DG2
+		 * steppings, but the tuning setting programming is a superset
+		 * since it applies to all DG2 variants and steppings.
+		 *
+		 * Note that register 0xE420 is write-only and cannot be read
+		 * back for verification on DG2 (due to Wa_14012342262), so
+		 * we need to explicitly skip the readback.
+		 */
+		wa_add(wal, GEN10_CACHE_MODE_SS, 0,
+		       _MASKED_BIT_ENABLE(ENABLE_PREFETCH_INTO_IC),
+		       0 /* write-only, so skip validation */,
+		       true);
+	}
+
+	/*
+	 * This tuning setting proves beneficial only on ATS-M designs; the
+	 * default "age based" setting is optimal on regular DG2 and other
+	 * platforms.
+	 */
+	if (INTEL_INFO(i915)->tuning_thread_rr_after_dep)
+		wa_masked_field_set(wal, GEN9_ROW_CHICKEN4, THREAD_EX_ARB_MODE,
+				    THREAD_EX_ARB_MODE_RR_AFTER_DEP);
+}
+
+/*
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * The workarounds in this function apply to shared registers in
  * the general render reset domain that aren't tied to a
  * specific engine.  Since all render+compute engines get reset
@@ -2683,6 +2794,11 @@ general_render_compute_wa_init(struct intel_engine_cs *engine, struct i915_wa_li
 {
 	struct drm_i915_private *i915 = engine->i915;
 
+<<<<<<< HEAD
+	add_render_compute_tuning_settings(i915, wal);
+
+	if (IS_PONTEVECCHIO(i915)) {
+=======
 	if (IS_PONTEVECCHIO(i915)) {
 		/*
 		 * The following is not actually a "workaround" but rather
@@ -2691,6 +2807,7 @@ general_render_compute_wa_init(struct intel_engine_cs *engine, struct i915_wa_li
 		 */
 		wa_write(wal, XEHPC_L3SCRUB, SCRUB_CL_DWNGRADE_SHARED | SCRUB_RATE_4B_PER_CLK);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Wa_16016694945 */
 		wa_masked_en(wal, XEHPC_LNCFMISCCFGREG0, XEHPC_OVRLSCCC);
 	}

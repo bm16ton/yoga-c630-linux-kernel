@@ -1,0 +1,1 @@
+cmd_drivers/iio/pressure/cros_ec_baro.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/pressure/cros_ec_baro.ko drivers/iio/pressure/cros_ec_baro.o drivers/iio/pressure/cros_ec_baro.mod.o;  true

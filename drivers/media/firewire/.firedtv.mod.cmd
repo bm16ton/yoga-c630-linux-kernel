@@ -1,0 +1,1 @@
+cmd_drivers/media/firewire/firedtv.mod := printf '%s\n'   firedtv-avc.o firedtv-ci.o firedtv-dvb.o firedtv-fe.o firedtv-fw.o firedtv-rc.o | awk '!x[$$0]++ { print("drivers/media/firewire/"$$0) }' > drivers/media/firewire/firedtv.mod

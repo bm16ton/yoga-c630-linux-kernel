@@ -25,12 +25,20 @@ static struct dma_fence *msm_job_run(struct drm_sched_job *job)
 
 		msm_gem_lock(obj);
 		msm_gem_unpin_vma_fenced(submit->bos[i].vma, fctx);
+<<<<<<< HEAD
+		msm_gem_unpin_locked(obj);
+		submit->bos[i].flags &= ~(BO_VMA_PINNED | BO_OBJ_PINNED);
+		msm_gem_unlock(obj);
+	}
+
+=======
 		submit->bos[i].flags &= ~BO_VMA_PINNED;
 		msm_gem_unlock(obj);
 	}
 
 	pm_runtime_get_sync(&gpu->pdev->dev);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* TODO move submit path over to using a per-ring lock.. */
 	mutex_lock(&gpu->lock);
 
@@ -38,8 +46,11 @@ static struct dma_fence *msm_job_run(struct drm_sched_job *job)
 
 	mutex_unlock(&gpu->lock);
 
+<<<<<<< HEAD
+=======
 	pm_runtime_put(&gpu->pdev->dev);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return dma_fence_get(submit->hw_fence);
 }
 

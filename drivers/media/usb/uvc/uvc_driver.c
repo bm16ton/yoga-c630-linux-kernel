@@ -20,6 +20,7 @@
 
 #include <media/v4l2-common.h>
 #include <media/v4l2-ioctl.h>
+#include <media/v4l2-uvc.h>
 
 #include "uvcvideo.h"
 
@@ -35,6 +36,8 @@ unsigned int uvc_dbg_param;
 unsigned int uvc_timeout_param = UVC_CTRL_STREAMING_TIMEOUT;
 
 /* ------------------------------------------------------------------------
+<<<<<<< HEAD
+=======
  * Video formats
  */
 
@@ -227,6 +230,7 @@ static struct uvc_format_desc uvc_fmts[] = {
 };
 
 /* ------------------------------------------------------------------------
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Utility functions
  */
 
@@ -240,19 +244,6 @@ struct usb_host_endpoint *uvc_find_endpoint(struct usb_host_interface *alts,
 		ep = &alts->endpoint[i];
 		if (ep->desc.bEndpointAddress == epaddr)
 			return ep;
-	}
-
-	return NULL;
-}
-
-static struct uvc_format_desc *uvc_format_by_guid(const u8 guid[16])
-{
-	unsigned int len = ARRAY_SIZE(uvc_fmts);
-	unsigned int i;
-
-	for (i = 0; i < len; ++i) {
-		if (memcmp(guid, uvc_fmts[i].guid, 16) == 0)
-			return &uvc_fmts[i];
 	}
 
 	return NULL;
@@ -329,6 +320,8 @@ static enum v4l2_ycbcr_encoding uvc_ycbcr_enc(const u8 matrix_coefficients)
 	return V4L2_YCBCR_ENC_DEFAULT;  /* Reserved */
 }
 
+<<<<<<< HEAD
+=======
 /*
  * Simplify a fraction using a simple continued fraction decomposition. The
  * idea here is to convert fractions such as 333333/10000000 to 1/30 using
@@ -413,6 +406,7 @@ u32 uvc_fraction_to_interval(u32 numerator, u32 denominator)
 	return denominator ? numerator * multiplier / denominator : 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* ------------------------------------------------------------------------
  * Terminal and unit management
  */
@@ -2740,7 +2734,11 @@ static const struct usb_device_id uvc_ids[] = {
 	  .idProduct		= 0x4034,
 	  .bInterfaceClass	= USB_CLASS_VIDEO,
 	  .bInterfaceSubClass	= 1,
+<<<<<<< HEAD
+	  .bInterfaceProtocol	= UVC_PC_PROTOCOL_15,
+=======
 	  .bInterfaceProtocol	= 0,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	  .driver_info		= (kernel_ulong_t)&uvc_ctrl_power_line_limited },
 	/* LogiLink Wireless Webcam */
 	{ .match_flags		= USB_DEVICE_ID_MATCH_DEVICE
@@ -3264,6 +3262,18 @@ static const struct usb_device_id uvc_ids[] = {
 	  .bInterfaceSubClass	= 1,
 	  .bInterfaceProtocol	= 0,
 	  .driver_info		= UVC_INFO_QUIRK(UVC_QUIRK_FORCE_BPP) },
+<<<<<<< HEAD
+	/* Sonix Technology USB 2.0 Camera */
+	{ .match_flags		= USB_DEVICE_ID_MATCH_DEVICE
+				| USB_DEVICE_ID_MATCH_INT_INFO,
+	  .idVendor		= 0x3277,
+	  .idProduct		= 0x0072,
+	  .bInterfaceClass	= USB_CLASS_VIDEO,
+	  .bInterfaceSubClass	= 1,
+	  .bInterfaceProtocol	= 0,
+	  .driver_info		= (kernel_ulong_t)&uvc_ctrl_power_line_limited },
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Acer EasyCamera */
 	{ .match_flags		= USB_DEVICE_ID_MATCH_DEVICE
 				| USB_DEVICE_ID_MATCH_INT_INFO,

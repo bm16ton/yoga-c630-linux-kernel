@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ti/wl18xx/wl18xx.mod := printf '%s\n'   main.o acx.o tx.o io.o debugfs.o scan.o cmd.o event.o | awk '!x[$$0]++ { print("drivers/net/wireless/ti/wl18xx/"$$0) }' > drivers/net/wireless/ti/wl18xx/wl18xx.mod

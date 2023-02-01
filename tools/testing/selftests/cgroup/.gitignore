@@ -5,3 +5,7 @@ test_freezer
 test_kmem
 test_kill
 test_cpu
+<<<<<<< HEAD
+wait_inotify
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

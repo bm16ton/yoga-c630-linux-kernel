@@ -1,0 +1,1 @@
+cmd_drivers/auxdisplay/panel.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/auxdisplay/panel.ko drivers/auxdisplay/panel.o drivers/auxdisplay/panel.mod.o;  true

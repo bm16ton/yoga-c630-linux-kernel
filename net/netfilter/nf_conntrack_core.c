@@ -891,7 +891,11 @@ nf_conntrack_hash_check_insert(struct nf_conn *ct)
 	zone = nf_ct_zone(ct);
 
 	if (!nf_ct_ext_valid_pre(ct->ext)) {
+<<<<<<< HEAD
+		NF_CT_STAT_INC_ATOMIC(net, insert_failed);
+=======
 		NF_CT_STAT_INC(net, insert_failed);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ETIMEDOUT;
 	}
 
@@ -938,7 +942,11 @@ nf_conntrack_hash_check_insert(struct nf_conn *ct)
 
 	if (!nf_ct_ext_valid_post(ct->ext)) {
 		nf_ct_kill(ct);
+<<<<<<< HEAD
+		NF_CT_STAT_INC_ATOMIC(net, drop);
+=======
 		NF_CT_STAT_INC(net, drop);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ETIMEDOUT;
 	}
 
@@ -1275,7 +1283,11 @@ chaintoolong:
 	 */
 	if (!nf_ct_ext_valid_post(ct->ext)) {
 		nf_ct_kill(ct);
+<<<<<<< HEAD
+		NF_CT_STAT_INC_ATOMIC(net, drop);
+=======
 		NF_CT_STAT_INC(net, drop);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return NF_DROP;
 	}
 
@@ -1684,10 +1696,17 @@ void nf_conntrack_free(struct nf_conn *ct)
 	 * the golden rule for SLAB_TYPESAFE_BY_RCU
 	 */
 	WARN_ON(refcount_read(&ct->ct_general.use) != 0);
+<<<<<<< HEAD
 
 	if (ct->status & IPS_SRC_NAT_DONE) {
 		const struct nf_nat_hook *nat_hook;
 
+=======
+
+	if (ct->status & IPS_SRC_NAT_DONE) {
+		const struct nf_nat_hook *nat_hook;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rcu_read_lock();
 		nat_hook = rcu_dereference(nf_nat_hook);
 		if (nat_hook)
@@ -2516,6 +2535,7 @@ static int kill_all(struct nf_conn *i, void *data)
 
 void nf_conntrack_cleanup_start(void)
 {
+	cleanup_nf_conntrack_bpf();
 	conntrack_gc_work.exiting = true;
 }
 
@@ -2810,10 +2830,13 @@ err_expect:
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
 #if (IS_BUILTIN(CONFIG_NF_CONNTRACK) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF)) || \
     (IS_MODULE(CONFIG_NF_CONNTRACK) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF_MODULES) || \
     IS_ENABLED(CONFIG_NF_CT_NETLINK))
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* ctnetlink code shared by both ctnetlink and nf_conntrack_bpf */
 
 int __nf_ct_change_timeout(struct nf_conn *ct, u64 timeout)
@@ -2869,5 +2892,8 @@ int nf_ct_change_status_common(struct nf_conn *ct, unsigned int status)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(nf_ct_change_status_common);
+<<<<<<< HEAD
+=======
 
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

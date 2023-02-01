@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/ad7879-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/ad7879-i2c.ko drivers/input/touchscreen/ad7879-i2c.o drivers/input/touchscreen/ad7879-i2c.mod.o;  true

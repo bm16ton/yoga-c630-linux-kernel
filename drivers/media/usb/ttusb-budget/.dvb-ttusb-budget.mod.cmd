@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/ttusb-budget/dvb-ttusb-budget.mod := printf '%s\n'   dvb-ttusb-budget.o | awk '!x[$$0]++ { print("drivers/media/usb/ttusb-budget/"$$0) }' > drivers/media/usb/ttusb-budget/dvb-ttusb-budget.mod

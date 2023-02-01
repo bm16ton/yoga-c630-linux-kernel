@@ -23,8 +23,11 @@ properties:
   reg:
     maxItems: 1
 
+<<<<<<< HEAD
+=======
   spi-max-frequency: true
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   interrupts:
     maxItems: 1
 

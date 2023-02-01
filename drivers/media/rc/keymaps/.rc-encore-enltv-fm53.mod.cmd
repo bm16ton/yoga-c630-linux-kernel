@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-encore-enltv-fm53.mod := printf '%s\n'   rc-encore-enltv-fm53.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-encore-enltv-fm53.mod

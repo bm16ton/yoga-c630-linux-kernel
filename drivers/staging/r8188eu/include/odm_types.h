@@ -6,11 +6,14 @@
 
 #define	ODM_CE			0x04	/* BIT(2) */
 
+<<<<<<< HEAD
+=======
 enum HAL_STATUS {
 	HAL_STATUS_SUCCESS,
 	HAL_STATUS_FAILURE,
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define SET_TX_DESC_ANTSEL_A_88E(__ptxdesc, __value)			\
 	le32p_replace_bits((__le32 *)(__ptxdesc + 8), __value, BIT(24))
 #define SET_TX_DESC_ANTSEL_B_88E(__ptxdesc, __value)			\

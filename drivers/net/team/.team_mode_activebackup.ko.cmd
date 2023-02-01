@@ -1,0 +1,1 @@
+cmd_drivers/net/team/team_mode_activebackup.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/team/team_mode_activebackup.ko drivers/net/team/team_mode_activebackup.o drivers/net/team/team_mode_activebackup.mod.o;  true

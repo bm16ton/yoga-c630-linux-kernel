@@ -341,6 +341,19 @@ static int emit_no_arbitration(struct i915_request *rq)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int max_pte_pkt_size(struct i915_request *rq, int pkt)
+{
+	struct intel_ring *ring = rq->ring;
+
+	pkt = min_t(int, pkt, (ring->space - rq->reserved_space) / sizeof(u32) + 5);
+	pkt = min_t(int, pkt, (ring->size - ring->emit) / sizeof(u32) + 5);
+
+	return pkt;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int emit_pte(struct i915_request *rq,
 		    struct sgt_dma *it,
 		    enum i915_cache_level cache_level,
@@ -387,8 +400,12 @@ static int emit_pte(struct i915_request *rq,
 		return PTR_ERR(cs);
 
 	/* Pack as many PTE updates as possible into a single MI command */
+<<<<<<< HEAD
+	pkt = max_pte_pkt_size(rq, dword_length);
+=======
 	pkt = min_t(int, dword_length, ring->space / sizeof(u32) + 5);
 	pkt = min_t(int, pkt, (ring->size - ring->emit) / sizeof(u32) + 5);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hdr = cs;
 	*cs++ = MI_STORE_DATA_IMM | REG_BIT(21); /* as qword elements */
@@ -421,8 +438,12 @@ static int emit_pte(struct i915_request *rq,
 				}
 			}
 
+<<<<<<< HEAD
+			pkt = max_pte_pkt_size(rq, dword_rem);
+=======
 			pkt = min_t(int, dword_rem, ring->space / sizeof(u32) + 5);
 			pkt = min_t(int, pkt, (ring->size - ring->emit) / sizeof(u32) + 5);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			hdr = cs;
 			*cs++ = MI_STORE_DATA_IMM | REG_BIT(21);
@@ -511,6 +532,8 @@ static inline u32 *i915_flush_dw(u32 *cmd, u32 flags)
 	return cmd;
 }
 
+<<<<<<< HEAD
+=======
 static u32 calc_ctrl_surf_instr_size(struct drm_i915_private *i915, int size)
 {
 	u32 num_cmds, num_blks, total_size;
@@ -536,12 +559,19 @@ static u32 calc_ctrl_surf_instr_size(struct drm_i915_private *i915, int size)
 	return total_size;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int emit_copy_ccs(struct i915_request *rq,
 			 u32 dst_offset, u8 dst_access,
 			 u32 src_offset, u8 src_access, int size)
 {
 	struct drm_i915_private *i915 = rq->engine->i915;
 	int mocs = rq->engine->gt->mocs.uc_index << 1;
+<<<<<<< HEAD
+	u32 num_ccs_blks;
+	u32 *cs;
+
+	cs = intel_ring_begin(rq, 12);
+=======
 	u32 num_ccs_blks, ccs_ring_size;
 	u32 *cs;
 
@@ -549,6 +579,7 @@ static int emit_copy_ccs(struct i915_request *rq,
 	WARN_ON(!ccs_ring_size);
 
 	cs = intel_ring_begin(rq, round_up(ccs_ring_size, 2));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(cs))
 		return PTR_ERR(cs);
 
@@ -583,8 +614,12 @@ static int emit_copy_ccs(struct i915_request *rq,
 		FIELD_PREP(XY_CTRL_SURF_MOCS_MASK, mocs);
 
 	cs = i915_flush_dw(cs, MI_FLUSH_DW_LLC | MI_FLUSH_DW_CCS);
+<<<<<<< HEAD
+	*cs++ = MI_NOOP;
+=======
 	if (ccs_ring_size & 1)
 		*cs++ = MI_NOOP;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	intel_ring_advance(rq, cs);
 
@@ -645,7 +680,11 @@ static u64 scatter_list_length(struct scatterlist *sg)
 	while (sg && sg_dma_len(sg)) {
 		len += sg_dma_len(sg);
 		sg = sg_next(sg);
+<<<<<<< HEAD
+	}
+=======
 	};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return len;
 }

@@ -281,6 +281,8 @@ out_bad_resource:
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
 /**
  * vmw_user_resource_noref_lookup_handle - lookup a struct resource from a
  * TTM user-space handle and perform basic type checks
@@ -314,6 +316,7 @@ vmw_user_resource_noref_lookup_handle(struct vmw_private *dev_priv,
 	return converter->base_obj_to_res(base);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Helper function that looks either a surface or bo.
  *
@@ -525,7 +528,7 @@ void vmw_resource_unreserve(struct vmw_resource *res,
  *                             for a resource and in that case, allocate
  *                             one, reserve and validate it.
  *
- * @ticket:         The ww aqcquire context to use, or NULL if trylocking.
+ * @ticket:         The ww acquire context to use, or NULL if trylocking.
  * @res:            The resource for which to allocate a backup buffer.
  * @interruptible:  Whether any sleeps during allocation should be
  *                  performed while interruptible.
@@ -686,7 +689,7 @@ out_no_unbind:
  * @intr: Perform waits interruptible if possible.
  * @dirtying: Pending GPU operation will dirty the resource
  *
- * On succesful return, any backup DMA buffer pointed to by @res->backup will
+ * On successful return, any backup DMA buffer pointed to by @res->backup will
  * be reserved and validated.
  * On hardware resource shortage, this function will repeatedly evict
  * resources of the same type until the validation succeeds.
@@ -804,7 +807,7 @@ void vmw_resource_unbind_list(struct vmw_buffer_object *vbo)
  * @dx_query_mob: Buffer containing the DX query MOB
  *
  * Read back cached states from the device if they exist.  This function
- * assumings binding_mutex is held.
+ * assumes binding_mutex is held.
  */
 int vmw_query_readback_all(struct vmw_buffer_object *dx_query_mob)
 {
@@ -1125,7 +1128,7 @@ int vmw_resources_clean(struct vmw_buffer_object *vbo, pgoff_t start,
 	}
 
 	/*
-	 * In order of increasing backup_offset, clean dirty resorces
+	 * In order of increasing backup_offset, clean dirty resources
 	 * intersecting the range.
 	 */
 	while (found) {

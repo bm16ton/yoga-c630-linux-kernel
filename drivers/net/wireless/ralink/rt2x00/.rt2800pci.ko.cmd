@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ralink/rt2x00/rt2800pci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/ralink/rt2x00/rt2800pci.ko drivers/net/wireless/ralink/rt2x00/rt2800pci.o drivers/net/wireless/ralink/rt2x00/rt2800pci.mod.o;  true

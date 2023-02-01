@@ -20,11 +20,20 @@ struct mei_aux_device;
 
 /**
  * struct intel_gsc - graphics security controller
+<<<<<<< HEAD
+ *
+ * @gem_obj: scratch memory GSC operations
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @intf : gsc interface
  */
 struct intel_gsc {
 	struct intel_gsc_intf {
 		struct mei_aux_device *adev;
+<<<<<<< HEAD
+		struct drm_i915_gem_object *gem_obj;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		int irq;
 		unsigned int id;
 	} intf[INTEL_GSC_NUM_INTERFACES];

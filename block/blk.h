@@ -88,6 +88,13 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
 	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
 	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
 
+	/*
+	 * Merging adjacent physical pages may not work correctly under KMSAN
+	 * if their metadata pages aren't adjacent. Just disable merging.
+	 */
+	if (IS_ENABLED(CONFIG_KMSAN))
+		return false;
+
 	if (addr1 + vec1->bv_len != addr2)
 		return false;
 	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
@@ -112,6 +119,7 @@ static inline bool bvec_gap_to_prev(struct queue_limits *lim,
 		struct bio_vec *bprv, unsigned int offset)
 {
 	if (!lim->virt_boundary_mask)
+<<<<<<< HEAD
 		return false;
 	return __bvec_gap_to_prev(lim, bprv, offset);
 }
@@ -126,6 +134,22 @@ static inline bool rq_mergeable(struct request *rq)
 
 	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
 		return false;
+=======
+		return false;
+	return __bvec_gap_to_prev(lim, bprv, offset);
+}
+
+static inline bool rq_mergeable(struct request *rq)
+{
+	if (blk_rq_is_passthrough(rq))
+		return false;
+
+	if (req_op(rq) == REQ_OP_FLUSH)
+		return false;
+
+	if (req_op(rq) == REQ_OP_WRITE_ZEROES)
+		return false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (req_op(rq) == REQ_OP_ZONE_APPEND)
 		return false;
@@ -389,9 +413,9 @@ static inline struct bio *blk_queue_bounce(struct bio *bio,
 }
 
 #ifdef CONFIG_BLK_CGROUP_IOLATENCY
-extern int blk_iolatency_init(struct request_queue *q);
+int blk_iolatency_init(struct gendisk *disk);
 #else
-static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+static inline int blk_iolatency_init(struct gendisk *disk) { return 0; };
 #endif
 
 #ifdef CONFIG_BLK_DEV_ZONED
@@ -429,7 +453,11 @@ static inline struct kmem_cache *blk_get_queue_kmem_cache(bool srcu)
 }
 struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu);
 
+<<<<<<< HEAD
+int disk_scan_partitions(struct gendisk *disk, fmode_t mode, void *owner);
+=======
 int disk_scan_partitions(struct gendisk *disk, fmode_t mode);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int disk_alloc_events(struct gendisk *disk);
 void disk_add_events(struct gendisk *disk);

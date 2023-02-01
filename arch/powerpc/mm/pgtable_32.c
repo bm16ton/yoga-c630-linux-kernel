@@ -158,10 +158,18 @@ void mark_rodata_ro(void)
 	}
 
 	/*
+<<<<<<< HEAD
+	 * mark text and rodata as read only. __end_rodata is set by
+	 * powerpc's linker script and includes tables and data
+	 * requiring relocation which are not put in RO_DATA.
+	 */
+	numpages = PFN_UP((unsigned long)__end_rodata) -
+=======
 	 * mark .text and .rodata as read only. Use __init_begin rather than
 	 * __end_rodata to cover NOTES and EXCEPTION_TABLE.
 	 */
 	numpages = PFN_UP((unsigned long)__init_begin) -
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		   PFN_DOWN((unsigned long)_stext);
 
 	set_memory_ro((unsigned long)_stext, numpages);

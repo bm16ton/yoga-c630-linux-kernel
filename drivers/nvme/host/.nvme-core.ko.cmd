@@ -1,0 +1,1 @@
+cmd_drivers/nvme/host/nvme-core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nvme/host/nvme-core.ko drivers/nvme/host/nvme-core.o drivers/nvme/host/nvme-core.mod.o;  true

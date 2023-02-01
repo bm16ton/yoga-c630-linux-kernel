@@ -1,0 +1,8 @@
+drivers/mtd/devices/docg3.ko
+drivers/mtd/devices/slram.ko
+drivers/mtd/devices/phram.ko
+drivers/mtd/devices/block2mtd.ko
+drivers/mtd/devices/mtd_dataflash.ko
+drivers/mtd/devices/mchp23k256.ko
+drivers/mtd/devices/mchp48l640.ko
+drivers/mtd/devices/sst25l.ko

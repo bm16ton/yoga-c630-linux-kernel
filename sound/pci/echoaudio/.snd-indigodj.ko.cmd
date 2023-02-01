@@ -1,0 +1,1 @@
+cmd_sound/pci/echoaudio/snd-indigodj.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/echoaudio/snd-indigodj.ko sound/pci/echoaudio/snd-indigodj.o sound/pci/echoaudio/snd-indigodj.mod.o;  true

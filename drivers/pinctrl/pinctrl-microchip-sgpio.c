@@ -12,6 +12,7 @@
 #include <linux/clk.h>
 #include <linux/gpio/driver.h>
 #include <linux/io.h>
+#include <linux/mfd/ocelot.h>
 #include <linux/mod_devicetable.h>
 #include <linux/module.h>
 #include <linux/pinctrl/pinmux.h>
@@ -142,6 +143,7 @@ static inline int sgpio_addr_to_pin(struct sgpio_priv *priv, int port, int bit)
 }
 
 static inline u32 sgpio_get_addr(struct sgpio_priv *priv, u32 rno, u32 off)
+<<<<<<< HEAD
 {
 	return (priv->properties->regoff[rno] + off) *
 		regmap_get_reg_stride(priv->regs);
@@ -156,6 +158,22 @@ static u32 sgpio_readl(struct sgpio_priv *priv, u32 rno, u32 off)
 	ret = regmap_read(priv->regs, addr, &val);
 	WARN_ONCE(ret, "error reading sgpio reg %d\n", ret);
 
+=======
+{
+	return (priv->properties->regoff[rno] + off) *
+		regmap_get_reg_stride(priv->regs);
+}
+
+static u32 sgpio_readl(struct sgpio_priv *priv, u32 rno, u32 off)
+{
+	u32 addr = sgpio_get_addr(priv, rno, off);
+	u32 val = 0;
+	int ret;
+
+	ret = regmap_read(priv->regs, addr, &val);
+	WARN_ONCE(ret, "error reading sgpio reg %d\n", ret);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return val;
 }
 
@@ -864,9 +882,10 @@ static int microchip_sgpio_register_bank(struct device *dev,
 	gc->can_sleep		= !bank->is_input;
 
 	if (bank->is_input && priv->properties->flags & SGPIO_FLAGS_HAS_IRQ) {
-		int irq = fwnode_irq_get(fwnode, 0);
+		int irq;
 
-		if (irq) {
+		irq = fwnode_irq_get(fwnode, 0);
+		if (irq > 0) {
 			struct gpio_irq_chip *girq = &gc->irq;
 
 			gpio_irq_chip_set_chip(girq, &microchip_sgpio_irqchip);
@@ -937,11 +956,15 @@ static int microchip_sgpio_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
+<<<<<<< HEAD
+	priv->regs = ocelot_regmap_from_resource(pdev, 0, &regmap_config);
+=======
 	regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(regs))
 		return PTR_ERR(regs);
 
 	priv->regs = devm_regmap_init_mmio(dev, regs, &regmap_config);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(priv->regs))
 		return PTR_ERR(priv->regs);
 
@@ -999,6 +1022,7 @@ static const struct of_device_id microchip_sgpio_gpio_of_match[] = {
 		/* sentinel */
 	}
 };
+MODULE_DEVICE_TABLE(of, microchip_sgpio_gpio_of_match);
 
 static struct platform_driver microchip_sgpio_pinctrl_driver = {
 	.driver = {
@@ -1008,4 +1032,7 @@ static struct platform_driver microchip_sgpio_pinctrl_driver = {
 	},
 	.probe = microchip_sgpio_probe,
 };
-builtin_platform_driver(microchip_sgpio_pinctrl_driver);
+module_platform_driver(microchip_sgpio_pinctrl_driver);
+
+MODULE_DESCRIPTION("Microchip SGPIO Pinctrl Driver");
+MODULE_LICENSE("GPL");

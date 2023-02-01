@@ -1,0 +1,12 @@
+drivers/gpu/drm/panel/panel-boe-bf060y8m-aj0.ko
+drivers/gpu/drm/panel/panel-boe-himax8279d.ko
+drivers/gpu/drm/panel/panel-boe-tv101wum-nl6.ko
+drivers/gpu/drm/panel/panel-dsi-cm.ko
+drivers/gpu/drm/panel/panel-lvds.ko
+drivers/gpu/drm/panel/panel-simple.ko
+drivers/gpu/drm/panel/panel-edp.ko
+drivers/gpu/drm/panel/panel-innolux-ej030na.ko
+drivers/gpu/drm/panel/panel-innolux-p079zca.ko
+drivers/gpu/drm/panel/panel-raspberrypi-touchscreen.ko
+drivers/gpu/drm/panel/panel-sharp-lq101r1sx01.ko
+drivers/gpu/drm/panel/panel-sharp-ls037v7dw01.ko

@@ -270,22 +270,31 @@ EXPORT_SYMBOL_NS(adis_debugfs_reg_access, IIO_ADISLIB);
 #endif
 
 /**
- * adis_enable_irq() - Enable or disable data ready IRQ
+ * __adis_enable_irq() - Enable or disable data ready IRQ (unlocked)
  * @adis: The adis device
  * @enable: Whether to enable the IRQ
  *
  * Returns 0 on success, negative error code otherwise
  */
-int adis_enable_irq(struct adis *adis, bool enable)
+int __adis_enable_irq(struct adis *adis, bool enable)
 {
+<<<<<<< HEAD
+	int ret;
+=======
 	int ret = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 msc;
 
-	mutex_lock(&adis->state_lock);
+	if (adis->data->enable_irq)
+		return adis->data->enable_irq(adis, enable);
 
-	if (adis->data->enable_irq) {
-		ret = adis->data->enable_irq(adis, enable);
-		goto out_unlock;
+	if (adis->data->unmasked_drdy) {
+		if (enable)
+			enable_irq(adis->spi->irq);
+		else
+			disable_irq(adis->spi->irq);
+
+		return 0;
 	}
 
 	if (adis->data->unmasked_drdy) {
@@ -299,7 +308,7 @@ int adis_enable_irq(struct adis *adis, bool enable)
 
 	ret = __adis_read_reg_16(adis, adis->data->msc_ctrl_reg, &msc);
 	if (ret)
-		goto out_unlock;
+		return ret;
 
 	msc |= ADIS_MSC_CTRL_DATA_RDY_POL_HIGH;
 	msc &= ~ADIS_MSC_CTRL_DATA_RDY_DIO2;
@@ -308,13 +317,13 @@ int adis_enable_irq(struct adis *adis, bool enable)
 	else
 		msc &= ~ADIS_MSC_CTRL_DATA_RDY_EN;
 
-	ret = __adis_write_reg_16(adis, adis->data->msc_ctrl_reg, msc);
-
-out_unlock:
-	mutex_unlock(&adis->state_lock);
-	return ret;
+	return __adis_write_reg_16(adis, adis->data->msc_ctrl_reg, msc);
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL_NS(__adis_enable_irq, IIO_ADISLIB);
+=======
 EXPORT_SYMBOL_NS(adis_enable_irq, IIO_ADISLIB);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * __adis_check_status() - Check the device for error conditions (unlocked)
@@ -445,7 +454,11 @@ int __adis_initial_startup(struct adis *adis)
 	 * with 'IRQF_NO_AUTOEN' anyways.
 	 */
 	if (!adis->data->unmasked_drdy)
+<<<<<<< HEAD
+		__adis_enable_irq(adis, false);
+=======
 		adis_enable_irq(adis, false);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!adis->data->prod_id_reg)
 		return 0;

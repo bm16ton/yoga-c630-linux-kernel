@@ -1,0 +1,1 @@
+cmd_drivers/media/cec/usb/rainshadow/rainshadow-cec.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/cec/usb/rainshadow/rainshadow-cec.ko drivers/media/cec/usb/rainshadow/rainshadow-cec.o drivers/media/cec/usb/rainshadow/rainshadow-cec.mod.o;  true

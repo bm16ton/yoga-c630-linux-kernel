@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/qcom/venus/venus-core.mod := printf '%s\n'   core.o helpers.o firmware.o hfi_venus.o hfi_msgs.o hfi_cmds.o hfi.o hfi_parser.o pm_helpers.o dbgfs.o hfi_platform.o hfi_platform_v4.o hfi_platform_v6.o hfi_plat_bufs_v6.o | awk '!x[$$0]++ { print("drivers/media/platform/qcom/venus/"$$0) }' > drivers/media/platform/qcom/venus/venus-core.mod

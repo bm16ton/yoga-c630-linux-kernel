@@ -1,0 +1,1 @@
+cmd_sound/pci/oxygen/modules.order := {   echo sound/pci/oxygen/snd-oxygen-lib.ko;   echo sound/pci/oxygen/snd-oxygen.ko;   echo sound/pci/oxygen/snd-virtuoso.ko; :; } > sound/pci/oxygen/modules.order

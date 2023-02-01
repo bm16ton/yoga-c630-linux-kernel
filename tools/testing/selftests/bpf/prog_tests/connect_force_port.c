@@ -53,7 +53,11 @@ static int run_test(int cgroup_fd, int server_fd, int family, int type)
 	__u16 expected_peer_port = 60000;
 	struct bpf_program *prog;
 	struct bpf_object *obj;
+<<<<<<< HEAD
+	const char *obj_file = v4 ? "connect_force_port4.bpf.o" : "connect_force_port6.bpf.o";
+=======
 	const char *obj_file = v4 ? "connect_force_port4.o" : "connect_force_port6.o";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int fd, err;
 	__u32 duration = 0;
 

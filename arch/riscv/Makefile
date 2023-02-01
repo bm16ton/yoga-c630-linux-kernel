@@ -110,8 +110,11 @@ else
 KBUILD_IMAGE	:= $(boot)/Image.gz
 endif
 
+<<<<<<< HEAD
+=======
 head-y := arch/riscv/kernel/head.o
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 libs-y += arch/riscv/lib/
 libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
 
@@ -136,10 +139,18 @@ ifneq ($(CONFIG_XIP_KERNEL),y)
 ifeq ($(CONFIG_RISCV_M_MODE)$(CONFIG_SOC_CANAAN),yy)
 KBUILD_IMAGE := $(boot)/loader.bin
 else
+ifeq ($(CONFIG_EFI_ZBOOT),)
 KBUILD_IMAGE := $(boot)/Image.gz
+else
+KBUILD_IMAGE := $(boot)/vmlinuz.efi
 endif
 endif
+<<<<<<< HEAD
+endif
+BOOT_TARGETS := Image Image.gz loader loader.bin xipImage vmlinuz.efi
+=======
 BOOT_TARGETS := Image Image.gz loader loader.bin xipImage
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 all:	$(notdir $(KBUILD_IMAGE))
 

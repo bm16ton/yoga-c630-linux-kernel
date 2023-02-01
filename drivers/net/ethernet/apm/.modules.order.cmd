@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/apm/modules.order := {   cat drivers/net/ethernet/apm/xgene/modules.order;   cat drivers/net/ethernet/apm/xgene-v2/modules.order; :; } > drivers/net/ethernet/apm/modules.order

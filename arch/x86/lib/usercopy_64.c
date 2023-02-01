@@ -14,6 +14,8 @@
  * Zero Userspace
  */
 
+<<<<<<< HEAD
+=======
 unsigned long __clear_user(void __user *addr, unsigned long size)
 {
 	long __d0;
@@ -54,6 +56,7 @@ unsigned long clear_user(void __user *to, unsigned long n)
 }
 EXPORT_SYMBOL(clear_user);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_ARCH_HAS_UACCESS_FLUSHCACHE
 /**
  * clean_cache_range - write back a cache range with CLWB

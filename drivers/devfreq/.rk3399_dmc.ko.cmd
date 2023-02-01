@@ -1,0 +1,1 @@
+cmd_drivers/devfreq/rk3399_dmc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/devfreq/rk3399_dmc.ko drivers/devfreq/rk3399_dmc.o drivers/devfreq/rk3399_dmc.mod.o;  true

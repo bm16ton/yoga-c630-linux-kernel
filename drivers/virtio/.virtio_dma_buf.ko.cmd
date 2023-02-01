@@ -1,0 +1,1 @@
+cmd_drivers/virtio/virtio_dma_buf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/virtio/virtio_dma_buf.ko drivers/virtio/virtio_dma_buf.o drivers/virtio/virtio_dma_buf.mod.o;  true

@@ -103,7 +103,12 @@ static struct snd_soc_dai_driver fsl_aud2htx_dai = {
 };
 
 static const struct snd_soc_component_driver fsl_aud2htx_component = {
+<<<<<<< HEAD
+	.name			= "fsl-aud2htx",
+	.legacy_dai_naming	= 1,
+=======
 	.name	= "fsl-aud2htx",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct reg_default fsl_aud2htx_reg_defaults[] = {

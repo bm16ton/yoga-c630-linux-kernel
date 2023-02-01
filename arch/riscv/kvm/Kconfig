@@ -24,6 +24,10 @@ config KVM
 	select PREEMPT_NOTIFIERS
 	select KVM_MMIO
 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+<<<<<<< HEAD
+	select KVM_XFER_TO_GUEST_WORK
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select HAVE_KVM_VCPU_ASYNC_IOCTL
 	select HAVE_KVM_EVENTFD
 	select SRCU

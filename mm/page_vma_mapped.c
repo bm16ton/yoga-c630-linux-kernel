@@ -86,7 +86,11 @@ static bool check_pte(struct page_vma_mapped_walk *pvmw)
 		    !is_device_exclusive_entry(entry))
 			return false;
 
+<<<<<<< HEAD
+		pfn = swp_offset_pfn(entry);
+=======
 		pfn = swp_offset(entry);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (is_swap_pte(*pvmw->pte)) {
 		swp_entry_t entry;
 
@@ -96,7 +100,11 @@ static bool check_pte(struct page_vma_mapped_walk *pvmw)
 		    !is_device_exclusive_entry(entry))
 			return false;
 
+<<<<<<< HEAD
+		pfn = swp_offset_pfn(entry);
+=======
 		pfn = swp_offset(entry);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		if (!pte_present(*pvmw->pte))
 			return false;
@@ -221,7 +229,11 @@ restart:
 					return not_found(pvmw);
 				entry = pmd_to_swp_entry(pmde);
 				if (!is_migration_entry(entry) ||
+<<<<<<< HEAD
+				    !check_pmd(swp_offset_pfn(entry), pvmw))
+=======
 				    !check_pmd(swp_offset(entry), pvmw))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					return not_found(pvmw);
 				return true;
 			}

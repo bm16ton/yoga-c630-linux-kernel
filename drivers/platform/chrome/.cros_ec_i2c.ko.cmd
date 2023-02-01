@@ -1,0 +1,1 @@
+cmd_drivers/platform/chrome/cros_ec_i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/platform/chrome/cros_ec_i2c.ko drivers/platform/chrome/cros_ec_i2c.o drivers/platform/chrome/cros_ec_i2c.mod.o;  true

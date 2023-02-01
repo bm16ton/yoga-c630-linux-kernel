@@ -231,6 +231,15 @@ enum pl2303_type {
 	TYPE_COUNT
 };
 
+<<<<<<< HEAD
+struct pl2303_type_data {
+	const char *name;
+	speed_t max_baud_rate;
+	unsigned long quirks;
+	unsigned int no_autoxonxoff:1;
+	unsigned int no_divisors:1;
+	unsigned int alt_divisors:1;
+=======
 #ifdef CONFIG_USB_SERIAL_PL2303_GPIO
 struct pl2303_gpio_desc {
 	u8 dir_offset;
@@ -240,6 +249,7 @@ struct pl2303_gpio_desc {
 	u8 value_mask;
 	u16 value_ctrl;
 	u16 read_ctrl;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct pl2303_gpio {
@@ -705,10 +715,22 @@ static int pl2303_startup(struct usb_serial *serial)
 	enum pl2303_type type;
 	unsigned char *buf;
 	int ret;
+<<<<<<< HEAD
+
+	ret = pl2303_detect_type(serial);
+	if (ret < 0)
+		return ret;
+
+	type = ret;
+	dev_dbg(&serial->interface->dev, "device type: %s\n", pl2303_type_data[type].name);
+=======
 	u16 bcdDevice;
 	u8 major_revision;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 
+<<<<<<< HEAD
+=======
 	ret = pl2303_detect_type(serial);
 	if (ret < 0)
 		return ret;
@@ -720,6 +742,7 @@ static int pl2303_startup(struct usb_serial *serial)
 	if (!spriv)
 		return -ENOMEM;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spriv->type = &pl2303_type_data[type];
 	spriv->quirks = (unsigned long)usb_get_serial_data(serial);
 	spriv->quirks |= spriv->type->quirks;
@@ -1044,7 +1067,8 @@ static bool pl2303_enable_xonxoff(struct tty_struct *tty, const struct pl2303_ty
 }
 
 static void pl2303_set_termios(struct tty_struct *tty,
-		struct usb_serial_port *port, struct ktermios *old_termios)
+			       struct usb_serial_port *port,
+			       const struct ktermios *old_termios)
 {
 	struct usb_serial *serial = port->serial;
 	struct pl2303_serial_private *spriv = usb_get_serial_data(serial);

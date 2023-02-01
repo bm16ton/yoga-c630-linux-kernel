@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/hisilicon/hibmc/hibmc-drm.mod := printf '%s\n'   hibmc_drm_drv.o hibmc_drm_de.o hibmc_drm_vdac.o hibmc_drm_i2c.o | awk '!x[$$0]++ { print("drivers/gpu/drm/hisilicon/hibmc/"$$0) }' > drivers/gpu/drm/hisilicon/hibmc/hibmc-drm.mod

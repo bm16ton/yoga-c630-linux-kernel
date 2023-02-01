@@ -59,7 +59,11 @@ int avs_ipc_unload_modules(struct avs_dev *adev, u16 *mod_ids, u32 num_mod_ids)
 	request.data = mod_ids;
 	request.size = sizeof(*mod_ids) * num_mod_ids;
 
+<<<<<<< HEAD
+	ret = avs_dsp_send_msg(adev, &request, NULL);
+=======
 	ret = avs_dsp_send_msg_timeout(adev, &request, NULL, AVS_CL_TIMEOUT_MS);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		avs_ipc_err(adev, &request, "unload multiple modules", ret);
 
@@ -378,7 +382,10 @@ int avs_ipc_get_large_config(struct avs_dev *adev, u16 module_id, u8 instance_id
 	union avs_module_msg msg = AVS_MODULE_REQUEST(LARGE_CONFIG_GET);
 	struct avs_ipc_msg request;
 	struct avs_ipc_msg reply = {{0}};
+<<<<<<< HEAD
+=======
 	size_t size;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void *buf;
 	int ret;
 
@@ -406,15 +413,23 @@ int avs_ipc_get_large_config(struct avs_dev *adev, u16 module_id, u8 instance_id
 		return ret;
 	}
 
+<<<<<<< HEAD
+	buf = krealloc(reply.data, reply.size, GFP_KERNEL);
+=======
 	size = reply.rsp.ext.large_config.data_off_size;
 	buf = krealloc(reply.data, size, GFP_KERNEL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!buf) {
 		kfree(reply.data);
 		return -ENOMEM;
 	}
 
 	*reply_data = buf;
+<<<<<<< HEAD
+	*reply_size = reply.size;
+=======
 	*reply_size = size;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -432,7 +447,11 @@ int avs_ipc_set_dx(struct avs_dev *adev, u32 core_mask, bool powerup)
 	request.data = &dx;
 	request.size = sizeof(dx);
 
+<<<<<<< HEAD
+	ret = avs_dsp_send_pm_msg(adev, &request, NULL, true);
+=======
 	ret = avs_dsp_send_msg(adev, &request, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		avs_ipc_err(adev, &request, "set dx", ret);
 
@@ -456,7 +475,11 @@ int avs_ipc_set_d0ix(struct avs_dev *adev, bool enable_pg, bool streaming)
 
 	request.header = msg.val;
 
+<<<<<<< HEAD
+	ret = avs_dsp_send_pm_msg(adev, &request, NULL, false);
+=======
 	ret = avs_dsp_send_msg(adev, &request, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		avs_ipc_err(adev, &request, "set d0ix", ret);
 
@@ -476,6 +499,12 @@ int avs_ipc_get_fw_config(struct avs_dev *adev, struct avs_fw_cfg *cfg)
 				       &payload, &payload_size);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
+	/* Non-zero payload expected for FIRMWARE_CONFIG. */
+	if (!payload_size)
+		return -EREMOTEIO;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	while (offset < payload_size) {
 		tlv = (struct avs_tlv *)(payload + offset);
@@ -561,6 +590,10 @@ int avs_ipc_get_fw_config(struct avs_dev *adev, struct avs_fw_cfg *cfg)
 		case AVS_FW_CFG_DMA_BUFFER_CONFIG:
 		case AVS_FW_CFG_SCHEDULER_CONFIG:
 		case AVS_FW_CFG_CLOCKS_CONFIG:
+<<<<<<< HEAD
+		case AVS_FW_CFG_RESERVED:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 
 		default:
@@ -589,6 +622,12 @@ int avs_ipc_get_hw_config(struct avs_dev *adev, struct avs_hw_cfg *cfg)
 				       &payload, &payload_size);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
+	/* Non-zero payload expected for HARDWARE_CONFIG. */
+	if (!payload_size)
+		return -EREMOTEIO;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	while (offset < payload_size) {
 		tlv = (struct avs_tlv *)(payload + offset);
@@ -672,11 +711,51 @@ int avs_ipc_get_modules_info(struct avs_dev *adev, struct avs_mods_info **info)
 				       &payload, &payload_size);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
+	/* Non-zero payload expected for MODULES_INFO. */
+	if (!payload_size)
+		return -EREMOTEIO;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	*info = (struct avs_mods_info *)payload;
 	return 0;
 }
 
+<<<<<<< HEAD
+int avs_ipc_set_enable_logs(struct avs_dev *adev, u8 *log_info, size_t size)
+{
+	int ret;
+
+	ret = avs_ipc_set_large_config(adev, AVS_BASEFW_MOD_ID, AVS_BASEFW_INST_ID,
+				       AVS_BASEFW_ENABLE_LOGS, log_info, size);
+	if (ret)
+		dev_err(adev->dev, "enable logs failed: %d\n", ret);
+
+	return ret;
+}
+
+int avs_ipc_set_system_time(struct avs_dev *adev)
+{
+	struct avs_sys_time sys_time;
+	int ret;
+	u64 us;
+
+	/* firmware expects UTC time in micro seconds */
+	us = ktime_to_us(ktime_get());
+	sys_time.val_l = us & UINT_MAX;
+	sys_time.val_u = us >> 32;
+
+	ret = avs_ipc_set_large_config(adev, AVS_BASEFW_MOD_ID, AVS_BASEFW_INST_ID,
+				       AVS_BASEFW_SYSTEM_TIME, (u8 *)&sys_time, sizeof(sys_time));
+	if (ret)
+		dev_err(adev->dev, "set system time failed: %d\n", ret);
+
+	return ret;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int avs_ipc_copier_set_sink_format(struct avs_dev *adev, u16 module_id,
 				   u8 instance_id, u32 sink_id,
 				   const struct avs_audio_format *src_fmt,

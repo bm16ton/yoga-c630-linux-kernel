@@ -144,9 +144,15 @@ void intel_pxp_session_work(struct work_struct *work)
 	intel_wakeref_t wakeref;
 	u32 events = 0;
 
+<<<<<<< HEAD
+	spin_lock_irq(gt->irq_lock);
+	events = fetch_and_zero(&pxp->session_events);
+	spin_unlock_irq(gt->irq_lock);
+=======
 	spin_lock_irq(&gt->irq_lock);
 	events = fetch_and_zero(&pxp->session_events);
 	spin_unlock_irq(&gt->irq_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!events)
 		return;

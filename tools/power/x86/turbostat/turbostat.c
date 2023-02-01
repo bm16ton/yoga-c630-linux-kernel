@@ -230,6 +230,10 @@ unsigned int do_slm_cstates;
 unsigned int use_c1_residency_msr;
 unsigned int has_aperf;
 unsigned int has_epb;
+<<<<<<< HEAD
+unsigned int has_turbo;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned int is_hybrid;
 unsigned int do_irtl_snb;
 unsigned int do_irtl_hsw;
@@ -691,10 +695,17 @@ int get_msr(int cpu, off_t offset, unsigned long long *msr)
 	ssize_t retval;
 
 	retval = pread(get_msr_fd(cpu), msr, sizeof(*msr), offset);
+<<<<<<< HEAD
 
 	if (retval != sizeof *msr)
 		err(-1, "cpu%d: msr offset 0x%llx read failed", cpu, (unsigned long long)offset);
 
+=======
+
+	if (retval != sizeof *msr)
+		err(-1, "cpu%d: msr offset 0x%llx read failed", cpu, (unsigned long long)offset);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -2367,6 +2378,7 @@ int pkg_cstate_limit = PCLUKN;
 char *pkg_cstate_limit_strings[] = { "reserved", "unknown", "pc0", "pc1", "pc2",
 	"pc3", "pc4", "pc6", "pc6n", "pc6r", "pc7", "pc7s", "pc8", "pc9", "pc10", "unlimited"
 };
+<<<<<<< HEAD
 
 int nhm_pkg_cstate_limits[16] =
     { PCL__0, PCL__1, PCL__3, PCL__6, PCL__7, PCLRSV, PCLRSV, PCLUNL, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV,
@@ -2393,6 +2405,34 @@ int amt_pkg_cstate_limits[16] =
 	PCLRSV, PCLRSV
 };
 
+=======
+
+int nhm_pkg_cstate_limits[16] =
+    { PCL__0, PCL__1, PCL__3, PCL__6, PCL__7, PCLRSV, PCLRSV, PCLUNL, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV,
+	PCLRSV, PCLRSV
+};
+
+int snb_pkg_cstate_limits[16] =
+    { PCL__0, PCL__2, PCL_6N, PCL_6R, PCL__7, PCL_7S, PCLRSV, PCLUNL, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV,
+	PCLRSV, PCLRSV
+};
+
+int hsw_pkg_cstate_limits[16] =
+    { PCL__0, PCL__2, PCL__3, PCL__6, PCL__7, PCL_7S, PCL__8, PCL__9, PCLUNL, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV,
+	PCLRSV, PCLRSV
+};
+
+int slv_pkg_cstate_limits[16] =
+    { PCL__0, PCL__1, PCLRSV, PCLRSV, PCL__4, PCLRSV, PCL__6, PCL__7, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV,
+	PCL__6, PCL__7
+};
+
+int amt_pkg_cstate_limits[16] =
+    { PCLUNL, PCL__1, PCL__2, PCLRSV, PCLRSV, PCLRSV, PCL__6, PCL__7, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV,
+	PCLRSV, PCLRSV
+};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int phi_pkg_cstate_limits[16] =
     { PCL__0, PCL__2, PCL_6N, PCL_6R, PCLRSV, PCLRSV, PCLRSV, PCLUNL, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV, PCLRSV,
 	PCLRSV, PCLRSV
@@ -3873,6 +3913,9 @@ int is_spr(unsigned int family, unsigned int model)
 	if (family != 6)
 		return 0;
 
+	if (family != 6)
+		return 0;
+
 	switch (model) {
 	case INTEL_FAM6_SAPPHIRERAPIDS_X:
 		return 1;
@@ -3880,6 +3923,41 @@ int is_spr(unsigned int family, unsigned int model)
 	return 0;
 }
 
+<<<<<<< HEAD
+int is_icx(unsigned int family, unsigned int model)
+{
+
+	if (!genuine_intel)
+		return 0;
+
+	if (family != 6)
+		return 0;
+
+	switch (model) {
+	case INTEL_FAM6_ICELAKE_X:
+		return 1;
+	}
+	return 0;
+}
+
+int is_spr(unsigned int family, unsigned int model)
+{
+
+	if (!genuine_intel)
+		return 0;
+
+	if (family != 6)
+		return 0;
+
+	switch (model) {
+	case INTEL_FAM6_SAPPHIRERAPIDS_X:
+		return 1;
+	}
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int is_ehl(unsigned int family, unsigned int model)
 {
 	if (!genuine_intel)
@@ -4080,12 +4158,14 @@ static void remove_underbar(char *s)
 	*to = 0;
 }
 
+<<<<<<< HEAD
+static void dump_turbo_ratio_info(unsigned int family, unsigned int model)
+=======
 static void dump_cstate_pstate_config_info(unsigned int family, unsigned int model)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
-	if (!do_nhm_platform_info)
+	if (!has_turbo)
 		return;
-
-	dump_nhm_platform_info();
 
 	if (has_hsw_turbo_ratio_limit(family, model))
 		dump_hsw_turbo_ratio_limits();
@@ -4108,7 +4188,15 @@ static void dump_cstate_pstate_config_info(unsigned int family, unsigned int mod
 
 	if (has_config_tdp(family, model))
 		dump_config_tdp();
+}
 
+static void dump_cstate_pstate_config_info(unsigned int family, unsigned int model)
+{
+	if (!do_nhm_platform_info)
+		return;
+
+	dump_nhm_platform_info();
+	dump_turbo_ratio_info(family, model);
 	dump_nhm_cst_cfg();
 }
 
@@ -5446,6 +5534,12 @@ unsigned int intel_model_duplicates(unsigned int model)
 	case INTEL_FAM6_ALDERLAKE_N:
 	case INTEL_FAM6_RAPTORLAKE:
 	case INTEL_FAM6_RAPTORLAKE_P:
+<<<<<<< HEAD
+	case INTEL_FAM6_RAPTORLAKE_S:
+	case INTEL_FAM6_METEORLAKE:
+	case INTEL_FAM6_METEORLAKE_L:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return INTEL_FAM6_CANNONLAKE_L;
 
 	case INTEL_FAM6_ATOM_TREMONT_L:
@@ -5504,7 +5598,10 @@ void process_cpuid()
 {
 	unsigned int eax, ebx, ecx, edx;
 	unsigned int fms, family, model, stepping, ecx_flags, edx_flags;
+<<<<<<< HEAD
+=======
 	unsigned int has_turbo;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long long ucode_patch = 0;
 
 	eax = ebx = ecx = edx = 0;
@@ -6216,7 +6313,11 @@ int get_and_dump_counters(void)
 
 void print_version()
 {
+<<<<<<< HEAD
+	fprintf(outf, "turbostat version 2022.10.04 - Len Brown <lenb@kernel.org>\n");
+=======
 	fprintf(outf, "turbostat version 2022.07.28 - Len Brown <lenb@kernel.org>\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #define COMMAND_LINE_SIZE 2048

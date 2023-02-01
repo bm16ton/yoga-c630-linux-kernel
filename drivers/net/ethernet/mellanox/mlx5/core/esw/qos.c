@@ -924,12 +924,25 @@ int mlx5_esw_qos_vport_update_group(struct mlx5_eswitch *esw,
 				    struct mlx5_esw_rate_group *group,
 				    struct netlink_ext_ack *extack)
 {
+<<<<<<< HEAD
+	int err = 0;
+
+	mutex_lock(&esw->state_lock);
+	if (!vport->qos.enabled && !group)
+		goto unlock;
+
+	err = esw_qos_vport_enable(esw, vport, 0, 0, extack);
+	if (!err)
+		err = esw_qos_vport_update_group(esw, vport, group, extack);
+unlock:
+=======
 	int err;
 
 	mutex_lock(&esw->state_lock);
 	err = esw_qos_vport_enable(esw, vport, 0, 0, extack);
 	if (!err)
 		err = esw_qos_vport_update_group(esw, vport, group, extack);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&esw->state_lock);
 	return err;
 }

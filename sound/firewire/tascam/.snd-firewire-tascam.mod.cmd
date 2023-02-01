@@ -1,0 +1,1 @@
+cmd_sound/firewire/tascam/snd-firewire-tascam.mod := printf '%s\n'   tascam-proc.o amdtp-tascam.o tascam-stream.o tascam-pcm.o tascam-hwdep.o tascam-transaction.o tascam-midi.o tascam.o | awk '!x[$$0]++ { print("sound/firewire/tascam/"$$0) }' > sound/firewire/tascam/snd-firewire-tascam.mod

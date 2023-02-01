@@ -15,6 +15,8 @@ config VIDEO_IMX_MIPI_CSIS
 	  Video4Linux2 sub-device driver for the MIPI CSI-2 CSIS receiver
 	  v3.3/v3.6.3 found on some i.MX7 and i.MX8 SoCs.
 
+<<<<<<< HEAD
+=======
 config VIDEO_VIU
 	tristate "NXP VIU Video Driver"
 	depends on V4L_PLATFORM_DRIVERS
@@ -27,6 +29,7 @@ config VIDEO_VIU
 	  Say Y here if you want to enable VIU device on MPC5121e Rev2+.
 	  In doubt, say N.
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # mem2mem drivers
 
 config VIDEO_IMX_PXP
@@ -51,4 +54,8 @@ config VIDEO_MX2_EMMAPRP
 	    memory to memory. Operations include resizing and format
 	    conversion.
 
+<<<<<<< HEAD
+source "drivers/media/platform/nxp/dw100/Kconfig"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/media/platform/nxp/imx-jpeg/Kconfig"

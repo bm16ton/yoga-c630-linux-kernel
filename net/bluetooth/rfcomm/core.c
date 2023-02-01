@@ -590,7 +590,11 @@ int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
 
 		ret = rfcomm_dlc_send_frag(d, frag);
 		if (ret < 0) {
+<<<<<<< HEAD
+			dev_kfree_skb_irq(frag);
+=======
 			kfree_skb(frag);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto unlock;
 		}
 

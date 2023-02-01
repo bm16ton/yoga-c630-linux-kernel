@@ -1,0 +1,1 @@
+cmd_drivers/net/ieee802154/mcr20a.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ieee802154/mcr20a.ko drivers/net/ieee802154/mcr20a.o drivers/net/ieee802154/mcr20a.mod.o;  true

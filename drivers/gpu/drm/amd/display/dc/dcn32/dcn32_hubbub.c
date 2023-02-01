@@ -68,7 +68,11 @@ static void dcn32_init_crb(struct hubbub *hubbub)
 	REG_UPDATE(DCHUBBUB_DEBUG_CTRL_0, DET_DEPTH, 0x47F);
 }
 
+<<<<<<< HEAD
+void dcn32_program_det_size(struct hubbub *hubbub, int hubp_inst, unsigned int det_buffer_size_in_kbyte)
+=======
 static void dcn32_program_det_size(struct hubbub *hubbub, int hubp_inst, unsigned int det_buffer_size_in_kbyte)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dcn20_hubbub *hubbub2 = TO_DCN20_HUBBUB(hubbub);
 
@@ -98,9 +102,19 @@ static void dcn32_program_det_size(struct hubbub *hubbub, int hubp_inst, unsigne
 	default:
 		break;
 	}
+<<<<<<< HEAD
+	if (hubbub2->det0_size + hubbub2->det1_size + hubbub2->det2_size
+			+ hubbub2->det3_size + hubbub2->compbuf_size_segments > hubbub2->crb_size_segs) {
+		/* This may happen during seamless transition from ODM 2:1 to ODM4:1 */
+		DC_LOG_WARNING("CRB Config Warning: DET size (%d,%d,%d,%d) + Compbuf size (%d) >  CRB segments (%d)\n",
+						hubbub2->det0_size, hubbub2->det1_size, hubbub2->det2_size, hubbub2->det3_size,
+						hubbub2->compbuf_size_segments, hubbub2->crb_size_segs);
+	}
+=======
 	/* Should never be hit, if it is we have an erroneous hw config*/
 	ASSERT(hubbub2->det0_size + hubbub2->det1_size + hubbub2->det2_size
 			+ hubbub2->det3_size + hubbub2->compbuf_size_segments <= hubbub2->crb_size_segs);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void dcn32_program_compbuf_size(struct hubbub *hubbub, unsigned int compbuf_size_kb, bool safe_to_increase)
@@ -140,7 +154,11 @@ static uint32_t convert_and_clamp(
 	return ret_val;
 }
 
+<<<<<<< HEAD
+bool hubbub32_program_urgent_watermarks(
+=======
 static bool hubbub32_program_urgent_watermarks(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct hubbub *hubbub,
 		struct dcn_watermark_set *watermarks,
 		unsigned int refclk_mhz,
@@ -330,7 +348,11 @@ static bool hubbub32_program_urgent_watermarks(
 	return wm_pending;
 }
 
+<<<<<<< HEAD
+bool hubbub32_program_stutter_watermarks(
+=======
 static bool hubbub32_program_stutter_watermarks(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct hubbub *hubbub,
 		struct dcn_watermark_set *watermarks,
 		unsigned int refclk_mhz,
@@ -476,7 +498,11 @@ static bool hubbub32_program_stutter_watermarks(
 }
 
 
+<<<<<<< HEAD
+bool hubbub32_program_pstate_watermarks(
+=======
 static bool hubbub32_program_pstate_watermarks(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct hubbub *hubbub,
 		struct dcn_watermark_set *watermarks,
 		unsigned int refclk_mhz,
@@ -629,7 +655,11 @@ static bool hubbub32_program_pstate_watermarks(
 }
 
 
+<<<<<<< HEAD
+bool hubbub32_program_usr_watermarks(
+=======
 static bool hubbub32_program_usr_watermarks(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct hubbub *hubbub,
 		struct dcn_watermark_set *watermarks,
 		unsigned int refclk_mhz,
@@ -769,7 +799,11 @@ static bool hubbub32_program_watermarks(
 }
 
 /* Copy values from WM set A to all other sets */
+<<<<<<< HEAD
+static void hubbub32_init_watermarks(struct hubbub *hubbub)
+=======
 void hubbub32_init_watermarks(struct hubbub *hubbub)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dcn20_hubbub *hubbub2 = TO_DCN20_HUBBUB(hubbub);
 	uint32_t reg;
@@ -820,7 +854,11 @@ void hubbub32_init_watermarks(struct hubbub *hubbub)
 	REG_WRITE(DCHUBBUB_ARB_FCLK_PSTATE_CHANGE_WATERMARK_D, reg);
 }
 
+<<<<<<< HEAD
+static void hubbub32_wm_read_state(struct hubbub *hubbub,
+=======
 void hubbub32_wm_read_state(struct hubbub *hubbub,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct dcn_hubbub_wm *wm)
 {
 	struct dcn20_hubbub *hubbub2 = TO_DCN20_HUBBUB(hubbub);
@@ -932,6 +970,10 @@ static const struct hubbub_funcs hubbub32_funcs = {
 	.program_watermarks = hubbub32_program_watermarks,
 	.allow_self_refresh_control = hubbub1_allow_self_refresh_control,
 	.is_allow_self_refresh_enabled = hubbub1_is_allow_self_refresh_enabled,
+<<<<<<< HEAD
+	.verify_allow_pstate_change_high = hubbub1_verify_allow_pstate_change_high,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.force_wm_propagate_to_pipes = hubbub32_force_wm_propagate_to_pipes,
 	.force_pstate_change_control = hubbub3_force_pstate_change_control,
 	.init_watermarks = hubbub32_init_watermarks,

@@ -72,7 +72,11 @@ static int damon_va_evenly_split_region(struct damon_target *t,
 		return -EINVAL;
 
 	orig_end = r->ar.end;
+<<<<<<< HEAD
+	sz_orig = damon_sz_region(r);
+=======
 	sz_orig = r->ar.end - r->ar.start;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sz_piece = ALIGN_DOWN(sz_orig / nr_pieces, DAMON_MIN_REGION);
 
 	if (!sz_piece)
@@ -113,6 +117,40 @@ static unsigned long sz_range(struct damon_addr_range *r)
  *
  * Returns 0 if success, or negative error code otherwise.
  */
+<<<<<<< HEAD
+static int __damon_va_three_regions(struct mm_struct *mm,
+				       struct damon_addr_range regions[3])
+{
+	struct damon_addr_range first_gap = {0}, second_gap = {0};
+	VMA_ITERATOR(vmi, mm, 0);
+	struct vm_area_struct *vma, *prev = NULL;
+	unsigned long start;
+
+	/*
+	 * Find the two biggest gaps so that first_gap > second_gap > others.
+	 * If this is too slow, it can be optimised to examine the maple
+	 * tree gaps.
+	 */
+	for_each_vma(vmi, vma) {
+		unsigned long gap;
+
+		if (!prev) {
+			start = vma->vm_start;
+			goto next;
+		}
+		gap = vma->vm_start - prev->vm_end;
+
+		if (gap > sz_range(&first_gap)) {
+			second_gap = first_gap;
+			first_gap.start = prev->vm_end;
+			first_gap.end = vma->vm_start;
+		} else if (gap > sz_range(&second_gap)) {
+			second_gap.start = prev->vm_end;
+			second_gap.end = vma->vm_start;
+		}
+next:
+		prev = vma;
+=======
 static int __damon_va_three_regions(struct vm_area_struct *vma,
 				       struct damon_addr_range regions[3])
 {
@@ -144,6 +182,7 @@ static int __damon_va_three_regions(struct vm_area_struct *vma,
 		}
 next:
 		last_vma = vma;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!sz_range(&second_gap) || !sz_range(&first_gap))
@@ -159,7 +198,11 @@ next:
 	regions[1].start = ALIGN(first_gap.end, DAMON_MIN_REGION);
 	regions[1].end = ALIGN(second_gap.start, DAMON_MIN_REGION);
 	regions[2].start = ALIGN(second_gap.end, DAMON_MIN_REGION);
+<<<<<<< HEAD
+	regions[2].end = ALIGN(prev->vm_end, DAMON_MIN_REGION);
+=======
 	regions[2].end = ALIGN(last_vma->vm_end, DAMON_MIN_REGION);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -180,7 +223,11 @@ static int damon_va_three_regions(struct damon_target *t,
 		return -EINVAL;
 
 	mmap_read_lock(mm);
+<<<<<<< HEAD
+	rc = __damon_va_three_regions(mm, regions);
+=======
 	rc = __damon_va_three_regions(mm->mmap, regions);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mmap_read_unlock(mm);
 
 	mmput(mm);
@@ -250,8 +297,13 @@ static void __damon_va_init_regions(struct damon_ctx *ctx,
 
 	for (i = 0; i < 3; i++)
 		sz += regions[i].end - regions[i].start;
+<<<<<<< HEAD
+	if (ctx->attrs.min_nr_regions)
+		sz /= ctx->attrs.min_nr_regions;
+=======
 	if (ctx->min_nr_regions)
 		sz /= ctx->min_nr_regions;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (sz < DAMON_MIN_REGION)
 		sz = DAMON_MIN_REGION;
 
@@ -302,14 +354,22 @@ static int damon_mkold_pmd_entry(pmd_t *pmd, unsigned long addr,
 	pte_t *pte;
 	spinlock_t *ptl;
 
+<<<<<<< HEAD
+	if (pmd_trans_huge(*pmd)) {
+=======
 	if (pmd_huge(*pmd)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ptl = pmd_lock(walk->mm, pmd);
 		if (!pmd_present(*pmd)) {
 			spin_unlock(ptl);
 			return 0;
 		}
 
+<<<<<<< HEAD
+		if (pmd_trans_huge(*pmd)) {
+=======
 		if (pmd_huge(*pmd)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			damon_pmdp_mkold(pmd, walk->mm, addr);
 			spin_unlock(ptl);
 			return 0;
@@ -396,8 +456,13 @@ static void damon_va_mkold(struct mm_struct *mm, unsigned long addr)
  * Functions for the access checking of the regions
  */
 
+<<<<<<< HEAD
+static void __damon_va_prepare_access_check(struct mm_struct *mm,
+					struct damon_region *r)
+=======
 static void __damon_va_prepare_access_check(struct damon_ctx *ctx,
 			struct mm_struct *mm, struct damon_region *r)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	r->sampling_addr = damon_rand(r->ar.start, r->ar.end);
 
@@ -415,7 +480,11 @@ static void damon_va_prepare_access_checks(struct damon_ctx *ctx)
 		if (!mm)
 			continue;
 		damon_for_each_region(r, t)
+<<<<<<< HEAD
+			__damon_va_prepare_access_check(mm, r);
+=======
 			__damon_va_prepare_access_check(ctx, mm, r);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mmput(mm);
 	}
 }
@@ -434,14 +503,22 @@ static int damon_young_pmd_entry(pmd_t *pmd, unsigned long addr,
 	struct damon_young_walk_private *priv = walk->private;
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+<<<<<<< HEAD
+	if (pmd_trans_huge(*pmd)) {
+=======
 	if (pmd_huge(*pmd)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ptl = pmd_lock(walk->mm, pmd);
 		if (!pmd_present(*pmd)) {
 			spin_unlock(ptl);
 			return 0;
 		}
 
+<<<<<<< HEAD
+		if (!pmd_trans_huge(*pmd)) {
+=======
 		if (!pmd_huge(*pmd)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			spin_unlock(ptl);
 			goto regular_page;
 		}
@@ -542,16 +619,26 @@ static bool damon_va_young(struct mm_struct *mm, unsigned long addr,
  * mm	'mm_struct' for the given virtual address space
  * r	the region to be checked
  */
+<<<<<<< HEAD
+static void __damon_va_check_access(struct mm_struct *mm,
+				struct damon_region *r, bool same_target)
+{
+=======
 static void __damon_va_check_access(struct damon_ctx *ctx,
 			       struct mm_struct *mm, struct damon_region *r)
 {
 	static struct mm_struct *last_mm;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	static unsigned long last_addr;
 	static unsigned long last_page_sz = PAGE_SIZE;
 	static bool last_accessed;
 
 	/* If the region is in the last checked page, reuse the result */
+<<<<<<< HEAD
+	if (same_target && (ALIGN_DOWN(last_addr, last_page_sz) ==
+=======
 	if (mm == last_mm && (ALIGN_DOWN(last_addr, last_page_sz) ==
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				ALIGN_DOWN(r->sampling_addr, last_page_sz))) {
 		if (last_accessed)
 			r->nr_accesses++;
@@ -562,7 +649,10 @@ static void __damon_va_check_access(struct damon_ctx *ctx,
 	if (last_accessed)
 		r->nr_accesses++;
 
+<<<<<<< HEAD
+=======
 	last_mm = mm;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	last_addr = r->sampling_addr;
 }
 
@@ -572,14 +662,26 @@ static unsigned int damon_va_check_accesses(struct damon_ctx *ctx)
 	struct mm_struct *mm;
 	struct damon_region *r;
 	unsigned int max_nr_accesses = 0;
+<<<<<<< HEAD
+	bool same_target;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	damon_for_each_target(t, ctx) {
 		mm = damon_get_mm(t);
 		if (!mm)
 			continue;
+<<<<<<< HEAD
+		same_target = false;
+		damon_for_each_region(r, t) {
+			__damon_va_check_access(mm, r, same_target);
+			max_nr_accesses = max(r->nr_accesses, max_nr_accesses);
+			same_target = true;
+=======
 		damon_for_each_region(r, t) {
 			__damon_va_check_access(ctx, mm, r);
 			max_nr_accesses = max(r->nr_accesses, max_nr_accesses);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		mmput(mm);
 	}
@@ -591,9 +693,14 @@ static unsigned int damon_va_check_accesses(struct damon_ctx *ctx)
  * Functions for the target validity check and cleanup
  */
 
+<<<<<<< HEAD
+static bool damon_va_target_valid(struct damon_target *t)
+{
+=======
 static bool damon_va_target_valid(void *target)
 {
 	struct damon_target *t = target;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct task_struct *task;
 
 	task = damon_get_task_struct(t);
@@ -617,7 +724,11 @@ static unsigned long damos_madvise(struct damon_target *target,
 {
 	struct mm_struct *mm;
 	unsigned long start = PAGE_ALIGN(r->ar.start);
+<<<<<<< HEAD
+	unsigned long len = PAGE_ALIGN(damon_sz_region(r));
+=======
 	unsigned long len = PAGE_ALIGN(r->ar.end - r->ar.start);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long applied;
 
 	mm = damon_get_mm(target);
@@ -656,6 +767,12 @@ static unsigned long damon_va_apply_scheme(struct damon_ctx *ctx,
 	case DAMOS_STAT:
 		return 0;
 	default:
+<<<<<<< HEAD
+		/*
+		 * DAMOS actions that are not yet supported by 'vaddr'.
+		 */
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 
@@ -669,7 +786,11 @@ static int damon_va_scheme_score(struct damon_ctx *context,
 
 	switch (scheme->action) {
 	case DAMOS_PAGEOUT:
+<<<<<<< HEAD
+		return damon_cold_score(context, r, scheme);
+=======
 		return damon_pageout_score(context, r, scheme);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		break;
 	}

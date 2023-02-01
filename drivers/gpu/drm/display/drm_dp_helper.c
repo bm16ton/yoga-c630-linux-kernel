@@ -30,6 +30,10 @@
 #include <linux/sched.h>
 #include <linux/seq_file.h>
 #include <linux/string_helpers.h>
+<<<<<<< HEAD
+#include <linux/dynamic_debug.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <drm/display/drm_dp_helper.h>
 #include <drm/display/drm_dp_mst_helper.h>
@@ -40,6 +44,21 @@
 
 #include "drm_dp_helper_internal.h"
 
+<<<<<<< HEAD
+DECLARE_DYNDBG_CLASSMAP(drm_debug_classes, DD_CLASS_TYPE_DISJOINT_BITS, 0,
+			"DRM_UT_CORE",
+			"DRM_UT_DRIVER",
+			"DRM_UT_KMS",
+			"DRM_UT_PRIME",
+			"DRM_UT_ATOMIC",
+			"DRM_UT_VBL",
+			"DRM_UT_STATE",
+			"DRM_UT_LEASE",
+			"DRM_UT_DP",
+			"DRM_UT_DRMRES");
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dp_aux_backlight {
 	struct backlight_device *base;
 	struct drm_dp_aux *aux;
@@ -390,6 +409,41 @@ void drm_dp_link_train_channel_eq_delay(const struct drm_dp_aux *aux,
 }
 EXPORT_SYMBOL(drm_dp_link_train_channel_eq_delay);
 
+<<<<<<< HEAD
+/**
+ * drm_dp_phy_name() - Get the name of the given DP PHY
+ * @dp_phy: The DP PHY identifier
+ *
+ * Given the @dp_phy, get a user friendly name of the DP PHY, either "DPRX" or
+ * "LTTPR <N>", or "<INVALID DP PHY>" on errors. The returned string is always
+ * non-NULL and valid.
+ *
+ * Returns: Name of the DP PHY.
+ */
+const char *drm_dp_phy_name(enum drm_dp_phy dp_phy)
+{
+	static const char * const phy_names[] = {
+		[DP_PHY_DPRX] = "DPRX",
+		[DP_PHY_LTTPR1] = "LTTPR 1",
+		[DP_PHY_LTTPR2] = "LTTPR 2",
+		[DP_PHY_LTTPR3] = "LTTPR 3",
+		[DP_PHY_LTTPR4] = "LTTPR 4",
+		[DP_PHY_LTTPR5] = "LTTPR 5",
+		[DP_PHY_LTTPR6] = "LTTPR 6",
+		[DP_PHY_LTTPR7] = "LTTPR 7",
+		[DP_PHY_LTTPR8] = "LTTPR 8",
+	};
+
+	if (dp_phy < 0 || dp_phy >= ARRAY_SIZE(phy_names) ||
+	    WARN_ON(!phy_names[dp_phy]))
+		return "<INVALID DP PHY>";
+
+	return phy_names[dp_phy];
+}
+EXPORT_SYMBOL(drm_dp_phy_name);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void drm_dp_lttpr_link_train_clock_recovery_delay(void)
 {
 	usleep_range(100, 200);
@@ -1597,7 +1651,11 @@ static int drm_dp_aux_reply_duration(const struct drm_dp_aux_msg *msg)
 
 /*
  * Calculate the length of the i2c transfer in usec, assuming
+<<<<<<< HEAD
+ * the i2c bus speed is as specified. Gives the "worst"
+=======
  * the i2c bus speed is as specified. Gives the the "worst"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * case estimate, ie. successful while as long as possible.
  * Doesn't account the "MOT" bit, and instead assumes each
  * message includes a START, ADDRESS and STOP. Neither does it

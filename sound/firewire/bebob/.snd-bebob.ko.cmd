@@ -1,0 +1,1 @@
+cmd_sound/firewire/bebob/snd-bebob.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/bebob/snd-bebob.ko sound/firewire/bebob/snd-bebob.o sound/firewire/bebob/snd-bebob.mod.o;  true

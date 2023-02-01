@@ -35,7 +35,9 @@
 #define MAX_HEIGHT 2160
 /* The minimum image width/height */
 #define MIN_WIDTH  16
-#define MIN_HEIGHT 16
+#define MIN_HEIGHT MIN_WIDTH
+/* Pixel Array control divider */
+#define PIXEL_ARRAY_DIV MIN_WIDTH
 /* The data_offset of plane 0 for the multiplanar formats */
 #define PLANE0_DATA_OFFSET 128
 
@@ -227,6 +229,10 @@ struct vivid_dev {
 	struct v4l2_ctrl		*bitmask;
 	struct v4l2_ctrl		*int_menu;
 	struct v4l2_ctrl		*ro_int32;
+<<<<<<< HEAD
+	struct v4l2_ctrl		*pixel_array;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct v4l2_ctrl		*test_pattern;
 	struct v4l2_ctrl		*colorspace;
 	struct v4l2_ctrl		*rgb_range_cap;

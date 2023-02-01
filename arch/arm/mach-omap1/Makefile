@@ -59,5 +59,8 @@ obj-$(CONFIG_ARCH_OMAP730)		+= gpio7xx.o
 obj-$(CONFIG_ARCH_OMAP850)		+= gpio7xx.o
 obj-$(CONFIG_ARCH_OMAP15XX)		+= gpio15xx.o
 obj-$(CONFIG_ARCH_OMAP16XX)		+= gpio16xx.o
+<<<<<<< HEAD
+=======
 
 endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

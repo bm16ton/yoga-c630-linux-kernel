@@ -42,6 +42,8 @@ ap_ts_pen_1v8: &i2c4 {
 
 &panel {
 	compatible = "auo,b116xa01";
+<<<<<<< HEAD
+=======
 };
 
 &pp3300_hub {
@@ -53,6 +55,7 @@ ap_ts_pen_1v8: &i2c4 {
 &pp3300_l7c {
 	regulator-always-on;
 	regulator-boot-on;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &sdhc_2 {
@@ -63,6 +66,17 @@ ap_ts_pen_1v8: &i2c4 {
 	interrupts = <58 IRQ_TYPE_EDGE_FALLING>;
 };
 
+<<<<<<< HEAD
+&usb_hub_2_x {
+	 vdd-supply = <&pp3300_l7c>;
+};
+
+&usb_hub_3_x {
+	 vdd-supply = <&pp3300_l7c>;
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* PINCTRL - modifications to sc7180-trogdor.dtsi */
 
 &trackpad_int_1v8_odl {

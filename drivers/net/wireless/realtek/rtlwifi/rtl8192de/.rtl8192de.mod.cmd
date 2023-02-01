@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8192de/rtl8192de.mod := printf '%s\n'   dm.o fw.o hw.o led.o phy.o rf.o sw.o table.o trx.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtlwifi/rtl8192de/"$$0) }' > drivers/net/wireless/realtek/rtlwifi/rtl8192de/rtl8192de.mod

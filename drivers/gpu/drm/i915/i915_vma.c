@@ -109,7 +109,7 @@ static void __i915_vma_retire(struct i915_active *ref)
 static struct i915_vma *
 vma_create(struct drm_i915_gem_object *obj,
 	   struct i915_address_space *vm,
-	   const struct i915_ggtt_view *view)
+	   const struct i915_gtt_view *view)
 {
 	struct i915_vma *pos = ERR_PTR(-E2BIG);
 	struct i915_vma *vma;
@@ -141,9 +141,9 @@ vma_create(struct drm_i915_gem_object *obj,
 	INIT_LIST_HEAD(&vma->obj_link);
 	RB_CLEAR_NODE(&vma->obj_node);
 
-	if (view && view->type != I915_GGTT_VIEW_NORMAL) {
-		vma->ggtt_view = *view;
-		if (view->type == I915_GGTT_VIEW_PARTIAL) {
+	if (view && view->type != I915_GTT_VIEW_NORMAL) {
+		vma->gtt_view = *view;
+		if (view->type == I915_GTT_VIEW_PARTIAL) {
 			GEM_BUG_ON(range_overflows_t(u64,
 						     view->partial.offset,
 						     view->partial.size,
@@ -151,10 +151,10 @@ vma_create(struct drm_i915_gem_object *obj,
 			vma->size = view->partial.size;
 			vma->size <<= PAGE_SHIFT;
 			GEM_BUG_ON(vma->size > obj->base.size);
-		} else if (view->type == I915_GGTT_VIEW_ROTATED) {
+		} else if (view->type == I915_GTT_VIEW_ROTATED) {
 			vma->size = intel_rotation_info_size(&view->rotated);
 			vma->size <<= PAGE_SHIFT;
-		} else if (view->type == I915_GGTT_VIEW_REMAPPED) {
+		} else if (view->type == I915_GTT_VIEW_REMAPPED) {
 			vma->size = intel_remapped_info_size(&view->remapped);
 			vma->size <<= PAGE_SHIFT;
 		}
@@ -248,7 +248,7 @@ err_vma:
 static struct i915_vma *
 i915_vma_lookup(struct drm_i915_gem_object *obj,
 	   struct i915_address_space *vm,
-	   const struct i915_ggtt_view *view)
+	   const struct i915_gtt_view *view)
 {
 	struct rb_node *rb;
 
@@ -286,7 +286,7 @@ i915_vma_lookup(struct drm_i915_gem_object *obj,
 struct i915_vma *
 i915_vma_instance(struct drm_i915_gem_object *obj,
 		  struct i915_address_space *vm,
-		  const struct i915_ggtt_view *view)
+		  const struct i915_gtt_view *view)
 {
 	struct i915_vma *vma;
 
@@ -1203,7 +1203,11 @@ err_st_alloc:
 }
 
 static noinline struct sg_table *
+<<<<<<< HEAD
+intel_partial_pages(const struct i915_gtt_view *view,
+=======
 intel_partial_pages(const struct i915_ggtt_view *view,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		    struct drm_i915_gem_object *obj)
 {
 	struct sg_table *st;
@@ -1247,6 +1251,28 @@ __i915_vma_get_pages(struct i915_vma *vma)
 	 */
 	GEM_BUG_ON(!i915_gem_object_has_pinned_pages(vma->obj));
 
+<<<<<<< HEAD
+	switch (vma->gtt_view.type) {
+	default:
+		GEM_BUG_ON(vma->gtt_view.type);
+		fallthrough;
+	case I915_GTT_VIEW_NORMAL:
+		pages = vma->obj->mm.pages;
+		break;
+
+	case I915_GTT_VIEW_ROTATED:
+		pages =
+			intel_rotate_pages(&vma->gtt_view.rotated, vma->obj);
+		break;
+
+	case I915_GTT_VIEW_REMAPPED:
+		pages =
+			intel_remap_pages(&vma->gtt_view.remapped, vma->obj);
+		break;
+
+	case I915_GTT_VIEW_PARTIAL:
+		pages = intel_partial_pages(&vma->gtt_view, vma->obj);
+=======
 	switch (vma->ggtt_view.type) {
 	default:
 		GEM_BUG_ON(vma->ggtt_view.type);
@@ -1267,13 +1293,18 @@ __i915_vma_get_pages(struct i915_vma *vma)
 
 	case I915_GGTT_VIEW_PARTIAL:
 		pages = intel_partial_pages(&vma->ggtt_view, vma->obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 
 	if (IS_ERR(pages)) {
 		drm_err(&vma->vm->i915->drm,
 			"Failed to get pages for VMA view type %u (%ld)!\n",
+<<<<<<< HEAD
+			vma->gtt_view.type, PTR_ERR(pages));
+=======
 			vma->ggtt_view.type, PTR_ERR(pages));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return PTR_ERR(pages);
 	}
 
@@ -1569,7 +1600,11 @@ static int __i915_ggtt_pin(struct i915_vma *vma, struct i915_gem_ww_ctx *ww,
 			 * locked objects when called from execbuf when pinning
 			 * is removed. This would probably regress badly.
 			 */
+<<<<<<< HEAD
+			i915_gem_evict_vm(vm, NULL, NULL);
+=======
 			i915_gem_evict_vm(vm, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			mutex_unlock(&vm->mutex);
 		}
 	} while (1);
@@ -1806,7 +1841,7 @@ void i915_vma_revoke_mmap(struct i915_vma *vma)
 	GEM_BUG_ON(!vma->obj->userfault_count);
 
 	node = &vma->mmo->vma_node;
-	vma_offset = vma->ggtt_view.partial.offset << PAGE_SHIFT;
+	vma_offset = vma->gtt_view.partial.offset << PAGE_SHIFT;
 	unmap_mapping_range(vma->vm->i915->drm.anon_inode->i_mapping,
 			    drm_vma_node_offset_addr(node) + vma_offset,
 			    vma->size,
@@ -2114,7 +2149,11 @@ int i915_vma_unbind_async(struct i915_vma *vma, bool trylock_vm)
 	if (!obj->mm.rsgt)
 		return -EBUSY;
 
+<<<<<<< HEAD
+	err = dma_resv_reserve_fences(obj->base.resv, 2);
+=======
 	err = dma_resv_reserve_fences(obj->base.resv, 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return -EBUSY;
 

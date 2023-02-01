@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/vf610_dac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/vf610_dac.ko drivers/iio/dac/vf610_dac.o drivers/iio/dac/vf610_dac.mod.o;  true

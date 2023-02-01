@@ -1,0 +1,1 @@
+cmd_drivers/scsi/csiostor/csiostor.mod := printf '%s\n'   csio_attr.o csio_init.o csio_lnode.o csio_scsi.o csio_hw.o csio_hw_t5.o csio_isr.o csio_mb.o csio_rnode.o csio_wr.o | awk '!x[$$0]++ { print("drivers/scsi/csiostor/"$$0) }' > drivers/scsi/csiostor/csiostor.mod

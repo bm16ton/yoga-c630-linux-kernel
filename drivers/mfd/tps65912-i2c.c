@@ -43,13 +43,16 @@ static int tps65912_i2c_probe(struct i2c_client *client,
 	return tps65912_device_init(tps);
 }
 
-static int tps65912_i2c_remove(struct i2c_client *client)
+static void tps65912_i2c_remove(struct i2c_client *client)
 {
 	struct tps65912 *tps = i2c_get_clientdata(client);
 
 	tps65912_device_exit(tps);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tps65912_i2c_id_table[] = {

@@ -1,0 +1,19 @@
+!<thin>
+//                                              118       `
+arm-cci.o/
+hisi_lpc.o/
+qcom-ebi2.o/
+sun50i-de2.o/
+sunxi-rsb.o/
+simple-pm-bus.o/
+tegra-aconnect.o/
+vexpress-config.o/
+
+/0              0           0     0     644     8568      `
+/11             0           0     0     644     13216     `
+/23             0           0     0     644     9104      `
+/36             0           0     0     644     4296      `
+/50             0           0     0     644     21264     `
+/63             0           0     0     644     6456      `
+/80             0           0     0     644     7800      `
+/98             0           0     0     644     13984     `

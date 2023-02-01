@@ -1,0 +1,1 @@
+cmd_drivers/spi/spi-tegra20-sflash.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/spi/spi-tegra20-sflash.ko drivers/spi/spi-tegra20-sflash.o drivers/spi/spi-tegra20-sflash.mod.o;  true

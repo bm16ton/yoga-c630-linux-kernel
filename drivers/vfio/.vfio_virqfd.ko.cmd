@@ -1,0 +1,1 @@
+cmd_drivers/vfio/vfio_virqfd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/vfio/vfio_virqfd.ko drivers/vfio/vfio_virqfd.o drivers/vfio/vfio_virqfd.mod.o;  true

@@ -9,16 +9,23 @@
 #include <linux/tracepoint.h>
 #include <trace/events/mmflags.h>
 
-DECLARE_EVENT_CLASS(kmem_alloc,
+TRACE_EVENT(kmem_cache_alloc,
 
 	TP_PROTO(unsigned long call_site,
 		 const void *ptr,
 		 struct kmem_cache *s,
+<<<<<<< HEAD
+		 gfp_t gfp_flags,
+		 int node),
+
+	TP_ARGS(call_site, ptr, s, gfp_flags, node),
+=======
 		 size_t bytes_req,
 		 size_t bytes_alloc,
 		 gfp_t gfp_flags),
 
 	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	TP_STRUCT__entry(
 		__field(	unsigned long,	call_site	)
@@ -26,12 +33,28 @@ DECLARE_EVENT_CLASS(kmem_alloc,
 		__field(	size_t,		bytes_req	)
 		__field(	size_t,		bytes_alloc	)
 		__field(	unsigned long,	gfp_flags	)
+<<<<<<< HEAD
+		__field(	int,		node		)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		__field(	bool,		accounted	)
 	),
 
 	TP_fast_assign(
 		__entry->call_site	= call_site;
 		__entry->ptr		= ptr;
+<<<<<<< HEAD
+		__entry->bytes_req	= s->object_size;
+		__entry->bytes_alloc	= s->size;
+		__entry->gfp_flags	= (__force unsigned long)gfp_flags;
+		__entry->node		= node;
+		__entry->accounted	= IS_ENABLED(CONFIG_MEMCG_KMEM) ?
+					  ((gfp_flags & __GFP_ACCOUNT) ||
+					  (s->flags & SLAB_ACCOUNT)) : false;
+	),
+
+	TP_printk("call_site=%pS ptr=%p bytes_req=%zu bytes_alloc=%zu gfp_flags=%s node=%d accounted=%s",
+=======
 		__entry->bytes_req	= bytes_req;
 		__entry->bytes_alloc	= bytes_alloc;
 		__entry->gfp_flags	= (__force unsigned long)gfp_flags;
@@ -41,11 +64,16 @@ DECLARE_EVENT_CLASS(kmem_alloc,
 	),
 
 	TP_printk("call_site=%pS ptr=%p bytes_req=%zu bytes_alloc=%zu gfp_flags=%s accounted=%s",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		(void *)__entry->call_site,
 		__entry->ptr,
 		__entry->bytes_req,
 		__entry->bytes_alloc,
 		show_gfp_flags(__entry->gfp_flags),
+<<<<<<< HEAD
+		__entry->node,
+		__entry->accounted ? "true" : "false")
+=======
 		__entry->accounted ? "true" : "false")
 );
 
@@ -63,9 +91,10 @@ DEFINE_EVENT(kmem_alloc, kmem_cache_alloc,
 		 size_t bytes_req, size_t bytes_alloc, gfp_t gfp_flags),
 
 	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 );
 
-DECLARE_EVENT_CLASS(kmem_alloc_node,
+TRACE_EVENT(kmalloc,
 
 	TP_PROTO(unsigned long call_site,
 		 const void *ptr,
@@ -106,6 +135,10 @@ DECLARE_EVENT_CLASS(kmem_alloc_node,
 		__entry->bytes_alloc,
 		show_gfp_flags(__entry->gfp_flags),
 		__entry->node,
+<<<<<<< HEAD
+		(IS_ENABLED(CONFIG_MEMCG_KMEM) &&
+		 (__entry->gfp_flags & (__force unsigned long)__GFP_ACCOUNT)) ? "true" : "false")
+=======
 		__entry->accounted ? "true" : "false")
 );
 
@@ -125,6 +158,7 @@ DEFINE_EVENT(kmem_alloc_node, kmem_cache_alloc_node,
 		 gfp_t gfp_flags, int node),
 
 	TP_ARGS(call_site, ptr, s, bytes_req, bytes_alloc, gfp_flags, node)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 );
 
 TRACE_EVENT(kfree,
@@ -149,20 +183,20 @@ TRACE_EVENT(kfree,
 
 TRACE_EVENT(kmem_cache_free,
 
-	TP_PROTO(unsigned long call_site, const void *ptr, const char *name),
+	TP_PROTO(unsigned long call_site, const void *ptr, const struct kmem_cache *s),
 
-	TP_ARGS(call_site, ptr, name),
+	TP_ARGS(call_site, ptr, s),
 
 	TP_STRUCT__entry(
 		__field(	unsigned long,	call_site	)
 		__field(	const void *,	ptr		)
-		__string(	name,	name	)
+		__string(	name,		s->name		)
 	),
 
 	TP_fast_assign(
 		__entry->call_site	= call_site;
 		__entry->ptr		= ptr;
-		__assign_str(name, name);
+		__assign_str(name, s->name);
 	),
 
 	TP_printk("call_site=%pS ptr=%p name=%s",

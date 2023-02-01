@@ -1,0 +1,11 @@
+drivers/input/misc/ati_remote2.ko
+drivers/input/misc/cm109.ko
+drivers/input/misc/gpio-beeper.ko
+drivers/input/misc/hisi_powerkey.ko
+drivers/input/misc/keyspan_remote.ko
+drivers/input/misc/pm8941-pwrkey.ko
+drivers/input/misc/pm8xxx-vibrator.ko
+drivers/input/misc/powermate.ko
+drivers/input/misc/axp20x-pek.ko
+drivers/input/misc/uinput.ko
+drivers/input/misc/yealink.ko

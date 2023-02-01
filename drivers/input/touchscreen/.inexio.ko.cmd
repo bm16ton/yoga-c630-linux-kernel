@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/inexio.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/inexio.ko drivers/input/touchscreen/inexio.o drivers/input/touchscreen/inexio.mod.o;  true

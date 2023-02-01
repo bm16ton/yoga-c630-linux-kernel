@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/hw/cxgb4/iw_cxgb4.mod := printf '%s\n'   device.o cm.o provider.o mem.o cq.o qp.o resource.o ev.o id_table.o restrack.o | awk '!x[$$0]++ { print("drivers/infiniband/hw/cxgb4/"$$0) }' > drivers/infiniband/hw/cxgb4/iw_cxgb4.mod

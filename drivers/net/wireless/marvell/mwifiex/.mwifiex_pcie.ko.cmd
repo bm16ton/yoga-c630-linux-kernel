@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/mwifiex/mwifiex_pcie.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/marvell/mwifiex/mwifiex_pcie.ko drivers/net/wireless/marvell/mwifiex/mwifiex_pcie.o drivers/net/wireless/marvell/mwifiex/mwifiex_pcie.mod.o;  true

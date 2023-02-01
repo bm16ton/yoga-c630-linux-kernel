@@ -21,6 +21,7 @@
 #include <asm/elf.h>
 #include <asm/ipl.h>
 #include <asm/sclp.h>
+#include <asm/maccess.h>
 
 #define PTR_ADD(x, y) (((char *) (x)) + ((unsigned long) (y)))
 #define PTR_SUB(x, y) (((char *) (x)) - ((unsigned long) (y)))
@@ -116,22 +117,62 @@ void __init save_area_add_vxrs(struct save_area *sa, __vector128 *vxrs)
 	memcpy(sa->vxrs_high, vxrs + 16, 16 * sizeof(__vector128));
 }
 
+<<<<<<< HEAD
+static size_t copy_oldmem_iter(struct iov_iter *iter, unsigned long src, size_t count)
+=======
 static size_t copy_to_iter_real(struct iov_iter *iter, unsigned long src, size_t count)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	size_t len, copied, res = 0;
 
 	mutex_lock(&memcpy_real_mutex);
 	while (count) {
+<<<<<<< HEAD
+		if (!oldmem_data.start && src < sclp.hsa_size) {
+			/* Copy from zfcp/nvme dump HSA area */
+			len = min(count, sclp.hsa_size - src);
+			copied = memcpy_hsa_iter(iter, src, len);
+		} else {
+			/* Check for swapped kdump oldmem areas */
+			if (oldmem_data.start && src - oldmem_data.start < oldmem_data.size) {
+				src -= oldmem_data.start;
+				len = min(count, oldmem_data.size - src);
+			} else if (oldmem_data.start && src < oldmem_data.size) {
+				len = min(count, oldmem_data.size - src);
+				src += oldmem_data.start;
+			} else {
+				len = count;
+			}
+			copied = memcpy_real_iter(iter, src, len);
+		}
+=======
 		len = min(PAGE_SIZE, count);
 		if (memcpy_real(memcpy_real_buf, src, len))
 			break;
 		copied = copy_to_iter(memcpy_real_buf, len, iter);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		count -= copied;
 		src += copied;
 		res += copied;
 		if (copied < len)
 			break;
 	}
+<<<<<<< HEAD
+	return res;
+}
+
+int copy_oldmem_kernel(void *dst, unsigned long src, size_t count)
+{
+	struct iov_iter iter;
+	struct kvec kvec;
+
+	kvec.iov_base = dst;
+	kvec.iov_len = count;
+	iov_iter_kvec(&iter, WRITE, &kvec, 1, count);
+	if (copy_oldmem_iter(&iter, src, count) < count)
+		return -EFAULT;
+	return 0;
+=======
 	mutex_unlock(&memcpy_real_mutex);
 	return res;
 }
@@ -165,6 +206,7 @@ size_t copy_oldmem_iter(struct iov_iter *iter, unsigned long src, size_t count)
 			break;
 	}
 	return res;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*

@@ -619,17 +619,33 @@ static ssize_t dlpar_cpu_add(u32 drc_index)
 static unsigned int pseries_cpuhp_cache_use_count(const struct device_node *cachedn)
 {
 	unsigned int use_count = 0;
+<<<<<<< HEAD
+	struct device_node *dn, *tn;
+=======
 	struct device_node *dn;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	WARN_ON(!of_node_is_type(cachedn, "cache"));
 
 	for_each_of_cpu_node(dn) {
+<<<<<<< HEAD
+		tn = of_find_next_cache_node(dn);
+		of_node_put(tn);
+		if (tn == cachedn)
+=======
 		if (of_find_next_cache_node(dn) == cachedn)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			use_count++;
 	}
 
 	for_each_node_by_type(dn, "cache") {
+<<<<<<< HEAD
+		tn = of_find_next_cache_node(dn);
+		of_node_put(tn);
+		if (tn == cachedn)
+=======
 		if (of_find_next_cache_node(dn) == cachedn)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			use_count++;
 	}
 
@@ -649,10 +665,20 @@ static int pseries_cpuhp_detach_nodes(struct device_node *cpudn)
 
 	dn = cpudn;
 	while ((dn = of_find_next_cache_node(dn))) {
+<<<<<<< HEAD
+		if (pseries_cpuhp_cache_use_count(dn) > 1) {
+			of_node_put(dn);
+			break;
+		}
+
+		ret = of_changeset_detach_node(&cs, dn);
+		of_node_put(dn);
+=======
 		if (pseries_cpuhp_cache_use_count(dn) > 1)
 			break;
 
 		ret = of_changeset_detach_node(&cs, dn);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret)
 			goto out;
 	}

@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/legacy/raw_gadget.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/legacy/raw_gadget.ko drivers/usb/gadget/legacy/raw_gadget.o drivers/usb/gadget/legacy/raw_gadget.mod.o;  true

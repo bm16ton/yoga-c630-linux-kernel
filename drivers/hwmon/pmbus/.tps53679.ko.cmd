@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/tps53679.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/tps53679.ko drivers/hwmon/pmbus/tps53679.o drivers/hwmon/pmbus/tps53679.mod.o;  true

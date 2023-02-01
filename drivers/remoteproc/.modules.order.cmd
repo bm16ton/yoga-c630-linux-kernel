@@ -1,0 +1,1 @@
+cmd_drivers/remoteproc/modules.order := {   echo drivers/remoteproc/qcom_pil_info.ko;   echo drivers/remoteproc/qcom_common.ko;   echo drivers/remoteproc/qcom_q6v5.ko;   echo drivers/remoteproc/qcom_q6v5_mss.ko;   echo drivers/remoteproc/qcom_q6v5_pas.ko;   echo drivers/remoteproc/qcom_sysmon.ko; :; } > drivers/remoteproc/modules.order

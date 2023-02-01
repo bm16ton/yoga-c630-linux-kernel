@@ -55,9 +55,15 @@ static ssize_t dbgfs_attrs_read(struct file *file,
 
 	mutex_lock(&ctx->kdamond_lock);
 	ret = scnprintf(kbuf, ARRAY_SIZE(kbuf), "%lu %lu %lu %lu %lu\n",
+<<<<<<< HEAD
+			ctx->attrs.sample_interval, ctx->attrs.aggr_interval,
+			ctx->attrs.ops_update_interval,
+			ctx->attrs.min_nr_regions, ctx->attrs.max_nr_regions);
+=======
 			ctx->sample_interval, ctx->aggr_interval,
 			ctx->ops_update_interval, ctx->min_nr_regions,
 			ctx->max_nr_regions);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&ctx->kdamond_lock);
 
 	return simple_read_from_buffer(buf, count, ppos, kbuf, ret);
@@ -67,7 +73,11 @@ static ssize_t dbgfs_attrs_write(struct file *file,
 		const char __user *buf, size_t count, loff_t *ppos)
 {
 	struct damon_ctx *ctx = file->private_data;
+<<<<<<< HEAD
+	struct damon_attrs attrs;
+=======
 	unsigned long s, a, r, minr, maxr;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	char *kbuf;
 	ssize_t ret;
 
@@ -76,7 +86,14 @@ static ssize_t dbgfs_attrs_write(struct file *file,
 		return PTR_ERR(kbuf);
 
 	if (sscanf(kbuf, "%lu %lu %lu %lu %lu",
+<<<<<<< HEAD
+				&attrs.sample_interval, &attrs.aggr_interval,
+				&attrs.ops_update_interval,
+				&attrs.min_nr_regions,
+				&attrs.max_nr_regions) != 5) {
+=======
 				&s, &a, &r, &minr, &maxr) != 5) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -EINVAL;
 		goto out;
 	}
@@ -87,7 +104,11 @@ static ssize_t dbgfs_attrs_write(struct file *file,
 		goto unlock_out;
 	}
 
+<<<<<<< HEAD
+	ret = damon_set_attrs(ctx, &attrs);
+=======
 	ret = damon_set_attrs(ctx, s, a, r, minr, maxr);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ret)
 		ret = count;
 unlock_out:
@@ -304,11 +325,17 @@ static ssize_t dbgfs_schemes_write(struct file *file, const char __user *buf,
 		goto unlock_out;
 	}
 
+<<<<<<< HEAD
+	damon_set_schemes(ctx, schemes, nr_schemes);
+	ret = count;
+	nr_schemes = 0;
+=======
 	ret = damon_set_schemes(ctx, schemes, nr_schemes);
 	if (!ret) {
 		ret = count;
 		nr_schemes = 0;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 unlock_out:
 	mutex_unlock(&ctx->kdamond_lock);
@@ -892,6 +919,10 @@ static int dbgfs_rm_context(char *name)
 	struct inode *inode;
 	struct damon_ctx **new_ctxs;
 	int i, j;
+<<<<<<< HEAD
+	int ret = 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (damon_nr_running_ctxs())
 		return -EBUSY;
@@ -912,14 +943,26 @@ static int dbgfs_rm_context(char *name)
 
 	new_dirs = kmalloc_array(dbgfs_nr_ctxs - 1, sizeof(*dbgfs_dirs),
 			GFP_KERNEL);
+<<<<<<< HEAD
+	if (!new_dirs) {
+		ret = -ENOMEM;
+		goto out_dput;
+	}
+=======
 	if (!new_dirs)
 		return -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	new_ctxs = kmalloc_array(dbgfs_nr_ctxs - 1, sizeof(*dbgfs_ctxs),
 			GFP_KERNEL);
 	if (!new_ctxs) {
+<<<<<<< HEAD
+		ret = -ENOMEM;
+		goto out_new_dirs;
+=======
 		kfree(new_dirs);
 		return -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	for (i = 0, j = 0; i < dbgfs_nr_ctxs; i++) {
@@ -939,7 +982,17 @@ static int dbgfs_rm_context(char *name)
 	dbgfs_ctxs = new_ctxs;
 	dbgfs_nr_ctxs--;
 
+<<<<<<< HEAD
+	goto out_dput;
+
+out_new_dirs:
+	kfree(new_dirs);
+out_dput:
+	dput(dir);
+	return ret;
+=======
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static ssize_t dbgfs_rm_context_write(struct file *file,
@@ -1058,7 +1111,11 @@ static int __init __damon_dbgfs_init(void)
 				fops[i]);
 	dbgfs_fill_ctx_dir(dbgfs_root, dbgfs_ctxs[0]);
 
+<<<<<<< HEAD
+	dbgfs_dirs = kmalloc(sizeof(dbgfs_root), GFP_KERNEL);
+=======
 	dbgfs_dirs = kmalloc_array(1, sizeof(dbgfs_root), GFP_KERNEL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!dbgfs_dirs) {
 		debugfs_remove(dbgfs_root);
 		return -ENOMEM;

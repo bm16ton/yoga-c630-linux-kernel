@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/st/cw1200/cw1200_wlan_spi.mod := printf '%s\n'   cw1200_spi.o | awk '!x[$$0]++ { print("drivers/net/wireless/st/cw1200/"$$0) }' > drivers/net/wireless/st/cw1200/cw1200_wlan_spi.mod

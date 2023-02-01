@@ -269,10 +269,13 @@ int iavf_get_vf_vlan_v2_caps(struct iavf_adapter *adapter)
 void iavf_configure_queues(struct iavf_adapter *adapter)
 {
 	struct virtchnl_vsi_queue_config_info *vqci;
-	struct virtchnl_queue_pair_info *vqpi;
+	int i, max_frame = adapter->vf_res->max_mtu;
 	int pairs = adapter->num_active_queues;
-	int i, max_frame = IAVF_MAX_RXBUFFER;
+	struct virtchnl_queue_pair_info *vqpi;
 	size_t len;
+
+	if (max_frame > IAVF_MAX_RXBUFFER || !max_frame)
+		max_frame = IAVF_MAX_RXBUFFER;
 
 	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
 		/* bail because we already have a command pending */
@@ -764,6 +767,7 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
 
 				if (i == count)
 					break;
+<<<<<<< HEAD
 
 				/* give priority over outer if it's enabled */
 				if (filtering_support->outer)
@@ -771,6 +775,15 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
 				else
 					vlan = &vvfl_v2->filters[i].inner;
 
+=======
+
+				/* give priority over outer if it's enabled */
+				if (filtering_support->outer)
+					vlan = &vvfl_v2->filters[i].outer;
+				else
+					vlan = &vvfl_v2->filters[i].inner;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				vlan->tci = f->vlan.vid;
 				vlan->tpid = f->vlan.tpid;
 
@@ -919,10 +932,17 @@ void iavf_del_vlans(struct iavf_adapter *adapter)
 					break;
 			}
 		}
+<<<<<<< HEAD
 
 		if (!more)
 			adapter->aq_required &= ~IAVF_FLAG_AQ_DEL_VLAN_FILTER;
 
+=======
+
+		if (!more)
+			adapter->aq_required &= ~IAVF_FLAG_AQ_DEL_VLAN_FILTER;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		spin_unlock_bh(&adapter->mac_vlan_list_lock);
 
 		iavf_send_pf_msg(adapter, VIRTCHNL_OP_DEL_VLAN_V2,

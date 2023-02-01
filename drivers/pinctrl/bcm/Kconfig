@@ -31,13 +31,21 @@ config PINCTRL_BCM2835
 
 config PINCTRL_BCM4908
 	tristate "Broadcom BCM4908 pinmux driver"
+<<<<<<< HEAD
+	depends on OF && (ARCH_BCMBCA || COMPILE_TEST)
+=======
 	depends on OF && (ARCH_BCM4908 || COMPILE_TEST)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select PINMUX
 	select PINCONF
 	select GENERIC_PINCONF
 	select GENERIC_PINCTRL_GROUPS
 	select GENERIC_PINMUX_FUNCTIONS
+<<<<<<< HEAD
+	default ARCH_BCMBCA
+=======
 	default ARCH_BCM4908
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Driver for BCM4908 family SoCs with integrated pin controller.
 

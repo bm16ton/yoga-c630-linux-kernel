@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath6kl/ath6kl_core.mod := printf '%s\n'   debug.o hif.o htc_mbox.o htc_pipe.o bmi.o cfg80211.o init.o main.o txrx.o wmi.o core.o recovery.o testmode.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath6kl/"$$0) }' > drivers/net/wireless/ath/ath6kl/ath6kl_core.mod

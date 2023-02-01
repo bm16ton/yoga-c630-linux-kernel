@@ -1,0 +1,1 @@
+cmd_drivers/xen/xen-pciback/xen-pciback.mod := printf '%s\n'   pci_stub.o pciback_ops.o xenbus.o conf_space.o conf_space_header.o conf_space_capability.o conf_space_quirks.o vpci.o passthrough.o | awk '!x[$$0]++ { print("drivers/xen/xen-pciback/"$$0) }' > drivers/xen/xen-pciback/xen-pciback.mod

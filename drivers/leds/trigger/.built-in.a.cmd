@@ -1,0 +1,1 @@
+cmd_drivers/leds/trigger/built-in.a := rm -f drivers/leds/trigger/built-in.a;  printf "drivers/leds/trigger/%s " ledtrig-disk.o ledtrig-mtd.o ledtrig-heartbeat.o ledtrig-cpu.o ledtrig-panic.o | xargs ar cDPrST drivers/leds/trigger/built-in.a

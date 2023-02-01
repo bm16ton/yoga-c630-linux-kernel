@@ -1,0 +1,1 @@
+cmd_drivers/usb/serial/io_edgeport.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/serial/io_edgeport.ko drivers/usb/serial/io_edgeport.o drivers/usb/serial/io_edgeport.mod.o;  true

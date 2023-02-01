@@ -3,6 +3,11 @@
  * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
  */
 #include <linux/export.h>
+<<<<<<< HEAD
+#include <linux/io.h>
+#include <linux/memblock.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/mm.h>
 #include <linux/mman.h>
 
@@ -116,3 +121,33 @@ int __virt_addr_valid(volatile void *kaddr)
 	return pfn_valid(PFN_DOWN(PHYSADDR(kaddr)));
 }
 EXPORT_SYMBOL_GPL(__virt_addr_valid);
+<<<<<<< HEAD
+
+/*
+ * You really shouldn't be using read() or write() on /dev/mem.  This might go
+ * away in the future.
+ */
+int valid_phys_addr_range(phys_addr_t addr, size_t size)
+{
+	/*
+	 * Check whether addr is covered by a memory region without the
+	 * MEMBLOCK_NOMAP attribute, and whether that region covers the
+	 * entire range. In theory, this could lead to false negatives
+	 * if the range is covered by distinct but adjacent memory regions
+	 * that only differ in other attributes. However, few of such
+	 * attributes have been defined, and it is debatable whether it
+	 * follows that /dev/mem read() calls should be able traverse
+	 * such boundaries.
+	 */
+	return memblock_is_region_memory(addr, size) && memblock_is_map_memory(addr);
+}
+
+/*
+ * Do not allow /dev/mem mappings beyond the supported physical range.
+ */
+int valid_mmap_phys_addr_range(unsigned long pfn, size_t size)
+{
+	return !(((pfn << PAGE_SHIFT) + size) & ~(GENMASK_ULL(cpu_pabits, 0)));
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

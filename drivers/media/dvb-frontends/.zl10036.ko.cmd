@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/zl10036.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/dvb-frontends/zl10036.ko drivers/media/dvb-frontends/zl10036.o drivers/media/dvb-frontends/zl10036.mod.o;  true

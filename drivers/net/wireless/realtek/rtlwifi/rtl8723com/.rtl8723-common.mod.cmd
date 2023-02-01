@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8723com/rtl8723-common.mod := printf '%s\n'   main.o dm_common.o fw_common.o phy_common.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtlwifi/rtl8723com/"$$0) }' > drivers/net/wireless/realtek/rtlwifi/rtl8723com/rtl8723-common.mod

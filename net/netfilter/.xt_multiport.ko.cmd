@@ -1,0 +1,1 @@
+cmd_net/netfilter/xt_multiport.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/xt_multiport.ko net/netfilter/xt_multiport.o net/netfilter/xt_multiport.mod.o;  true

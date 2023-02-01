@@ -1,0 +1,9 @@
+drivers/net/ppp/ppp_generic.ko
+drivers/net/ppp/ppp_async.ko
+drivers/net/ppp/bsd_comp.ko
+drivers/net/ppp/ppp_deflate.ko
+drivers/net/ppp/ppp_mppe.ko
+drivers/net/ppp/ppp_synctty.ko
+drivers/net/ppp/pppox.ko
+drivers/net/ppp/pppoe.ko
+drivers/net/ppp/pptp.ko

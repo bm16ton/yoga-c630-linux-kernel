@@ -1,0 +1,9 @@
+!<thin>
+//                                              60        `
+zynqmp_power.o/
+zynqmp_pm_domains.o/
+xlnx_event_manager.o/
+
+/0              0           0     0     644     11752     `
+/16             0           0     0     644     8176      `
+/37             0           0     0     644     19456     `

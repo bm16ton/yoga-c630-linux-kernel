@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/veml6030.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/veml6030.ko drivers/iio/light/veml6030.o drivers/iio/light/veml6030.mod.o;  true

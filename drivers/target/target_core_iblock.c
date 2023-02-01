@@ -230,6 +230,14 @@ static void iblock_unplug_device(struct se_dev_plug *se_plug)
 	clear_bit(IBD_PLUGF_PLUGGED, &ib_dev_plug->flags);
 }
 
+<<<<<<< HEAD
+static sector_t iblock_get_blocks(struct se_device *dev)
+{
+	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
+	u32 block_size = bdev_logical_block_size(ib_dev->ibd_bd);
+	unsigned long long blocks_long =
+		div_u64(bdev_nr_bytes(ib_dev->ibd_bd), block_size) - 1;
+=======
 static unsigned long long iblock_emulate_read_cap_with_block_size(
 	struct se_device *dev,
 	struct block_device *bd,
@@ -238,6 +246,7 @@ static unsigned long long iblock_emulate_read_cap_with_block_size(
 	u32 block_size = bdev_logical_block_size(bd);
 	unsigned long long blocks_long =
 		div_u64(bdev_nr_bytes(bd), block_size) - 1;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (block_size == dev->dev_attrib.block_size)
 		return blocks_long;
@@ -827,15 +836,6 @@ fail_free_ibr:
 	kfree(ibr);
 fail:
 	return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-}
-
-static sector_t iblock_get_blocks(struct se_device *dev)
-{
-	struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
-	struct block_device *bd = ib_dev->ibd_bd;
-	struct request_queue *q = bdev_get_queue(bd);
-
-	return iblock_emulate_read_cap_with_block_size(dev, bd, q);
 }
 
 static sector_t iblock_get_alignment_offset_lbas(struct se_device *dev)

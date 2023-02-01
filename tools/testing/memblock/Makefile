@@ -29,13 +29,21 @@ include: ../../../include/linux/memblock.h ../../include/linux/*.h \
 
 	@mkdir -p linux
 	test -L linux/memblock.h || ln -s ../../../../include/linux/memblock.h linux/memblock.h
+<<<<<<< HEAD
+	test -L asm/asm.h || ln -s ../../../arch/x86/include/asm/asm.h asm/asm.h
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	test -L asm/cmpxchg.h || ln -s ../../../arch/x86/include/asm/cmpxchg.h asm/cmpxchg.h
 
 memblock.c: $(EXTR_SRC)
 	test -L memblock.c || ln -s $(EXTR_SRC) memblock.c
 
 clean:
+<<<<<<< HEAD
+	$(RM) $(TARGETS) $(OFILES) linux/memblock.h memblock.c asm/asm.h asm/cmpxchg.h
+=======
 	$(RM) $(TARGETS) $(OFILES) linux/memblock.h memblock.c asm/cmpxchg.h
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 help:
 	@echo  'Memblock simulator'

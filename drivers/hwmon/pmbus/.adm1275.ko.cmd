@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/adm1275.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/adm1275.ko drivers/hwmon/pmbus/adm1275.o drivers/hwmon/pmbus/adm1275.mod.o;  true

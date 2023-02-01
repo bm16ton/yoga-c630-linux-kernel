@@ -1,0 +1,1 @@
+cmd_drivers/interconnect/qcom/built-in.a := rm -f drivers/interconnect/qcom/built-in.a;  printf "drivers/interconnect/qcom/%s " icc-common.o bcm-voter.o osm-l3.o icc-rpmh.o sc8180x.o sdm845.o | xargs ar cDPrST drivers/interconnect/qcom/built-in.a

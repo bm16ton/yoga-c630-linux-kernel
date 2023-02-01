@@ -51,6 +51,12 @@ struct amdgpu_umc_ras {
 	struct amdgpu_ras_block_object ras_block;
 	void (*err_cnt_init)(struct amdgpu_device *adev);
 	bool (*query_ras_poison_mode)(struct amdgpu_device *adev);
+<<<<<<< HEAD
+	void (*convert_ras_error_address)(struct amdgpu_device *adev,
+				struct ras_err_data *err_data, uint64_t err_addr,
+				uint32_t ch_inst, uint32_t umc_inst);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*ecc_info_query_ras_error_count)(struct amdgpu_device *adev,
 				      void *ras_error_status);
 	void (*ecc_info_query_ras_error_address)(struct amdgpu_device *adev,

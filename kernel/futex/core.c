@@ -638,6 +638,10 @@ static int handle_futex_death(u32 __user *uaddr, struct task_struct *curr,
 			      bool pi, bool pending_op)
 {
 	u32 uval, nval, mval;
+<<<<<<< HEAD
+	pid_t owner;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	/* Futex address must be 32bit aligned */
@@ -659,6 +663,13 @@ retry:
 	 * 2. A woken up waiter is killed before it can acquire the
 	 *    futex in user space.
 	 *
+<<<<<<< HEAD
+	 * In the second case, the wake up notification could be generated
+	 * by the unlock path in user space after setting the futex value
+	 * to zero or by the kernel after setting the OWNER_DIED bit below.
+	 *
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * In both cases the TID validation below prevents a wakeup of
 	 * potential waiters which can cause these waiters to block
 	 * forever.
@@ -667,11 +678,28 @@ retry:
 	 *
 	 *	1) task->robust_list->list_op_pending != NULL
 	 *	   @pending_op == true
+<<<<<<< HEAD
+	 *	2) The owner part of user space futex value == 0
+=======
 	 *	2) User space futex value == 0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *	3) Regular futex: @pi == false
 	 *
 	 * If these conditions are met, it is safe to attempt waking up a
 	 * potential waiter without touching the user space futex value and
+<<<<<<< HEAD
+	 * trying to set the OWNER_DIED bit. If the futex value is zero,
+	 * the rest of the user space mutex state is consistent, so a woken
+	 * waiter will just take over the uncontended futex. Setting the
+	 * OWNER_DIED bit would create inconsistent state and malfunction
+	 * of the user space owner died handling. Otherwise, the OWNER_DIED
+	 * bit is already set, and the woken waiter is expected to deal with
+	 * this.
+	 */
+	owner = uval & FUTEX_TID_MASK;
+
+	if (pending_op && !pi && !owner) {
+=======
 	 * trying to set the OWNER_DIED bit. The user space futex value is
 	 * uncontended and the rest of the user space mutex state is
 	 * consistent, so a woken waiter will just take over the
@@ -680,11 +708,16 @@ retry:
 	 * handling.
 	 */
 	if (pending_op && !pi && !uval) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		futex_wake(uaddr, 1, 1, FUTEX_BITSET_MATCH_ANY);
 		return 0;
 	}
 
+<<<<<<< HEAD
+	if (owner != task_pid_vnr(curr))
+=======
 	if ((uval & FUTEX_TID_MASK) != task_pid_vnr(curr))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	/*

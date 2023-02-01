@@ -478,7 +478,7 @@ static int axi_fan_control_probe(struct platform_device *pdev)
 	if (IS_ERR(ctl->base))
 		return PTR_ERR(ctl->base);
 
-	clk = devm_clk_get(&pdev->dev, NULL);
+	clk = devm_clk_get_enabled(&pdev->dev, NULL);
 	if (IS_ERR(clk)) {
 		dev_err(&pdev->dev, "clk_get failed with %ld\n", PTR_ERR(clk));
 		return PTR_ERR(clk);

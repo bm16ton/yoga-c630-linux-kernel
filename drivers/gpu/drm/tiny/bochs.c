@@ -585,6 +585,19 @@ static int bochs_load(struct drm_device *dev)
 
 	ret = drmm_vram_helper_init(dev, bochs->fb_base, bochs->fb_size);
 	if (ret)
+<<<<<<< HEAD
+		goto err_hw_fini;
+
+	ret = bochs_kms_init(bochs);
+	if (ret)
+		goto err_hw_fini;
+
+	return 0;
+
+err_hw_fini:
+	bochs_hw_fini(dev);
+	return ret;
+=======
 		return ret;
 
 	ret = bochs_kms_init(bochs);
@@ -592,6 +605,7 @@ static int bochs_load(struct drm_device *dev)
 		return ret;
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 DEFINE_DRM_GEM_FOPS(bochs_fops);
@@ -666,11 +680,20 @@ static int bochs_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent
 
 	ret = drm_dev_register(dev, 0);
 	if (ret)
+<<<<<<< HEAD
+		goto err_hw_fini;
+=======
 		goto err_free_dev;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	drm_fbdev_generic_setup(dev, 32);
 	return ret;
 
+<<<<<<< HEAD
+err_hw_fini:
+	bochs_hw_fini(dev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_free_dev:
 	drm_dev_put(dev);
 	return ret;

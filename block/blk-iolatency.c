@@ -292,7 +292,7 @@ static void __blkcg_iolatency_throttle(struct rq_qos *rqos,
 	unsigned use_delay = atomic_read(&lat_to_blkg(iolat)->use_delay);
 
 	if (use_delay)
-		blkcg_schedule_throttle(rqos->q, use_memdelay);
+		blkcg_schedule_throttle(rqos->q->disk, use_memdelay);
 
 	/*
 	 * To avoid priority inversions we want to just take a slot if we are
@@ -734,6 +734,8 @@ next:
  * context, ->enabled flipping is punted to this work function.
  */
 static void blkiolatency_enable_work_fn(struct work_struct *work)
+<<<<<<< HEAD
+=======
 {
 	struct blk_iolatency *blkiolat = container_of(work, struct blk_iolatency,
 						      enable_work);
@@ -757,7 +759,32 @@ static void blkiolatency_enable_work_fn(struct work_struct *work)
 }
 
 int blk_iolatency_init(struct request_queue *q)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
+	struct blk_iolatency *blkiolat = container_of(work, struct blk_iolatency,
+						      enable_work);
+	bool enabled;
+
+	/*
+	 * There can only be one instance of this function running for @blkiolat
+	 * and it's guaranteed to be executed at least once after the latest
+	 * ->enabled_cnt modification. Acting on the latest ->enable_cnt is
+	 * sufficient.
+	 *
+	 * Also, we know @blkiolat is safe to access as ->enable_work is flushed
+	 * in blkcg_iolatency_exit().
+	 */
+	enabled = atomic_read(&blkiolat->enable_cnt);
+	if (enabled != blkiolat->enabled) {
+		blk_mq_freeze_queue(blkiolat->rqos.q);
+		blkiolat->enabled = enabled;
+		blk_mq_unfreeze_queue(blkiolat->rqos.q);
+	}
+}
+
+int blk_iolatency_init(struct gendisk *disk)
+{
+	struct request_queue *q = disk->queue;
 	struct blk_iolatency *blkiolat;
 	struct rq_qos *rqos;
 	int ret;

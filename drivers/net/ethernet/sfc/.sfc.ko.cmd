@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/sfc/sfc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/sfc/sfc.ko drivers/net/ethernet/sfc/sfc.o drivers/net/ethernet/sfc/sfc.mod.o;  true

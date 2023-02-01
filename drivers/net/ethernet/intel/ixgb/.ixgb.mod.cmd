@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/ixgb/ixgb.mod := printf '%s\n'   ixgb_main.o ixgb_hw.o ixgb_ee.o ixgb_ethtool.o ixgb_param.o | awk '!x[$$0]++ { print("drivers/net/ethernet/intel/ixgb/"$$0) }' > drivers/net/ethernet/intel/ixgb/ixgb.mod

@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/ibm-cffps.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/ibm-cffps.ko drivers/hwmon/pmbus/ibm-cffps.o drivers/hwmon/pmbus/ibm-cffps.mod.o;  true

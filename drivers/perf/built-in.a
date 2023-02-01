@@ -1,0 +1,32 @@
+!<thin>
+//                                              340       `
+arm-cci.o/
+arm-ccn.o/
+arm_pmu.o/
+arm_pmu_platform.o/
+arm_pmu_acpi.o/
+hisilicon/hisi_uncore_pmu.o/
+hisilicon/hisi_uncore_l3c_pmu.o/
+hisilicon/hisi_uncore_hha_pmu.o/
+hisilicon/hisi_uncore_ddrc_pmu.o/
+hisilicon/hisi_uncore_sllc_pmu.o/
+hisilicon/hisi_uncore_pa_pmu.o/
+hisilicon/hisi_uncore_cpa_pmu.o/
+qcom_l2_pmu.o/
+qcom_l3_pmu.o/
+xgene_pmu.o/
+/0              0           0     0     644     49816     `
+/11             0           0     0     644     39656     `
+/22             0           0     0     644     20664     `
+/33             0           0     0     644     7664      `
+/53             0           0     0     644     7376      `
+/69             0           0     0     644     22216     `
+/98             0           0     0     644     19328     `
+/131            0           0     0     644     21288     `
+/164            0           0     0     644     18872     `
+/198            0           0     0     644     15752     `
+/232            0           0     0     644     14856     `
+/264            0           0     0     644     14392     `
+/297            0           0     0     644     22016     `
+/312            0           0     0     644     16208     `
+/327            0           0     0     644     81848     `

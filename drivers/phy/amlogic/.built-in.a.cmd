@@ -1,0 +1,1 @@
+cmd_drivers/phy/amlogic/built-in.a := rm -f drivers/phy/amlogic/built-in.a;  printf "drivers/phy/amlogic/%s " phy-meson-gxl-usb2.o phy-meson-g12a-usb2.o phy-meson-g12a-usb3-pcie.o phy-meson-g12a-mipi-dphy-analog.o phy-meson-axg-pcie.o phy-meson-axg-mipi-pcie-analog.o phy-meson-axg-mipi-dphy.o | xargs ar cDPrST drivers/phy/amlogic/built-in.a

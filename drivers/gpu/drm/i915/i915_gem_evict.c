@@ -416,6 +416,14 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
  * @vm: Address space to cleanse
  * @ww: An optional struct i915_gem_ww_ctx. If not NULL, i915_gem_evict_vm
  * will be able to evict vma's locked by the ww as well.
+<<<<<<< HEAD
+ * @busy_bo: Optional pointer to struct drm_i915_gem_object. If not NULL, then
+ * in the event i915_gem_evict_vm() is unable to trylock an object for eviction,
+ * then @busy_bo will point to it. -EBUSY is also returned. The caller must drop
+ * the vm->mutex, before trying again to acquire the contended lock. The caller
+ * also owns a reference to the object.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * This function evicts all vmas from a vm.
  *
@@ -425,7 +433,12 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
  * To clarify: This is for freeing up virtual address space, not for freeing
  * memory in e.g. the shrinker.
  */
+<<<<<<< HEAD
+int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww,
+		      struct drm_i915_gem_object **busy_bo)
+=======
 int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret = 0;
 
@@ -457,15 +470,31 @@ int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww)
 			 * the resv is shared among multiple objects, we still
 			 * need the object ref.
 			 */
+<<<<<<< HEAD
+			if (!i915_gem_object_get_rcu(vma->obj) ||
+=======
 			if (dying_vma(vma) ||
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			    (ww && (dma_resv_locking_ctx(vma->obj->base.resv) == &ww->ctx))) {
 				__i915_vma_pin(vma);
 				list_add(&vma->evict_link, &locked_eviction_list);
 				continue;
 			}
 
+<<<<<<< HEAD
+			if (!i915_gem_object_trylock(vma->obj, ww)) {
+				if (busy_bo) {
+					*busy_bo = vma->obj; /* holds ref */
+					ret = -EBUSY;
+					break;
+				}
+				i915_gem_object_put(vma->obj);
+				continue;
+			}
+=======
 			if (!i915_gem_object_trylock(vma->obj, ww))
 				continue;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			__i915_vma_pin(vma);
 			list_add(&vma->evict_link, &eviction_list);
@@ -473,25 +502,47 @@ int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww)
 		if (list_empty(&eviction_list) && list_empty(&locked_eviction_list))
 			break;
 
+<<<<<<< HEAD
+=======
 		ret = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Unbind locked objects first, before unlocking the eviction_list */
 		list_for_each_entry_safe(vma, vn, &locked_eviction_list, evict_link) {
 			__i915_vma_unpin(vma);
 
+<<<<<<< HEAD
+			if (ret == 0) {
+				ret = __i915_vma_unbind(vma);
+				if (ret != -EINTR) /* "Get me out of here!" */
+					ret = 0;
+			}
+			if (!dying_vma(vma))
+				i915_gem_object_put(vma->obj);
+=======
 			if (ret == 0)
 				ret = __i915_vma_unbind(vma);
 			if (ret != -EINTR) /* "Get me out of here!" */
 				ret = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		list_for_each_entry_safe(vma, vn, &eviction_list, evict_link) {
 			__i915_vma_unpin(vma);
-			if (ret == 0)
+			if (ret == 0) {
 				ret = __i915_vma_unbind(vma);
+<<<<<<< HEAD
+				if (ret != -EINTR) /* "Get me out of here!" */
+					ret = 0;
+			}
+
+			i915_gem_object_unlock(vma->obj);
+			i915_gem_object_put(vma->obj);
+=======
 			if (ret != -EINTR) /* "Get me out of here!" */
 				ret = 0;
 
 			i915_gem_object_unlock(vma->obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	} while (ret == 0);
 

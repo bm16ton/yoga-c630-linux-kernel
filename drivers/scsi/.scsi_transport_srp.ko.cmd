@@ -1,0 +1,1 @@
+cmd_drivers/scsi/scsi_transport_srp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/scsi_transport_srp.ko drivers/scsi/scsi_transport_srp.o drivers/scsi/scsi_transport_srp.mod.o;  true

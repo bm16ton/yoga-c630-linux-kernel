@@ -18,14 +18,23 @@ readonly V4_ADDR1=10.0.10.2
 readonly V6_ADDR0=2001:db8:91::1
 readonly V6_ADDR1=2001:db8:91::2
 nsid=100
+<<<<<<< HEAD
+ret=0
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 cleanup_v6()
 {
     ip netns del me
     ip netns del peer
 
+<<<<<<< HEAD
+    sysctl -w net.ipv6.conf.veth1.ndisc_evict_nocarrier=1 >/dev/null 2>&1
+    sysctl -w net.ipv6.conf.all.ndisc_evict_nocarrier=1 >/dev/null 2>&1
+=======
     sysctl -w net.ipv4.conf.veth0.ndisc_evict_nocarrier=1 >/dev/null 2>&1
     sysctl -w net.ipv4.conf.all.ndisc_evict_nocarrier=1 >/dev/null 2>&1
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 create_ns()
@@ -61,7 +70,11 @@ setup_v6() {
     if [ $? -ne 0 ]; then
         cleanup_v6
         echo "failed"
+<<<<<<< HEAD
+        exit 1
+=======
         exit
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     fi
 
     # Set veth2 down, which will put veth1 in NOCARRIER state
@@ -88,7 +101,11 @@ setup_v4() {
     if [ $? -ne 0 ]; then
         cleanup_v4
         echo "failed"
+<<<<<<< HEAD
+        exit 1
+=======
         exit
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     fi
 
     # Set veth1 down, which will put veth0 in NOCARRIER state
@@ -115,6 +132,10 @@ run_arp_evict_nocarrier_enabled() {
 
     if [ $? -eq 0 ];then
         echo "failed"
+<<<<<<< HEAD
+        ret=1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     else
         echo "ok"
     fi
@@ -134,6 +155,10 @@ run_arp_evict_nocarrier_disabled() {
         echo "ok"
     else
         echo "failed"
+<<<<<<< HEAD
+        ret=1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     fi
 
     cleanup_v4
@@ -164,6 +189,10 @@ run_ndisc_evict_nocarrier_enabled() {
 
     if [ $? -eq 0 ];then
         echo "failed"
+<<<<<<< HEAD
+        ret=1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     else
         echo "ok"
     fi
@@ -182,6 +211,10 @@ run_ndisc_evict_nocarrier_disabled() {
         echo "ok"
     else
         echo "failed"
+<<<<<<< HEAD
+        ret=1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     fi
 
     cleanup_v6
@@ -198,6 +231,10 @@ run_ndisc_evict_nocarrier_disabled_all() {
         echo "ok"
     else
         echo "failed"
+<<<<<<< HEAD
+        ret=1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     fi
 
     cleanup_v6
@@ -218,3 +255,7 @@ if [ "$(id -u)" -ne 0 ];then
 fi
 
 run_all_tests
+<<<<<<< HEAD
+exit $ret
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -204,7 +204,11 @@ void machine_kexec(struct kimage *kimage)
 		typeof(cpu_soft_restart) *restart;
 
 		cpu_install_idmap();
+<<<<<<< HEAD
+		restart = (void *)__pa_symbol(cpu_soft_restart);
+=======
 		restart = (void *)__pa_symbol(function_nocfi(cpu_soft_restart));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		restart(is_hyp_nvhe(), kimage->start, kimage->arch.dtb_mem,
 			0, 0);
 	} else {

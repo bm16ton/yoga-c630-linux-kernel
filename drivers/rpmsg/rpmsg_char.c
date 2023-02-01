@@ -426,6 +426,14 @@ int rpmsg_chrdev_eptdev_create(struct rpmsg_device *rpdev, struct device *parent
 			       struct rpmsg_channel_info chinfo)
 {
 	struct rpmsg_eptdev *eptdev;
+<<<<<<< HEAD
+
+	eptdev = rpmsg_chrdev_eptdev_alloc(rpdev, parent);
+	if (IS_ERR(eptdev))
+		return PTR_ERR(eptdev);
+
+	return rpmsg_chrdev_eptdev_add(eptdev, chinfo);
+=======
 	int ret;
 
 	eptdev = rpmsg_chrdev_eptdev_alloc(rpdev, parent);
@@ -435,6 +443,7 @@ int rpmsg_chrdev_eptdev_create(struct rpmsg_device *rpdev, struct device *parent
 	ret = rpmsg_chrdev_eptdev_add(eptdev, chinfo);
 
 	return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(rpmsg_chrdev_eptdev_create);
 

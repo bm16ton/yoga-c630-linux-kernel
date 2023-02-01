@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/tw686x/tw686x.mod := printf '%s\n'   tw686x-core.o tw686x-video.o tw686x-audio.o | awk '!x[$$0]++ { print("drivers/media/pci/tw686x/"$$0) }' > drivers/media/pci/tw686x/tw686x.mod

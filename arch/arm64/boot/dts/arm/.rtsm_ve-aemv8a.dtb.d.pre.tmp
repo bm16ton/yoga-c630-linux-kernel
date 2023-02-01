@@ -1,0 +1,4 @@
+rtsm_ve-aemv8a.o: arch/arm64/boot/dts/arm/rtsm_ve-aemv8a.dts \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ arch/arm64/boot/dts/arm/rtsm_ve-motherboard.dtsi

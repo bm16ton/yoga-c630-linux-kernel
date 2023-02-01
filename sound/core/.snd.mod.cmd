@@ -1,0 +1,1 @@
+cmd_sound/core/snd.mod := printf '%s\n'   sound.o init.o memory.o control.o misc.o device.o info.o info_oss.o sound_oss.o vmaster.o ctljack.o jack.o | awk '!x[$$0]++ { print("sound/core/"$$0) }' > sound/core/snd.mod

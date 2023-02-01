@@ -1,0 +1,1 @@
+cmd_drivers/xen/xen-privcmd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/xen/xen-privcmd.ko drivers/xen/xen-privcmd.o drivers/xen/xen-privcmd.mod.o;  true

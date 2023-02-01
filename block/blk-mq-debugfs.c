@@ -807,8 +807,11 @@ static const char *rq_qos_id_to_name(enum rq_qos_id id)
 		return "latency";
 	case RQ_QOS_COST:
 		return "cost";
+<<<<<<< HEAD
+=======
 	case RQ_QOS_IOPRIO:
 		return "ioprio";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return "unknown";
 }

@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/ad5593r.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/ad5593r.ko drivers/iio/dac/ad5593r.o drivers/iio/dac/ad5593r.mod.o;  true

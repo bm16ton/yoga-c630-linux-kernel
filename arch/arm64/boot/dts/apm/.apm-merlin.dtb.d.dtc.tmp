@@ -1,0 +1,1 @@
+arch/arm64/boot/dts/apm/apm-merlin.dtb: arch/arm64/boot/dts/apm/.apm-merlin.dtb.dts.tmp arch/arm64/boot/dts/apm/apm-shadowcat.dtsi

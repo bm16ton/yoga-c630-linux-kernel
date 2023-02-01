@@ -17,7 +17,11 @@
 #include <linux/vfio.h>
 #include <linux/vgaarb.h>
 
+<<<<<<< HEAD
+#include "vfio_pci_priv.h"
+=======
 #include <linux/vfio_pci_core.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef __LITTLE_ENDIAN
 #define vfio_ioread64	ioread64
@@ -412,8 +416,13 @@ static void vfio_pci_ioeventfd_thread(void *opaque, void *unused)
 	vfio_pci_ioeventfd_do_write(ioeventfd, ioeventfd->test_mem);
 }
 
+<<<<<<< HEAD
+int vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
+		       uint64_t data, int count, int fd)
+=======
 long vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
 			uint64_t data, int count, int fd)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct pci_dev *pdev = vdev->pdev;
 	loff_t pos = offset & VFIO_PCI_OFFSET_MASK;

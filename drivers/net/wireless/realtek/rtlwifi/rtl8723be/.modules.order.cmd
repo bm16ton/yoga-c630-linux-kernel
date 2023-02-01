@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8723be/modules.order := {   echo drivers/net/wireless/realtek/rtlwifi/rtl8723be/rtl8723be.ko; :; } > drivers/net/wireless/realtek/rtlwifi/rtl8723be/modules.order

@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/hw/qedr/qedr.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/infiniband/hw/qedr/qedr.ko drivers/infiniband/hw/qedr/qedr.o drivers/infiniband/hw/qedr/qedr.mod.o;  true

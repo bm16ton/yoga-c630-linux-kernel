@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/isl7998x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/i2c/isl7998x.ko drivers/media/i2c/isl7998x.o drivers/media/i2c/isl7998x.mod.o;  true

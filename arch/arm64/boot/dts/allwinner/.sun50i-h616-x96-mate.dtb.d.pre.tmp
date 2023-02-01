@@ -1,0 +1,11 @@
+sun50i-h616-x96-mate.o: \
+ arch/arm64/boot/dts/allwinner/sun50i-h616-x96-mate.dts \
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun50i-h616-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun50i-h6-r-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun6i-rtc.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun50i-h616-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun50i-h6-r-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h

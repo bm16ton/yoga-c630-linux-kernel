@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/mwifiex/mwifiex_sdio.mod := printf '%s\n'   sdio.o | awk '!x[$$0]++ { print("drivers/net/wireless/marvell/mwifiex/"$$0) }' > drivers/net/wireless/marvell/mwifiex/mwifiex_sdio.mod

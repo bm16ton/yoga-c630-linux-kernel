@@ -1,0 +1,1 @@
+cmd_drivers/iio/pressure/dps310.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/pressure/dps310.ko drivers/iio/pressure/dps310.o drivers/iio/pressure/dps310.mod.o;  true

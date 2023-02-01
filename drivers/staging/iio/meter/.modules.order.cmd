@@ -1,0 +1,1 @@
+cmd_drivers/staging/iio/meter/modules.order := {   echo drivers/staging/iio/meter/ade7854.ko;   echo drivers/staging/iio/meter/ade7854-i2c.ko;   echo drivers/staging/iio/meter/ade7854-spi.ko; :; } > drivers/staging/iio/meter/modules.order

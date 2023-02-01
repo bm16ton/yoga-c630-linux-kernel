@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/btcoexist/modules.order := {   echo drivers/net/wireless/realtek/rtlwifi/btcoexist/btcoexist.ko; :; } > drivers/net/wireless/realtek/rtlwifi/btcoexist/modules.order

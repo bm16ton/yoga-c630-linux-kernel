@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ddbridge/modules.order := {   echo drivers/media/pci/ddbridge/ddbridge.ko;   echo drivers/media/pci/ddbridge/ddbridge-dummy-fe.ko; :; } > drivers/media/pci/ddbridge/modules.order

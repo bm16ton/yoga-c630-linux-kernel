@@ -1,0 +1,1 @@
+cmd_drivers/tty/modules.order := {   cat drivers/tty/vt/modules.order;   cat drivers/tty/hvc/modules.order;   cat drivers/tty/serial/modules.order;   cat drivers/tty/serdev/modules.order;   cat drivers/tty/ipwireless/modules.order;   echo drivers/tty/n_gsm.ko;   echo drivers/tty/nozomi.ko; :; } > drivers/tty/modules.order

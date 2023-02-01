@@ -1,0 +1,1 @@
+cmd_drivers/net/can/can327.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/can/can327.ko drivers/net/can/can327.o drivers/net/can/can327.mod.o;  true

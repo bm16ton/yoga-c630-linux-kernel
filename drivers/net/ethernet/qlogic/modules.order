@@ -1,0 +1,5 @@
+drivers/net/ethernet/qlogic/qla3xxx.ko
+drivers/net/ethernet/qlogic/qlcnic/qlcnic.ko
+drivers/net/ethernet/qlogic/netxen/netxen_nic.ko
+drivers/net/ethernet/qlogic/qed/qed.ko
+drivers/net/ethernet/qlogic/qede/qede.ko

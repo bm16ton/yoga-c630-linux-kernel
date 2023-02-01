@@ -1,0 +1,10 @@
+sound/firewire/snd-firewire-lib.ko
+sound/firewire/dice/snd-dice.ko
+sound/firewire/oxfw/snd-oxfw.ko
+sound/firewire/snd-isight.ko
+sound/firewire/fireworks/snd-fireworks.ko
+sound/firewire/bebob/snd-bebob.ko
+sound/firewire/digi00x/snd-firewire-digi00x.ko
+sound/firewire/tascam/snd-firewire-tascam.ko
+sound/firewire/motu/snd-firewire-motu.ko
+sound/firewire/fireface/snd-fireface.ko

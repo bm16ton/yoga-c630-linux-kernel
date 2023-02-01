@@ -158,7 +158,11 @@ static struct bpf_map *bloom_map_alloc(union bpf_attr *attr)
 			attr->value_size / sizeof(u32);
 
 	if (!(attr->map_flags & BPF_F_ZERO_SEED))
+<<<<<<< HEAD
+		bloom->hash_seed = get_random_u32();
+=======
 		bloom->hash_seed = get_random_int();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return &bloom->map;
 }

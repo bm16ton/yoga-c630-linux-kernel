@@ -1412,9 +1412,13 @@ static irqreturn_t int_bcast_v1_hw(int irq, void *p)
 		goto end;
 	}
 
+<<<<<<< HEAD
+	hisi_sas_phy_bcast(phy);
+=======
 	if (!test_bit(HISI_SAS_RESETTING_BIT, &hisi_hba->flags))
 		sas_notify_port_event(sas_phy, PORTE_BROADCAST_RCVD,
 				      GFP_ATOMIC);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 end:
 	hisi_sas_phy_write32(hisi_hba, phy_no, CHL_INT2,

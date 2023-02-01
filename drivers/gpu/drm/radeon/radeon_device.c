@@ -1438,7 +1438,10 @@ int radeon_device_init(struct radeon_device *rdev,
 		goto failed;
 
 	radeon_gem_debugfs_init(rdev);
+<<<<<<< HEAD
+=======
 	radeon_mst_debugfs_init(rdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (rdev->flags & RADEON_IS_AGP && !rdev->accel_working) {
 		/* Acceleration not working on AGP card try again

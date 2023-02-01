@@ -343,7 +343,11 @@ static const u32 vsc9953_sys_regmap[] = {
 	REG(SYS_COUNT_TX_GREEN_PRIO_5,		0x00016c),
 	REG(SYS_COUNT_TX_GREEN_PRIO_6,		0x000170),
 	REG(SYS_COUNT_TX_GREEN_PRIO_7,		0x000174),
+<<<<<<< HEAD
+	REG(SYS_COUNT_TX_AGED,			0x000178),
+=======
 	REG(SYS_COUNT_TX_AGING,			0x000178),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	REG(SYS_COUNT_DROP_LOCAL,		0x000200),
 	REG(SYS_COUNT_DROP_TAIL,		0x000204),
 	REG(SYS_COUNT_DROP_YELLOW_PRIO_0,	0x000208),
@@ -383,7 +387,6 @@ static const u32 vsc9953_sys_regmap[] = {
 	REG_RESERVED(SYS_MMGT_FAST),
 	REG_RESERVED(SYS_EVENTS_DIF),
 	REG_RESERVED(SYS_EVENTS_CORE),
-	REG_RESERVED(SYS_CNT),
 	REG_RESERVED(SYS_PTP_STATUS),
 	REG_RESERVED(SYS_PTP_TXSTAMP),
 	REG_RESERVED(SYS_PTP_NXT),
@@ -459,110 +462,40 @@ static const u32 *vsc9953_regmap[TARGET_MAX] = {
 };
 
 /* Addresses are relative to the device's base address */
-static const struct resource vsc9953_target_io_res[TARGET_MAX] = {
-	[ANA] = {
-		.start	= 0x0280000,
-		.end	= 0x028ffff,
-		.name	= "ana",
-	},
-	[QS] = {
-		.start	= 0x0080000,
-		.end	= 0x00800ff,
-		.name	= "qs",
-	},
-	[QSYS] = {
-		.start	= 0x0200000,
-		.end	= 0x021ffff,
-		.name	= "qsys",
-	},
-	[REW] = {
-		.start	= 0x0030000,
-		.end	= 0x003ffff,
-		.name	= "rew",
-	},
-	[SYS] = {
-		.start	= 0x0010000,
-		.end	= 0x001ffff,
-		.name	= "sys",
-	},
-	[S0] = {
-		.start	= 0x0040000,
-		.end	= 0x00403ff,
-		.name	= "s0",
-	},
-	[S1] = {
-		.start	= 0x0050000,
-		.end	= 0x00503ff,
-		.name	= "s1",
-	},
-	[S2] = {
-		.start	= 0x0060000,
-		.end	= 0x00603ff,
-		.name	= "s2",
-	},
-	[PTP] = {
-		.start	= 0x0090000,
-		.end	= 0x00900cb,
-		.name	= "ptp",
-	},
-	[GCB] = {
-		.start	= 0x0070000,
-		.end	= 0x00701ff,
-		.name	= "devcpu_gcb",
-	},
+static const struct resource vsc9953_resources[] = {
+	DEFINE_RES_MEM_NAMED(0x0010000, 0x0010000, "sys"),
+	DEFINE_RES_MEM_NAMED(0x0030000, 0x0010000, "rew"),
+	DEFINE_RES_MEM_NAMED(0x0040000, 0x0000400, "s0"),
+	DEFINE_RES_MEM_NAMED(0x0050000, 0x0000400, "s1"),
+	DEFINE_RES_MEM_NAMED(0x0060000, 0x0000400, "s2"),
+	DEFINE_RES_MEM_NAMED(0x0070000, 0x0000200, "devcpu_gcb"),
+	DEFINE_RES_MEM_NAMED(0x0080000, 0x0000100, "qs"),
+	DEFINE_RES_MEM_NAMED(0x0090000, 0x00000cc, "ptp"),
+	DEFINE_RES_MEM_NAMED(0x0100000, 0x0010000, "port0"),
+	DEFINE_RES_MEM_NAMED(0x0110000, 0x0010000, "port1"),
+	DEFINE_RES_MEM_NAMED(0x0120000, 0x0010000, "port2"),
+	DEFINE_RES_MEM_NAMED(0x0130000, 0x0010000, "port3"),
+	DEFINE_RES_MEM_NAMED(0x0140000, 0x0010000, "port4"),
+	DEFINE_RES_MEM_NAMED(0x0150000, 0x0010000, "port5"),
+	DEFINE_RES_MEM_NAMED(0x0160000, 0x0010000, "port6"),
+	DEFINE_RES_MEM_NAMED(0x0170000, 0x0010000, "port7"),
+	DEFINE_RES_MEM_NAMED(0x0180000, 0x0010000, "port8"),
+	DEFINE_RES_MEM_NAMED(0x0190000, 0x0010000, "port9"),
+	DEFINE_RES_MEM_NAMED(0x0200000, 0x0020000, "qsys"),
+	DEFINE_RES_MEM_NAMED(0x0280000, 0x0010000, "ana"),
 };
 
-static const struct resource vsc9953_port_io_res[] = {
-	{
-		.start	= 0x0100000,
-		.end	= 0x010ffff,
-		.name	= "port0",
-	},
-	{
-		.start	= 0x0110000,
-		.end	= 0x011ffff,
-		.name	= "port1",
-	},
-	{
-		.start	= 0x0120000,
-		.end	= 0x012ffff,
-		.name	= "port2",
-	},
-	{
-		.start	= 0x0130000,
-		.end	= 0x013ffff,
-		.name	= "port3",
-	},
-	{
-		.start	= 0x0140000,
-		.end	= 0x014ffff,
-		.name	= "port4",
-	},
-	{
-		.start	= 0x0150000,
-		.end	= 0x015ffff,
-		.name	= "port5",
-	},
-	{
-		.start	= 0x0160000,
-		.end	= 0x016ffff,
-		.name	= "port6",
-	},
-	{
-		.start	= 0x0170000,
-		.end	= 0x017ffff,
-		.name	= "port7",
-	},
-	{
-		.start	= 0x0180000,
-		.end	= 0x018ffff,
-		.name	= "port8",
-	},
-	{
-		.start	= 0x0190000,
-		.end	= 0x019ffff,
-		.name	= "port9",
-	},
+static const char * const vsc9953_resource_names[TARGET_MAX] = {
+	[SYS] = "sys",
+	[REW] = "rew",
+	[S0] = "s0",
+	[S1] = "s1",
+	[S2] = "s2",
+	[GCB] = "devcpu_gcb",
+	[QS] = "qs",
+	[PTP] = "ptp",
+	[QSYS] = "qsys",
+	[ANA] = "ana",
 };
 
 static const struct reg_field vsc9953_regfields[REGFIELD_MAX] = {
@@ -615,6 +548,9 @@ static const struct reg_field vsc9953_regfields[REGFIELD_MAX] = {
 };
 
 static const struct ocelot_stat_layout vsc9953_stats_layout[OCELOT_NUM_STATS] = {
+<<<<<<< HEAD
+	OCELOT_COMMON_STATS,
+=======
 	[OCELOT_STAT_RX_OCTETS] = {
 		.name = "rx_octets",
 		.reg = SYS_COUNT_RX_OCTETS,
@@ -987,6 +923,7 @@ static const struct ocelot_stat_layout vsc9953_stats_layout[OCELOT_NUM_STATS] = 
 		.name = "drop_green_prio_7",
 		.reg = SYS_COUNT_DROP_GREEN_PRIO_7,
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct vcap_field vsc9953_vcap_es0_keys[] = {
@@ -1432,8 +1369,9 @@ static void vsc9953_mdio_bus_free(struct ocelot *ocelot)
 }
 
 static const struct felix_info seville_info_vsc9953 = {
-	.target_io_res		= vsc9953_target_io_res,
-	.port_io_res		= vsc9953_port_io_res,
+	.resources		= vsc9953_resources,
+	.num_resources		= ARRAY_SIZE(vsc9953_resources),
+	.resource_names		= vsc9953_resource_names,
 	.regfields		= vsc9953_regfields,
 	.map			= vsc9953_regmap,
 	.ops			= &vsc9953_ops,
@@ -1450,7 +1388,10 @@ static const struct felix_info seville_info_vsc9953 = {
 	.mdio_bus_free		= vsc9953_mdio_bus_free,
 	.phylink_validate	= vsc9953_phylink_validate,
 	.port_modes		= vsc9953_port_modes,
+<<<<<<< HEAD
+=======
 	.init_regmap		= ocelot_regmap_init,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int seville_probe(struct platform_device *pdev)

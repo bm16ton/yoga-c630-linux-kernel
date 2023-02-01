@@ -13,6 +13,11 @@
 #include <linux/sched.h>
 #include <linux/workqueue.h>
 
+<<<<<<< HEAD
+#include "modules-common.h"
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef MODULE_PARAM_PREFIX
 #undef MODULE_PARAM_PREFIX
 #endif
@@ -63,6 +68,37 @@ module_param(hot_thres_access_freq, ulong, 0600);
 static unsigned long cold_min_age __read_mostly = 120000000;
 module_param(cold_min_age, ulong, 0600);
 
+<<<<<<< HEAD
+static struct damos_quota damon_lru_sort_quota = {
+	/* Use up to 10 ms per 1 sec, by default */
+	.ms = 10,
+	.sz = 0,
+	.reset_interval = 1000,
+	/* Within the quota, mark hotter regions accessed first. */
+	.weight_sz = 0,
+	.weight_nr_accesses = 1,
+	.weight_age = 0,
+};
+DEFINE_DAMON_MODULES_DAMOS_TIME_QUOTA(damon_lru_sort_quota);
+
+static struct damos_watermarks damon_lru_sort_wmarks = {
+	.metric = DAMOS_WMARK_FREE_MEM_RATE,
+	.interval = 5000000,	/* 5 seconds */
+	.high = 200,		/* 20 percent */
+	.mid = 150,		/* 15 percent */
+	.low = 50,		/* 5 percent */
+};
+DEFINE_DAMON_MODULES_WMARKS_PARAMS(damon_lru_sort_wmarks);
+
+static struct damon_attrs damon_lru_sort_mon_attrs = {
+	.sample_interval = 5000,	/* 5 ms */
+	.aggr_interval = 100000,	/* 100 ms */
+	.ops_update_interval = 0,
+	.min_nr_regions = 10,
+	.max_nr_regions = 1000,
+};
+DEFINE_DAMON_MODULES_MON_ATTRS_PARAMS(damon_lru_sort_mon_attrs);
+=======
 /*
  * Limit of time for trying the LRU lists sorting in milliseconds.
  *
@@ -166,6 +202,7 @@ module_param(min_nr_regions, ulong, 0600);
  */
 static unsigned long max_nr_regions __read_mostly = 1000;
 module_param(max_nr_regions, ulong, 0600);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Start of the target memory region in physical address.
@@ -194,6 +231,29 @@ module_param(monitor_region_end, ulong, 0600);
 static int kdamond_pid __read_mostly = -1;
 module_param(kdamond_pid, int, 0400);
 
+<<<<<<< HEAD
+static struct damos_stat damon_lru_sort_hot_stat;
+DEFINE_DAMON_MODULES_DAMOS_STATS_PARAMS(damon_lru_sort_hot_stat,
+		lru_sort_tried_hot_regions, lru_sorted_hot_regions,
+		hot_quota_exceeds);
+
+static struct damos_stat damon_lru_sort_cold_stat;
+DEFINE_DAMON_MODULES_DAMOS_STATS_PARAMS(damon_lru_sort_cold_stat,
+		lru_sort_tried_cold_regions, lru_sorted_cold_regions,
+		cold_quota_exceeds);
+
+static struct damos_access_pattern damon_lru_sort_stub_pattern = {
+	/* Find regions having PAGE_SIZE or larger size */
+	.min_sz_region = PAGE_SIZE,
+	.max_sz_region = ULONG_MAX,
+	/* no matter its access frequency */
+	.min_nr_accesses = 0,
+	.max_nr_accesses = UINT_MAX,
+	/* no matter its age */
+	.min_age_region = 0,
+	.max_age_region = UINT_MAX,
+};
+=======
 /*
  * Number of hot memory regions that tried to be LRU-sorted.
  */
@@ -253,10 +313,30 @@ module_param(bytes_lru_sorted_cold_regions, ulong, 0400);
  */
 static unsigned long nr_cold_quota_exceeds __read_mostly;
 module_param(nr_cold_quota_exceeds, ulong, 0400);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct damon_ctx *ctx;
 static struct damon_target *target;
 
+<<<<<<< HEAD
+static struct damos *damon_lru_sort_new_scheme(
+		struct damos_access_pattern *pattern, enum damos_action action)
+{
+	struct damos_quota quota = damon_lru_sort_quota;
+
+	/* Use half of total quota for hot/cold pages sorting */
+	quota.ms = quota.ms / 2;
+
+	return damon_new_scheme(
+			/* find the pattern, and */
+			pattern,
+			/* (de)prioritize on LRU-lists */
+			action,
+			/* under the quota. */
+			&quota,
+			/* (De)activate this according to the watermarks. */
+			&damon_lru_sort_wmarks);
+=======
 struct damon_lru_sort_ram_walk_arg {
 	unsigned long start;
 	unsigned long end;
@@ -288,11 +368,18 @@ static bool get_monitoring_region(unsigned long *start, unsigned long *end)
 	*start = arg.start;
 	*end = arg.end;
 	return true;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Create a DAMON-based operation scheme for hot memory regions */
 static struct damos *damon_lru_sort_new_hot_scheme(unsigned int hot_thres)
 {
+<<<<<<< HEAD
+	struct damos_access_pattern pattern = damon_lru_sort_stub_pattern;
+
+	pattern.min_nr_accesses = hot_thres;
+	return damon_lru_sort_new_scheme(&pattern, DAMOS_LRU_PRIO);
+=======
 	struct damos_access_pattern pattern = {
 		/* Find regions having PAGE_SIZE or larger size */
 		.min_sz_region = PAGE_SIZE,
@@ -333,11 +420,19 @@ static struct damos *damon_lru_sort_new_hot_scheme(unsigned int hot_thres)
 			&quota,
 			/* (De)activate this according to the watermarks. */
 			&wmarks);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Create a DAMON-based operation scheme for cold memory regions */
 static struct damos *damon_lru_sort_new_cold_scheme(unsigned int cold_thres)
 {
+<<<<<<< HEAD
+	struct damos_access_pattern pattern = damon_lru_sort_stub_pattern;
+
+	pattern.max_nr_accesses = 0;
+	pattern.min_age_region = cold_thres;
+	return damon_lru_sort_new_scheme(&pattern, DAMOS_LRU_DEPRIO);
+=======
 	struct damos_access_pattern pattern = {
 		/* Find regions having PAGE_SIZE or larger size */
 		.min_sz_region = PAGE_SIZE,
@@ -379,10 +474,31 @@ static struct damos *damon_lru_sort_new_cold_scheme(unsigned int cold_thres)
 			&quota,
 			/* (De)activate this according to the watermarks. */
 			&wmarks);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int damon_lru_sort_apply_parameters(void)
 {
+<<<<<<< HEAD
+	struct damos *scheme;
+	unsigned int hot_thres, cold_thres;
+	int err = 0;
+
+	err = damon_set_attrs(ctx, &damon_lru_sort_mon_attrs);
+	if (err)
+		return err;
+
+	/* aggr_interval / sample_interval is the maximum nr_accesses */
+	hot_thres = damon_lru_sort_mon_attrs.aggr_interval /
+		damon_lru_sort_mon_attrs.sample_interval *
+		hot_thres_access_freq / 1000;
+	scheme = damon_lru_sort_new_hot_scheme(hot_thres);
+	if (!scheme)
+		return -ENOMEM;
+	damon_set_schemes(ctx, &scheme, 1);
+
+	cold_thres = cold_min_age / damon_lru_sort_mon_attrs.aggr_interval;
+=======
 	struct damos *scheme, *next_scheme;
 	struct damon_addr_range addr_range;
 	unsigned int hot_thres, cold_thres;
@@ -406,11 +522,17 @@ static int damon_lru_sort_apply_parameters(void)
 	damon_add_scheme(ctx, scheme);
 
 	cold_thres = cold_min_age / aggr_interval;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	scheme = damon_lru_sort_new_cold_scheme(cold_thres);
 	if (!scheme)
 		return -ENOMEM;
 	damon_add_scheme(ctx, scheme);
 
+<<<<<<< HEAD
+	return damon_set_region_biggest_system_ram_default(target,
+					&monitor_region_start,
+					&monitor_region_end);
+=======
 	if (monitor_region_start > monitor_region_end)
 		return -EINVAL;
 	if (!monitor_region_start && !monitor_region_end &&
@@ -420,6 +542,7 @@ static int damon_lru_sort_apply_parameters(void)
 	addr_range.start = monitor_region_start;
 	addr_range.end = monitor_region_end;
 	return damon_set_regions(target, &addr_range, 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int damon_lru_sort_turn(bool on)
@@ -505,6 +628,12 @@ static int damon_lru_sort_after_aggregation(struct damon_ctx *c)
 
 	/* update the stats parameter */
 	damon_for_each_scheme(s, c) {
+<<<<<<< HEAD
+		if (s->action == DAMOS_LRU_PRIO)
+			damon_lru_sort_hot_stat = s->stat;
+		else if (s->action == DAMOS_LRU_DEPRIO)
+			damon_lru_sort_cold_stat = s->stat;
+=======
 		if (s->action == DAMOS_LRU_PRIO) {
 			nr_lru_sort_tried_hot_regions = s->stat.nr_tried;
 			bytes_lru_sort_tried_hot_regions = s->stat.sz_tried;
@@ -518,6 +647,7 @@ static int damon_lru_sort_after_aggregation(struct damon_ctx *c)
 			bytes_lru_sorted_cold_regions = s->stat.sz_applied;
 			nr_cold_quota_exceeds = s->stat.qt_exceeds;
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return damon_lru_sort_handle_commit_inputs();

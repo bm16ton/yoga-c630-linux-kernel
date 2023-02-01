@@ -127,8 +127,11 @@ struct mt7915_sta {
 	unsigned long jiffies;
 	unsigned long ampdu_state;
 
+<<<<<<< HEAD
+=======
 	struct mt76_sta_stats stats;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mt76_connac_sta_key_conf bip;
 
 	struct {

@@ -1,0 +1,16 @@
+drivers/iio/proximity/as3935.ko
+drivers/iio/proximity/cros_ec_mkbp_proximity.ko
+drivers/iio/proximity/isl29501.ko
+drivers/iio/proximity/pulsedlight-lidar-lite-v2.ko
+drivers/iio/proximity/mb1232.ko
+drivers/iio/proximity/ping.ko
+drivers/iio/proximity/rfd77402.ko
+drivers/iio/proximity/srf04.ko
+drivers/iio/proximity/srf08.ko
+drivers/iio/proximity/sx9310.ko
+drivers/iio/proximity/sx9324.ko
+drivers/iio/proximity/sx9360.ko
+drivers/iio/proximity/sx_common.ko
+drivers/iio/proximity/sx9500.ko
+drivers/iio/proximity/vcnl3020.ko
+drivers/iio/proximity/vl53l0x-i2c.ko

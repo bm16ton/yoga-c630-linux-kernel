@@ -1,0 +1,1 @@
+cmd_drivers/uio/uio_dmem_genirq.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/uio/uio_dmem_genirq.ko drivers/uio/uio_dmem_genirq.o drivers/uio/uio_dmem_genirq.mod.o;  true

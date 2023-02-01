@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt7615/mt7663-usb-sdio-common.mod := printf '%s\n'   usb_sdio.o | awk '!x[$$0]++ { print("drivers/net/wireless/mediatek/mt76/mt7615/"$$0) }' > drivers/net/wireless/mediatek/mt76/mt7615/mt7663-usb-sdio-common.mod

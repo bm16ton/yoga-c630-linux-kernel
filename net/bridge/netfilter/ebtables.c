@@ -329,6 +329,7 @@ find_inlist_lock_noload(struct net *net, const char *name, int *error,
 	list_for_each_entry(table, &ebt_net->tables, list) {
 		if (strcmp(table->name, name) == 0)
 			return table;
+<<<<<<< HEAD
 	}
 
 	list_for_each_entry(tmpl, &template_tables, list) {
@@ -352,6 +353,31 @@ find_inlist_lock_noload(struct net *net, const char *name, int *error,
 		}
 	}
 
+=======
+	}
+
+	list_for_each_entry(tmpl, &template_tables, list) {
+		if (strcmp(name, tmpl->name) == 0) {
+			struct module *owner = tmpl->owner;
+
+			if (!try_module_get(owner))
+				goto out;
+
+			mutex_unlock(mutex);
+
+			*error = tmpl->table_init(net);
+			if (*error) {
+				module_put(owner);
+				return NULL;
+			}
+
+			mutex_lock(mutex);
+			module_put(owner);
+			break;
+		}
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	list_for_each_entry(table, &ebt_net->tables, list) {
 		if (strcmp(table->name, name) == 0)
 			return table;
@@ -1040,8 +1066,14 @@ static int do_replace_finish(struct net *net, struct ebt_replace *repl,
 		goto free_iterate;
 	}
 
+<<<<<<< HEAD
+	if (repl->valid_hooks != t->valid_hooks) {
+		ret = -EINVAL;
+=======
 	if (repl->valid_hooks != t->valid_hooks)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto free_unlock;
+	}
 
 	if (repl->num_counters && repl->num_counters != t->private->nentries) {
 		ret = -EINVAL;
@@ -1440,7 +1472,7 @@ static inline int ebt_obj_to_user(char __user *um, const char *_name,
 	/* ebtables expects 31 bytes long names but xt_match names are 29 bytes
 	 * long. Copy 29 bytes and fill remaining bytes with zeroes.
 	 */
-	strlcpy(name, _name, sizeof(name));
+	strscpy(name, _name, sizeof(name));
 	if (copy_to_user(um, name, EBT_EXTENSION_MAXNAMELEN) ||
 	    put_user(revision, (u8 __user *)(um + EBT_EXTENSION_MAXNAMELEN)) ||
 	    put_user(datasize, (int __user *)(um + EBT_EXTENSION_MAXNAMELEN + 1)) ||

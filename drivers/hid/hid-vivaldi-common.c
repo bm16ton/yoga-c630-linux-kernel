@@ -116,6 +116,12 @@ static struct attribute *vivaldi_sysfs_attrs[] = {
 	NULL
 };
 
+<<<<<<< HEAD
+static umode_t vivaldi_is_visible(struct kobject *kobj, struct attribute *attr,
+				  int n)
+{
+	struct hid_device *hdev = to_hid_device(kobj_to_dev(kobj));
+=======
 static const struct attribute_group vivaldi_attribute_group = {
 	.attrs = vivaldi_sysfs_attrs,
 };
@@ -128,13 +134,30 @@ static const struct attribute_group vivaldi_attribute_group = {
 int vivaldi_input_configured(struct hid_device *hdev,
 			     struct hid_input *hidinput)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vivaldi_data *data = hid_get_drvdata(hdev);
 
 	if (!data->num_function_row_keys)
 		return 0;
+<<<<<<< HEAD
+	return attr->mode;
+}
+
+static const struct attribute_group vivaldi_attribute_group = {
+	.attrs = vivaldi_sysfs_attrs,
+	.is_visible = vivaldi_is_visible,
+};
+
+const struct attribute_group *vivaldi_attribute_groups[] = {
+	&vivaldi_attribute_group,
+	NULL,
+};
+EXPORT_SYMBOL_GPL(vivaldi_attribute_groups);
+=======
 
 	return devm_device_add_group(&hdev->dev, &vivaldi_attribute_group);
 }
 EXPORT_SYMBOL_GPL(vivaldi_input_configured);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MODULE_LICENSE("GPL");

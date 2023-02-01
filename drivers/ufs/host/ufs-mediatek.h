@@ -124,6 +124,15 @@ struct ufs_mtk_crypt_cfg {
 	int vcore_volt;
 };
 
+<<<<<<< HEAD
+struct ufs_mtk_clk {
+	struct ufs_clk_info *ufs_sel_clki; /* Mux */
+	struct ufs_clk_info *ufs_sel_max_clki; /* Max src */
+	struct ufs_clk_info *ufs_sel_min_clki; /* Min src */
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct ufs_mtk_hw_ver {
 	u8 step;
 	u8 minor;
@@ -139,6 +148,10 @@ struct ufs_mtk_host {
 	struct reset_control *crypto_reset;
 	struct ufs_hba *hba;
 	struct ufs_mtk_crypt_cfg *crypt;
+<<<<<<< HEAD
+	struct ufs_mtk_clk mclk;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ufs_mtk_hw_ver hw_ver;
 	enum ufs_mtk_host_caps caps;
 	bool mphy_powered_on;

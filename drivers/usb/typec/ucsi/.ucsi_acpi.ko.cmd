@@ -1,0 +1,1 @@
+cmd_drivers/usb/typec/ucsi/ucsi_acpi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/typec/ucsi/ucsi_acpi.ko drivers/usb/typec/ucsi/ucsi_acpi.o drivers/usb/typec/ucsi/ucsi_acpi.mod.o;  true

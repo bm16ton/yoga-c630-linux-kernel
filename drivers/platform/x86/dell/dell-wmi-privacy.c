@@ -61,7 +61,11 @@ static const struct key_entry dell_wmi_keymap_type_0012[] = {
 	/* privacy mic mute */
 	{ KE_KEY, 0x0001, { KEY_MICMUTE } },
 	/* privacy camera mute */
+<<<<<<< HEAD
+	{ KE_VSW, 0x0002, { SW_CAMERA_LENS_COVER } },
+=======
 	{ KE_SW,  0x0002, { SW_CAMERA_LENS_COVER } },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ KE_END, 0},
 };
 
@@ -115,9 +119,19 @@ bool dell_privacy_process_event(int type, int code, int status)
 
 	switch (code) {
 	case DELL_PRIVACY_AUDIO_EVENT: /* Mic mute */
+<<<<<<< HEAD
+		priv->last_status = status;
+		sparse_keymap_report_entry(priv->input_dev, key, 1, true);
+		ret = true;
+		break;
+	case DELL_PRIVACY_CAMERA_EVENT: /* Camera mute */
+		priv->last_status = status;
+		sparse_keymap_report_entry(priv->input_dev, key, !(status & CAMERA_STATUS), false);
+=======
 	case DELL_PRIVACY_CAMERA_EVENT: /* Camera mute */
 		priv->last_status = status;
 		sparse_keymap_report_entry(priv->input_dev, key, 1, true);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = true;
 		break;
 	default:
@@ -174,15 +188,23 @@ static ssize_t dell_privacy_current_state_show(struct device *dev,
 static DEVICE_ATTR_RO(dell_privacy_supported_type);
 static DEVICE_ATTR_RO(dell_privacy_current_state);
 
+<<<<<<< HEAD
+static struct attribute *privacy_attrs[] = {
+=======
 static struct attribute *privacy_attributes[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&dev_attr_dell_privacy_supported_type.attr,
 	&dev_attr_dell_privacy_current_state.attr,
 	NULL,
 };
+<<<<<<< HEAD
+ATTRIBUTE_GROUPS(privacy);
+=======
 
 static const struct attribute_group privacy_attribute_group = {
 	.attrs = privacy_attributes
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Describes the Device State class exposed by BIOS which can be consumed by
@@ -295,7 +317,11 @@ static int dell_privacy_wmi_probe(struct wmi_device *wdev, const void *context)
 {
 	struct privacy_wmi_data *priv;
 	struct key_entry *keymap;
+<<<<<<< HEAD
+	int ret, i, j;
+=======
 	int ret, i;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = wmi_has_guid(DELL_PRIVACY_GUID);
 	if (!ret)
@@ -307,6 +333,14 @@ static int dell_privacy_wmi_probe(struct wmi_device *wdev, const void *context)
 
 	dev_set_drvdata(&wdev->dev, priv);
 	priv->wdev = wdev;
+<<<<<<< HEAD
+
+	ret = get_current_status(priv->wdev);
+	if (ret)
+		return ret;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* create evdev passing interface */
 	priv->input_dev = devm_input_allocate_device(&wdev->dev);
 	if (!priv->input_dev)
@@ -321,9 +355,26 @@ static int dell_privacy_wmi_probe(struct wmi_device *wdev, const void *context)
 	/* remap the keymap code with Dell privacy key type 0x12 as prefix
 	 * KEY_MICMUTE scancode will be reported as 0x120001
 	 */
+<<<<<<< HEAD
+	for (i = 0, j = 0; i < ARRAY_SIZE(dell_wmi_keymap_type_0012); i++) {
+		/*
+		 * Unlike keys where only presses matter, userspace may act
+		 * on switches in both of their positions. Only register
+		 * SW_CAMERA_LENS_COVER if it is actually there.
+		 */
+		if (dell_wmi_keymap_type_0012[i].type == KE_VSW &&
+		    dell_wmi_keymap_type_0012[i].sw.code == SW_CAMERA_LENS_COVER &&
+		    !(priv->features_present & BIT(DELL_PRIVACY_TYPE_CAMERA)))
+			continue;
+
+		keymap[j] = dell_wmi_keymap_type_0012[i];
+		keymap[j].code |= (0x0012 << 16);
+		j++;
+=======
 	for (i = 0; i < ARRAY_SIZE(dell_wmi_keymap_type_0012); i++) {
 		keymap[i] = dell_wmi_keymap_type_0012[i];
 		keymap[i].code |= (0x0012 << 16);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	ret = sparse_keymap_setup(priv->input_dev, keymap, NULL);
 	kfree(keymap);
@@ -334,10 +385,20 @@ static int dell_privacy_wmi_probe(struct wmi_device *wdev, const void *context)
 	priv->input_dev->name = "Dell Privacy Driver";
 	priv->input_dev->id.bustype = BUS_HOST;
 
+<<<<<<< HEAD
+	/* Report initial camera-cover status */
+	if (priv->features_present & BIT(DELL_PRIVACY_TYPE_CAMERA))
+		input_report_switch(priv->input_dev, SW_CAMERA_LENS_COVER,
+				    !(priv->last_status & CAMERA_STATUS));
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = input_register_device(priv->input_dev);
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+=======
 	ret = get_current_status(priv->wdev);
 	if (ret)
 		return ret;
@@ -346,6 +407,7 @@ static int dell_privacy_wmi_probe(struct wmi_device *wdev, const void *context)
 	if (ret)
 		return ret;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (priv->features_present & BIT(DELL_PRIVACY_TYPE_AUDIO)) {
 		ret = dell_privacy_leds_setup(&priv->wdev->dev);
 		if (ret)
@@ -374,6 +436,10 @@ static const struct wmi_device_id dell_wmi_privacy_wmi_id_table[] = {
 static struct wmi_driver dell_privacy_wmi_driver = {
 	.driver = {
 		.name = "dell-privacy",
+<<<<<<< HEAD
+		.dev_groups = privacy_groups,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	.probe = dell_privacy_wmi_probe,
 	.remove = dell_privacy_wmi_remove,

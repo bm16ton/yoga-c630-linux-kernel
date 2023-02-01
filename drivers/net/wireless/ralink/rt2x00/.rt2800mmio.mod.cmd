@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ralink/rt2x00/rt2800mmio.mod := printf '%s\n'   rt2800mmio.o | awk '!x[$$0]++ { print("drivers/net/wireless/ralink/rt2x00/"$$0) }' > drivers/net/wireless/ralink/rt2x00/rt2800mmio.mod

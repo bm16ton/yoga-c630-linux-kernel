@@ -1,0 +1,1 @@
+cmd_drivers/usb/core/built-in.a := rm -f drivers/usb/core/built-in.a;  printf "drivers/usb/core/%s " usb.o hub.o hcd.o urb.o message.o driver.o config.o file.o buffer.o sysfs.o endpoint.o devio.o notify.o generic.o quirks.o devices.o phy.o port.o of.o hcd-pci.o usb-acpi.o ../misc/onboard_usb_hub_pdevs.o | xargs ar cDPrST drivers/usb/core/built-in.a

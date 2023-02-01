@@ -1,0 +1,1 @@
+cmd_drivers/usb/serial/belkin_sa.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/serial/belkin_sa.ko drivers/usb/serial/belkin_sa.o drivers/usb/serial/belkin_sa.mod.o;  true

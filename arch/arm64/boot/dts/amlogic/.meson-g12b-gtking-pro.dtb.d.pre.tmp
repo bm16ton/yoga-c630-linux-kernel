@@ -1,0 +1,23 @@
+meson-g12b-gtking-pro.o: \
+ arch/arm64/boot/dts/amlogic/meson-g12b-gtking-pro.dts \
+ arch/arm64/boot/dts/amlogic/meson-g12b-w400.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-g12b.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-g12.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-g12-common.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/phy/phy.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/g12a-clkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/g12a-aoclkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/amlogic,meson-g12a-reset.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/axg-audio-clkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/meson-g12a-power.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/amlogic,meson-axg-audio-arb.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/amlogic,meson-g12a-audio-reset.h \
+ arch/arm64/boot/dts/amlogic/meson-g12b-s922x.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/input/input.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/linux-event-codes.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/meson-g12a-gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/sound/meson-g12a-tohdmitx.h

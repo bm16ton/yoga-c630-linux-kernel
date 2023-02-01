@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/realtek/8139too.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/realtek/8139too.ko drivers/net/ethernet/realtek/8139too.o drivers/net/ethernet/realtek/8139too.mod.o;  true

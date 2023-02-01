@@ -105,10 +105,17 @@ void efx_siena_ethtool_get_drvinfo(struct net_device *net_dev,
 {
 	struct efx_nic *efx = netdev_priv(net_dev);
 
+<<<<<<< HEAD
+	strscpy(info->driver, KBUILD_MODNAME, sizeof(info->driver));
+	efx_siena_mcdi_print_fwver(efx, info->fw_version,
+				   sizeof(info->fw_version));
+	strscpy(info->bus_info, pci_name(efx->pci_dev), sizeof(info->bus_info));
+=======
 	strlcpy(info->driver, KBUILD_MODNAME, sizeof(info->driver));
 	efx_siena_mcdi_print_fwver(efx, info->fw_version,
 				   sizeof(info->fw_version));
 	strlcpy(info->bus_info, pci_name(efx->pci_dev), sizeof(info->bus_info));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 u32 efx_siena_ethtool_get_msglevel(struct net_device *net_dev)
@@ -467,7 +474,11 @@ void efx_siena_ethtool_get_strings(struct net_device *net_dev,
 		strings += (efx->type->describe_stats(efx, strings) *
 			    ETH_GSTRING_LEN);
 		for (i = 0; i < EFX_ETHTOOL_SW_STAT_COUNT; i++)
+<<<<<<< HEAD
+			strscpy(strings + i * ETH_GSTRING_LEN,
+=======
 			strlcpy(strings + i * ETH_GSTRING_LEN,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				efx_sw_stat_desc[i].name, ETH_GSTRING_LEN);
 		strings += EFX_ETHTOOL_SW_STAT_COUNT * ETH_GSTRING_LEN;
 		strings += (efx_describe_per_queue_stats(efx, strings) *

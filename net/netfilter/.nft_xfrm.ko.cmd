@@ -1,0 +1,1 @@
+cmd_net/netfilter/nft_xfrm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/nft_xfrm.ko net/netfilter/nft_xfrm.o net/netfilter/nft_xfrm.mod.o;  true

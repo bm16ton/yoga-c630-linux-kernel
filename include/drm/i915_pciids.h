@@ -641,6 +641,10 @@
 	INTEL_VGA_DEVICE(0x4682, info), \
 	INTEL_VGA_DEVICE(0x4688, info), \
 	INTEL_VGA_DEVICE(0x468A, info), \
+<<<<<<< HEAD
+	INTEL_VGA_DEVICE(0x468B, info), \
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	INTEL_VGA_DEVICE(0x4690, info), \
 	INTEL_VGA_DEVICE(0x4692, info), \
 	INTEL_VGA_DEVICE(0x4693, info)

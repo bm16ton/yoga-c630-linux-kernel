@@ -1,0 +1,1 @@
+cmd_net/wireless/lib80211_crypt_tkip.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/wireless/lib80211_crypt_tkip.ko net/wireless/lib80211_crypt_tkip.o net/wireless/lib80211_crypt_tkip.mod.o;  true

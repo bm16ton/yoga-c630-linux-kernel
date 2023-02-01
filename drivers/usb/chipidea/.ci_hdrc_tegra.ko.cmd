@@ -1,0 +1,1 @@
+cmd_drivers/usb/chipidea/ci_hdrc_tegra.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/chipidea/ci_hdrc_tegra.ko drivers/usb/chipidea/ci_hdrc_tegra.o drivers/usb/chipidea/ci_hdrc_tegra.mod.o;  true

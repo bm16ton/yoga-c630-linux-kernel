@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath5k/ath5k.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/ath/ath5k/ath5k.ko drivers/net/wireless/ath/ath5k/ath5k.o drivers/net/wireless/ath/ath5k/ath5k.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/auxdisplay/img-ascii-lcd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/auxdisplay/img-ascii-lcd.ko drivers/auxdisplay/img-ascii-lcd.o drivers/auxdisplay/img-ascii-lcd.mod.o;  true

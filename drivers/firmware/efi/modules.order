@@ -1,0 +1,2 @@
+drivers/firmware/efi/efibc.ko
+drivers/firmware/efi/capsule-loader.ko

@@ -1,0 +1,4 @@
+thunder2-99xx.o: arch/arm64/boot/dts/cavium/thunder2-99xx.dts \
+ arch/arm64/boot/dts/cavium/thunder2-99xx.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

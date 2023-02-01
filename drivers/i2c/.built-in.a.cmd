@@ -1,0 +1,1 @@
+cmd_drivers/i2c/built-in.a := rm -f drivers/i2c/built-in.a;  printf "drivers/i2c/%s " i2c-boardinfo.o i2c-core-base.o i2c-core-smbus.o i2c-core-acpi.o i2c-core-slave.o i2c-core-of.o i2c-dev.o algos/built-in.a busses/built-in.a muxes/built-in.a | xargs ar cDPrST drivers/i2c/built-in.a

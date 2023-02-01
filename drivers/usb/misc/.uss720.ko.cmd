@@ -1,0 +1,1 @@
+cmd_drivers/usb/misc/uss720.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/misc/uss720.ko drivers/usb/misc/uss720.o drivers/usb/misc/uss720.mod.o;  true

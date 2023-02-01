@@ -1914,11 +1914,19 @@ static const char *overlay_name_from_nr(int nr)
 static const char *bus_path = "/testcase-data/overlay-node/test-bus";
 
 #define MAX_TRACK_OVCS_IDS 256
+<<<<<<< HEAD
 
 static int track_ovcs_id[MAX_TRACK_OVCS_IDS];
 static int track_ovcs_id_overlay_nr[MAX_TRACK_OVCS_IDS];
 static int track_ovcs_id_cnt;
 
+=======
+
+static int track_ovcs_id[MAX_TRACK_OVCS_IDS];
+static int track_ovcs_id_overlay_nr[MAX_TRACK_OVCS_IDS];
+static int track_ovcs_id_cnt;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void of_unittest_track_overlay(int ovcs_id, int overlay_nr)
 {
 	if (WARN_ON(track_ovcs_id_cnt >= MAX_TRACK_OVCS_IDS))
@@ -2465,7 +2473,7 @@ static int unittest_i2c_bus_probe(struct platform_device *pdev)
 	adap = &std->adap;
 	i2c_set_adapdata(adap, std);
 	adap->nr = -1;
-	strlcpy(adap->name, pdev->name, sizeof(adap->name));
+	strscpy(adap->name, pdev->name, sizeof(adap->name));
 	adap->class = I2C_CLASS_DEPRECATED;
 	adap->algo = &unittest_i2c_algo;
 	adap->dev.parent = dev;
@@ -2524,13 +2532,12 @@ static int unittest_i2c_dev_probe(struct i2c_client *client,
 	return 0;
 };
 
-static int unittest_i2c_dev_remove(struct i2c_client *client)
+static void unittest_i2c_dev_remove(struct i2c_client *client)
 {
 	struct device *dev = &client->dev;
 	struct device_node *np = client->dev.of_node;
 
 	dev_dbg(dev, "%s for node @%pOF\n", __func__, np);
-	return 0;
 }
 
 static const struct i2c_device_id unittest_i2c_dev_id[] = {
@@ -2601,7 +2608,7 @@ static int unittest_i2c_mux_probe(struct i2c_client *client,
 	return 0;
 };
 
-static int unittest_i2c_mux_remove(struct i2c_client *client)
+static void unittest_i2c_mux_remove(struct i2c_client *client)
 {
 	struct device *dev = &client->dev;
 	struct device_node *np = client->dev.of_node;
@@ -2609,7 +2616,6 @@ static int unittest_i2c_mux_remove(struct i2c_client *client)
 
 	dev_dbg(dev, "%s for node @%pOF\n", __func__, np);
 	i2c_mux_del_adapters(muxc);
-	return 0;
 }
 
 static const struct i2c_device_id unittest_i2c_mux_id[] = {
@@ -3466,6 +3472,9 @@ static int __init of_unittest(void)
 	int res;
 
 	pr_info("start of unittest - you will see error messages\n");
+
+	/* Taint the kernel so we know we've run tests. */
+	add_taint(TAINT_TEST, LOCKDEP_STILL_OK);
 
 	/* adding data for unittest */
 

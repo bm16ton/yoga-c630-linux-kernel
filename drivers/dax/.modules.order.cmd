@@ -1,0 +1,1 @@
+cmd_drivers/dax/modules.order := {   cat drivers/dax/hmem/modules.order;   echo drivers/dax/dax.ko;   echo drivers/dax/device_dax.ko;   echo drivers/dax/kmem.ko;   echo drivers/dax/dax_pmem.ko; :; } > drivers/dax/modules.order

@@ -1,0 +1,1 @@
+cmd_net/netfilter/xt_AUDIT.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/xt_AUDIT.ko net/netfilter/xt_AUDIT.o net/netfilter/xt_AUDIT.mod.o;  true

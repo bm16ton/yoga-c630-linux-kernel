@@ -10,12 +10,26 @@
 ksft_skip=4
 
 testns=testns-$(mktemp -u "XXXXXXXX")
+<<<<<<< HEAD
+tmp=""
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 tables="foo bar baz quux"
 global_ret=0
 eret=0
 lret=0
 
+<<<<<<< HEAD
+cleanup() {
+	ip netns pids "$testns" | xargs kill 2>/dev/null
+	ip netns del "$testns"
+
+	rm -f "$tmp"
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 check_result()
 {
 	local r=$1
@@ -43,6 +57,7 @@ if [ $? -ne 0 ];then
 	exit $ksft_skip
 fi
 
+trap cleanup EXIT
 tmp=$(mktemp)
 
 for table in $tables; do
@@ -89,6 +104,7 @@ for table in $tables;do
 	if [ $lret -ne 0 ]; then
 		eret=$lret
 	fi
+<<<<<<< HEAD
 done
 
 check_result $eret "add/delete"
@@ -123,10 +139,60 @@ for i in $(seq 1 10) ; do
 	fi
 done
 
+=======
+done
+
+check_result $eret "add/delete"
+
+for i in $(seq 1 10) ; do
+	(echo "flush ruleset"; cat "$tmp") | ip netns exec "$testns" nft -f /dev/stdin
+
+	lret=$?
+	if [ $lret -ne 0 ]; then
+		eret=$lret
+	fi
+done
+
+check_result $eret "reload"
+
+for i in $(seq 1 10) ; do
+	(echo "flush ruleset"; cat "$tmp"
+	 echo "insert rule inet foo INPUT meta nftrace set 1"
+	 echo "insert rule inet foo OUTPUT meta nftrace set 1"
+	 ) | ip netns exec "$testns" nft -f /dev/stdin
+	lret=$?
+	if [ $lret -ne 0 ]; then
+		eret=$lret
+	fi
+
+	(echo "flush ruleset"; cat "$tmp"
+	 ) | ip netns exec "$testns" nft -f /dev/stdin
+
+	lret=$?
+	if [ $lret -ne 0 ]; then
+		eret=$lret
+	fi
+done
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 check_result $eret "add/delete with nftrace enabled"
 
 echo "insert rule inet foo INPUT meta nftrace set 1" >> $tmp
 echo "insert rule inet foo OUTPUT meta nftrace set 1" >> $tmp
+<<<<<<< HEAD
+=======
+
+for i in $(seq 1 10) ; do
+	(echo "flush ruleset"; cat "$tmp") | ip netns exec "$testns" nft -f /dev/stdin
+
+	lret=$?
+	if [ $lret -ne 0 ]; then
+		eret=1
+	fi
+done
+
+check_result $lret "add/delete with nftrace enabled"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 for i in $(seq 1 10) ; do
 	(echo "flush ruleset"; cat "$tmp") | ip netns exec "$testns" nft -f /dev/stdin
@@ -139,11 +205,10 @@ done
 
 check_result $lret "add/delete with nftrace enabled"
 
-pkill -9 ping
-
-wait
-
+<<<<<<< HEAD
+=======
 rm -f "$tmp"
 ip netns del "$testns"
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exit $global_ret

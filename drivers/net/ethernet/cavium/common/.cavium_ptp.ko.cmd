@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/common/cavium_ptp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/cavium/common/cavium_ptp.ko drivers/net/ethernet/cavium/common/cavium_ptp.o drivers/net/ethernet/cavium/common/cavium_ptp.mod.o;  true

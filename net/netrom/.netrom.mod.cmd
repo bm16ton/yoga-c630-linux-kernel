@@ -1,0 +1,1 @@
+cmd_net/netrom/netrom.mod := printf '%s\n'   af_netrom.o nr_dev.o nr_in.o nr_loopback.o nr_out.o nr_route.o nr_subr.o nr_timer.o sysctl_net_netrom.o | awk '!x[$$0]++ { print("net/netrom/"$$0) }' > net/netrom/netrom.mod

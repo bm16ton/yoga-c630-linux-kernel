@@ -21,13 +21,13 @@
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
 
+#include <drm/drm_aperture.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_debugfs.h>
 #include <drm/drm_drv.h>
-#include <drm/drm_fb_cma_helper.h>
 #include <drm/drm_fb_helper.h>
-#include <drm/drm_gem_cma_helper.h>
+#include <drm/drm_gem_dma_helper.h>
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_modeset_helper.h>
 #include <drm/drm_module.h>
@@ -40,8 +40,12 @@
 
 static irqreturn_t hdlcd_irq(int irq, void *arg)
 {
+<<<<<<< HEAD
+	struct hdlcd_drm_private *hdlcd = arg;
+=======
 	struct drm_device *drm = arg;
 	struct hdlcd_drm_private *hdlcd = drm->dev_private;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long irq_status;
 
 	irq_status = hdlcd_read(hdlcd, HDLCD_REG_INT_STATUS);
@@ -69,6 +73,24 @@ static irqreturn_t hdlcd_irq(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
+<<<<<<< HEAD
+static int hdlcd_irq_install(struct hdlcd_drm_private *hdlcd)
+{
+	int ret;
+
+	/* Ensure interrupts are disabled */
+	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, 0);
+	hdlcd_write(hdlcd, HDLCD_REG_INT_CLEAR, ~0);
+
+	ret = request_irq(hdlcd->irq, hdlcd_irq, 0, "hdlcd", hdlcd);
+	if (ret)
+		return ret;
+
+#ifdef CONFIG_DEBUG_FS
+	/* enable debug interrupts */
+	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, HDLCD_DEBUG_INT_MASK);
+#endif
+=======
 static void hdlcd_irq_preinstall(struct drm_device *drm)
 {
 	struct hdlcd_drm_private *hdlcd = drm->dev_private;
@@ -104,10 +126,19 @@ static int hdlcd_irq_install(struct drm_device *drm, int irq)
 		return ret;
 
 	hdlcd_irq_postinstall(drm);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
+<<<<<<< HEAD
+static void hdlcd_irq_uninstall(struct hdlcd_drm_private *hdlcd)
+{
+	/* disable all the interrupts that we might have enabled */
+	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, 0);
+
+	free_irq(hdlcd->irq, hdlcd);
+=======
 static void hdlcd_irq_uninstall(struct drm_device *drm)
 {
 	struct hdlcd_drm_private *hdlcd = drm->dev_private;
@@ -124,6 +155,7 @@ static void hdlcd_irq_uninstall(struct drm_device *drm)
 	hdlcd_write(hdlcd, HDLCD_REG_INT_MASK, irq_mask);
 
 	free_irq(hdlcd->irq, drm);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int hdlcd_load(struct drm_device *drm, unsigned long flags)
@@ -183,7 +215,11 @@ static int hdlcd_load(struct drm_device *drm, unsigned long flags)
 		goto irq_fail;
 	hdlcd->irq = ret;
 
+<<<<<<< HEAD
+	ret = hdlcd_irq_install(hdlcd);
+=======
 	ret = hdlcd_irq_install(drm, hdlcd->irq);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		DRM_ERROR("failed to install IRQ handler\n");
 		goto irq_fail;
@@ -255,11 +291,15 @@ static void hdlcd_debugfs_init(struct drm_minor *minor)
 }
 #endif
 
-DEFINE_DRM_GEM_CMA_FOPS(fops);
+DEFINE_DRM_GEM_DMA_FOPS(fops);
 
 static const struct drm_driver hdlcd_driver = {
 	.driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
+<<<<<<< HEAD
+	DRM_GEM_DMA_DRIVER_OPS,
+=======
 	DRM_GEM_CMA_DRIVER_OPS,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_DEBUG_FS
 	.debugfs_init = hdlcd_debugfs_init,
 #endif
@@ -314,6 +354,15 @@ static int hdlcd_drm_bind(struct device *dev)
 		goto err_vblank;
 	}
 
+	/*
+	 * If EFI left us running, take over from simple framebuffer
+	 * drivers. Read HDLCD_REG_COMMAND to see if we are enabled.
+	 */
+	if (hdlcd_read(hdlcd, HDLCD_REG_COMMAND)) {
+		hdlcd_write(hdlcd, HDLCD_REG_COMMAND, 0);
+		drm_aperture_remove_framebuffers(false, &hdlcd_driver);
+	}
+
 	drm_mode_config_reset(drm);
 	drm_kms_helper_poll_init(drm);
 
@@ -335,7 +384,11 @@ err_pm_active:
 err_unload:
 	of_node_put(hdlcd->crtc.port);
 	hdlcd->crtc.port = NULL;
+<<<<<<< HEAD
+	hdlcd_irq_uninstall(hdlcd);
+=======
 	hdlcd_irq_uninstall(drm);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	of_reserved_mem_device_release(drm->dev);
 err_free:
 	drm_mode_config_cleanup(drm);
@@ -357,7 +410,11 @@ static void hdlcd_drm_unbind(struct device *dev)
 	hdlcd->crtc.port = NULL;
 	pm_runtime_get_sync(dev);
 	drm_atomic_helper_shutdown(drm);
+<<<<<<< HEAD
+	hdlcd_irq_uninstall(hdlcd);
+=======
 	hdlcd_irq_uninstall(drm);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pm_runtime_put(dev);
 	if (pm_runtime_enabled(dev))
 		pm_runtime_disable(dev);

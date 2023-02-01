@@ -23,6 +23,10 @@
 
 #include "amdgpu_reset.h"
 #include "aldebaran.h"
+<<<<<<< HEAD
+#include "sienna_cichlid.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int amdgpu_reset_add_handler(struct amdgpu_reset_control *reset_ctl,
 			     struct amdgpu_reset_handler *handler)
@@ -40,6 +44,12 @@ int amdgpu_reset_init(struct amdgpu_device *adev)
 	case IP_VERSION(13, 0, 2):
 		ret = aldebaran_reset_init(adev);
 		break;
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 7):
+		ret = sienna_cichlid_reset_init(adev);
+		break;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		break;
 	}
@@ -55,6 +65,12 @@ int amdgpu_reset_fini(struct amdgpu_device *adev)
 	case IP_VERSION(13, 0, 2):
 		ret = aldebaran_reset_fini(adev);
 		break;
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 7):
+		ret = sienna_cichlid_reset_fini(adev);
+		break;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		break;
 	}

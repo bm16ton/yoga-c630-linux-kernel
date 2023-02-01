@@ -521,4 +521,8 @@ source "drivers/misc/cardreader/Kconfig"
 source "drivers/misc/habanalabs/Kconfig"
 source "drivers/misc/uacce/Kconfig"
 source "drivers/misc/pvpanic/Kconfig"
+<<<<<<< HEAD
+source "drivers/misc/mchp_pci1xxxx/Kconfig"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endmenu

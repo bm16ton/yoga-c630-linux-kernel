@@ -3,7 +3,11 @@
 
 # Simulate CONFIG_NUMA=y
 ifeq ($(NUMA), 1)
+<<<<<<< HEAD
+	CFLAGS += -D CONFIG_NUMA -D CONFIG_NODES_SHIFT=4
+=======
 	CFLAGS += -D CONFIG_NUMA
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endif
 
 # Use 32 bit physical addresses.

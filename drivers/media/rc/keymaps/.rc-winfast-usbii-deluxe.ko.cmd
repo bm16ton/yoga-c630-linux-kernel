@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-winfast-usbii-deluxe.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-winfast-usbii-deluxe.ko drivers/media/rc/keymaps/rc-winfast-usbii-deluxe.o drivers/media/rc/keymaps/rc-winfast-usbii-deluxe.mod.o;  true

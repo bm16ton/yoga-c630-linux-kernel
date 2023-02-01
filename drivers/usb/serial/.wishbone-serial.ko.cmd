@@ -1,0 +1,1 @@
+cmd_drivers/usb/serial/wishbone-serial.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/serial/wishbone-serial.ko drivers/usb/serial/wishbone-serial.o drivers/usb/serial/wishbone-serial.mod.o;  true

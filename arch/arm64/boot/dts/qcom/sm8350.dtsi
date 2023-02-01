@@ -1762,150 +1762,238 @@
 			wakeup-parent = <&pdc>;
 
 			qup_uart3_default_state: qup-uart3-default-state {
+<<<<<<< HEAD
+				rx-pins {
+					pins = "gpio18";
+					function = "qup3";
+				};
+				tx-pins {
+=======
 				rx {
 					pins = "gpio18";
 					function = "qup3";
 				};
 				tx {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					pins = "gpio19";
 					function = "qup3";
 				};
 			};
 
+<<<<<<< HEAD
+			qup_uart6_default: qup-uart6-default-state {
+=======
 			qup_uart6_default: qup-uart6-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio30", "gpio31";
 				function = "qup6";
 				drive-strength = <2>;
 				bias-disable;
 			};
 
+<<<<<<< HEAD
+			qup_uart18_default: qup-uart18-default-state {
+=======
 			qup_uart18_default: qup-uart18-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio58", "gpio59";
 				function = "qup18";
 				drive-strength = <2>;
 				bias-disable;
 			};
 
+<<<<<<< HEAD
+			qup_i2c0_default: qup-i2c0-default-state {
+=======
 			qup_i2c0_default: qup-i2c0-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio4", "gpio5";
 				function = "qup0";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c1_default: qup-i2c1-default-state {
+=======
 			qup_i2c1_default: qup-i2c1-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio8", "gpio9";
 				function = "qup1";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c2_default: qup-i2c2-default-state {
+=======
 			qup_i2c2_default: qup-i2c2-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio12", "gpio13";
 				function = "qup2";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c4_default: qup-i2c4-default-state {
+=======
 			qup_i2c4_default: qup-i2c4-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio20", "gpio21";
 				function = "qup4";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c5_default: qup-i2c5-default-state {
+=======
 			qup_i2c5_default: qup-i2c5-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio24", "gpio25";
 				function = "qup5";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c6_default: qup-i2c6-default-state {
+=======
 			qup_i2c6_default: qup-i2c6-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio28", "gpio29";
 				function = "qup6";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c7_default: qup-i2c7-default-state {
+=======
 			qup_i2c7_default: qup-i2c7-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio32", "gpio33";
 				function = "qup7";
 				drive-strength = <2>;
 				bias-disable;
 			};
 
+<<<<<<< HEAD
+			qup_i2c8_default: qup-i2c8-default-state {
+=======
 			qup_i2c8_default: qup-i2c8-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio36", "gpio37";
 				function = "qup8";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c9_default: qup-i2c9-default-state {
+=======
 			qup_i2c9_default: qup-i2c9-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio40", "gpio41";
 				function = "qup9";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c10_default: qup-i2c10-default-state {
+=======
 			qup_i2c10_default: qup-i2c10-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio44", "gpio45";
 				function = "qup10";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c11_default: qup-i2c11-default-state {
+=======
 			qup_i2c11_default: qup-i2c11-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio48", "gpio49";
 				function = "qup11";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c12_default: qup-i2c12-default-state {
+=======
 			qup_i2c12_default: qup-i2c12-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio52", "gpio53";
 				function = "qup12";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c13_default: qup-i2c13-default-state {
+=======
 			qup_i2c13_default: qup-i2c13-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio0", "gpio1";
 				function = "qup13";
 				drive-strength = <2>;
 				bias-pull-up;
 			};
 
+<<<<<<< HEAD
+			qup_i2c14_default: qup-i2c14-default-state {
+=======
 			qup_i2c14_default: qup-i2c14-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio56", "gpio57";
 				function = "qup14";
 				drive-strength = <2>;
 				bias-disable;
 			};
 
+<<<<<<< HEAD
+			qup_i2c15_default: qup-i2c15-default-state {
+=======
 			qup_i2c15_default: qup-i2c15-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio60", "gpio61";
 				function = "qup15";
 				drive-strength = <2>;
 				bias-disable;
 			};
 
+<<<<<<< HEAD
+			qup_i2c16_default: qup-i2c16-default-state {
+=======
 			qup_i2c16_default: qup-i2c16-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio64", "gpio65";
 				function = "qup16";
 				drive-strength = <2>;
 				bias-disable;
 			};
 
+<<<<<<< HEAD
+			qup_i2c17_default: qup-i2c17-default-state {
+=======
 			qup_i2c17_default: qup-i2c17-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio72", "gpio73";
 				function = "qup17";
 				drive-strength = <2>;
 				bias-disable;
 			};
 
+<<<<<<< HEAD
+			qup_i2c19_default: qup-i2c19-default-state {
+=======
 			qup_i2c19_default: qup-i2c19-default {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				pins = "gpio76", "gpio77";
 				function = "qup19";
 				drive-strength = <2>;
@@ -2128,7 +2216,11 @@
 
 		ufs_mem_phy: phy@1d87000 {
 			compatible = "qcom,sm8350-qmp-ufs-phy";
+<<<<<<< HEAD
+			reg = <0 0x01d87000 0 0x1c4>;
+=======
 			reg = <0 0x01d87000 0 0xe10>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			#address-cells = <2>;
 			#size-cells = <2>;
 			ranges;
@@ -2142,11 +2234,19 @@
 			status = "disabled";
 
 			ufs_mem_phy_lanes: phy@1d87400 {
+<<<<<<< HEAD
+				reg = <0 0x01d87400 0 0x188>,
+				      <0 0x01d87600 0 0x200>,
+				      <0 0x01d87c00 0 0x200>,
+				      <0 0x01d87800 0 0x188>,
+				      <0 0x01d87a00 0 0x200>;
+=======
 				reg = <0 0x01d87400 0 0x108>,
 				      <0 0x01d87600 0 0x1e0>,
 				      <0 0x01d87c00 0 0x1dc>,
 				      <0 0x01d87800 0 0x108>,
 				      <0 0x01d87a00 0 0x1e0>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				#phy-cells = <0>;
 			};
 		};

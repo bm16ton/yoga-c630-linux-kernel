@@ -1,0 +1,1 @@
+cmd_drivers/media/common/videobuf2/videobuf2-vmalloc.mod := printf '%s\n'   videobuf2-vmalloc.o | awk '!x[$$0]++ { print("drivers/media/common/videobuf2/"$$0) }' > drivers/media/common/videobuf2/videobuf2-vmalloc.mod

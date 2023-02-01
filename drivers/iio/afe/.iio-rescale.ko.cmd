@@ -1,0 +1,1 @@
+cmd_drivers/iio/afe/iio-rescale.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/afe/iio-rescale.ko drivers/iio/afe/iio-rescale.o drivers/iio/afe/iio-rescale.mod.o;  true

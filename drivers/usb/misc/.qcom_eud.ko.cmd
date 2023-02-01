@@ -1,0 +1,1 @@
+cmd_drivers/usb/misc/qcom_eud.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/misc/qcom_eud.ko drivers/usb/misc/qcom_eud.o drivers/usb/misc/qcom_eud.mod.o;  true

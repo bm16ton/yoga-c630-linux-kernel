@@ -7,7 +7,11 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Texas Instruments ADS131E0x 4-, 6- and 8-Channel ADCs
 
 maintainers:
+<<<<<<< HEAD
+  - Jonathan Cameron <jic23@kernel.org>
+=======
   - Tomislav Denis <tomislav.denis@avl.com>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 description: |
   The ADS131E0x are a family of multichannel, simultaneous sampling,
@@ -28,8 +32,11 @@ properties:
   reg:
     maxItems: 1
 
+<<<<<<< HEAD
+=======
   spi-max-frequency: true
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   spi-cpha: true
 
   clocks:
@@ -120,7 +127,14 @@ patternProperties:
 
     additionalProperties: false
 
+<<<<<<< HEAD
+allOf:
+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+
+unevaluatedProperties: false
+=======
 additionalProperties: false
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

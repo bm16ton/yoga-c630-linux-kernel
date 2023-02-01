@@ -1427,7 +1427,6 @@ int atomisp_css_get_grid_info(struct atomisp_sub_device *asd,
 	struct ia_css_pipe_info p_info;
 	struct ia_css_grid_info old_info;
 	struct atomisp_device *isp = asd->isp;
-	int stream_index = atomisp_source_pad_to_stream_id(asd, source_pad);
 	int md_width = asd->stream_env[ATOMISP_INPUT_STREAM_GENERAL].
 		       stream_config.metadata_config.resolution.width;
 
@@ -1435,7 +1434,7 @@ int atomisp_css_get_grid_info(struct atomisp_sub_device *asd,
 	memset(&old_info, 0, sizeof(struct ia_css_grid_info));
 
 	if (ia_css_pipe_get_info(
-		asd->stream_env[stream_index].pipes[pipe_id],
+		asd->stream_env[ATOMISP_INPUT_STREAM_GENERAL].pipes[pipe_id],
 		&p_info) != 0) {
 		dev_err(isp->dev, "ia_css_pipe_get_info failed\n");
 		return -EINVAL;
@@ -1574,6 +1573,8 @@ void atomisp_free_metadata_output_buf(struct atomisp_sub_device *asd)
 	}
 }
 
+<<<<<<< HEAD
+=======
 void atomisp_css_get_dis_statistics(struct atomisp_sub_device *asd,
 				    struct atomisp_css_buffer *isp_css_buffer,
 				    struct ia_css_isp_dvs_statistics_map *dvs_map)
@@ -1588,6 +1589,7 @@ void atomisp_css_get_dis_statistics(struct atomisp_sub_device *asd,
 	}
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void atomisp_css_temp_pipe_to_pipe_id(struct atomisp_sub_device *asd,
 				      struct atomisp_css_event *current_event)
 {
@@ -2629,9 +2631,15 @@ static int __get_frame_info(struct atomisp_sub_device *asd,
 	}
 	dev_dbg(isp->dev, "get frame info: w=%d, h=%d, num_invalid_frames %d.\n",
 		info->res.width, info->res.height, p_info.num_invalid_frames);
+<<<<<<< HEAD
 
 	return 0;
 
+=======
+
+	return 0;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 get_info_err:
 	atomisp_destroy_pipes_stream_force(asd);
 	return -EINVAL;
@@ -2694,11 +2702,15 @@ int atomisp_get_css_frame_info(struct atomisp_sub_device *asd,
 	struct atomisp_device *isp = asd->isp;
 
 	if (ATOMISP_SOC_CAMERA(asd)) {
+<<<<<<< HEAD
+		stream_index = ATOMISP_INPUT_STREAM_GENERAL;
+=======
 		stream_index = atomisp_source_pad_to_stream_id(asd, source_pad);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		stream_index = (pipe_index == IA_CSS_PIPE_ID_YUVPP) ?
 			       ATOMISP_INPUT_STREAM_VIDEO :
-			       atomisp_source_pad_to_stream_id(asd, source_pad);
+			       ATOMISP_INPUT_STREAM_GENERAL;
 	}
 
 	if (0 != ia_css_pipe_get_info(asd->stream_env[stream_index]
@@ -3626,6 +3638,8 @@ int atomisp_css_get_dis_stat(struct atomisp_sub_device *asd,
 	struct atomisp_dis_buf *dis_buf;
 	unsigned long flags;
 
+	lockdep_assert_held(&isp->mutex);
+
 	if (!asd->params.dvs_stat->hor_prod.odd_real ||
 	    !asd->params.dvs_stat->hor_prod.odd_imag ||
 	    !asd->params.dvs_stat->hor_prod.even_real ||
@@ -3637,12 +3651,8 @@ int atomisp_css_get_dis_stat(struct atomisp_sub_device *asd,
 		return -EINVAL;
 
 	/* isp needs to be streaming to get DIS statistics */
-	spin_lock_irqsave(&isp->lock, flags);
-	if (asd->streaming != ATOMISP_DEVICE_STREAMING_ENABLED) {
-		spin_unlock_irqrestore(&isp->lock, flags);
+	if (asd->streaming != ATOMISP_DEVICE_STREAMING_ENABLED)
 		return -EINVAL;
-	}
-	spin_unlock_irqrestore(&isp->lock, flags);
 
 	if (atomisp_compare_dvs_grid(asd, &stats->dvs2_stat.grid_info) != 0)
 		/* If the grid info in the argument differs from the current
@@ -3763,6 +3773,8 @@ void atomisp_css_morph_table_free(struct ia_css_morph_table *table)
 	ia_css_morph_table_free(table);
 }
 
+<<<<<<< HEAD
+=======
 void atomisp_css_set_cont_prev_start_time(struct atomisp_device *isp,
 	unsigned int overlap)
 {
@@ -3789,6 +3801,7 @@ int atomisp_css_set_acc_parameters(struct atomisp_acc_fw *acc_fw)
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct atomisp_sub_device *__get_atomisp_subdev(
     struct ia_css_pipe *css_pipe,
     struct atomisp_device *isp,
@@ -3824,9 +3837,12 @@ int atomisp_css_isr_thread(struct atomisp_device *isp,
 	enum atomisp_input_stream_id stream_id = 0;
 	struct atomisp_css_event current_event;
 	struct atomisp_sub_device *asd;
-	bool reset_wdt_timer[MAX_STREAM_NUM] = {false};
-	int i;
 
+<<<<<<< HEAD
+	lockdep_assert_held(&isp->mutex);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (!ia_css_dequeue_psys_event(&current_event.event)) {
 		if (current_event.event.type ==
 		    IA_CSS_EVENT_TYPE_FW_ASSERT) {
@@ -3839,14 +3855,8 @@ int atomisp_css_isr_thread(struct atomisp_device *isp,
 				__func__,
 				current_event.event.fw_assert_module_id,
 				current_event.event.fw_assert_line_no);
-			for (i = 0; i < isp->num_of_streams; i++)
-				atomisp_wdt_stop(&isp->asd[i], 0);
 
-			if (!IS_ISP2401)
-				atomisp_wdt(&isp->asd[0].wdt);
-			else
-				queue_work(isp->wdt_work_queue, &isp->wdt_work);
-
+			queue_work(system_long_wq, &isp->assert_recovery_work);
 			return -EINVAL;
 		} else if (current_event.event.type == IA_CSS_EVENT_TYPE_FW_WARNING) {
 			dev_warn(isp->dev, "%s: ISP reports warning, code is %d, exp_id %d\n",
@@ -3875,20 +3885,12 @@ int atomisp_css_isr_thread(struct atomisp_device *isp,
 			frame_done_found[asd->index] = true;
 			atomisp_buf_done(asd, 0, IA_CSS_BUFFER_TYPE_OUTPUT_FRAME,
 					 current_event.pipe, true, stream_id);
-
-			if (!IS_ISP2401)
-				reset_wdt_timer[asd->index] = true; /* ISP running */
-
 			break;
 		case IA_CSS_EVENT_TYPE_SECOND_OUTPUT_FRAME_DONE:
 			dev_dbg(isp->dev, "event: Second output frame done");
 			frame_done_found[asd->index] = true;
 			atomisp_buf_done(asd, 0, IA_CSS_BUFFER_TYPE_SEC_OUTPUT_FRAME,
 					 current_event.pipe, true, stream_id);
-
-			if (!IS_ISP2401)
-				reset_wdt_timer[asd->index] = true; /* ISP running */
-
 			break;
 		case IA_CSS_EVENT_TYPE_3A_STATISTICS_DONE:
 			dev_dbg(isp->dev, "event: 3A stats frame done");
@@ -3909,19 +3911,12 @@ int atomisp_css_isr_thread(struct atomisp_device *isp,
 			atomisp_buf_done(asd, 0,
 					 IA_CSS_BUFFER_TYPE_VF_OUTPUT_FRAME,
 					 current_event.pipe, true, stream_id);
-
-			if (!IS_ISP2401)
-				reset_wdt_timer[asd->index] = true; /* ISP running */
-
 			break;
 		case IA_CSS_EVENT_TYPE_SECOND_VF_OUTPUT_FRAME_DONE:
 			dev_dbg(isp->dev, "event: second VF output frame done");
 			atomisp_buf_done(asd, 0,
 					 IA_CSS_BUFFER_TYPE_SEC_VF_OUTPUT_FRAME,
 					 current_event.pipe, true, stream_id);
-			if (!IS_ISP2401)
-				reset_wdt_timer[asd->index] = true; /* ISP running */
-
 			break;
 		case IA_CSS_EVENT_TYPE_DIS_STATISTICS_DONE:
 			dev_dbg(isp->dev, "event: dis stats frame done");
@@ -3942,24 +3937,6 @@ int atomisp_css_isr_thread(struct atomisp_device *isp,
 				current_event.event.type);
 			break;
 		}
-	}
-
-	if (IS_ISP2401)
-		return 0;
-
-	/* ISP2400: If there are no buffers queued then delete wdt timer. */
-	for (i = 0; i < isp->num_of_streams; i++) {
-		asd = &isp->asd[i];
-		if (!asd)
-			continue;
-		if (asd->streaming != ATOMISP_DEVICE_STREAMING_ENABLED)
-			continue;
-		if (!atomisp_buffers_queued(asd))
-			atomisp_wdt_stop(asd, false);
-		else if (reset_wdt_timer[i])
-			/* SOF irq should not reset wdt timer. */
-			atomisp_wdt_refresh(asd,
-					    ATOMISP_WDT_KEEP_CURRENT_DELAY);
 	}
 
 	return 0;

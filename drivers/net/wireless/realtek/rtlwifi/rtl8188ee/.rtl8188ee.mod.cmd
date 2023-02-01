@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8188ee/rtl8188ee.mod := printf '%s\n'   dm.o fw.o hw.o led.o phy.o pwrseq.o rf.o sw.o table.o trx.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtlwifi/rtl8188ee/"$$0) }' > drivers/net/wireless/realtek/rtlwifi/rtl8188ee/rtl8188ee.mod

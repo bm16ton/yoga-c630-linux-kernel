@@ -3,6 +3,9 @@
 #define _TOOLS_INCLUDE_LINUX_GFP_H
 
 #include <linux/types.h>
+<<<<<<< HEAD
+#include <linux/gfp_types.h>
+=======
 
 #define __GFP_BITS_SHIFT 26
 #define __GFP_BITS_MASK ((gfp_t)((1 << __GFP_BITS_SHIFT) - 1))
@@ -23,6 +26,7 @@
 #define GFP_ATOMIC	(__GFP_HIGH | __GFP_ATOMIC | __GFP_KSWAPD_RECLAIM)
 #define GFP_KERNEL	(__GFP_RECLAIM | __GFP_IO | __GFP_FS)
 #define GFP_NOWAIT	(__GFP_KSWAPD_RECLAIM)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline bool gfpflags_allow_blocking(const gfp_t gfp_flags)
 {

@@ -1,0 +1,1 @@
+cmd_drivers/tty/serial/built-in.a := rm -f drivers/tty/serial/built-in.a;  printf "drivers/tty/serial/%s " serial_core.o earlycon.o 8250/built-in.a amba-pl010.o amba-pl011.o meson_uart.o msm_serial.o qcom_geni_serial.o xilinx_uartps.o serial-tegra.o fsl_lpuart.o mvebu-uart.o serial_mctrl_gpio.o | xargs ar cDPrST drivers/tty/serial/built-in.a

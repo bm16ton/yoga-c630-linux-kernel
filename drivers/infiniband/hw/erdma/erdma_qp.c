@@ -6,6 +6,8 @@
 /* Authors: Bernard Metzler <bmt@zurich.ibm.com> */
 /* Copyright (c) 2008-2019, IBM Corporation */
 
+<<<<<<< HEAD
+=======
 #include <linux/errno.h>
 #include <linux/pci.h>
 #include <linux/scatterlist.h>
@@ -15,6 +17,7 @@
 #include <rdma/ib_verbs.h>
 
 #include "erdma.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "erdma_cm.h"
 #include "erdma_verbs.h"
 
@@ -105,8 +108,12 @@ static int erdma_modify_qp_state_to_rts(struct erdma_qp *qp,
 		req.send_nxt += MPA_DEFAULT_HDR_LEN + qp->attrs.pd_len;
 	req.recv_nxt = tp->rcv_nxt;
 
+<<<<<<< HEAD
+	return erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
+=======
 	return erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
 				   NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int erdma_modify_qp_state_to_stop(struct erdma_qp *qp,
@@ -124,8 +131,12 @@ static int erdma_modify_qp_state_to_stop(struct erdma_qp *qp,
 	req.cfg = FIELD_PREP(ERDMA_CMD_MODIFY_QP_STATE_MASK, attrs->state) |
 		  FIELD_PREP(ERDMA_CMD_MODIFY_QP_QPN_MASK, QP_ID(qp));
 
+<<<<<<< HEAD
+	return erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
+=======
 	return erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
 				   NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int erdma_modify_qp_internal(struct erdma_qp *qp, struct erdma_qp_attrs *attrs,

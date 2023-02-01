@@ -1,0 +1,2 @@
+drivers/gpu/drm/meson/meson-drm.ko
+drivers/gpu/drm/meson/meson_dw_hdmi.ko

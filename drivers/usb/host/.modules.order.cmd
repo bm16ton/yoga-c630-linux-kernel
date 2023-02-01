@@ -1,0 +1,1 @@
+cmd_drivers/usb/host/modules.order := {   echo drivers/usb/host/ehci-platform.ko;   echo drivers/usb/host/ehci-orion.ko;   echo drivers/usb/host/xhci-tegra.ko;   echo drivers/usb/host/u132-hcd.ko; :; } > drivers/usb/host/modules.order

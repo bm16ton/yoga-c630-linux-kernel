@@ -478,9 +478,18 @@ static int rdacm20_initialize(struct rdacm20_device *dev)
 	 * has to be asserted for at least 200 microseconds.
 	 */
 	ret = max9271_enable_gpios(&dev->serializer, MAX9271_GPIO1OUT);
+<<<<<<< HEAD
+=======
 	if (ret)
 		return ret;
 
+	ret = max9271_clear_gpios(&dev->serializer, MAX9271_GPIO1OUT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	if (ret)
+		return ret;
+	usleep_range(200, 500);
+
+<<<<<<< HEAD
 	ret = max9271_clear_gpios(&dev->serializer, MAX9271_GPIO1OUT);
 	if (ret)
 		return ret;
@@ -494,6 +503,16 @@ static int rdacm20_initialize(struct rdacm20_device *dev)
 	if (ret < 0)
 		return ret;
 
+=======
+	ret = max9271_configure_gmsl_link(&dev->serializer);
+	if (ret)
+		return ret;
+
+	ret = max9271_verify_id(&dev->serializer);
+	if (ret < 0)
+		return ret;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = max9271_set_address(&dev->serializer, dev->addrs[0]);
 	if (ret < 0)
 		return ret;
@@ -646,7 +665,7 @@ error:
 	return ret;
 }
 
-static int rdacm20_remove(struct i2c_client *client)
+static void rdacm20_remove(struct i2c_client *client)
 {
 	struct rdacm20_device *dev = i2c_to_rdacm20(client);
 
@@ -655,8 +674,6 @@ static int rdacm20_remove(struct i2c_client *client)
 	v4l2_ctrl_handler_free(&dev->ctrls);
 	media_entity_cleanup(&dev->sd.entity);
 	i2c_unregister_device(dev->sensor);
-
-	return 0;
 }
 
 static void rdacm20_shutdown(struct i2c_client *client)

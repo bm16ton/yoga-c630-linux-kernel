@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/hw/mlx4/mlx4_ib.mod := printf '%s\n'   ah.o cq.o doorbell.o mad.o main.o mr.o qp.o srq.o mcg.o cm.o alias_GUID.o sysfs.o | awk '!x[$$0]++ { print("drivers/infiniband/hw/mlx4/"$$0) }' > drivers/infiniband/hw/mlx4/mlx4_ib.mod

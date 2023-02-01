@@ -1,0 +1,1 @@
+cmd_drivers/scsi/aacraid/aacraid.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/aacraid/aacraid.ko drivers/scsi/aacraid/aacraid.o drivers/scsi/aacraid/aacraid.mod.o;  true

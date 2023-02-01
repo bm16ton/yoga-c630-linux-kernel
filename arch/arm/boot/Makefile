@@ -10,22 +10,16 @@
 #
 # Copyright (C) 1995-2002 Russell King
 #
-
 OBJCOPYFLAGS	:=-O binary -R .comment -S
 
-ifneq ($(MACHINE),)
-include $(MACHINE)/Makefile.boot
+#   ZRELADDR == virt_to_phys(PAGE_OFFSET + TEXT_OFFSET)
+ifdef CONFIG_PHYS_OFFSET
+add_hex = $(shell printf 0x%x $$(( $(1) + $(2) )) )
+ZRELADDR    := $(call add_hex, $(CONFIG_PHYS_OFFSET), $(TEXT_OFFSET))
 endif
 
-# Note: the following conditions must always be true:
-#   ZRELADDR == virt_to_phys(PAGE_OFFSET + TEXT_OFFSET)
-#   PARAMS_PHYS must be within 4MB of ZRELADDR
-#   INITRD_PHYS must be in RAM
-ZRELADDR    := $(zreladdr-y)
-PARAMS_PHYS := $(params_phys-y)
-INITRD_PHYS := $(initrd_phys-y)
-
-export ZRELADDR INITRD_PHYS PARAMS_PHYS
+PHYS_OFFSET := $(CONFIG_PHYS_OFFSET)
+export ZRELADDR PARAMS_PHYS PHYS_OFFSET
 
 targets := Image zImage xipImage bootpImage uImage
 
@@ -90,12 +84,14 @@ $(obj)/uImage:	$(obj)/zImage FORCE
 	@$(check_for_multiple_loadaddr)
 	$(call if_changed,uimage)
 
-$(obj)/bootp/bootp: $(obj)/zImage initrd FORCE
+$(obj)/bootp/bootp: $(obj)/zImage FORCE
 	$(Q)$(MAKE) $(build)=$(obj)/bootp $@
 
 $(obj)/bootpImage: $(obj)/bootp/bootp FORCE
 	$(call if_changed,objcopy)
 
+<<<<<<< HEAD
+=======
 PHONY += initrd
 initrd:
 	@test "$(INITRD_PHYS)" != "" || \
@@ -103,4 +99,5 @@ initrd:
 	@test "$(INITRD)" != "" || \
 	(echo You must specify INITRD; exit -1)
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 subdir-	    := bootp compressed dts

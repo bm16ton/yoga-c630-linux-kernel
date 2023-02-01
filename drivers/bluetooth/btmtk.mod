@@ -1,0 +1,1 @@
+drivers/bluetooth/btmtk.o

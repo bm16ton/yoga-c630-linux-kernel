@@ -53,7 +53,11 @@ static u32 dcs_get_backlight(struct intel_connector *connector, enum pipe unused
 	enum port port;
 	size_t len = panel->backlight.max > U8_MAX ? 2 : 1;
 
+<<<<<<< HEAD
+	for_each_dsi_port(port, panel->vbt.dsi.bl_ports) {
+=======
 	for_each_dsi_port(port, intel_dsi->dcs_backlight_ports) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dsi_device = intel_dsi->dsi_hosts[port]->device;
 		mipi_dsi_dcs_read(dsi_device, MIPI_DCS_GET_DISPLAY_BRIGHTNESS,
 				  &data, len);
@@ -80,7 +84,11 @@ static void dcs_set_backlight(const struct drm_connector_state *conn_state, u32 
 		data[1] = level;
 	}
 
+<<<<<<< HEAD
+	for_each_dsi_port(port, panel->vbt.dsi.bl_ports) {
+=======
 	for_each_dsi_port(port, intel_dsi->dcs_backlight_ports) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dsi_device = intel_dsi->dsi_hosts[port]->device;
 		mode_flags = dsi_device->mode_flags;
 		dsi_device->mode_flags &= ~MIPI_DSI_MODE_LPM;
@@ -93,12 +101,13 @@ static void dcs_set_backlight(const struct drm_connector_state *conn_state, u32 
 static void dcs_disable_backlight(const struct drm_connector_state *conn_state, u32 level)
 {
 	struct intel_dsi *intel_dsi = enc_to_intel_dsi(to_intel_encoder(conn_state->best_encoder));
+	struct intel_panel *panel = &to_intel_connector(conn_state->connector)->panel;
 	struct mipi_dsi_device *dsi_device;
 	enum port port;
 
 	dcs_set_backlight(conn_state, 0);
 
-	for_each_dsi_port(port, intel_dsi->dcs_cabc_ports) {
+	for_each_dsi_port(port, panel->vbt.dsi.cabc_ports) {
 		u8 cabc = POWER_SAVE_OFF;
 
 		dsi_device = intel_dsi->dsi_hosts[port]->device;
@@ -106,7 +115,7 @@ static void dcs_disable_backlight(const struct drm_connector_state *conn_state, 
 				   &cabc, sizeof(cabc));
 	}
 
-	for_each_dsi_port(port, intel_dsi->dcs_backlight_ports) {
+	for_each_dsi_port(port, panel->vbt.dsi.bl_ports) {
 		u8 ctrl = 0;
 
 		dsi_device = intel_dsi->dsi_hosts[port]->device;
@@ -127,10 +136,11 @@ static void dcs_enable_backlight(const struct intel_crtc_state *crtc_state,
 				 const struct drm_connector_state *conn_state, u32 level)
 {
 	struct intel_dsi *intel_dsi = enc_to_intel_dsi(to_intel_encoder(conn_state->best_encoder));
+	struct intel_panel *panel = &to_intel_connector(conn_state->connector)->panel;
 	struct mipi_dsi_device *dsi_device;
 	enum port port;
 
-	for_each_dsi_port(port, intel_dsi->dcs_backlight_ports) {
+	for_each_dsi_port(port, panel->vbt.dsi.bl_ports) {
 		u8 ctrl = 0;
 
 		dsi_device = intel_dsi->dsi_hosts[port]->device;
@@ -146,7 +156,7 @@ static void dcs_enable_backlight(const struct intel_crtc_state *crtc_state,
 				   &ctrl, sizeof(ctrl));
 	}
 
-	for_each_dsi_port(port, intel_dsi->dcs_cabc_ports) {
+	for_each_dsi_port(port, panel->vbt.dsi.cabc_ports) {
 		u8 cabc = POWER_SAVE_MEDIUM;
 
 		dsi_device = intel_dsi->dsi_hosts[port]->device;

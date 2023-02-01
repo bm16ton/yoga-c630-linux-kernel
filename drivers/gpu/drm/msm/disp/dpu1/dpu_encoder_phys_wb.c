@@ -132,7 +132,10 @@ static void dpu_encoder_phys_wb_set_qos(struct dpu_encoder_phys *phys_enc)
  * dpu_encoder_phys_wb_setup_fb - setup output framebuffer
  * @phys_enc:	Pointer to physical encoder
  * @fb:		Pointer to output framebuffer
+<<<<<<< HEAD
+=======
  * @wb_roi:	Pointer to output region of interest
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 static void dpu_encoder_phys_wb_setup_fb(struct dpu_encoder_phys *phys_enc,
 		struct drm_framebuffer *fb)
@@ -692,7 +695,11 @@ static void dpu_encoder_phys_wb_init_ops(struct dpu_encoder_phys_ops *ops)
 
 /**
  * dpu_encoder_phys_wb_init - initialize writeback encoder
+<<<<<<< HEAD
+ * @p:	Pointer to init info structure with initialization params
+=======
  * @init:	Pointer to init info structure with initialization params
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct dpu_encoder_phys *dpu_encoder_phys_wb_init(
 		struct dpu_enc_phys_init_params *p)

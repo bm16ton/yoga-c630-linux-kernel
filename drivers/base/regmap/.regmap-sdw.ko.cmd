@@ -1,0 +1,1 @@
+cmd_drivers/base/regmap/regmap-sdw.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/base/regmap/regmap-sdw.ko drivers/base/regmap/regmap-sdw.o drivers/base/regmap/regmap-sdw.mod.o;  true

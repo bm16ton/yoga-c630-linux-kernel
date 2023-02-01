@@ -73,14 +73,30 @@
 #
 # Run and dump packet contents:
 #   sudo ./test_xsk.sh -D
+<<<<<<< HEAD
+#
+# Run test suite for physical device in loopback mode
+#   sudo ./test_xsk.sh -i IFACE
+
+. xsk_prereqs.sh
+
+ETH=""
+
+while getopts "vDi:" flag
+=======
 
 . xsk_prereqs.sh
 
 while getopts "vD" flag
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 do
 	case "${flag}" in
 		v) verbose=1;;
 		D) dump_pkts=1;;
+<<<<<<< HEAD
+		i) ETH=${OPTARG};;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	esac
 done
 
@@ -132,18 +148,28 @@ setup_vethPairs() {
 	ip link set ${VETH0} up
 }
 
-validate_root_exec
-validate_veth_support ${VETH0}
-validate_ip_utility
-setup_vethPairs
+if [ ! -z $ETH ]; then
+	VETH0=${ETH}
+	VETH1=${ETH}
+	NS1=""
+else
+	validate_root_exec
+	validate_veth_support ${VETH0}
+	validate_ip_utility
+	setup_vethPairs
 
-retval=$?
-if [ $retval -ne 0 ]; then
-	test_status $retval "${TEST_NAME}"
-	cleanup_exit ${VETH0} ${VETH1} ${NS1}
-	exit $retval
+	retval=$?
+	if [ $retval -ne 0 ]; then
+		test_status $retval "${TEST_NAME}"
+		cleanup_exit ${VETH0} ${VETH1} ${NS1}
+		exit $retval
+	fi
 fi
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 if [[ $verbose -eq 1 ]]; then
 	ARGS+="-v "
 fi
@@ -152,12 +178,28 @@ if [[ $dump_pkts -eq 1 ]]; then
 	ARGS="-D "
 fi
 
+retval=$?
 test_status $retval "${TEST_NAME}"
 
 ## START TESTS
 
 statusList=()
 
+<<<<<<< HEAD
+TEST_NAME="XSK_SELFTESTS_${VETH0}_SOFTIRQ"
+
+exec_xskxceiver
+
+if [ -z $ETH ]; then
+	cleanup_exit ${VETH0} ${VETH1} ${NS1}
+fi
+TEST_NAME="XSK_SELFTESTS_${VETH0}_BUSY_POLL"
+busy_poll=1
+
+if [ -z $ETH ]; then
+	setup_vethPairs
+fi
+=======
 TEST_NAME="XSK_SELFTESTS_SOFTIRQ"
 
 exec_xskxceiver
@@ -167,11 +209,14 @@ TEST_NAME="XSK_SELFTESTS_BUSY_POLL"
 busy_poll=1
 
 setup_vethPairs
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exec_xskxceiver
 
 ## END TESTS
 
-cleanup_exit ${VETH0} ${VETH1} ${NS1}
+if [ -z $ETH ]; then
+	cleanup_exit ${VETH0} ${VETH1} ${NS1}
+fi
 
 failures=0
 echo -e "\nSummary:"

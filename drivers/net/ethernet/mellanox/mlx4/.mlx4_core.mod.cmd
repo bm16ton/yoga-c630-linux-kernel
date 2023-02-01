@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/mellanox/mlx4/mlx4_core.mod := printf '%s\n'   alloc.o catas.o cmd.o cq.o eq.o fw.o fw_qos.o icm.o intf.o main.o mcg.o mr.o pd.o port.o profile.o qp.o reset.o sense.o srq.o resource_tracker.o crdump.o | awk '!x[$$0]++ { print("drivers/net/ethernet/mellanox/mlx4/"$$0) }' > drivers/net/ethernet/mellanox/mlx4/mlx4_core.mod

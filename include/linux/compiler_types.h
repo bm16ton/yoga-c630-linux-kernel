@@ -4,8 +4,17 @@
 
 #ifndef __ASSEMBLY__
 
+<<<<<<< HEAD
+/*
+ * Skipped when running bindgen due to a libclang issue;
+ * see https://github.com/rust-lang/rust-bindgen/issues/2244.
+ */
+#if defined(CONFIG_DEBUG_INFO_BTF) && defined(CONFIG_PAHOLE_HAS_BTF_TAG) && \
+	__has_attribute(btf_type_tag) && !defined(__BINDGEN__)
+=======
 #if defined(CONFIG_DEBUG_INFO_BTF) && defined(CONFIG_PAHOLE_HAS_BTF_TAG) && \
 	__has_attribute(btf_type_tag)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # define BTF_TYPE_TAG(value) __attribute__((btf_type_tag(#value)))
 #else
 # define BTF_TYPE_TAG(value) /* nothing */
@@ -229,7 +238,12 @@ struct ftrace_likely_data {
 /* Section for code which can't be instrumented at all */
 #define noinstr								\
 	noinline notrace __attribute((__section__(".noinstr.text")))	\
+<<<<<<< HEAD
+	__no_kcsan __no_sanitize_address __no_profile __no_sanitize_coverage \
+	__no_sanitize_memory
+=======
 	__no_kcsan __no_sanitize_address __no_profile __no_sanitize_coverage
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* __KERNEL__ */
 
@@ -265,6 +279,20 @@ struct ftrace_likely_data {
 # define __nocfi
 #endif
 
+<<<<<<< HEAD
+/*
+ * Any place that could be marked with the "alloc_size" attribute is also
+ * a place to be marked with the "malloc" attribute, except those that may
+ * be performing a _reallocation_, as that may alias the existing pointer.
+ * For these, use __realloc_size().
+ */
+#ifdef __alloc_size__
+# define __alloc_size(x, ...)	__alloc_size__(x, ## __VA_ARGS__) __malloc
+# define __realloc_size(x, ...)	__alloc_size__(x, ## __VA_ARGS__)
+#else
+# define __alloc_size(x, ...)	__malloc
+# define __realloc_size(x, ...)
+=======
 #ifndef __cficanonical
 # define __cficanonical
 #endif
@@ -279,6 +307,7 @@ struct ftrace_likely_data {
 # define __alloc_size(x, ...)	__alloc_size__(x, ## __VA_ARGS__) __malloc
 #else
 # define __alloc_size(x, ...)	__malloc
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #ifndef asm_volatile_goto

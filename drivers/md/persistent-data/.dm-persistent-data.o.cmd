@@ -1,0 +1,1 @@
+cmd_drivers/md/persistent-data/dm-persistent-data.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/md/persistent-data/dm-persistent-data.o @drivers/md/persistent-data/dm-persistent-data.mod 

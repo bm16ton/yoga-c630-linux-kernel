@@ -1,0 +1,6 @@
+net/nfc/nfc.ko
+net/nfc/nci/nci.ko
+net/nfc/nci/nci_spi.ko
+net/nfc/nci/nci_uart.ko
+net/nfc/hci/hci.ko
+net/nfc/nfc_digital.ko

@@ -587,9 +587,13 @@ int setxattr_copy(const char __user *name, struct xattr_ctx *ctx)
 static void setxattr_convert(struct user_namespace *mnt_userns,
 			     struct dentry *d, struct xattr_ctx *ctx)
 {
+<<<<<<< HEAD
+	if (ctx->size && is_posix_acl_xattr(ctx->kname->name))
+=======
 	if (ctx->size &&
 		((strcmp(ctx->kname->name, XATTR_NAME_POSIX_ACL_ACCESS) == 0) ||
 		(strcmp(ctx->kname->name, XATTR_NAME_POSIX_ACL_DEFAULT) == 0)))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		posix_acl_fix_xattr_from_user(ctx->kvalue, ctx->size);
 }
 
@@ -600,6 +604,7 @@ int do_setxattr(struct user_namespace *mnt_userns, struct dentry *dentry,
 	return vfs_setxattr(mnt_userns, dentry, ctx->kname->name,
 			ctx->kvalue, ctx->size, ctx->flags);
 }
+<<<<<<< HEAD
 
 static long
 setxattr(struct user_namespace *mnt_userns, struct dentry *d,
@@ -622,6 +627,30 @@ setxattr(struct user_namespace *mnt_userns, struct dentry *d,
 
 	error = do_setxattr(mnt_userns, d, &ctx);
 
+=======
+
+static long
+setxattr(struct user_namespace *mnt_userns, struct dentry *d,
+	const char __user *name, const void __user *value, size_t size,
+	int flags)
+{
+	struct xattr_name kname;
+	struct xattr_ctx ctx = {
+		.cvalue   = value,
+		.kvalue   = NULL,
+		.size     = size,
+		.kname    = &kname,
+		.flags    = flags,
+	};
+	int error;
+
+	error = setxattr_copy(name, &ctx);
+	if (error)
+		return error;
+
+	error = do_setxattr(mnt_userns, d, &ctx);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kvfree(ctx.kvalue);
 	return error;
 }
@@ -705,8 +734,12 @@ do_getxattr(struct user_namespace *mnt_userns, struct dentry *d,
 
 	error = vfs_getxattr(mnt_userns, d, kname, ctx->kvalue, ctx->size);
 	if (error > 0) {
+<<<<<<< HEAD
+		if (is_posix_acl_xattr(kname))
+=======
 		if ((strcmp(kname, XATTR_NAME_POSIX_ACL_ACCESS) == 0) ||
 		    (strcmp(kname, XATTR_NAME_POSIX_ACL_DEFAULT) == 0))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			posix_acl_fix_xattr_to_user(ctx->kvalue, error);
 		if (ctx->size && copy_to_user(ctx->value, ctx->kvalue, error))
 			error = -EFAULT;
@@ -1147,7 +1180,7 @@ static int xattr_list_one(char **buffer, ssize_t *remaining_size,
 ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
 			  char *buffer, size_t size)
 {
-	bool trusted = capable(CAP_SYS_ADMIN);
+	bool trusted = ns_capable_noaudit(&init_user_ns, CAP_SYS_ADMIN);
 	struct simple_xattr *xattr;
 	ssize_t remaining_size = size;
 	int err = 0;

@@ -1,0 +1,5 @@
+drivers/usb/typec/tcpm/tcpm.ko
+drivers/usb/typec/tcpm/fusb302.ko
+drivers/usb/typec/tcpm/tcpci.ko
+drivers/usb/typec/tcpm/tcpci_rt1711h.ko
+drivers/usb/typec/tcpm/tcpci_maxim.ko

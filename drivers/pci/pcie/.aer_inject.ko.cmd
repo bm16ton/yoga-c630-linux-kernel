@@ -1,0 +1,1 @@
+cmd_drivers/pci/pcie/aer_inject.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/pci/pcie/aer_inject.ko drivers/pci/pcie/aer_inject.o drivers/pci/pcie/aer_inject.mod.o;  true

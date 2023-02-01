@@ -1,0 +1,1 @@
+cmd_drivers/scsi/qedf/qedf.mod := printf '%s\n'   qedf_dbg.o qedf_main.o qedf_io.o qedf_fip.o qedf_attr.o qedf_els.o drv_scsi_fw_funcs.o drv_fcoe_fw_funcs.o qedf_debugfs.o | awk '!x[$$0]++ { print("drivers/scsi/qedf/"$$0) }' > drivers/scsi/qedf/qedf.mod

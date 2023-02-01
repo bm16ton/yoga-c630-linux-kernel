@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/cx231xx/cx231xx.mod := printf '%s\n'   cx231xx-video.o cx231xx-i2c.o cx231xx-cards.o cx231xx-core.o cx231xx-avcore.o cx231xx-417.o cx231xx-pcb-cfg.o cx231xx-vbi.o cx231xx-input.o | awk '!x[$$0]++ { print("drivers/media/usb/cx231xx/"$$0) }' > drivers/media/usb/cx231xx/cx231xx.mod

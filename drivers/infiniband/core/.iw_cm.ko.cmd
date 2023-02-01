@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/core/iw_cm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/infiniband/core/iw_cm.ko drivers/infiniband/core/iw_cm.o drivers/infiniband/core/iw_cm.mod.o;  true

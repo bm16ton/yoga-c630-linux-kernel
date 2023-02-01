@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/qxl/qxl.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/qxl/qxl.ko drivers/gpu/drm/qxl/qxl.o drivers/gpu/drm/qxl/qxl.mod.o;  true

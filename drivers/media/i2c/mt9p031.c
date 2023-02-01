@@ -702,7 +702,10 @@ static int mt9p031_init_cfg(struct v4l2_subdev *subdev,
 					     V4L2_SUBDEV_FORMAT_TRY;
 
 	crop = __mt9p031_get_pad_crop(mt9p031, sd_state, 0, which);
+<<<<<<< HEAD
+=======
 	v4l2_subdev_get_try_crop(subdev, sd_state, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	crop->left = MT9P031_COLUMN_START_DEF;
 	crop->top = MT9P031_ROW_START_DEF;
 	crop->width = MT9P031_WINDOW_WIDTH_DEF;
@@ -1209,7 +1212,7 @@ done:
 	return ret;
 }
 
-static int mt9p031_remove(struct i2c_client *client)
+static void mt9p031_remove(struct i2c_client *client)
 {
 	struct v4l2_subdev *subdev = i2c_get_clientdata(client);
 	struct mt9p031 *mt9p031 = to_mt9p031(subdev);
@@ -1218,8 +1221,6 @@ static int mt9p031_remove(struct i2c_client *client)
 	v4l2_async_unregister_subdev(subdev);
 	media_entity_cleanup(&subdev->entity);
 	mutex_destroy(&mt9p031->power_lock);
-
-	return 0;
 }
 
 static const struct i2c_device_id mt9p031_id[] = {

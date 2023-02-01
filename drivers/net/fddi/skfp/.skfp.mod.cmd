@@ -1,0 +1,1 @@
+cmd_drivers/net/fddi/skfp/skfp.mod := printf '%s\n'   skfddi.o hwmtm.o fplustm.o smt.o cfm.o ecm.o pcmplc.o pmf.o queue.o rmt.o smtdef.o smtinit.o smttimer.o srf.o hwt.o drvfbi.o ess.o | awk '!x[$$0]++ { print("drivers/net/fddi/skfp/"$$0) }' > drivers/net/fddi/skfp/skfp.mod

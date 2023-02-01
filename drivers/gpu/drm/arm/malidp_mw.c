@@ -10,10 +10,17 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_edid.h>
+<<<<<<< HEAD
+#include <drm/drm_fb_dma_helper.h>
+#include <drm/drm_fourcc.h>
+#include <drm/drm_framebuffer.h>
+#include <drm/drm_gem_dma_helper.h>
+=======
 #include <drm/drm_fb_cma_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_cma_helper.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_writeback.h>
 
@@ -160,7 +167,7 @@ malidp_mw_encoder_atomic_check(struct drm_encoder *encoder,
 
 	n_planes = fb->format->num_planes;
 	for (i = 0; i < n_planes; i++) {
-		struct drm_gem_cma_object *obj = drm_fb_cma_get_gem_obj(fb, i);
+		struct drm_gem_dma_object *obj = drm_fb_dma_get_gem_obj(fb, i);
 		/* memory write buffers are never rotated */
 		u8 alignment = malidp_hw_get_pitch_align(malidp->dev, 0);
 
@@ -170,7 +177,7 @@ malidp_mw_encoder_atomic_check(struct drm_encoder *encoder,
 			return -EINVAL;
 		}
 		mw_state->pitches[i] = fb->pitches[i];
-		mw_state->addrs[i] = obj->paddr + fb->offsets[i];
+		mw_state->addrs[i] = obj->dma_addr + fb->offsets[i];
 	}
 	mw_state->n_planes = n_planes;
 

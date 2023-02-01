@@ -58,7 +58,10 @@ static int ctucan_platform_probe(struct platform_device *pdev)
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	addr = devm_ioremap_resource(dev, res);
 	if (IS_ERR(addr)) {
+<<<<<<< HEAD
+=======
 		dev_err(dev, "Cannot remap address.\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = PTR_ERR(addr);
 		goto err;
 	}

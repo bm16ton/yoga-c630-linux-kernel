@@ -889,6 +889,10 @@ static int tc_set_edp_video_mode(struct tc_data *tc,
 	u32 dp0_syncval;
 	u32 bits_per_pixel = 24;
 	u32 in_bw, out_bw;
+<<<<<<< HEAD
+	u32 dpipxlfmt;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Recommended maximum number of symbols transferred in a transfer unit:
@@ -938,10 +942,15 @@ static int tc_set_edp_video_mode(struct tc_data *tc,
 	if (ret)
 		return ret;
 
-	ret = regmap_write(tc->regmap, DPIPXLFMT,
-			   VS_POL_ACTIVE_LOW | HS_POL_ACTIVE_LOW |
-			   DE_POL_ACTIVE_HIGH | SUB_CFG_TYPE_CONFIG1 |
-			   DPI_BPP_RGB888);
+	dpipxlfmt = DE_POL_ACTIVE_HIGH | SUB_CFG_TYPE_CONFIG1 | DPI_BPP_RGB888;
+
+	if (mode->flags & DRM_MODE_FLAG_NVSYNC)
+		dpipxlfmt |= VS_POL_ACTIVE_LOW;
+
+	if (mode->flags & DRM_MODE_FLAG_NHSYNC)
+		dpipxlfmt |= HS_POL_ACTIVE_LOW;
+
+	ret = regmap_write(tc->regmap, DPIPXLFMT, dpipxlfmt);
 	if (ret)
 		return ret;
 
@@ -1244,9 +1253,107 @@ static int tc_main_link_disable(struct tc_data *tc)
 	if (ret)
 		return ret;
 
-	return regmap_write(tc->regmap, DP0CTL, 0);
+	ret = regmap_write(tc->regmap, DP0CTL, 0);
+	if (ret)
+		return ret;
+
+	return regmap_update_bits(tc->regmap, DP_PHY_CTRL,
+				  PHY_M0_RST | PHY_M1_RST | PHY_M0_EN,
+				  PHY_M0_RST | PHY_M1_RST);
 }
 
+static int tc_dsi_rx_enable(struct tc_data *tc)
+{
+	u32 value;
+	int ret;
+
+	regmap_write(tc->regmap, PPI_D0S_CLRSIPOCOUNT, 5);
+	regmap_write(tc->regmap, PPI_D1S_CLRSIPOCOUNT, 5);
+	regmap_write(tc->regmap, PPI_D2S_CLRSIPOCOUNT, 5);
+	regmap_write(tc->regmap, PPI_D3S_CLRSIPOCOUNT, 5);
+	regmap_write(tc->regmap, PPI_D0S_ATMR, 0);
+	regmap_write(tc->regmap, PPI_D1S_ATMR, 0);
+	regmap_write(tc->regmap, PPI_TX_RX_TA, TTA_GET | TTA_SURE);
+	regmap_write(tc->regmap, PPI_LPTXTIMECNT, LPX_PERIOD);
+
+	value = ((LANEENABLE_L0EN << tc->dsi->lanes) - LANEENABLE_L0EN) |
+		LANEENABLE_CLEN;
+	regmap_write(tc->regmap, PPI_LANEENABLE, value);
+	regmap_write(tc->regmap, DSI_LANEENABLE, value);
+
+	/* Set input interface */
+	value = DP0_AUDSRC_NO_INPUT;
+	if (tc_test_pattern)
+		value |= DP0_VIDSRC_COLOR_BAR;
+	else
+		value |= DP0_VIDSRC_DSI_RX;
+	ret = regmap_write(tc->regmap, SYSCTRL, value);
+	if (ret)
+		return ret;
+
+	usleep_range(120, 150);
+
+	regmap_write(tc->regmap, PPI_STARTPPI, PPI_START_FUNCTION);
+	regmap_write(tc->regmap, DSI_STARTDSI, DSI_RX_START);
+
+	return 0;
+}
+
+static int tc_dpi_rx_enable(struct tc_data *tc)
+{
+	u32 value;
+
+	/* Set input interface */
+	value = DP0_AUDSRC_NO_INPUT;
+	if (tc_test_pattern)
+		value |= DP0_VIDSRC_COLOR_BAR;
+	else
+		value |= DP0_VIDSRC_DPI_RX;
+	return regmap_write(tc->regmap, SYSCTRL, value);
+}
+
+static int tc_dpi_stream_enable(struct tc_data *tc)
+{
+	int ret;
+
+	dev_dbg(tc->dev, "enable video stream\n");
+
+	/* Setup PLL */
+	ret = tc_set_syspllparam(tc);
+	if (ret)
+		return ret;
+
+	/*
+	 * Initially PLLs are in bypass. Force PLL parameter update,
+	 * disable PLL bypass, enable PLL
+	 */
+	ret = tc_pllupdate(tc, DP0_PLLCTRL);
+	if (ret)
+		return ret;
+
+	ret = tc_pllupdate(tc, DP1_PLLCTRL);
+	if (ret)
+		return ret;
+
+	/* Pixel PLL must always be enabled for DPI mode */
+	ret = tc_pxl_pll_en(tc, clk_get_rate(tc->refclk),
+			    1000 * tc->mode.clock);
+	if (ret)
+		return ret;
+
+	ret = tc_set_common_video_mode(tc, &tc->mode);
+	if (ret)
+		return ret;
+
+	ret = tc_set_dpi_video_mode(tc, &tc->mode);
+	if (ret)
+		return ret;
+
+	return tc_dsi_rx_enable(tc);
+}
+
+<<<<<<< HEAD
+=======
 static int tc_dsi_rx_enable(struct tc_data *tc)
 {
 	u32 value;
@@ -1337,6 +1444,7 @@ static int tc_dpi_stream_enable(struct tc_data *tc)
 	return tc_dsi_rx_enable(tc);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int tc_dpi_stream_disable(struct tc_data *tc)
 {
 	dev_dbg(tc->dev, "disable video stream\n");
@@ -1496,18 +1604,44 @@ tc_edp_bridge_atomic_disable(struct drm_bridge *bridge,
 		dev_err(tc->dev, "main link disable error: %d\n", ret);
 }
 
-static bool tc_bridge_mode_fixup(struct drm_bridge *bridge,
-				 const struct drm_display_mode *mode,
-				 struct drm_display_mode *adj)
+static int tc_dpi_atomic_check(struct drm_bridge *bridge,
+			       struct drm_bridge_state *bridge_state,
+			       struct drm_crtc_state *crtc_state,
+			       struct drm_connector_state *conn_state)
 {
-	/* Fixup sync polarities, both hsync and vsync are active low */
-	adj->flags = mode->flags;
-	adj->flags |= (DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC);
-	adj->flags &= ~(DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC);
+	/* DSI->DPI interface clock limitation: upto 100 MHz */
+	if (crtc_state->adjusted_mode.clock > 100000)
+		return -EINVAL;
 
-	return true;
+	return 0;
 }
 
+static int tc_edp_atomic_check(struct drm_bridge *bridge,
+			       struct drm_bridge_state *bridge_state,
+			       struct drm_crtc_state *crtc_state,
+			       struct drm_connector_state *conn_state)
+{
+	/* DPI->(e)DP interface clock limitation: upto 154 MHz */
+	if (crtc_state->adjusted_mode.clock > 154000)
+		return -EINVAL;
+
+	return 0;
+}
+
+static enum drm_mode_status
+tc_dpi_mode_valid(struct drm_bridge *bridge,
+		  const struct drm_display_info *info,
+		  const struct drm_display_mode *mode)
+{
+	/* DPI interface clock limitation: upto 100 MHz */
+	if (mode->clock > 100000)
+		return MODE_CLOCK_HIGH;
+
+	return MODE_OK;
+}
+
+<<<<<<< HEAD
+=======
 static int tc_common_atomic_check(struct drm_bridge *bridge,
 				  struct drm_bridge_state *bridge_state,
 				  struct drm_crtc_state *crtc_state,
@@ -1555,6 +1689,7 @@ tc_dpi_mode_valid(struct drm_bridge *bridge,
 	return MODE_OK;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static enum drm_mode_status
 tc_edp_mode_valid(struct drm_bridge *bridge,
 		  const struct drm_display_info *info,
@@ -1783,7 +1918,10 @@ static const struct drm_bridge_funcs tc_edp_bridge_funcs = {
 	.atomic_check = tc_edp_atomic_check,
 	.atomic_enable = tc_edp_bridge_atomic_enable,
 	.atomic_disable = tc_edp_bridge_atomic_disable,
+<<<<<<< HEAD
+=======
 	.mode_fixup = tc_bridge_mode_fixup,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.detect = tc_bridge_detect,
 	.get_edid = tc_get_edid,
 	.atomic_duplicate_state = drm_atomic_helper_bridge_duplicate_state,
@@ -1925,15 +2063,32 @@ static int tc_mipi_dsi_host_attach(struct tc_data *tc)
 static int tc_probe_dpi_bridge_endpoint(struct tc_data *tc)
 {
 	struct device *dev = tc->dev;
+<<<<<<< HEAD
+	struct drm_bridge *bridge;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct drm_panel *panel;
 	int ret;
 
 	/* port@1 is the DPI input/output port */
+<<<<<<< HEAD
+	ret = drm_of_find_panel_or_bridge(dev->of_node, 1, 0, &panel, &bridge);
+=======
 	ret = drm_of_find_panel_or_bridge(dev->of_node, 1, 0, &panel, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret && ret != -ENODEV)
 		return ret;
 
 	if (panel) {
+<<<<<<< HEAD
+		bridge = devm_drm_panel_bridge_add(dev, panel);
+		if (IS_ERR(bridge))
+			return PTR_ERR(bridge);
+	}
+
+	if (bridge) {
+		tc->panel_bridge = bridge;
+=======
 		struct drm_bridge *panel_bridge;
 
 		panel_bridge = devm_drm_panel_bridge_add(dev, panel);
@@ -1941,6 +2096,7 @@ static int tc_probe_dpi_bridge_endpoint(struct tc_data *tc)
 			return PTR_ERR(panel_bridge);
 
 		tc->panel_bridge = panel_bridge;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		tc->bridge.type = DRM_MODE_CONNECTOR_DPI;
 		tc->bridge.funcs = &tc_dpi_bridge_funcs;
 
@@ -2195,13 +2351,16 @@ static int tc_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	return 0;
 }
 
-static int tc_remove(struct i2c_client *client)
+static void tc_remove(struct i2c_client *client)
 {
 	struct tc_data *tc = i2c_get_clientdata(client);
 
 	drm_bridge_remove(&tc->bridge);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tc358767_i2c_ids[] = {

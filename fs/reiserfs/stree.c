@@ -579,7 +579,11 @@ static int search_by_key_reada(struct super_block *s,
 		if (!buffer_uptodate(bh[j])) {
 			if (depth == -1)
 				depth = reiserfs_write_unlock_nested(s);
+<<<<<<< HEAD
+			bh_readahead(bh[j], REQ_RAHEAD);
+=======
 			ll_rw_block(REQ_OP_READ | REQ_RAHEAD, 1, bh + j);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		brelse(bh[j]);
 	}
@@ -685,7 +689,11 @@ int search_by_key(struct super_block *sb, const struct cpu_key *key,
 			if (!buffer_uptodate(bh) && depth == -1)
 				depth = reiserfs_write_unlock_nested(sb);
 
+<<<<<<< HEAD
+			bh_read_nowait(bh, 0);
+=======
 			ll_rw_block(REQ_OP_READ, 1, &bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			wait_on_buffer(bh);
 
 			if (depth != -1)

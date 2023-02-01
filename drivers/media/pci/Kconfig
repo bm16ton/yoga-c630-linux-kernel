@@ -13,12 +13,19 @@ if MEDIA_PCI_SUPPORT
 if MEDIA_CAMERA_SUPPORT
 	comment "Media capture support"
 
+<<<<<<< HEAD
+=======
 source "drivers/media/pci/meye/Kconfig"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/media/pci/solo6x10/Kconfig"
 source "drivers/media/pci/sta2x11/Kconfig"
 source "drivers/media/pci/tw5864/Kconfig"
 source "drivers/media/pci/tw68/Kconfig"
 source "drivers/media/pci/tw686x/Kconfig"
+<<<<<<< HEAD
+source "drivers/media/pci/zoran/Kconfig"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 endif
 
@@ -27,7 +34,10 @@ if MEDIA_ANALOG_TV_SUPPORT
 
 source "drivers/media/pci/dt3155/Kconfig"
 source "drivers/media/pci/ivtv/Kconfig"
+<<<<<<< HEAD
+=======
 source "drivers/media/pci/saa7146/Kconfig"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 endif
 
@@ -58,7 +68,10 @@ source "drivers/media/pci/pluto2/Kconfig"
 source "drivers/media/pci/pt1/Kconfig"
 source "drivers/media/pci/pt3/Kconfig"
 source "drivers/media/pci/smipcie/Kconfig"
+<<<<<<< HEAD
+=======
 source "drivers/media/pci/ttpci/Kconfig"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 endif
 

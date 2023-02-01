@@ -52,6 +52,31 @@ struct intel_runtime_pm {
 	bool suspended;
 	bool irqs_enabled;
 	bool no_wakeref_tracking;
+<<<<<<< HEAD
+
+	/*
+	 *  Protects access to lmem usefault list.
+	 *  It is required, if we are outside of the runtime suspend path,
+	 *  access to @lmem_userfault_list requires always first grabbing the
+	 *  runtime pm, to ensure we can't race against runtime suspend.
+	 *  Once we have that we also need to grab @lmem_userfault_lock,
+	 *  at which point we have exclusive access.
+	 *  The runtime suspend path is special since it doesn't really hold any locks,
+	 *  but instead has exclusive access by virtue of all other accesses requiring
+	 *  holding the runtime pm wakeref.
+	 */
+	spinlock_t lmem_userfault_lock;
+
+	/*
+	 *  Keep list of userfaulted gem obj, which require to release their
+	 *  mmap mappings at runtime suspend path.
+	 */
+	struct list_head lmem_userfault_list;
+
+	/* Manual runtime pm autosuspend delay for user GGTT/lmem mmaps */
+	struct intel_wakeref_auto userfault_wakeref;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
 	/*

@@ -1,0 +1,18 @@
+sun50i-h5-emlid-neutis-n5-devboard.o: \
+ arch/arm64/boot/dts/allwinner/sun50i-h5-emlid-neutis-n5-devboard.dts \
+ arch/arm64/boot/dts/allwinner/sun50i-h5-emlid-neutis-n5.dtsi \
+ arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi \
+ scripts/dtc/include-prefixes/arm/sunxi-h3-h5.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun6i-rtc.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun8i-de2.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun8i-h3-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun8i-r-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun8i-de2.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun8i-h3-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun8i-r-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ scripts/dtc/include-prefixes/arm/sunxi-h3-h5-emlid-neutis.dtsi \
+ scripts/dtc/include-prefixes/arm/sunxi-common-regulators.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h

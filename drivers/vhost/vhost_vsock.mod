@@ -1,0 +1,1 @@
+drivers/vhost/vsock.o

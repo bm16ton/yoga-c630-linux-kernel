@@ -1,0 +1,1 @@
+cmd_drivers/usb/chipidea/usbmisc_imx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/chipidea/usbmisc_imx.ko drivers/usb/chipidea/usbmisc_imx.o drivers/usb/chipidea/usbmisc_imx.mod.o;  true

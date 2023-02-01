@@ -1,0 +1,1 @@
+cmd_drivers/iio/chemical/atlas-sensor.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/chemical/atlas-sensor.ko drivers/iio/chemical/atlas-sensor.o drivers/iio/chemical/atlas-sensor.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/au0828/au0828.mod := printf '%s\n'   au0828-core.o au0828-i2c.o au0828-cards.o au0828-dvb.o au0828-video.o au0828-vbi.o au0828-input.o | awk '!x[$$0]++ { print("drivers/media/usb/au0828/"$$0) }' > drivers/media/usb/au0828/au0828.mod

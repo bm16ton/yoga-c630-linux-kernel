@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/stmicro/stmmac/dwmac-meson.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/stmicro/stmmac/dwmac-meson.ko drivers/net/ethernet/stmicro/stmmac/dwmac-meson.o drivers/net/ethernet/stmicro/stmmac/dwmac-meson.mod.o;  true

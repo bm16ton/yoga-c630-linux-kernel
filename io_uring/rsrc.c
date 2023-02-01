@@ -341,7 +341,11 @@ __cold static int io_rsrc_ref_quiesce(struct io_rsrc_data *data,
 		flush_delayed_work(&ctx->rsrc_put_work);
 		reinit_completion(&data->done);
 
+<<<<<<< HEAD
+		ret = io_run_task_work_sig(ctx);
+=======
 		ret = io_run_task_work_sig();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mutex_lock(&ctx->uring_lock);
 	} while (ret >= 0);
 	data->quiesce = false;
@@ -757,20 +761,31 @@ int io_queue_rsrc_removal(struct io_rsrc_data *data, unsigned idx,
 
 void __io_sqe_files_unregister(struct io_ring_ctx *ctx)
 {
+<<<<<<< HEAD
+=======
 #if !defined(IO_URING_SCM_ALL)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 
 	for (i = 0; i < ctx->nr_user_files; i++) {
 		struct file *file = io_file_from_index(&ctx->file_table, i);
 
+<<<<<<< HEAD
+		/* skip scm accounted files, they'll be freed by ->ring_sock */
+		if (!file || io_file_need_scm(file))
+=======
 		if (!file)
 			continue;
 		if (io_fixed_file_slot(&ctx->file_table, i)->file_ptr & FFS_SCM)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			continue;
 		io_file_bitmap_clear(&ctx->file_table, i);
 		fput(file);
 	}
+<<<<<<< HEAD
+=======
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if defined(CONFIG_UNIX)
 	if (ctx->ring_sock) {

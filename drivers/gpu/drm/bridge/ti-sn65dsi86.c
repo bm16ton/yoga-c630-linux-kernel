@@ -29,6 +29,10 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_bridge.h>
 #include <drm/drm_bridge_connector.h>
+<<<<<<< HEAD
+#include <drm/drm_edid.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_of.h>
 #include <drm/drm_panel.h>
@@ -68,6 +72,7 @@
 #define  BPP_18_RGB				BIT(0)
 #define SN_HPD_DISABLE_REG			0x5C
 #define  HPD_DISABLE				BIT(0)
+#define  HPD_DEBOUNCED_STATE			BIT(4)
 #define SN_GPIO_IO_REG				0x5E
 #define  SN_GPIO_INPUT_SHIFT			4
 #define  SN_GPIO_OUTPUT_SHIFT			0
@@ -92,6 +97,8 @@
 #define SN_DATARATE_CONFIG_REG			0x94
 #define  DP_DATARATE_MASK			GENMASK(7, 5)
 #define  DP_DATARATE(x)				((x) << 5)
+#define SN_TRAINING_SETTING_REG			0x95
+#define  SCRAMBLE_DISABLE			BIT(4)
 #define SN_ML_TX_MODE_REG			0x96
 #define  ML_TX_MAIN_LINK_OFF			0
 #define  ML_TX_NORMAL_MODE			BIT(0)
@@ -420,17 +427,27 @@ static int status_show(struct seq_file *s, void *data)
 DEFINE_SHOW_ATTRIBUTE(status);
 
 static void ti_sn65dsi86_debugfs_remove(void *data)
+<<<<<<< HEAD
 {
 	debugfs_remove_recursive(data);
 }
 
 static void ti_sn65dsi86_debugfs_init(struct ti_sn65dsi86 *pdata)
 {
+=======
+{
+	debugfs_remove_recursive(data);
+}
+
+static void ti_sn65dsi86_debugfs_init(struct ti_sn65dsi86 *pdata)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct device *dev = pdata->dev;
 	struct dentry *debugfs;
 	int ret;
 
 	debugfs = debugfs_create_dir(dev_name(dev), NULL);
+<<<<<<< HEAD
 
 	/*
 	 * We might get an error back if debugfs wasn't enabled in the kernel
@@ -439,6 +456,16 @@ static void ti_sn65dsi86_debugfs_init(struct ti_sn65dsi86 *pdata)
 	if (IS_ERR_OR_NULL(debugfs))
 		return;
 
+=======
+
+	/*
+	 * We might get an error back if debugfs wasn't enabled in the kernel
+	 * so let's just silently return upon failure.
+	 */
+	if (IS_ERR_OR_NULL(debugfs))
+		return;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = devm_add_action_or_reset(dev, ti_sn65dsi86_debugfs_remove, debugfs);
 	if (ret)
 		return;
@@ -470,6 +497,7 @@ static void ti_sn65dsi86_noop(struct device *dev) {}
 static int ti_sn65dsi86_add_aux_device(struct ti_sn65dsi86 *pdata,
 				       struct auxiliary_device *aux,
 				       const char *name)
+<<<<<<< HEAD
 {
 	struct device *dev = pdata->dev;
 	int ret;
@@ -531,6 +559,69 @@ static ssize_t ti_sn_aux_transfer(struct drm_dp_aux *aux,
 		goto exit;
 	}
 
+=======
+{
+	struct device *dev = pdata->dev;
+	int ret;
+
+	aux->name = name;
+	aux->dev.parent = dev;
+	aux->dev.release = ti_sn65dsi86_noop;
+	device_set_of_node_from_dev(&aux->dev, dev);
+	ret = auxiliary_device_init(aux);
+	if (ret)
+		return ret;
+	ret = devm_add_action_or_reset(dev, ti_sn65dsi86_uninit_aux, aux);
+	if (ret)
+		return ret;
+
+	ret = auxiliary_device_add(aux);
+	if (ret)
+		return ret;
+	ret = devm_add_action_or_reset(dev, ti_sn65dsi86_delete_aux, aux);
+
+	return ret;
+}
+
+/* -----------------------------------------------------------------------------
+ * AUX Adapter
+ */
+
+static struct ti_sn65dsi86 *aux_to_ti_sn65dsi86(struct drm_dp_aux *aux)
+{
+	return container_of(aux, struct ti_sn65dsi86, aux);
+}
+
+static ssize_t ti_sn_aux_transfer(struct drm_dp_aux *aux,
+				  struct drm_dp_aux_msg *msg)
+{
+	struct ti_sn65dsi86 *pdata = aux_to_ti_sn65dsi86(aux);
+	u32 request = msg->request & ~(DP_AUX_I2C_MOT | DP_AUX_I2C_WRITE_STATUS_UPDATE);
+	u32 request_val = AUX_CMD_REQ(msg->request);
+	u8 *buf = msg->buffer;
+	unsigned int len = msg->size;
+	unsigned int val;
+	int ret;
+	u8 addr_len[SN_AUX_LENGTH_REG + 1 - SN_AUX_ADDR_19_16_REG];
+
+	if (len > SN_AUX_MAX_PAYLOAD_BYTES)
+		return -EINVAL;
+
+	pm_runtime_get_sync(pdata->dev);
+	mutex_lock(&pdata->comms_mutex);
+
+	/*
+	 * If someone tries to do a DDC over AUX transaction before pre_enable()
+	 * on a device without a dedicated reference clock then we just can't
+	 * do it. Fail right away. This prevents non-refclk users from reading
+	 * the EDID before enabling the panel but such is life.
+	 */
+	if (!pdata->comms_enabled) {
+		ret = -EIO;
+		goto exit;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (request) {
 	case DP_AUX_NATIVE_WRITE:
 	case DP_AUX_I2C_WRITE:
@@ -543,6 +634,7 @@ static ssize_t ti_sn_aux_transfer(struct drm_dp_aux *aux,
 	default:
 		ret = -EINVAL;
 		goto exit;
+<<<<<<< HEAD
 	}
 
 	BUILD_BUG_ON(sizeof(addr_len) != sizeof(__be32));
@@ -582,6 +674,47 @@ static ssize_t ti_sn_aux_transfer(struct drm_dp_aux *aux,
 		goto exit;
 	}
 
+=======
+	}
+
+	BUILD_BUG_ON(sizeof(addr_len) != sizeof(__be32));
+	put_unaligned_be32((msg->address & SN_AUX_ADDR_MASK) << 8 | len,
+			   addr_len);
+	regmap_bulk_write(pdata->regmap, SN_AUX_ADDR_19_16_REG, addr_len,
+			  ARRAY_SIZE(addr_len));
+
+	if (request == DP_AUX_NATIVE_WRITE || request == DP_AUX_I2C_WRITE)
+		regmap_bulk_write(pdata->regmap, SN_AUX_WDATA_REG(0), buf, len);
+
+	/* Clear old status bits before start so we don't get confused */
+	regmap_write(pdata->regmap, SN_AUX_CMD_STATUS_REG,
+		     AUX_IRQ_STATUS_NAT_I2C_FAIL |
+		     AUX_IRQ_STATUS_AUX_RPLY_TOUT |
+		     AUX_IRQ_STATUS_AUX_SHORT);
+
+	regmap_write(pdata->regmap, SN_AUX_CMD_REG, request_val | AUX_CMD_SEND);
+
+	/* Zero delay loop because i2c transactions are slow already */
+	ret = regmap_read_poll_timeout(pdata->regmap, SN_AUX_CMD_REG, val,
+				       !(val & AUX_CMD_SEND), 0, 50 * 1000);
+	if (ret)
+		goto exit;
+
+	ret = regmap_read(pdata->regmap, SN_AUX_CMD_STATUS_REG, &val);
+	if (ret)
+		goto exit;
+
+	if (val & AUX_IRQ_STATUS_AUX_RPLY_TOUT) {
+		/*
+		 * The hardware tried the message seven times per the DP spec
+		 * but it hit a timeout. We ignore defers here because they're
+		 * handled in hardware.
+		 */
+		ret = -ETIMEDOUT;
+		goto exit;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (val & AUX_IRQ_STATUS_AUX_SHORT) {
 		ret = regmap_read(pdata->regmap, SN_AUX_LENGTH_REG, &len);
 		if (ret)
@@ -666,6 +799,16 @@ static int ti_sn_attach_host(struct ti_sn65dsi86 *pdata)
 						   .channel = 0,
 						   .node = NULL,
 	};
+<<<<<<< HEAD
+
+	host = of_find_mipi_dsi_host_by_node(pdata->host_node);
+	if (!host)
+		return -EPROBE_DEFER;
+
+	dsi = devm_mipi_dsi_device_register_full(dev, host, &info);
+	if (IS_ERR(dsi))
+		return PTR_ERR(dsi);
+=======
 
 	host = of_find_mipi_dsi_host_by_node(pdata->host_node);
 	if (!host)
@@ -680,6 +823,42 @@ static int ti_sn_attach_host(struct ti_sn65dsi86 *pdata)
 	dsi->format = MIPI_DSI_FMT_RGB888;
 	dsi->mode_flags = MIPI_DSI_MODE_VIDEO;
 
+	/* check if continuous dsi clock is required or not */
+	pm_runtime_get_sync(dev);
+	regmap_read(pdata->regmap, SN_DPPLL_SRC_REG, &val);
+	pm_runtime_put_autosuspend(dev);
+	if (!(val & DPPLL_CLK_SRC_DSICLK))
+		dsi->mode_flags |= MIPI_DSI_CLOCK_NON_CONTINUOUS;
+
+	pdata->dsi = dsi;
+
+	return devm_mipi_dsi_attach(dev, dsi);
+}
+
+static int ti_sn_bridge_attach(struct drm_bridge *bridge,
+			       enum drm_bridge_attach_flags flags)
+{
+	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
+	int ret;
+
+	pdata->aux.drm_dev = bridge->dev;
+	ret = drm_dp_aux_register(&pdata->aux);
+	if (ret < 0) {
+		drm_err(bridge->dev, "Failed to register DP AUX channel: %d\n", ret);
+		return ret;
+	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	/*
+	 * Attach the next bridge.
+	 * We never want the next bridge to *also* create a connector.
+	 */
+	ret = drm_bridge_attach(bridge->encoder, pdata->next_bridge,
+				&pdata->bridge, flags | DRM_BRIDGE_ATTACH_NO_CONNECTOR);
+	if (ret < 0)
+		goto err_initted_aux;
+
+<<<<<<< HEAD
 	/* check if continuous dsi clock is required or not */
 	pm_runtime_get_sync(dev);
 	regmap_read(pdata->regmap, SN_DPPLL_SRC_REG, &val);
@@ -724,6 +903,18 @@ static int ti_sn_bridge_attach(struct drm_bridge *bridge,
 		goto err_initted_aux;
 	}
 
+=======
+	if (flags & DRM_BRIDGE_ATTACH_NO_CONNECTOR)
+		return 0;
+
+	pdata->connector = drm_bridge_connector_init(pdata->bridge.dev,
+						     pdata->bridge.encoder);
+	if (IS_ERR(pdata->connector)) {
+		ret = PTR_ERR(pdata->connector);
+		goto err_initted_aux;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_connector_attach_encoder(pdata->connector, pdata->bridge.encoder);
 
 	return 0;
@@ -746,6 +937,30 @@ ti_sn_bridge_mode_valid(struct drm_bridge *bridge,
 	/* maximum supported resolution is 4K at 60 fps */
 	if (mode->clock > 594000)
 		return MODE_CLOCK_HIGH;
+<<<<<<< HEAD
+
+	/*
+	 * The front and back porch registers are 8 bits, and pulse width
+	 * registers are 15 bits, so reject any modes with larger periods.
+	 */
+
+	if ((mode->hsync_start - mode->hdisplay) > 0xff)
+		return MODE_HBLANK_WIDE;
+
+	if ((mode->vsync_start - mode->vdisplay) > 0xff)
+		return MODE_VBLANK_WIDE;
+
+	if ((mode->hsync_end - mode->hsync_start) > 0x7fff)
+		return MODE_HSYNC_WIDE;
+
+	if ((mode->vsync_end - mode->vsync_start) > 0x7fff)
+		return MODE_VSYNC_WIDE;
+
+	if ((mode->htotal - mode->hsync_end) > 0xff)
+		return MODE_HBLANK_WIDE;
+
+	if ((mode->vtotal - mode->vsync_end) > 0xff)
+		return MODE_VBLANK_WIDE;
 
 	return MODE_OK;
 }
@@ -755,6 +970,17 @@ static void ti_sn_bridge_atomic_disable(struct drm_bridge *bridge,
 {
 	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
 
+=======
+
+	return MODE_OK;
+}
+
+static void ti_sn_bridge_atomic_disable(struct drm_bridge *bridge,
+					struct drm_bridge_state *old_bridge_state)
+{
+	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* disable video stream */
 	regmap_update_bits(pdata->regmap, SN_ENH_FRAME_REG, VSTREAM_ENABLE, 0);
 }
@@ -904,9 +1130,9 @@ static void ti_sn_bridge_set_video_timings(struct ti_sn65dsi86 *pdata)
 		&pdata->bridge.encoder->crtc->state->adjusted_mode;
 	u8 hsync_polarity = 0, vsync_polarity = 0;
 
-	if (mode->flags & DRM_MODE_FLAG_PHSYNC)
+	if (mode->flags & DRM_MODE_FLAG_NHSYNC)
 		hsync_polarity = CHA_HSYNC_POLARITY;
-	if (mode->flags & DRM_MODE_FLAG_PVSYNC)
+	if (mode->flags & DRM_MODE_FLAG_NVSYNC)
 		vsync_polarity = CHA_VSYNC_POLARITY;
 
 	ti_sn65dsi86_write_u16(pdata, SN_CHA_ACTIVE_LINE_LENGTH_LOW_REG,
@@ -1047,12 +1273,23 @@ static void ti_sn_bridge_atomic_enable(struct drm_bridge *bridge,
 
 	/*
 	 * The SN65DSI86 only supports ASSR Display Authentication method and
-	 * this method is enabled by default. An eDP panel must support this
+	 * this method is enabled for eDP panels. An eDP panel must support this
 	 * authentication method. We need to enable this method in the eDP panel
 	 * at DisplayPort address 0x0010A prior to link training.
+	 *
+	 * As only ASSR is supported by SN65DSI86, for full DisplayPort displays
+	 * we need to disable the scrambler.
 	 */
-	drm_dp_dpcd_writeb(&pdata->aux, DP_EDP_CONFIGURATION_SET,
-			   DP_ALTERNATE_SCRAMBLER_RESET_ENABLE);
+	if (pdata->bridge.type == DRM_MODE_CONNECTOR_eDP) {
+		drm_dp_dpcd_writeb(&pdata->aux, DP_EDP_CONFIGURATION_SET,
+				   DP_ALTERNATE_SCRAMBLER_RESET_ENABLE);
+
+		regmap_update_bits(pdata->regmap, SN_TRAINING_SETTING_REG,
+				   SCRAMBLE_DISABLE, 0);
+	} else {
+		regmap_update_bits(pdata->regmap, SN_TRAINING_SETTING_REG,
+				   SCRAMBLE_DISABLE, SCRAMBLE_DISABLE);
+	}
 
 	bpp = ti_sn_bridge_get_bpp(connector);
 	/* Set the DP output format (18 bpp or 24 bpp) */
@@ -1122,10 +1359,36 @@ static void ti_sn_bridge_atomic_post_disable(struct drm_bridge *bridge,
 	pm_runtime_put_sync(pdata->dev);
 }
 
+static enum drm_connector_status ti_sn_bridge_detect(struct drm_bridge *bridge)
+{
+	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
+	int val = 0;
+
+	pm_runtime_get_sync(pdata->dev);
+	regmap_read(pdata->regmap, SN_HPD_DISABLE_REG, &val);
+	pm_runtime_put_autosuspend(pdata->dev);
+
+	return val & HPD_DEBOUNCED_STATE ? connector_status_connected
+					 : connector_status_disconnected;
+}
+
+static struct edid *ti_sn_bridge_get_edid(struct drm_bridge *bridge,
+					  struct drm_connector *connector)
+{
+	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
+
+	return drm_get_edid(connector, &pdata->aux.ddc);
+}
+
 static const struct drm_bridge_funcs ti_sn_bridge_funcs = {
 	.attach = ti_sn_bridge_attach,
 	.detach = ti_sn_bridge_detach,
 	.mode_valid = ti_sn_bridge_mode_valid,
+<<<<<<< HEAD
+	.get_edid = ti_sn_bridge_get_edid,
+	.detect = ti_sn_bridge_detect,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.atomic_pre_enable = ti_sn_bridge_atomic_pre_enable,
 	.atomic_enable = ti_sn_bridge_atomic_enable,
 	.atomic_disable = ti_sn_bridge_atomic_disable,
@@ -1206,10 +1469,16 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 	int ret;
 
 	pdata->next_bridge = devm_drm_of_get_bridge(pdata->dev, np, 1, 0);
+<<<<<<< HEAD
+	if (IS_ERR(pdata->next_bridge))
+		return dev_err_probe(pdata->dev, PTR_ERR(pdata->next_bridge),
+				     "failed to create panel bridge\n");
+=======
 	if (IS_ERR(pdata->next_bridge)) {
 		DRM_ERROR("failed to create panel bridge\n");
 		return PTR_ERR(pdata->next_bridge);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ti_sn_bridge_parse_lanes(pdata, np);
 
@@ -1219,6 +1488,12 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 
 	pdata->bridge.funcs = &ti_sn_bridge_funcs;
 	pdata->bridge.of_node = np;
+<<<<<<< HEAD
+	pdata->bridge.type = pdata->next_bridge->type == DRM_MODE_CONNECTOR_DisplayPort
+			   ? DRM_MODE_CONNECTOR_DisplayPort : DRM_MODE_CONNECTOR_eDP;
+
+	if (pdata->bridge.type == DRM_MODE_CONNECTOR_DisplayPort)
+		pdata->bridge.ops = DRM_BRIDGE_OP_EDID | DRM_BRIDGE_OP_DETECT;
 
 	drm_bridge_add(&pdata->bridge);
 
@@ -1228,6 +1503,17 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 		goto err_remove_bridge;
 	}
 
+=======
+
+	drm_bridge_add(&pdata->bridge);
+
+	ret = ti_sn_attach_host(pdata);
+	if (ret) {
+		dev_err_probe(pdata->dev, ret, "failed to attach dsi host\n");
+		goto err_remove_bridge;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 err_remove_bridge:

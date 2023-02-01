@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hisi_femac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/hisilicon/hisi_femac.ko drivers/net/ethernet/hisilicon/hisi_femac.o drivers/net/ethernet/hisilicon/hisi_femac.mod.o;  true

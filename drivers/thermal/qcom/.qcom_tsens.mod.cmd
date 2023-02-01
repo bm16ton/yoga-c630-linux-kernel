@@ -1,0 +1,1 @@
+cmd_drivers/thermal/qcom/qcom_tsens.mod := printf '%s\n'   tsens.o tsens-v2.o tsens-v1.o tsens-v0_1.o tsens-8960.o | awk '!x[$$0]++ { print("drivers/thermal/qcom/"$$0) }' > drivers/thermal/qcom/qcom_tsens.mod

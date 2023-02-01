@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/sur40.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/sur40.ko drivers/input/touchscreen/sur40.o drivers/input/touchscreen/sur40.mod.o;  true

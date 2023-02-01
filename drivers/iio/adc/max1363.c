@@ -29,7 +29,6 @@
 #include <linux/iio/sysfs.h>
 #include <linux/iio/events.h>
 #include <linux/iio/buffer.h>
-#include <linux/iio/driver.h>
 #include <linux/iio/kfifo_buf.h>
 #include <linux/iio/trigger_consumer.h>
 #include <linux/iio/triggered_buffer.h>
@@ -1595,11 +1594,14 @@ static int max1363_probe(struct i2c_client *client,
 	if (!indio_dev)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+=======
 	ret = devm_iio_map_array_register(&client->dev, indio_dev,
 					  client->dev.platform_data);
 	if (ret < 0)
 		return ret;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	st = iio_priv(indio_dev);
 
 	mutex_init(&st->lock);

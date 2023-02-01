@@ -1175,7 +1175,11 @@ void __init setup_arch(char **cmdline_p)
 	 * Moreover, on machines with SandyBridge graphics or in setups that use
 	 * crashkernel the entire 1M is reserved anyway.
 	 */
+<<<<<<< HEAD
+	x86_platform.realmode_reserve();
+=======
 	reserve_real_mode();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	init_mem_mapping();
 

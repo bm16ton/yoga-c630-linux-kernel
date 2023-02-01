@@ -116,6 +116,12 @@ wed_txinfo_show(struct seq_file *s, void *data)
 		DUMP_WDMA(WDMA_GLO_CFG),
 		DUMP_WDMA_RING(WDMA_RING_RX(0)),
 		DUMP_WDMA_RING(WDMA_RING_RX(1)),
+<<<<<<< HEAD
+
+		DUMP_STR("TX FREE"),
+		DUMP_WED(WED_RX_MIB(0)),
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	struct mtk_wed_hw *hw = s->private;
 	struct mtk_wed_device *dev = hw->wed_dev;

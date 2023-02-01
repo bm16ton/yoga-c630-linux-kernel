@@ -42,6 +42,12 @@ int smu_cmn_send_smc_msg(struct smu_context *smu,
 			 enum smu_message_type msg,
 			 uint32_t *read_arg);
 
+<<<<<<< HEAD
+int smu_cmn_send_debug_smc_msg(struct smu_context *smu,
+			 uint32_t msg);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int smu_cmn_wait_for_response(struct smu_context *smu);
 
 int smu_cmn_to_asic_specific_index(struct smu_context *smu,

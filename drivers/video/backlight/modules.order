@@ -1,0 +1,8 @@
+drivers/video/backlight/lcd.ko
+drivers/video/backlight/platform_lcd.ko
+drivers/video/backlight/bd6107.ko
+drivers/video/backlight/gpio_backlight.ko
+drivers/video/backlight/lp855x_bl.ko
+drivers/video/backlight/pwm_bl.ko
+drivers/video/backlight/qcom-wled.ko
+drivers/video/backlight/led_bl.ko

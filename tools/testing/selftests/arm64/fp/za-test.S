@@ -167,6 +167,18 @@ function irritator_handler
 	ret
 endfunction
 
+<<<<<<< HEAD
+function tickle_handler
+	// Increment the signal count (x23):
+	ldr	x0, [x2, #ucontext_regs + 8 * 23]
+	add	x0, x0, #1
+	str	x0, [x2, #ucontext_regs + 8 * 23]
+
+	ret
+endfunction
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 function terminate_handler
 	mov	w21, w0
 	mov	x20, x2
@@ -223,6 +235,33 @@ endfunction
 .globl _start
 function _start
 _start:
+<<<<<<< HEAD
+	mov	x23, #0		// signal count
+
+	mov	w0, #SIGINT
+	adr	x1, terminate_handler
+	mov	w2, #SA_SIGINFO
+	bl	setsignal
+
+	mov	w0, #SIGTERM
+	adr	x1, terminate_handler
+	mov	w2, #SA_SIGINFO
+	bl	setsignal
+
+	mov	w0, #SIGUSR1
+	adr	x1, irritator_handler
+	mov	w2, #SA_SIGINFO
+	orr	w2, w2, #SA_NODEFER
+	bl	setsignal
+
+	mov	w0, #SIGUSR2
+	adr	x1, tickle_handler
+	mov	w2, #SA_SIGINFO
+	orr	w2, w2, #SA_NODEFER
+	bl	setsignal
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	puts	"Streaming mode "
 	smstart_za
 
@@ -255,6 +294,8 @@ _start:
 	mov	x0, x20
 	bl	putdecn
 
+<<<<<<< HEAD
+=======
 	mov	x23, #0		// Irritation signal count
 
 	mov	w0, #SIGINT
@@ -273,6 +314,7 @@ _start:
 	orr	w2, w2, #SA_NODEFER
 	bl	setsignal
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mov	x22, #0		// generation number, increments per iteration
 .Ltest_loop:
 	rdsvl	0, 8
@@ -287,12 +329,16 @@ _start:
 	subs	x21, x21, #1
 	b.ne	0b
 
+<<<<<<< HEAD
+	mov	x8, #__NR_sched_yield	// encourage preemption
+=======
 	and	x8, x22, #127		// Every 128 interations...
 	cbz	x8, 0f
 	mov	x8, #__NR_getpid	// (otherwise minimal syscall)
 	b	1f
 0:
 	mov	x8, #__NR_sched_yield	// ...encourage preemption
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 1:
 	svc	#0
 

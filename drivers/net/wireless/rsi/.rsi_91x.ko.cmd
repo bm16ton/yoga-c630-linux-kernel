@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/rsi/rsi_91x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/rsi/rsi_91x.ko drivers/net/wireless/rsi/rsi_91x.o drivers/net/wireless/rsi/rsi_91x.mod.o;  true

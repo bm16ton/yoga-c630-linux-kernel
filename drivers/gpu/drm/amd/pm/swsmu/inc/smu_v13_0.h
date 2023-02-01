@@ -28,6 +28,10 @@
 #define SMU13_DRIVER_IF_VERSION_INV 0xFFFFFFFF
 #define SMU13_DRIVER_IF_VERSION_YELLOW_CARP 0x04
 #define SMU13_DRIVER_IF_VERSION_ALDE 0x08
+<<<<<<< HEAD
+#define SMU13_DRIVER_IF_VERSION_SMU_V13_0_0_0 0x34
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define SMU13_DRIVER_IF_VERSION_SMU_V13_0_4 0x07
 #define SMU13_DRIVER_IF_VERSION_SMU_V13_0_5 0x04
 #define SMU13_DRIVER_IF_VERSION_SMU_V13_0_0_10 0x32
@@ -272,6 +276,12 @@ int smu_v13_0_init_pptable_microcode(struct smu_context *smu);
 
 int smu_v13_0_run_btc(struct smu_context *smu);
 
+<<<<<<< HEAD
+int smu_v13_0_gpo_control(struct smu_context *smu,
+			  bool enablement);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int smu_v13_0_deep_sleep_control(struct smu_context *smu,
 				 bool enablement);
 

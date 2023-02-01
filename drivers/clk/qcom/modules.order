@@ -1,0 +1,2 @@
+drivers/clk/qcom/camcc-sdm845.ko
+drivers/clk/qcom/dispcc-sm8250.ko

@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/stk1160/stk1160.mod := printf '%s\n'   stk1160-core.o stk1160-v4l.o stk1160-video.o stk1160-i2c.o stk1160-ac97.o | awk '!x[$$0]++ { print("drivers/media/usb/stk1160/"$$0) }' > drivers/media/usb/stk1160/stk1160.mod

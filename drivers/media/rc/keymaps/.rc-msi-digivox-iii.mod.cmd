@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-msi-digivox-iii.mod := printf '%s\n'   rc-msi-digivox-iii.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-msi-digivox-iii.mod

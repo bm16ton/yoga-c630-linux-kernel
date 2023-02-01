@@ -1,0 +1,1 @@
+cmd_drivers/scsi/megaraid/megaraid_sas.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/megaraid/megaraid_sas.ko drivers/scsi/megaraid/megaraid_sas.o drivers/scsi/megaraid/megaraid_sas.mod.o;  true

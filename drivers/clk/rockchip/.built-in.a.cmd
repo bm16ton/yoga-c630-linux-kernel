@@ -1,0 +1,1 @@
+cmd_drivers/clk/rockchip/built-in.a := rm -f drivers/clk/rockchip/built-in.a;  printf "drivers/clk/rockchip/%s " clk.o clk-pll.o clk-cpu.o clk-half-divider.o clk-inverter.o clk-mmc-phase.o clk-muxgrf.o clk-ddr.o softrst.o clk-px30.o clk-rk3308.o clk-rk3328.o clk-rk3368.o clk-rk3399.o clk-rk3568.o | xargs ar cDPrST drivers/clk/rockchip/built-in.a

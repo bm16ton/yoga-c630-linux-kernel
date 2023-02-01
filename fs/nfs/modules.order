@@ -1,0 +1,7 @@
+fs/nfs/nfs.ko
+fs/nfs/nfsv2.ko
+fs/nfs/nfsv3.ko
+fs/nfs/nfsv4.ko
+fs/nfs/filelayout/nfs_layout_nfsv41_files.ko
+fs/nfs/blocklayout/blocklayoutdriver.ko
+fs/nfs/flexfilelayout/nfs_layout_flexfiles.ko

@@ -19,5 +19,10 @@ int prestera_flower_tmplt_create(struct prestera_flow_block *block,
 void prestera_flower_tmplt_destroy(struct prestera_flow_block *block,
 				   struct flow_cls_offload *f);
 void prestera_flower_template_cleanup(struct prestera_flow_block *block);
+<<<<<<< HEAD
+int prestera_flower_prio_get(struct prestera_flow_block *block, u32 chain_index,
+			     u32 *prio_min, u32 *prio_max);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _PRESTERA_FLOWER_H_ */

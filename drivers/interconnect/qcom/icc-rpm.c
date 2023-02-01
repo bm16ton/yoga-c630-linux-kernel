@@ -101,11 +101,91 @@ static int qcom_icc_set_bimc_qos(struct icc_node *src, u64 max_bw)
 	u32 mode = NOC_QOS_MODE_BYPASS;
 	u32 val = 0;
 	int i, rc = 0;
+<<<<<<< HEAD
 
 	qn = src->data;
 	provider = src->provider;
 	qp = to_qcom_provider(provider);
 
+	if (qn->qos.qos_mode != NOC_QOS_MODE_INVALID)
+		mode = qn->qos.qos_mode;
+
+	/* QoS Priority: The QoS Health parameters are getting considered
+	 * only if we are NOT in Bypass Mode.
+	 */
+	if (mode != NOC_QOS_MODE_BYPASS) {
+		for (i = 3; i >= 0; i--) {
+			rc = qcom_icc_bimc_set_qos_health(qp,
+							  &qn->qos, i);
+			if (rc)
+				return rc;
+		}
+
+		/* Set BKE_EN to 1 when Fixed, Regulator or Limiter Mode */
+		val = 1;
+	}
+
+	return regmap_update_bits(qp->regmap,
+				  qp->qos_offset + M_BKE_EN_ADDR(qn->qos.qos_port),
+				  M_BKE_EN_EN_BMASK, val);
+}
+
+static int qcom_icc_noc_set_qos_priority(struct qcom_icc_provider *qp,
+					 struct qcom_icc_qos *qos)
+{
+	u32 val;
+	int rc;
+
+	/* Must be updated one at a time, P1 first, P0 last */
+	val = qos->areq_prio << NOC_QOS_PRIORITY_P1_SHIFT;
+	rc = regmap_update_bits(qp->regmap,
+				qp->qos_offset + NOC_QOS_PRIORITYn_ADDR(qos->qos_port),
+				NOC_QOS_PRIORITY_P1_MASK, val);
+	if (rc)
+		return rc;
+
+	return regmap_update_bits(qp->regmap,
+				  qp->qos_offset + NOC_QOS_PRIORITYn_ADDR(qos->qos_port),
+				  NOC_QOS_PRIORITY_P0_MASK, qos->prio_level);
+}
+
+static int qcom_icc_set_noc_qos(struct icc_node *src, u64 max_bw)
+{
+	struct qcom_icc_provider *qp;
+	struct qcom_icc_node *qn;
+	struct icc_provider *provider;
+	u32 mode = NOC_QOS_MODE_BYPASS;
+	int rc = 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	qn = src->data;
+	provider = src->provider;
+	qp = to_qcom_provider(provider);
+
+<<<<<<< HEAD
+	if (qn->qos.qos_port < 0) {
+		dev_dbg(src->provider->dev,
+			"NoC QoS: Skipping %s: vote aggregated on parent.\n",
+			qn->name);
+		return 0;
+	}
+
+	if (qn->qos.qos_mode != NOC_QOS_MODE_INVALID)
+		mode = qn->qos.qos_mode;
+
+	if (mode == NOC_QOS_MODE_FIXED) {
+		dev_dbg(src->provider->dev, "NoC QoS: %s: Set Fixed mode\n",
+			qn->name);
+		rc = qcom_icc_noc_set_qos_priority(qp, &qn->qos);
+		if (rc)
+			return rc;
+	} else if (mode == NOC_QOS_MODE_BYPASS) {
+		dev_dbg(src->provider->dev, "NoC QoS: %s: Set Bypass mode\n",
+			qn->name);
+	}
+
+=======
 	if (qn->qos.qos_mode != NOC_QOS_MODE_INVALID)
 		mode = qn->qos.qos_mode;
 
@@ -181,6 +261,7 @@ static int qcom_icc_set_noc_qos(struct icc_node *src, u64 max_bw)
 			qn->name);
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return regmap_update_bits(qp->regmap,
 				  qp->qos_offset + NOC_QOS_MODEn_ADDR(qn->qos.qos_port),
 				  NOC_QOS_MODEn_MASK, mode);
@@ -233,6 +314,7 @@ static int qcom_icc_rpm_set(int mas_rpm_id, int slv_rpm_id, u64 sum_bw)
 
 	return ret;
 }
+<<<<<<< HEAD
 
 static int __qcom_icc_set(struct icc_node *n, struct qcom_icc_node *qn,
 			  u64 sum_bw)
@@ -263,6 +345,38 @@ static void qcom_icc_pre_bw_aggregate(struct icc_node *node)
 	struct qcom_icc_node *qn;
 	size_t i;
 
+=======
+
+static int __qcom_icc_set(struct icc_node *n, struct qcom_icc_node *qn,
+			  u64 sum_bw)
+{
+	int ret;
+
+	if (!qn->qos.ap_owned) {
+		/* send bandwidth request message to the RPM processor */
+		ret = qcom_icc_rpm_set(qn->mas_rpm_id, qn->slv_rpm_id, sum_bw);
+		if (ret)
+			return ret;
+	} else if (qn->qos.qos_mode != -1) {
+		/* set bandwidth directly from the AP */
+		ret = qcom_icc_qos_set(n, sum_bw);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
+}
+
+/**
+ * qcom_icc_pre_bw_aggregate - cleans up values before re-aggregate requests
+ * @node: icc node to operate on
+ */
+static void qcom_icc_pre_bw_aggregate(struct icc_node *node)
+{
+	struct qcom_icc_node *qn;
+	size_t i;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qn = node->data;
 	for (i = 0; i < QCOM_ICC_NUM_BUCKETS; i++) {
 		qn->sum_avg[i] = 0;
@@ -342,6 +456,8 @@ static void qcom_icc_bus_aggregate(struct icc_provider *provider,
 		*max_agg_avg = max_t(u64, *max_agg_avg, agg_avg[i]);
 }
 
+<<<<<<< HEAD
+=======
 /**
  * qcom_icc_bus_aggregate - aggregate bandwidth by traversing all nodes
  * @provider: generic interconnect provider
@@ -382,6 +498,7 @@ static void qcom_icc_bus_aggregate(struct icc_provider *provider,
 		*max_agg_avg = max_t(u64, *max_agg_avg, agg_avg[i]);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 {
 	struct qcom_icc_provider *qp;
@@ -603,6 +720,8 @@ int qnoc_remove(struct platform_device *pdev)
 
 	icc_nodes_remove(&qp->provider);
 	clk_bulk_disable_unprepare(qp->num_clks, qp->bus_clks);
-	return icc_provider_del(&qp->provider);
+	icc_provider_del(&qp->provider);
+
+	return 0;
 }
 EXPORT_SYMBOL(qnoc_remove);

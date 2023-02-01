@@ -81,7 +81,11 @@ static int imx_audmix_fe_hw_params(struct snd_pcm_substream *substream,
 	int ret, dir;
 
 	/* For playback the AUDMIX is consumer, and for record is provider */
+<<<<<<< HEAD
+	fmt |= tx ? SND_SOC_DAIFMT_BP_FP : SND_SOC_DAIFMT_BC_FC;
+=======
 	fmt |= tx ? SND_SOC_DAIFMT_CBC_CFC : SND_SOC_DAIFMT_CBP_CFP;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dir  = tx ? SND_SOC_CLOCK_OUT : SND_SOC_CLOCK_IN;
 
 	/* set DAI configuration */
@@ -122,7 +126,11 @@ static int imx_audmix_be_hw_params(struct snd_pcm_substream *substream,
 		return 0;
 
 	/* For playback the AUDMIX is consumer */
+<<<<<<< HEAD
+	fmt |= SND_SOC_DAIFMT_BC_FC;
+=======
 	fmt |= SND_SOC_DAIFMT_CBP_CFP;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* set AUDMIX DAI configuration */
 	ret = snd_soc_dai_set_fmt(asoc_rtd_to_cpu(rtd, 0), fmt);

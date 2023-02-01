@@ -1,0 +1,1 @@
+cmd_drivers/rtc/rtc-armada38x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/rtc/rtc-armada38x.ko drivers/rtc/rtc-armada38x.o drivers/rtc/rtc-armada38x.mod.o;  true

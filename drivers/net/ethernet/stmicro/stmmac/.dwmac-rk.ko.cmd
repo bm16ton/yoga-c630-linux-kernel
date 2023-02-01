@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/stmicro/stmmac/dwmac-rk.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/stmicro/stmmac/dwmac-rk.ko drivers/net/ethernet/stmicro/stmmac/dwmac-rk.o drivers/net/ethernet/stmicro/stmmac/dwmac-rk.mod.o;  true

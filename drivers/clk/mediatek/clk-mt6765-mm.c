@@ -61,6 +61,12 @@ static const struct mtk_gate mm_clks[] = {
 	GATE_MM(CLK_MM_F26M_HRTWT, "mm_hrtwt", "f_f26m_ck", 29),
 };
 
+<<<<<<< HEAD
+static const struct mtk_clk_desc mm_desc = {
+	.clks = mm_clks,
+	.num_clks = ARRAY_SIZE(mm_clks),
+};
+=======
 static int clk_mt6765_mm_probe(struct platform_device *pdev)
 {
 	struct clk_hw_onecell_data *clk_data;
@@ -79,14 +85,20 @@ static int clk_mt6765_mm_probe(struct platform_device *pdev)
 
 	return r;
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct of_device_id of_match_clk_mt6765_mm[] = {
-	{ .compatible = "mediatek,mt6765-mmsys", },
-	{}
+	{
+		.compatible = "mediatek,mt6765-mmsys",
+		.data = &mm_desc,
+	}, {
+		/* sentinel */
+	}
 };
 
 static struct platform_driver clk_mt6765_mm_drv = {
-	.probe = clk_mt6765_mm_probe,
+	.probe = mtk_clk_simple_probe,
+	.remove = mtk_clk_simple_remove,
 	.driver = {
 		.name = "clk-mt6765-mm",
 		.of_match_table = of_match_clk_mt6765_mm,

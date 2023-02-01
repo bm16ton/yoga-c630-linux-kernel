@@ -1607,9 +1607,10 @@ int register_kprobe(struct kprobe *p)
 	struct kprobe *old_p;
 	struct module *probed_mod;
 	kprobe_opcode_t *addr;
+	bool on_func_entry;
 
 	/* Adjust probe address from symbol */
-	addr = kprobe_addr(p);
+	addr = _kprobe_addr(p->addr, p->symbol_name, p->offset, &on_func_entry);
 	if (IS_ERR(addr))
 		return PTR_ERR(addr);
 	p->addr = addr;
@@ -1628,6 +1629,9 @@ int register_kprobe(struct kprobe *p)
 		return ret;
 
 	mutex_lock(&kprobe_mutex);
+
+	if (on_func_entry)
+		p->flags |= KPROBE_FLAG_ON_FUNC_ENTRY;
 
 	old_p = get_kprobe(p->addr);
 	if (old_p) {
@@ -1895,11 +1899,19 @@ void kprobe_flush_task(struct task_struct *tk)
 {
 	struct kretprobe_instance *ri;
 	struct llist_node *node;
+<<<<<<< HEAD
 
 	/* Early boot, not yet initialized. */
 	if (unlikely(!kprobes_initialized))
 		return;
 
+=======
+
+	/* Early boot, not yet initialized. */
+	if (unlikely(!kprobes_initialized))
+		return;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kprobe_busy_begin();
 
 	node = __llist_del_all(&tk->kretprobe_instances);
@@ -1993,6 +2005,7 @@ unsigned long kretprobe_find_ret_addr(struct task_struct *tsk, void *fp,
 	return (unsigned long)ret;
 }
 NOKPROBE_SYMBOL(kretprobe_find_ret_addr);
+<<<<<<< HEAD
 
 void __weak arch_kretprobe_fixup_return(struct pt_regs *regs,
 					kprobe_opcode_t *correct_ret_addr)
@@ -2003,6 +2016,18 @@ void __weak arch_kretprobe_fixup_return(struct pt_regs *regs,
 	 */
 }
 
+=======
+
+void __weak arch_kretprobe_fixup_return(struct pt_regs *regs,
+					kprobe_opcode_t *correct_ret_addr)
+{
+	/*
+	 * Do nothing by default. Please fill this to update the fake return
+	 * address on the stack with the correct one on each arch if possible.
+	 */
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned long __kretprobe_trampoline_handler(struct pt_regs *regs,
 					     void *frame_pointer)
 {
@@ -2120,11 +2145,19 @@ static int pre_handler_kretprobe(struct kprobe *p, struct pt_regs *regs)
 		rethook_recycle(rhn);
 	else
 		rethook_hook(rhn, regs, kprobe_ftrace(p));
+<<<<<<< HEAD
 
 	return 0;
 }
 NOKPROBE_SYMBOL(pre_handler_kretprobe);
 
+=======
+
+	return 0;
+}
+NOKPROBE_SYMBOL(pre_handler_kretprobe);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void kretprobe_rethook_handler(struct rethook_node *rh, void *data,
 				      struct pt_regs *regs)
 {
@@ -2209,13 +2242,9 @@ int register_kretprobe(struct kretprobe *rp)
 	rp->kp.post_handler = NULL;
 
 	/* Pre-allocate memory for max kretprobe instances */
-	if (rp->maxactive <= 0) {
-#ifdef CONFIG_PREEMPTION
+	if (rp->maxactive <= 0)
 		rp->maxactive = max_t(unsigned int, 10, 2*num_possible_cpus());
-#else
-		rp->maxactive = num_possible_cpus();
-#endif
-	}
+
 #ifdef CONFIG_KRETPROBE_ON_RETHOOK
 	rp->rh = rethook_alloc((void *)rp, kretprobe_rethook_handler);
 	if (!rp->rh)
@@ -2238,6 +2267,31 @@ int register_kretprobe(struct kretprobe *rp)
 		rethook_free(rp->rh);
 		rp->rh = NULL;
 	}
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_KRETPROBE_ON_RETHOOK
+	rp->rh = rethook_alloc((void *)rp, kretprobe_rethook_handler);
+	if (!rp->rh)
+		return -ENOMEM;
+
+	for (i = 0; i < rp->maxactive; i++) {
+		inst = kzalloc(sizeof(struct kretprobe_instance) +
+			       rp->data_size, GFP_KERNEL);
+		if (inst == NULL) {
+			rethook_free(rp->rh);
+			rp->rh = NULL;
+			return -ENOMEM;
+		}
+		rethook_add_node(rp->rh, &inst->node);
+	}
+	rp->nmissed = 0;
+	/* Establish function entry probe point */
+	ret = register_kprobe(&rp->kp);
+	if (ret != 0) {
+		rethook_free(rp->rh);
+		rp->rh = NULL;
+	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else	/* !CONFIG_KRETPROBE_ON_RETHOOK */
 	rp->freelist.head = NULL;
 	rp->rph = kzalloc(sizeof(struct kretprobe_holder), GFP_KERNEL);
@@ -2360,6 +2414,14 @@ static void kill_kprobe(struct kprobe *p)
 
 	lockdep_assert_held(&kprobe_mutex);
 
+	/*
+	 * The module is going away. We should disarm the kprobe which
+	 * is using ftrace, because ftrace framework is still available at
+	 * 'MODULE_STATE_GOING' notification.
+	 */
+	if (kprobe_ftrace(p) && !kprobe_disabled(p) && !kprobes_all_disarmed)
+		disarm_kprobe_ftrace(p);
+
 	p->flags |= KPROBE_FLAG_GONE;
 	if (kprobe_aggrprobe(p)) {
 		/*
@@ -2376,6 +2438,8 @@ static void kill_kprobe(struct kprobe *p)
 	 * the original probed function (which will be freed soon) any more.
 	 */
 	arch_remove_kprobe(p);
+<<<<<<< HEAD
+=======
 
 	/*
 	 * The module is going away. We should disarm the kprobe which
@@ -2384,6 +2448,7 @@ static void kill_kprobe(struct kprobe *p)
 	 */
 	if (kprobe_ftrace(p) && !kprobe_disabled(p) && !kprobes_all_disarmed)
 		disarm_kprobe_ftrace(p);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Disable one kprobe */

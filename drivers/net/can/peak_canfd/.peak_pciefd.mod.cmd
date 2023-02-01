@@ -1,0 +1,1 @@
+cmd_drivers/net/can/peak_canfd/peak_pciefd.mod := printf '%s\n'   peak_pciefd_main.o peak_canfd.o | awk '!x[$$0]++ { print("drivers/net/can/peak_canfd/"$$0) }' > drivers/net/can/peak_canfd/peak_pciefd.mod

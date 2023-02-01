@@ -400,6 +400,32 @@ information:
     allocated objects. The output is sorted by frequency of each trace.
 
     Information in the output:
+<<<<<<< HEAD
+    Number of objects, allocating function, possible memory wastage of
+    kmalloc objects(total/per-object), minimal/average/maximal jiffies
+    since alloc, pid range of the allocating processes, cpu mask of
+    allocating cpus, numa node mask of origins of memory, and stack trace.
+
+    Example:::
+
+    338 pci_alloc_dev+0x2c/0xa0 waste=521872/1544 age=290837/291891/293509 pid=1 cpus=106 nodes=0-1
+        __kmem_cache_alloc_node+0x11f/0x4e0
+        kmalloc_trace+0x26/0xa0
+        pci_alloc_dev+0x2c/0xa0
+        pci_scan_single_device+0xd2/0x150
+        pci_scan_slot+0xf7/0x2d0
+        pci_scan_child_bus_extend+0x4e/0x360
+        acpi_pci_root_create+0x32e/0x3b0
+        pci_acpi_scan_root+0x2b9/0x2d0
+        acpi_pci_root_add.cold.11+0x110/0xb0a
+        acpi_bus_attach+0x262/0x3f0
+        device_for_each_child+0xb7/0x110
+        acpi_dev_for_each_child+0x77/0xa0
+        acpi_bus_attach+0x108/0x3f0
+        device_for_each_child+0xb7/0x110
+        acpi_dev_for_each_child+0x77/0xa0
+        acpi_bus_attach+0x108/0x3f0
+=======
     Number of objects, allocating function, minimal/average/maximal jiffies since alloc,
     pid range of the allocating processes, cpu mask of allocating cpus, and stack trace.
 
@@ -415,6 +441,7 @@ information:
 	kernel_init+0xe/0x118
 	ret_from_fork+0x22/0x30
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 2. free_traces::
 

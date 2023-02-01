@@ -7,6 +7,12 @@
 #include <linux/backlight.h>
 #include <linux/mod_devicetable.h>
 #include <linux/module.h>
+<<<<<<< HEAD
+#include <linux/platform_data/x86/nvidia-wmi-ec-backlight.h>
+#include <linux/types.h>
+#include <linux/wmi.h>
+#include <acpi/video.h>
+=======
 #include <linux/types.h>
 #include <linux/wmi.h>
 
@@ -74,6 +80,7 @@ struct wmi_brightness_args {
 	u32 ret;
 	u32 ignored[3];
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * wmi_brightness_notify() - helper function for calling WMI-wrapped ACPI method
@@ -151,6 +158,12 @@ static int nvidia_wmi_ec_backlight_probe(struct wmi_device *wdev, const void *ct
 {
 	struct backlight_properties props = {};
 	struct backlight_device *bdev;
+<<<<<<< HEAD
+	int ret;
+
+	/* drivers/acpi/video_detect.c also checks that SOURCE == EC */
+	if (acpi_video_get_backlight_type() != acpi_backlight_nvidia_wmi_ec)
+=======
 	u32 source;
 	int ret;
 
@@ -164,6 +177,7 @@ static int nvidia_wmi_ec_backlight_probe(struct wmi_device *wdev, const void *ct
 	 * by the EC; otherwise, the GPU driver(s) should control brightness.
 	 */
 	if (source != WMI_BRIGHTNESS_SOURCE_EC)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENODEV;
 
 	/*
@@ -191,8 +205,11 @@ static int nvidia_wmi_ec_backlight_probe(struct wmi_device *wdev, const void *ct
 	return PTR_ERR_OR_ZERO(bdev);
 }
 
+<<<<<<< HEAD
+=======
 #define WMI_BRIGHTNESS_GUID "603E9613-EF25-4338-A3D0-C46177516DB7"
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct wmi_device_id nvidia_wmi_ec_backlight_id_table[] = {
 	{ .guid_string = WMI_BRIGHTNESS_GUID },
 	{ }

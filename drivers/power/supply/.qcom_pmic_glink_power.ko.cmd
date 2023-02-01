@@ -1,0 +1,1 @@
+cmd_drivers/power/supply/qcom_pmic_glink_power.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/power/supply/qcom_pmic_glink_power.ko drivers/power/supply/qcom_pmic_glink_power.o drivers/power/supply/qcom_pmic_glink_power.mod.o;  true

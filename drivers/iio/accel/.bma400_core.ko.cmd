@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/bma400_core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/bma400_core.ko drivers/iio/accel/bma400_core.o drivers/iio/accel/bma400_core.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_sound/pci/ctxfi/snd-ctxfi.mod := printf '%s\n'   xfi.o ctatc.o ctvmem.o ctpcm.o ctmixer.o ctresource.o ctsrc.o ctamixer.o ctdaio.o ctimap.o cthardware.o cttimer.o cthw20k2.o cthw20k1.o | awk '!x[$$0]++ { print("sound/pci/ctxfi/"$$0) }' > sound/pci/ctxfi/snd-ctxfi.mod

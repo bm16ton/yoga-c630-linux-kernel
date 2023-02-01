@@ -1,0 +1,1 @@
+cmd_drivers/watchdog/armada_37xx_wdt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/watchdog/armada_37xx_wdt.ko drivers/watchdog/armada_37xx_wdt.o drivers/watchdog/armada_37xx_wdt.mod.o;  true

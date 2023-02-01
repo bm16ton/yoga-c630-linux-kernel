@@ -3810,6 +3810,18 @@ static int __stmmac_open(struct net_device *dev,
 
 	stmmac_reset_queues_param(priv);
 
+<<<<<<< HEAD
+	if (priv->plat->serdes_powerup) {
+		ret = priv->plat->serdes_powerup(dev, priv->plat->bsp_priv);
+		if (ret < 0) {
+			netdev_err(priv->dev, "%s: Serdes powerup failed\n",
+				   __func__);
+			goto init_error;
+		}
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = stmmac_hw_setup(dev, true);
 	if (ret < 0) {
 		netdev_err(priv->dev, "%s: Hw setup failed\n", __func__);
@@ -3912,6 +3924,10 @@ static int stmmac_release(struct net_device *dev)
 
 	/* Disable the MAC Rx/Tx */
 	stmmac_mac_set(priv, priv->ioaddr, false);
+
+	/* Powerdown Serdes if there is */
+	if (priv->plat->serdes_powerdown)
+		priv->plat->serdes_powerdown(dev, priv->plat->bsp_priv);
 
 	netif_carrier_off(dev);
 
@@ -5064,6 +5080,31 @@ read_again:
 			if (!priv->hwts_rx_en)
 				priv->dev->stats.rx_errors++;
 		}
+<<<<<<< HEAD
+
+		if (unlikely(error && (status & rx_not_ls)))
+			goto read_again;
+		if (unlikely(error)) {
+			count++;
+			continue;
+		}
+
+		/* XSK pool expects RX frame 1:1 mapped to XSK buffer */
+		if (likely(status & rx_not_ls)) {
+			xsk_buff_free(buf->xdp);
+			buf->xdp = NULL;
+			dirty++;
+			count++;
+			goto read_again;
+		}
+
+		/* XDP ZC Frame only support primary buffers for now */
+		buf1_len = stmmac_rx_buf1_len(priv, p, status, len);
+		len += buf1_len;
+
+		/* ACS is disabled; strip manually. */
+		if (likely(!(status & rx_not_ls))) {
+=======
 
 		if (unlikely(error && (status & rx_not_ls)))
 			goto read_again;
@@ -5095,6 +5136,7 @@ read_again:
 		if (likely(!(status & rx_not_ls)) &&
 		    (likely(priv->synopsys_id >= DWMAC_CORE_4_00) ||
 		     unlikely(status != llc_snap))) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			buf1_len -= ETH_FCS_LEN;
 			len -= ETH_FCS_LEN;
 		}
@@ -5271,6 +5313,10 @@ read_again:
 		buf2_len = stmmac_rx_buf2_len(priv, p, status, len);
 		len += buf2_len;
 
+<<<<<<< HEAD
+		/* ACS is disabled; strip manually. */
+		if (likely(!(status & rx_not_ls))) {
+=======
 		/* ACS is set; GMAC core strips PAD/FCS for IEEE 802.3
 		 * Type frames (LLC/LLC-SNAP)
 		 *
@@ -5281,6 +5327,7 @@ read_again:
 		if (likely(!(status & rx_not_ls)) &&
 		    (likely(priv->synopsys_id >= DWMAC_CORE_4_00) ||
 		     unlikely(status != llc_snap))) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (buf2_len) {
 				buf2_len -= ETH_FCS_LEN;
 				len -= ETH_FCS_LEN;
@@ -6537,6 +6584,288 @@ void stmmac_enable_tx_queue(struct stmmac_priv *priv, u32 queue)
 	stmmac_reset_tx_queue(priv, queue);
 	stmmac_clear_tx_descriptors(priv, &priv->dma_conf, queue);
 
+<<<<<<< HEAD
+	/* Create per netdev entries */
+	priv->dbgfs_dir = debugfs_create_dir(dev->name, stmmac_fs_dir);
+
+	/* Entry to report DMA RX/TX rings */
+	debugfs_create_file("descriptors_status", 0444, priv->dbgfs_dir, dev,
+			    &stmmac_rings_status_fops);
+
+	/* Entry to report the DMA HW features */
+	debugfs_create_file("dma_cap", 0444, priv->dbgfs_dir, dev,
+			    &stmmac_dma_cap_fops);
+
+	rtnl_unlock();
+}
+
+static void stmmac_exit_fs(struct net_device *dev)
+{
+	struct stmmac_priv *priv = netdev_priv(dev);
+
+	debugfs_remove_recursive(priv->dbgfs_dir);
+}
+#endif /* CONFIG_DEBUG_FS */
+
+static u32 stmmac_vid_crc32_le(__le16 vid_le)
+{
+	unsigned char *data = (unsigned char *)&vid_le;
+	unsigned char data_byte = 0;
+	u32 crc = ~0x0;
+	u32 temp = 0;
+	int i, bits;
+
+	bits = get_bitmask_order(VLAN_VID_MASK);
+	for (i = 0; i < bits; i++) {
+		if ((i % 8) == 0)
+			data_byte = data[i / 8];
+
+		temp = ((crc & 1) ^ data_byte) & 1;
+		crc >>= 1;
+		data_byte >>= 1;
+
+		if (temp)
+			crc ^= 0xedb88320;
+	}
+
+	return crc;
+}
+
+static int stmmac_vlan_update(struct stmmac_priv *priv, bool is_double)
+{
+	u32 crc, hash = 0;
+	__le16 pmatch = 0;
+	int count = 0;
+	u16 vid = 0;
+
+	for_each_set_bit(vid, priv->active_vlans, VLAN_N_VID) {
+		__le16 vid_le = cpu_to_le16(vid);
+		crc = bitrev32(~stmmac_vid_crc32_le(vid_le)) >> 28;
+		hash |= (1 << crc);
+		count++;
+	}
+
+	if (!priv->dma_cap.vlhash) {
+		if (count > 2) /* VID = 0 always passes filter */
+			return -EOPNOTSUPP;
+
+		pmatch = cpu_to_le16(vid);
+		hash = 0;
+	}
+
+	return stmmac_update_vlan_hash(priv, priv->hw, hash, pmatch, is_double);
+}
+
+static int stmmac_vlan_rx_add_vid(struct net_device *ndev, __be16 proto, u16 vid)
+{
+	struct stmmac_priv *priv = netdev_priv(ndev);
+	bool is_double = false;
+	int ret;
+
+	if (be16_to_cpu(proto) == ETH_P_8021AD)
+		is_double = true;
+
+	set_bit(vid, priv->active_vlans);
+	ret = stmmac_vlan_update(priv, is_double);
+	if (ret) {
+		clear_bit(vid, priv->active_vlans);
+		return ret;
+	}
+
+	if (priv->hw->num_vlan) {
+		ret = stmmac_add_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto, vid);
+		if (ret)
+			return ret;
+	}
+
+	return 0;
+}
+
+static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vid)
+{
+	struct stmmac_priv *priv = netdev_priv(ndev);
+	bool is_double = false;
+	int ret;
+
+	ret = pm_runtime_resume_and_get(priv->device);
+	if (ret < 0)
+		return ret;
+
+	if (be16_to_cpu(proto) == ETH_P_8021AD)
+		is_double = true;
+
+	clear_bit(vid, priv->active_vlans);
+
+	if (priv->hw->num_vlan) {
+		ret = stmmac_del_hw_vlan_rx_fltr(priv, ndev, priv->hw, proto, vid);
+		if (ret)
+			goto del_vlan_error;
+	}
+
+	ret = stmmac_vlan_update(priv, is_double);
+
+del_vlan_error:
+	pm_runtime_put(priv->device);
+
+	return ret;
+}
+
+static int stmmac_bpf(struct net_device *dev, struct netdev_bpf *bpf)
+{
+	struct stmmac_priv *priv = netdev_priv(dev);
+
+	switch (bpf->command) {
+	case XDP_SETUP_PROG:
+		return stmmac_xdp_set_prog(priv, bpf->prog, bpf->extack);
+	case XDP_SETUP_XSK_POOL:
+		return stmmac_xdp_setup_pool(priv, bpf->xsk.pool,
+					     bpf->xsk.queue_id);
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
+static int stmmac_xdp_xmit(struct net_device *dev, int num_frames,
+			   struct xdp_frame **frames, u32 flags)
+{
+	struct stmmac_priv *priv = netdev_priv(dev);
+	int cpu = smp_processor_id();
+	struct netdev_queue *nq;
+	int i, nxmit = 0;
+	int queue;
+
+	if (unlikely(test_bit(STMMAC_DOWN, &priv->state)))
+		return -ENETDOWN;
+
+	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+		return -EINVAL;
+
+	queue = stmmac_xdp_get_tx_queue(priv, cpu);
+	nq = netdev_get_tx_queue(priv->dev, queue);
+
+	__netif_tx_lock(nq, cpu);
+	/* Avoids TX time-out as we are sharing with slow path */
+	txq_trans_cond_update(nq);
+
+	for (i = 0; i < num_frames; i++) {
+		int res;
+
+		res = stmmac_xdp_xmit_xdpf(priv, queue, frames[i], true);
+		if (res == STMMAC_XDP_CONSUMED)
+			break;
+
+		nxmit++;
+	}
+
+	if (flags & XDP_XMIT_FLUSH) {
+		stmmac_flush_tx_descriptors(priv, queue);
+		stmmac_tx_timer_arm(priv, queue);
+	}
+
+	__netif_tx_unlock(nq);
+
+	return nxmit;
+}
+
+void stmmac_disable_rx_queue(struct stmmac_priv *priv, u32 queue)
+{
+	struct stmmac_channel *ch = &priv->channel[queue];
+	unsigned long flags;
+
+	spin_lock_irqsave(&ch->lock, flags);
+	stmmac_disable_dma_irq(priv, priv->ioaddr, queue, 1, 0);
+	spin_unlock_irqrestore(&ch->lock, flags);
+
+	stmmac_stop_rx_dma(priv, queue);
+	__free_dma_rx_desc_resources(priv, &priv->dma_conf, queue);
+}
+
+void stmmac_enable_rx_queue(struct stmmac_priv *priv, u32 queue)
+{
+	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[queue];
+	struct stmmac_channel *ch = &priv->channel[queue];
+	unsigned long flags;
+	u32 buf_size;
+	int ret;
+
+	ret = __alloc_dma_rx_desc_resources(priv, &priv->dma_conf, queue);
+	if (ret) {
+		netdev_err(priv->dev, "Failed to alloc RX desc.\n");
+		return;
+	}
+
+	ret = __init_dma_rx_desc_rings(priv, &priv->dma_conf, queue, GFP_KERNEL);
+	if (ret) {
+		__free_dma_rx_desc_resources(priv, &priv->dma_conf, queue);
+		netdev_err(priv->dev, "Failed to init RX desc.\n");
+		return;
+	}
+
+	stmmac_reset_rx_queue(priv, queue);
+	stmmac_clear_rx_descriptors(priv, &priv->dma_conf, queue);
+
+	stmmac_init_rx_chan(priv, priv->ioaddr, priv->plat->dma_cfg,
+			    rx_q->dma_rx_phy, rx_q->queue_index);
+
+	rx_q->rx_tail_addr = rx_q->dma_rx_phy + (rx_q->buf_alloc_num *
+			     sizeof(struct dma_desc));
+	stmmac_set_rx_tail_ptr(priv, priv->ioaddr,
+			       rx_q->rx_tail_addr, rx_q->queue_index);
+
+	if (rx_q->xsk_pool && rx_q->buf_alloc_num) {
+		buf_size = xsk_pool_get_rx_frame_size(rx_q->xsk_pool);
+		stmmac_set_dma_bfsize(priv, priv->ioaddr,
+				      buf_size,
+				      rx_q->queue_index);
+	} else {
+		stmmac_set_dma_bfsize(priv, priv->ioaddr,
+				      priv->dma_conf.dma_buf_sz,
+				      rx_q->queue_index);
+	}
+
+	stmmac_start_rx_dma(priv, queue);
+
+	spin_lock_irqsave(&ch->lock, flags);
+	stmmac_enable_dma_irq(priv, priv->ioaddr, queue, 1, 0);
+	spin_unlock_irqrestore(&ch->lock, flags);
+}
+
+void stmmac_disable_tx_queue(struct stmmac_priv *priv, u32 queue)
+{
+	struct stmmac_channel *ch = &priv->channel[queue];
+	unsigned long flags;
+
+	spin_lock_irqsave(&ch->lock, flags);
+	stmmac_disable_dma_irq(priv, priv->ioaddr, queue, 0, 1);
+	spin_unlock_irqrestore(&ch->lock, flags);
+
+	stmmac_stop_tx_dma(priv, queue);
+	__free_dma_tx_desc_resources(priv, &priv->dma_conf, queue);
+}
+
+void stmmac_enable_tx_queue(struct stmmac_priv *priv, u32 queue)
+{
+	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
+	struct stmmac_channel *ch = &priv->channel[queue];
+	unsigned long flags;
+	int ret;
+
+	ret = __alloc_dma_tx_desc_resources(priv, &priv->dma_conf, queue);
+	if (ret) {
+		netdev_err(priv->dev, "Failed to alloc TX desc.\n");
+		return;
+	}
+
+	ret = __init_dma_tx_desc_rings(priv,  &priv->dma_conf, queue);
+	if (ret) {
+		__free_dma_tx_desc_resources(priv, &priv->dma_conf, queue);
+		netdev_err(priv->dev, "Failed to init TX desc.\n");
+		return;
+	}
+
+	stmmac_reset_tx_queue(priv, queue);
+	stmmac_clear_tx_descriptors(priv, &priv->dma_conf, queue);
+
 	stmmac_init_tx_chan(priv, priv->ioaddr, priv->plat->dma_cfg,
 			    tx_q->dma_tx_phy, tx_q->queue_index);
 
@@ -6549,6 +6878,20 @@ void stmmac_enable_tx_queue(struct stmmac_priv *priv, u32 queue)
 
 	stmmac_start_tx_dma(priv, queue);
 
+=======
+	stmmac_init_tx_chan(priv, priv->ioaddr, priv->plat->dma_cfg,
+			    tx_q->dma_tx_phy, tx_q->queue_index);
+
+	if (tx_q->tbs & STMMAC_TBS_AVAIL)
+		stmmac_enable_tbs(priv, priv->ioaddr, 1, tx_q->queue_index);
+
+	tx_q->tx_tail_addr = tx_q->dma_tx_phy;
+	stmmac_set_tx_tail_ptr(priv, priv->ioaddr,
+			       tx_q->tx_tail_addr, tx_q->queue_index);
+
+	stmmac_start_tx_dma(priv, queue);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_lock_irqsave(&ch->lock, flags);
 	stmmac_enable_dma_irq(priv, priv->ioaddr, queue, 0, 1);
 	spin_unlock_irqrestore(&ch->lock, flags);
@@ -6902,8 +7245,7 @@ static void stmmac_napi_add(struct net_device *dev)
 		spin_lock_init(&ch->lock);
 
 		if (queue < priv->plat->rx_queues_to_use) {
-			netif_napi_add(dev, &ch->rx_napi, stmmac_napi_poll_rx,
-				       NAPI_POLL_WEIGHT);
+			netif_napi_add(dev, &ch->rx_napi, stmmac_napi_poll_rx);
 		}
 		if (queue < priv->plat->tx_queues_to_use) {
 			netif_napi_add_tx(dev, &ch->tx_napi,
@@ -6912,8 +7254,12 @@ static void stmmac_napi_add(struct net_device *dev)
 		if (queue < priv->plat->rx_queues_to_use &&
 		    queue < priv->plat->tx_queues_to_use) {
 			netif_napi_add(dev, &ch->rxtx_napi,
+<<<<<<< HEAD
+				       stmmac_napi_poll_rxtx);
+=======
 				       stmmac_napi_poll_rxtx,
 				       NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 }
@@ -7102,7 +7448,8 @@ int stmmac_dvr_probe(struct device *device,
 	priv->wq = create_singlethread_workqueue("stmmac_wq");
 	if (!priv->wq) {
 		dev_err(priv->device, "failed to create workqueue\n");
-		return -ENOMEM;
+		ret = -ENOMEM;
+		goto error_wq_init;
 	}
 
 	INIT_WORK(&priv->service_task, stmmac_service_task);
@@ -7305,14 +7652,6 @@ int stmmac_dvr_probe(struct device *device,
 		goto error_netdev_register;
 	}
 
-	if (priv->plat->serdes_powerup) {
-		ret = priv->plat->serdes_powerup(ndev,
-						 priv->plat->bsp_priv);
-
-		if (ret < 0)
-			goto error_serdes_powerup;
-	}
-
 #ifdef CONFIG_DEBUG_FS
 	stmmac_init_fs(ndev);
 #endif
@@ -7327,8 +7666,6 @@ int stmmac_dvr_probe(struct device *device,
 
 	return ret;
 
-error_serdes_powerup:
-	unregister_netdev(ndev);
 error_netdev_register:
 	phylink_destroy(priv->phylink);
 error_xpcs_setup:
@@ -7340,6 +7677,10 @@ error_mdio_register:
 	stmmac_napi_del(ndev);
 error_hw_init:
 	destroy_workqueue(priv->wq);
+<<<<<<< HEAD
+error_wq_init:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bitmap_free(priv->af_xdp_zc_qps);
 
 	return ret;

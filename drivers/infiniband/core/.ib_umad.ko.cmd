@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/core/ib_umad.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/infiniband/core/ib_umad.ko drivers/infiniband/core/ib_umad.o drivers/infiniband/core/ib_umad.mod.o;  true

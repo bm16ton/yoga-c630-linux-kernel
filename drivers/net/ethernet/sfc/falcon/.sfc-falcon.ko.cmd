@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/sfc/falcon/sfc-falcon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/sfc/falcon/sfc-falcon.ko drivers/net/ethernet/sfc/falcon/sfc-falcon.o drivers/net/ethernet/sfc/falcon/sfc-falcon.mod.o;  true

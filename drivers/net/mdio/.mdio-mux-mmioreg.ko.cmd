@@ -1,0 +1,1 @@
+cmd_drivers/net/mdio/mdio-mux-mmioreg.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/mdio/mdio-mux-mmioreg.ko drivers/net/mdio/mdio-mux-mmioreg.o drivers/net/mdio/mdio-mux-mmioreg.mod.o;  true

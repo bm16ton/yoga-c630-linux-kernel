@@ -1,0 +1,13 @@
+drivers/infiniband/hw/hns/hns_roce_hw_v2.o
+drivers/infiniband/hw/hns/hns_roce_main.o
+drivers/infiniband/hw/hns/hns_roce_cmd.o
+drivers/infiniband/hw/hns/hns_roce_pd.o
+drivers/infiniband/hw/hns/hns_roce_ah.o
+drivers/infiniband/hw/hns/hns_roce_hem.o
+drivers/infiniband/hw/hns/hns_roce_mr.o
+drivers/infiniband/hw/hns/hns_roce_qp.o
+drivers/infiniband/hw/hns/hns_roce_cq.o
+drivers/infiniband/hw/hns/hns_roce_alloc.o
+drivers/infiniband/hw/hns/hns_roce_db.o
+drivers/infiniband/hw/hns/hns_roce_srq.o
+drivers/infiniband/hw/hns/hns_roce_restrack.o

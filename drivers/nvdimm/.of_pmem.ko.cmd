@@ -1,0 +1,1 @@
+cmd_drivers/nvdimm/of_pmem.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nvdimm/of_pmem.ko drivers/nvdimm/of_pmem.o drivers/nvdimm/of_pmem.mod.o;  true

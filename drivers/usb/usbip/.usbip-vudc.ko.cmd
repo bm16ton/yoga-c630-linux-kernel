@@ -1,0 +1,1 @@
+cmd_drivers/usb/usbip/usbip-vudc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/usbip/usbip-vudc.ko drivers/usb/usbip/usbip-vudc.o drivers/usb/usbip/usbip-vudc.mod.o;  true

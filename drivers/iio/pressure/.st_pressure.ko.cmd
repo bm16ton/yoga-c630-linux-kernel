@@ -1,0 +1,1 @@
+cmd_drivers/iio/pressure/st_pressure.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/pressure/st_pressure.ko drivers/iio/pressure/st_pressure.o drivers/iio/pressure/st_pressure.mod.o;  true

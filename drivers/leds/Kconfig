@@ -260,6 +260,16 @@ config LEDS_NET48XX
 	  This option enables support for the Soekris net4801 and net4826 error
 	  LED.
 
+<<<<<<< HEAD
+config LEDS_WS2812B
+    tristate "neopixel support over spi"
+    depends on LEDS_CLASS
+    depends on SPI_MASTER
+    help
+	  This option enables support for neopixels via spi.
+    
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config LEDS_WRAP
 	tristate "LED Support for the WRAP series LEDs"
 	depends on LEDS_CLASS
@@ -857,6 +867,8 @@ config LEDS_IP30
 	  To compile this driver as a module, choose M here: the module
 	  will be called leds-ip30.
 
+<<<<<<< HEAD
+=======
 config LEDS_USBNEOPIXELS
 	tristate "32 NEOPIXEL BAR GRAPH OVER USB"
 	depends on LEDS_CLASS
@@ -864,6 +876,7 @@ config LEDS_USBNEOPIXELS
 	  This driver sits on top of the arduino cdc-acm device stack and looks
 	  like just a usb vendor, control 32 neopixels in a line for activitu
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config LEDS_ACER_A500
 	tristate "Power button LED support for Acer Iconia Tab A500"
 	depends on LEDS_CLASS && MFD_ACER_A500_EC

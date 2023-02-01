@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/toshsd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/toshsd.ko drivers/mmc/host/toshsd.o drivers/mmc/host/toshsd.mod.o;  true

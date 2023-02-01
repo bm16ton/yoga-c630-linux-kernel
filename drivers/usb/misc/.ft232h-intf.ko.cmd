@@ -1,0 +1,1 @@
+cmd_drivers/usb/misc/ft232h-intf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/misc/ft232h-intf.ko drivers/usb/misc/ft232h-intf.o drivers/usb/misc/ft232h-intf.mod.o;  true

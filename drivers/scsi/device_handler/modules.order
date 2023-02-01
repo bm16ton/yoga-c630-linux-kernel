@@ -1,0 +1,4 @@
+drivers/scsi/device_handler/scsi_dh_rdac.ko
+drivers/scsi/device_handler/scsi_dh_hp_sw.ko
+drivers/scsi/device_handler/scsi_dh_emc.ko
+drivers/scsi/device_handler/scsi_dh_alua.ko

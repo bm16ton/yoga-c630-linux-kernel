@@ -1,0 +1,12 @@
+rk3399-nanopc-t4.o: arch/arm64/boot/dts/rockchip/rk3399-nanopc-t4.dts \
+ arch/arm64/boot/dts/rockchip/rk3399-nanopi4.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/input/linux-event-codes.h \
+ arch/arm64/boot/dts/rockchip/rk3399.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/rk3399-cru.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/rockchip.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/rk3399-power.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ arch/arm64/boot/dts/rockchip/rk3399-opp.dtsi

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/broadcom/modules.order := {   cat drivers/net/wireless/broadcom/b43/modules.order;   cat drivers/net/wireless/broadcom/b43legacy/modules.order;   cat drivers/net/wireless/broadcom/brcm80211/modules.order; :; } > drivers/net/wireless/broadcom/modules.order

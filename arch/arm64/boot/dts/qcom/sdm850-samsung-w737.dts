@@ -415,8 +415,15 @@
 };
 
 &qup_i2c12_default {
+<<<<<<< HEAD
+	pinmux {
+		drive-strength = <2>;
+		bias-disable;
+	};
+=======
 	drive-strength = <2>;
 	bias-disable;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &qup_uart6_default {
@@ -704,7 +711,11 @@
 	pinctrl-names = "default";
 	clock-names = "extclk";
 	clocks = <&rpmhcc RPMH_LN_BB_CLK2>;
+<<<<<<< HEAD
+	reset-gpios = <&tlmm 64 GPIO_ACTIVE_HIGH>;
+=======
 	reset-gpios = <&tlmm 64 0>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vdd-buck-supply = <&vreg_s4a_1p8>;
 	vdd-buck-sido-supply = <&vreg_s4a_1p8>;
 	vdd-tx-supply = <&vreg_s4a_1p8>;

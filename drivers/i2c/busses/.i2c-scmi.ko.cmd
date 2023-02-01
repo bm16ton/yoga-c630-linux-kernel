@@ -1,0 +1,1 @@
+cmd_drivers/i2c/busses/i2c-scmi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/busses/i2c-scmi.ko drivers/i2c/busses/i2c-scmi.o drivers/i2c/busses/i2c-scmi.mod.o;  true

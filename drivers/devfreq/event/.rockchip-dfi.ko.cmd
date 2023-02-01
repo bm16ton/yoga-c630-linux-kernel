@@ -1,0 +1,1 @@
+cmd_drivers/devfreq/event/rockchip-dfi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/devfreq/event/rockchip-dfi.ko drivers/devfreq/event/rockchip-dfi.o drivers/devfreq/event/rockchip-dfi.mod.o;  true

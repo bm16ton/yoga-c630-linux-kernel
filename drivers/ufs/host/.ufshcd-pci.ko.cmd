@@ -1,0 +1,1 @@
+cmd_drivers/ufs/host/ufshcd-pci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/ufs/host/ufshcd-pci.ko drivers/ufs/host/ufshcd-pci.o drivers/ufs/host/ufshcd-pci.mod.o;  true

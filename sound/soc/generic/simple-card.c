@@ -393,8 +393,12 @@ static int __simple_for_each_link(struct asoc_simple_priv *priv,
 			 * or has convert-xxx property
 			 */
 			if (dpcm_selectable &&
+<<<<<<< HEAD
+			    (num > 2 || asoc_simple_is_convert_required(&adata))) {
+=======
 			    (num > 2 ||
 			     adata.convert_rate || adata.convert_channels)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				/*
 				 * np
 				 *	 |1(CPU)|0(Codec)  li->cpu

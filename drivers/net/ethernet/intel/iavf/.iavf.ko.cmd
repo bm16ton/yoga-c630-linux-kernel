@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/iavf/iavf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/intel/iavf/iavf.ko drivers/net/ethernet/intel/iavf/iavf.o drivers/net/ethernet/intel/iavf/iavf.mod.o;  true

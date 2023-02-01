@@ -11,6 +11,10 @@
 
 #include <linux/bitfield.h>
 #include <linux/bits.h>
+<<<<<<< HEAD
+#include <linux/clk.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/delay.h>
 #include <linux/gpio/consumer.h>
 #include <linux/i2c.h>
@@ -151,6 +155,11 @@ struct chipone {
 	struct regulator *vdd1;
 	struct regulator *vdd2;
 	struct regulator *vdd3;
+<<<<<<< HEAD
+	struct clk *refclk;
+	unsigned long refclk_rate;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool interface_i2c;
 };
 
@@ -259,7 +268,11 @@ static void chipone_configure_pll(struct chipone *icn,
 
 	/*
 	 * DSI byte clock frequency (input into PLL) is calculated as:
+<<<<<<< HEAD
+	 *  DSI_CLK = HS clock / 4
+=======
 	 *  DSI_CLK = mode clock * bpp / dsi_data_lanes / 8
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *
 	 * DPI pixel clock frequency (output from PLL) is mode clock.
 	 *
@@ -273,8 +286,15 @@ static void chipone_configure_pll(struct chipone *icn,
 	 * It seems the PLL input clock after applying P pre-divider have
 	 * to be lower than 20 MHz.
 	 */
+<<<<<<< HEAD
+	if (icn->refclk)
+		fin = icn->refclk_rate;
+	else
+		fin = icn->dsi->hs_rate / 4; /* in Hz */
+=======
 	fin = mode_clock * mipi_dsi_pixel_format_to_bpp(icn->dsi->format) /
 	      icn->dsi->lanes / 8; /* in Hz */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Minimum value of P predivider for PLL input in 5..20 MHz */
 	p_min = clamp(DIV_ROUND_UP(fin, 20000000), 1U, 31U);
@@ -319,16 +339,29 @@ static void chipone_configure_pll(struct chipone *icn,
 	best_p_pot = !(best_p & 1);
 
 	dev_dbg(icn->dev,
+<<<<<<< HEAD
+		"PLL: P[3:0]=%d P[4]=2*%d M=%d S[7:5]=2^%d delta=%d => DSI f_in(%s)=%d Hz ; DPI f_out=%d Hz\n",
+		best_p >> best_p_pot, best_p_pot, best_m, best_s + 1,
+		min_delta, icn->refclk ? "EXT" : "DSI", fin,
+		(fin * best_m) / (best_p << (best_s + 1)));
+=======
 		"PLL: P[3:0]=%d P[4]=2*%d M=%d S[7:5]=2^%d delta=%d => DSI f_in=%d Hz ; DPI f_out=%d Hz\n",
 		best_p >> best_p_pot, best_p_pot, best_m, best_s + 1,
 		min_delta, fin, (fin * best_m) / (best_p << (best_s + 1)));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ref_div = PLL_REF_DIV_P(best_p >> best_p_pot) | PLL_REF_DIV_S(best_s);
 	if (best_p_pot)	/* Prefer /2 pre-divider */
 		ref_div |= PLL_REF_DIV_Pe;
 
+<<<<<<< HEAD
+	/* Clock source selection either external clock or MIPI DSI clock lane */
+	chipone_writeb(icn, PLL_CTRL(6),
+		       icn->refclk ? PLL_CTRL_6_EXTERNAL : PLL_CTRL_6_MIPI_CLK);
+=======
 	/* Clock source selection fixed to MIPI DSI clock lane */
 	chipone_writeb(icn, PLL_CTRL(6), PLL_CTRL_6_MIPI_CLK);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	chipone_writeb(icn, PLL_REF_DIV, ref_div);
 	chipone_writeb(icn, PLL_INT(0), best_m);
 }
@@ -464,6 +497,14 @@ static void chipone_atomic_pre_enable(struct drm_bridge *bridge,
 				      "failed to enable VDD3 regulator: %d\n", ret);
 	}
 
+<<<<<<< HEAD
+	ret = clk_prepare_enable(icn->refclk);
+	if (ret)
+		DRM_DEV_ERROR(icn->dev,
+			      "failed to enable RECLK clock: %d\n", ret);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpiod_set_value(icn->enable_gpio, 1);
 
 	usleep_range(10000, 11000);
@@ -474,6 +515,11 @@ static void chipone_atomic_post_disable(struct drm_bridge *bridge,
 {
 	struct chipone *icn = bridge_to_chipone(bridge);
 
+<<<<<<< HEAD
+	clk_disable_unprepare(icn->refclk);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (icn->vdd1)
 		regulator_disable(icn->vdd1);
 
@@ -515,6 +561,11 @@ static int chipone_dsi_attach(struct chipone *icn)
 	dsi->format = MIPI_DSI_FMT_RGB888;
 	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
 			  MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_NO_EOT_PACKET;
+<<<<<<< HEAD
+	dsi->hs_rate = 500000000;
+	dsi->lp_rate = 16000000;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = mipi_dsi_attach(dsi);
 	if (ret < 0)
@@ -617,6 +668,23 @@ static int chipone_parse_dt(struct chipone *icn)
 	struct device *dev = icn->dev;
 	int ret;
 
+<<<<<<< HEAD
+	icn->refclk = devm_clk_get_optional(dev, "refclk");
+	if (IS_ERR(icn->refclk)) {
+		ret = PTR_ERR(icn->refclk);
+		DRM_DEV_ERROR(dev, "failed to get REFCLK clock: %d\n", ret);
+		return ret;
+	} else if (icn->refclk) {
+		icn->refclk_rate = clk_get_rate(icn->refclk);
+		if (icn->refclk_rate < 10000000 || icn->refclk_rate > 154000000) {
+			DRM_DEV_ERROR(dev, "REFCLK out of range: %ld Hz\n",
+				      icn->refclk_rate);
+			return -EINVAL;
+		}
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	icn->vdd1 = devm_regulator_get_optional(dev, "vdd1");
 	if (IS_ERR(icn->vdd1)) {
 		ret = PTR_ERR(icn->vdd1);
@@ -735,14 +803,21 @@ static int chipone_i2c_probe(struct i2c_client *client,
 	return chipone_dsi_host_attach(icn);
 }
 
+<<<<<<< HEAD
+static void chipone_dsi_remove(struct mipi_dsi_device *dsi)
+=======
 static int chipone_dsi_remove(struct mipi_dsi_device *dsi)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct chipone *icn = mipi_dsi_get_drvdata(dsi);
 
 	mipi_dsi_detach(dsi);
 	drm_bridge_remove(&icn->bridge);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id chipone_of_match[] = {

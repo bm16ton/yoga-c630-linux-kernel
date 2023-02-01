@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/scheduler/gpu-sched.mod := printf '%s\n'   sched_main.o sched_fence.o sched_entity.o | awk '!x[$$0]++ { print("drivers/gpu/drm/scheduler/"$$0) }' > drivers/gpu/drm/scheduler/gpu-sched.mod

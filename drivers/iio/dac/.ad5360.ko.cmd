@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/ad5360.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/ad5360.ko drivers/iio/dac/ad5360.o drivers/iio/dac/ad5360.mod.o;  true

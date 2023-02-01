@@ -5,6 +5,10 @@
  */
 
 #include <linux/device.h>
+<<<<<<< HEAD
+#include <linux/interconnect.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/module.h>
 #include <linux/of_device.h>
 #include <linux/platform_device.h>
@@ -37,6 +41,11 @@ struct imx8m_blk_ctrl_domain_data {
 	const char *name;
 	const char * const *clk_names;
 	int num_clks;
+<<<<<<< HEAD
+	const char * const *path_names;
+	int num_paths;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const char *gpc_name;
 	u32 rst_mask;
 	u32 clk_mask;
@@ -52,13 +61,24 @@ struct imx8m_blk_ctrl_domain_data {
 };
 
 #define DOMAIN_MAX_CLKS 4
+<<<<<<< HEAD
+#define DOMAIN_MAX_PATHS 4
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct imx8m_blk_ctrl_domain {
 	struct generic_pm_domain genpd;
 	const struct imx8m_blk_ctrl_domain_data *data;
 	struct clk_bulk_data clks[DOMAIN_MAX_CLKS];
+<<<<<<< HEAD
+	struct icc_bulk_data paths[DOMAIN_MAX_PATHS];
 	struct device *power_dev;
 	struct imx8m_blk_ctrl *bc;
+	int num_paths;
+=======
+	struct device *power_dev;
+	struct imx8m_blk_ctrl *bc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct imx8m_blk_ctrl_data {
@@ -117,6 +137,13 @@ static int imx8m_blk_ctrl_power_on(struct generic_pm_domain *genpd)
 	if (data->mipi_phy_rst_mask)
 		regmap_set_bits(bc->regmap, BLK_MIPI_RESET_DIV, data->mipi_phy_rst_mask);
 
+<<<<<<< HEAD
+	ret = icc_bulk_set_bw(domain->num_paths, domain->paths);
+	if (ret)
+		dev_err(bc->dev, "failed to set icc bw\n");
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* disable upstream clocks */
 	clk_bulk_disable_unprepare(data->num_clks, domain->clks);
 
@@ -152,6 +179,8 @@ static int imx8m_blk_ctrl_power_off(struct generic_pm_domain *genpd)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
 static struct generic_pm_domain *
 imx8m_blk_ctrl_xlate(struct of_phandle_args *args, void *data)
 {
@@ -165,6 +194,7 @@ imx8m_blk_ctrl_xlate(struct of_phandle_args *args, void *data)
 	return onecell_data->domains[index];
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct lock_class_key blk_ctrl_genpd_lock_class;
 
 static int imx8m_blk_ctrl_probe(struct platform_device *pdev)
@@ -206,7 +236,10 @@ static int imx8m_blk_ctrl_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	bc->onecell_data.num_domains = bc_data->num_domains;
+<<<<<<< HEAD
+=======
 	bc->onecell_data.xlate = imx8m_blk_ctrl_xlate;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bc->onecell_data.domains =
 		devm_kcalloc(dev, bc_data->num_domains,
 			     sizeof(struct generic_pm_domain *), GFP_KERNEL);
@@ -224,10 +257,35 @@ static int imx8m_blk_ctrl_probe(struct platform_device *pdev)
 		int j;
 
 		domain->data = data;
+<<<<<<< HEAD
+		domain->num_paths = data->num_paths;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		for (j = 0; j < data->num_clks; j++)
 			domain->clks[j].id = data->clk_names[j];
 
+<<<<<<< HEAD
+		for (j = 0; j < data->num_paths; j++) {
+			domain->paths[j].name = data->path_names[j];
+			/* Fake value for now, just let ICC could configure NoC mode/priority */
+			domain->paths[j].avg_bw = 1;
+			domain->paths[j].peak_bw = 1;
+		}
+
+		ret = devm_of_icc_bulk_get(dev, data->num_paths, domain->paths);
+		if (ret) {
+			if (ret != -EPROBE_DEFER) {
+				dev_warn_once(dev, "Could not get interconnect paths, NoC will stay unconfigured!\n");
+				domain->num_paths = 0;
+			} else {
+				dev_err_probe(dev, ret, "failed to get noc entries\n");
+				goto cleanup_pds;
+			}
+		}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = devm_clk_bulk_get(dev, data->num_clks, domain->clks);
 		if (ret) {
 			dev_err_probe(dev, ret, "failed to get clock\n");
@@ -454,6 +512,49 @@ static const struct imx8m_blk_ctrl_data imx8mm_vpu_blk_ctl_dev_data = {
 	.num_domains = ARRAY_SIZE(imx8mm_vpu_blk_ctl_domain_data),
 };
 
+<<<<<<< HEAD
+static const struct imx8m_blk_ctrl_domain_data imx8mp_vpu_blk_ctl_domain_data[] = {
+	[IMX8MP_VPUBLK_PD_G1] = {
+		.name = "vpublk-g1",
+		.clk_names = (const char *[]){ "g1", },
+		.num_clks = 1,
+		.gpc_name = "g1",
+		.rst_mask = BIT(1),
+		.clk_mask = BIT(1),
+		.path_names = (const char *[]){"g1"},
+		.num_paths = 1,
+	},
+	[IMX8MP_VPUBLK_PD_G2] = {
+		.name = "vpublk-g2",
+		.clk_names = (const char *[]){ "g2", },
+		.num_clks = 1,
+		.gpc_name = "g2",
+		.rst_mask = BIT(0),
+		.clk_mask = BIT(0),
+		.path_names = (const char *[]){"g2"},
+		.num_paths = 1,
+	},
+	[IMX8MP_VPUBLK_PD_VC8000E] = {
+		.name = "vpublk-vc8000e",
+		.clk_names = (const char *[]){ "vc8000e", },
+		.num_clks = 1,
+		.gpc_name = "vc8000e",
+		.rst_mask = BIT(2),
+		.clk_mask = BIT(2),
+		.path_names = (const char *[]){"vc8000e"},
+		.num_paths = 1,
+	},
+};
+
+static const struct imx8m_blk_ctrl_data imx8mp_vpu_blk_ctl_dev_data = {
+	.max_reg = 0x18,
+	.power_notifier_fn = imx8mm_vpu_power_notifier,
+	.domains = imx8mp_vpu_blk_ctl_domain_data,
+	.num_domains = ARRAY_SIZE(imx8mp_vpu_blk_ctl_domain_data),
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int imx8mm_disp_power_notifier(struct notifier_block *nb,
 				      unsigned long action, void *data)
 {
@@ -649,6 +750,11 @@ static const struct imx8m_blk_ctrl_domain_data imx8mp_media_blk_ctl_domain_data[
 		.gpc_name = "lcdif1",
 		.rst_mask = BIT(4) | BIT(5) | BIT(23),
 		.clk_mask = BIT(4) | BIT(5) | BIT(23),
+<<<<<<< HEAD
+		.path_names = (const char *[]){"lcdif-rd", "lcdif-wr"},
+		.num_paths = 2,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[IMX8MP_MEDIABLK_PD_ISI] = {
 		.name = "mediablk-isi",
@@ -657,6 +763,11 @@ static const struct imx8m_blk_ctrl_domain_data imx8mp_media_blk_ctl_domain_data[
 		.gpc_name = "isi",
 		.rst_mask = BIT(6) | BIT(7),
 		.clk_mask = BIT(6) | BIT(7),
+<<<<<<< HEAD
+		.path_names = (const char *[]){"isi0", "isi1", "isi2"},
+		.num_paths = 3,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[IMX8MP_MEDIABLK_PD_MIPI_CSI2_2] = {
 		.name = "mediablk-mipi-csi2-2",
@@ -674,6 +785,11 @@ static const struct imx8m_blk_ctrl_domain_data imx8mp_media_blk_ctl_domain_data[
 		.gpc_name = "lcdif2",
 		.rst_mask = BIT(11) | BIT(12) | BIT(24),
 		.clk_mask = BIT(11) | BIT(12) | BIT(24),
+<<<<<<< HEAD
+		.path_names = (const char *[]){"lcdif-rd", "lcdif-wr"},
+		.num_paths = 2,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[IMX8MP_MEDIABLK_PD_ISP] = {
 		.name = "mediablk-isp",
@@ -682,6 +798,11 @@ static const struct imx8m_blk_ctrl_domain_data imx8mp_media_blk_ctl_domain_data[
 		.gpc_name = "isp",
 		.rst_mask = BIT(16) | BIT(17) | BIT(18),
 		.clk_mask = BIT(16) | BIT(17) | BIT(18),
+<<<<<<< HEAD
+		.path_names = (const char *[]){"isp0", "isp1"},
+		.num_paths = 2,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[IMX8MP_MEDIABLK_PD_DWE] = {
 		.name = "mediablk-dwe",
@@ -690,6 +811,11 @@ static const struct imx8m_blk_ctrl_domain_data imx8mp_media_blk_ctl_domain_data[
 		.gpc_name = "dwe",
 		.rst_mask = BIT(19) | BIT(20) | BIT(21),
 		.clk_mask = BIT(19) | BIT(20) | BIT(21),
+<<<<<<< HEAD
+		.path_names = (const char *[]){"dwe"},
+		.num_paths = 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[IMX8MP_MEDIABLK_PD_MIPI_DSI_2] = {
 		.name = "mediablk-mipi-dsi-2",
@@ -788,6 +914,12 @@ static const struct of_device_id imx8m_blk_ctrl_of_match[] = {
 		.compatible = "fsl,imx8mq-vpu-blk-ctrl",
 		.data = &imx8mq_vpu_blk_ctl_dev_data
 	}, {
+<<<<<<< HEAD
+		.compatible = "fsl,imx8mp-vpu-blk-ctrl",
+		.data = &imx8mp_vpu_blk_ctl_dev_data
+	}, {
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Sentinel */
 	}
 };

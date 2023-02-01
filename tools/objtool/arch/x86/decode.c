@@ -296,9 +296,15 @@ int arch_decode_instruction(struct objtool_file *file, const struct section *sec
 	case 0x89:
 		if (!rex_w)
 			break;
+<<<<<<< HEAD
 
 		if (modrm_reg == CFI_SP) {
 
+=======
+
+		if (modrm_reg == CFI_SP) {
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (mod_is_reg()) {
 				/* mov %rsp, reg */
 				ADD_OP(op) {
@@ -633,6 +639,12 @@ int arch_decode_instruction(struct objtool_file *file, const struct section *sec
 	case 0xca: /* retf */
 	case 0xcb: /* retf */
 		*type = INSN_CONTEXT_SWITCH;
+		break;
+
+	case 0xe0: /* loopne */
+	case 0xe1: /* loope */
+	case 0xe2: /* loop */
+		*type = INSN_JUMP_CONDITIONAL;
 		break;
 
 	case 0xe8:

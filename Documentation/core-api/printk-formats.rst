@@ -625,6 +625,19 @@ Examples::
 	%p4cc	Y10  little-endian (0x20303159)
 	%p4cc	NV12 big-endian (0xb231564e)
 
+<<<<<<< HEAD
+Rust
+----
+
+::
+
+	%pA
+
+Only intended to be used from Rust code to format ``core::fmt::Arguments``.
+Do *not* use it from C.
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Thanks
 ======
 

@@ -89,6 +89,8 @@ static u32 sdma_v5_2_get_reg_offset(struct amdgpu_device *adev, u32 instance, u3
 	return base + internal_offset;
 }
 
+<<<<<<< HEAD
+=======
 static int sdma_v5_2_init_inst_ctx(struct amdgpu_sdma_instance *sdma_inst)
 {
 	int err = 0;
@@ -116,6 +118,7 @@ static void sdma_v5_2_destroy_inst_ctx(struct amdgpu_device *adev)
 	       sizeof(struct amdgpu_sdma_instance) * AMDGPU_MAX_SDMA_INSTANCES);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * sdma_v5_2_init_microcode - load ucode images from disk
  *
@@ -132,15 +135,13 @@ static int sdma_v5_2_init_microcode(struct amdgpu_device *adev)
 {
 	const char *chip_name;
 	char fw_name[40];
-	int err = 0, i;
-	struct amdgpu_firmware_info *info = NULL;
-	const struct common_firmware_header *header = NULL;
 
 	DRM_DEBUG("\n");
 
 	switch (adev->ip_versions[SDMA0_HWIP][0]) {
 	case IP_VERSION(5, 2, 0):
 		chip_name = "sienna_cichlid_sdma";
+<<<<<<< HEAD
 		break;
 	case IP_VERSION(5, 2, 2):
 		chip_name = "navy_flounder_sdma";
@@ -151,6 +152,18 @@ static int sdma_v5_2_init_microcode(struct amdgpu_device *adev)
 	case IP_VERSION(5, 2, 4):
 		chip_name = "dimgrey_cavefish_sdma";
 		break;
+=======
+		break;
+	case IP_VERSION(5, 2, 2):
+		chip_name = "navy_flounder_sdma";
+		break;
+	case IP_VERSION(5, 2, 1):
+		chip_name = "vangogh_sdma";
+		break;
+	case IP_VERSION(5, 2, 4):
+		chip_name = "dimgrey_cavefish_sdma";
+		break;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case IP_VERSION(5, 2, 5):
 		chip_name = "beige_goby_sdma";
 		break;
@@ -168,6 +181,8 @@ static int sdma_v5_2_init_microcode(struct amdgpu_device *adev)
 	}
 
 	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s.bin", chip_name);
+<<<<<<< HEAD
+=======
 
 	err = request_firmware(&adev->sdma.instance[0].fw, fw_name, adev->dev);
 	if (err)
@@ -198,13 +213,9 @@ static int sdma_v5_2_init_microcode(struct amdgpu_device *adev)
 				ALIGN(le32_to_cpu(header->ucode_size_bytes), PAGE_SIZE);
 		}
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-out:
-	if (err) {
-		DRM_ERROR("sdma_v5_2: Failed to load firmware \"%s\"\n", fw_name);
-		sdma_v5_2_destroy_inst_ctx(adev);
-	}
-	return err;
+	return amdgpu_sdma_init_microcode(adev, fw_name, 0, true);
 }
 
 static unsigned sdma_v5_2_ring_init_cond_exec(struct amdgpu_ring *ring)
@@ -479,18 +490,10 @@ static void sdma_v5_2_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 se
  */
 static void sdma_v5_2_gfx_stop(struct amdgpu_device *adev)
 {
-	struct amdgpu_ring *sdma0 = &adev->sdma.instance[0].ring;
-	struct amdgpu_ring *sdma1 = &adev->sdma.instance[1].ring;
-	struct amdgpu_ring *sdma2 = &adev->sdma.instance[2].ring;
-	struct amdgpu_ring *sdma3 = &adev->sdma.instance[3].ring;
 	u32 rb_cntl, ib_cntl;
 	int i;
 
-	if ((adev->mman.buffer_funcs_ring == sdma0) ||
-	    (adev->mman.buffer_funcs_ring == sdma1) ||
-	    (adev->mman.buffer_funcs_ring == sdma2) ||
-	    (adev->mman.buffer_funcs_ring == sdma3))
-		amdgpu_ttm_set_buffer_funcs_status(adev, false);
+	amdgpu_sdma_unset_buffer_funcs_helper(adev);
 
 	for (i = 0; i < adev->sdma.num_instances; i++) {
 		rb_cntl = RREG32_SOC15_IP(GC, sdma_v5_2_get_reg_offset(adev, i, mmSDMA0_GFX_RB_CNTL));
@@ -1406,27 +1409,33 @@ static int sdma_v5_2_sw_fini(void *handle)
 	for (i = 0; i < adev->sdma.num_instances; i++)
 		amdgpu_ring_fini(&adev->sdma.instance[i].ring);
 
-	sdma_v5_2_destroy_inst_ctx(adev);
+	amdgpu_sdma_destroy_inst_ctx(adev, true);
 
 	return 0;
 }
 
 static int sdma_v5_2_hw_init(void *handle)
 {
-	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
+<<<<<<< HEAD
+	return sdma_v5_2_start(adev);
+=======
 	r = sdma_v5_2_start(adev);
 
 	return r;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int sdma_v5_2_hw_fini(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
-	if (amdgpu_sriov_vf(adev))
+	if (amdgpu_sriov_vf(adev)) {
+		/* disable the scheduler for SDMA */
+		amdgpu_sdma_unset_buffer_funcs_helper(adev);
 		return 0;
+	}
 
 	sdma_v5_2_ctx_switch_enable(adev, false);
 	sdma_v5_2_enable(adev, false);

@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/tsl2583.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/tsl2583.ko drivers/iio/light/tsl2583.o drivers/iio/light/tsl2583.mod.o;  true

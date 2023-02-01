@@ -792,7 +792,7 @@ static int bpf_exec_tx_verdict(struct sk_msg *msg, struct sock *sk,
 	struct sk_psock *psock;
 	struct sock *sk_redir;
 	struct tls_rec *rec;
-	bool enospc, policy;
+	bool enospc, policy, redir_ingress;
 	int err = 0, send;
 	u32 delta = 0;
 
@@ -837,6 +837,7 @@ more_data:
 		}
 		break;
 	case __SK_REDIRECT:
+		redir_ingress = psock->redir_ingress;
 		sk_redir = psock->sk_redir;
 		memcpy(&msg_redir, msg, sizeof(*msg));
 		if (msg->apply_bytes < send)
@@ -846,7 +847,8 @@ more_data:
 		sk_msg_return_zero(sk, msg, send);
 		msg->sg.size -= send;
 		release_sock(sk);
-		err = tcp_bpf_sendmsg_redir(sk_redir, &msg_redir, send, flags);
+		err = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
+					    &msg_redir, send, flags);
 		lock_sock(sk);
 		if (err < 0) {
 			*copied -= sk_msg_free_nocharge(sk, &msg_redir);
@@ -1500,12 +1502,21 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
 	switch (prot->cipher_type) {
 	case TLS_CIPHER_AES_CCM_128:
 		dctx->iv[0] = TLS_AES_CCM_IV_B0_BYTE;
+<<<<<<< HEAD
 		iv_offset = 1;
 		break;
 	case TLS_CIPHER_SM4_CCM:
 		dctx->iv[0] = TLS_SM4_CCM_IV_B0_BYTE;
 		iv_offset = 1;
 		break;
+=======
+		iv_offset = 1;
+		break;
+	case TLS_CIPHER_SM4_CCM:
+		dctx->iv[0] = TLS_SM4_CCM_IV_B0_BYTE;
+		iv_offset = 1;
+		break;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* Prepare IV */
@@ -1579,10 +1590,17 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
 			__skb_queue_tail(&ctx->async_hold, darg->skb);
 		return err;
 	}
+<<<<<<< HEAD
 
 	if (prot->tail_size)
 		darg->tail = dctx->tail;
 
+=======
+
+	if (prot->tail_size)
+		darg->tail = dctx->tail;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exit_free_pages:
 	/* Release the pages in case iov was mapped to pages */
 	for (; pages > 0; pages--)
@@ -1702,10 +1720,17 @@ static int tls_rx_one_record(struct sock *sk, struct msghdr *msg,
 	rxm->offset += prot->prepend_size;
 	rxm->full_len -= prot->overhead_size;
 	tls_advance_record_sn(sk, prot, &tls_ctx->rx);
+<<<<<<< HEAD
 
 	return 0;
 }
 
+=======
+
+	return 0;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int decrypt_skb(struct sock *sk, struct scatterlist *sgout)
 {
 	struct tls_decrypt_arg darg = { .zc = true, };
@@ -2056,10 +2081,17 @@ put_on_rx_list:
 						    msg, chunk);
 			if (err < 0)
 				goto put_on_rx_list_err;
+<<<<<<< HEAD
 
 			if (is_peek)
 				goto put_on_rx_list;
 
+=======
+
+			if (is_peek)
+				goto put_on_rx_list;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (partially_consumed) {
 				rxm->offset += chunk;
 				rxm->full_len -= chunk;
@@ -2629,6 +2661,43 @@ int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx, int tx)
 		cipher_name = "ccm(sm4)";
 		break;
 	}
+<<<<<<< HEAD
+	case TLS_CIPHER_ARIA_GCM_128: {
+		struct tls12_crypto_info_aria_gcm_128 *aria_gcm_128_info;
+
+		aria_gcm_128_info = (void *)crypto_info;
+		nonce_size = TLS_CIPHER_ARIA_GCM_128_IV_SIZE;
+		tag_size = TLS_CIPHER_ARIA_GCM_128_TAG_SIZE;
+		iv_size = TLS_CIPHER_ARIA_GCM_128_IV_SIZE;
+		iv = aria_gcm_128_info->iv;
+		rec_seq_size = TLS_CIPHER_ARIA_GCM_128_REC_SEQ_SIZE;
+		rec_seq = aria_gcm_128_info->rec_seq;
+		keysize = TLS_CIPHER_ARIA_GCM_128_KEY_SIZE;
+		key = aria_gcm_128_info->key;
+		salt = aria_gcm_128_info->salt;
+		salt_size = TLS_CIPHER_ARIA_GCM_128_SALT_SIZE;
+		cipher_name = "gcm(aria)";
+		break;
+	}
+	case TLS_CIPHER_ARIA_GCM_256: {
+		struct tls12_crypto_info_aria_gcm_256 *gcm_256_info;
+
+		gcm_256_info = (void *)crypto_info;
+		nonce_size = TLS_CIPHER_ARIA_GCM_256_IV_SIZE;
+		tag_size = TLS_CIPHER_ARIA_GCM_256_TAG_SIZE;
+		iv_size = TLS_CIPHER_ARIA_GCM_256_IV_SIZE;
+		iv = gcm_256_info->iv;
+		rec_seq_size = TLS_CIPHER_ARIA_GCM_256_REC_SEQ_SIZE;
+		rec_seq = gcm_256_info->rec_seq;
+		keysize = TLS_CIPHER_ARIA_GCM_256_KEY_SIZE;
+		key = gcm_256_info->key;
+		salt = gcm_256_info->salt;
+		salt_size = TLS_CIPHER_ARIA_GCM_256_SALT_SIZE;
+		cipher_name = "gcm(aria)";
+		break;
+	}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		rc = -EINVAL;
 		goto free_priv;

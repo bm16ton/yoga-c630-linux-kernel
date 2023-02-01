@@ -1,0 +1,4 @@
+drivers/nfc/pn533/pn533.ko
+drivers/nfc/pn533/pn533_usb.ko
+drivers/nfc/pn533/pn533_i2c.ko
+drivers/nfc/pn533/pn532_uart.ko

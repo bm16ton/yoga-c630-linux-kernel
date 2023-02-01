@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/gunze.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/gunze.ko drivers/input/touchscreen/gunze.o drivers/input/touchscreen/gunze.mod.o;  true

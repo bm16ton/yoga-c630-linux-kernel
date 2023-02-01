@@ -1,0 +1,2 @@
+drivers/devfreq/event/rockchip-dfi.ko
+drivers/devfreq/rk3399_dmc.ko

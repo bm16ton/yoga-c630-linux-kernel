@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/chelsio/libcxgb/libcxgb.mod := printf '%s\n'   libcxgb_ppm.o libcxgb_cm.o | awk '!x[$$0]++ { print("drivers/net/ethernet/chelsio/libcxgb/"$$0) }' > drivers/net/ethernet/chelsio/libcxgb/libcxgb.mod

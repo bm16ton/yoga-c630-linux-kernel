@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/apds9300.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/apds9300.ko drivers/iio/light/apds9300.o drivers/iio/light/apds9300.mod.o;  true

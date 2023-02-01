@@ -16,6 +16,7 @@
 #include "rtrs-log.h"
 #include <rdma/ib_cm.h>
 #include <rdma/ib_verbs.h>
+#include "rtrs-srv-trace.h"
 
 MODULE_DESCRIPTION("RDMA Transport Server");
 MODULE_LICENSE("GPL");
@@ -57,11 +58,14 @@ static inline struct rtrs_srv_con *to_srv_con(struct rtrs_con *c)
 	return container_of(c, struct rtrs_srv_con, c);
 }
 
+<<<<<<< HEAD
+=======
 static inline struct rtrs_srv_path *to_srv_path(struct rtrs_path *s)
 {
 	return container_of(s, struct rtrs_srv_path, s);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool rtrs_srv_change_state(struct rtrs_srv_path *srv_path,
 				  enum rtrs_srv_state new_state)
 {
@@ -121,6 +125,7 @@ static struct ib_cqe io_comp_cqe = {
 };
 
 static inline void rtrs_srv_inflight_ref_release(struct percpu_ref *ref)
+<<<<<<< HEAD
 {
 	struct rtrs_srv_path *srv_path = container_of(ref,
 						      struct rtrs_srv_path,
@@ -132,6 +137,19 @@ static inline void rtrs_srv_inflight_ref_release(struct percpu_ref *ref)
 
 static int rtrs_srv_alloc_ops_ids(struct rtrs_srv_path *srv_path)
 {
+=======
+{
+	struct rtrs_srv_path *srv_path = container_of(ref,
+						      struct rtrs_srv_path,
+						      ids_inflight_ref);
+
+	percpu_ref_exit(&srv_path->ids_inflight_ref);
+	complete(&srv_path->complete_done);
+}
+
+static int rtrs_srv_alloc_ops_ids(struct rtrs_srv_path *srv_path)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rtrs_srv_sess *srv = srv_path->srv;
 	struct rtrs_srv_op *id;
 	int i, ret;
@@ -148,6 +166,7 @@ static int rtrs_srv_alloc_ops_ids(struct rtrs_srv_path *srv_path)
 			goto err;
 
 		srv_path->ops_ids[i] = id;
+<<<<<<< HEAD
 	}
 
 	ret = percpu_ref_init(&srv_path->ids_inflight_ref,
@@ -156,6 +175,16 @@ static int rtrs_srv_alloc_ops_ids(struct rtrs_srv_path *srv_path)
 		pr_err("Percpu reference init failed\n");
 		goto err;
 	}
+=======
+	}
+
+	ret = percpu_ref_init(&srv_path->ids_inflight_ref,
+			      rtrs_srv_inflight_ref_release, 0, GFP_KERNEL);
+	if (ret) {
+		pr_err("Percpu reference init failed\n");
+		goto err;
+	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	init_completion(&srv_path->complete_done);
 
 	return 0;
@@ -166,6 +195,7 @@ err:
 }
 
 static inline void rtrs_srv_get_ops_ids(struct rtrs_srv_path *srv_path)
+<<<<<<< HEAD
 {
 	percpu_ref_get(&srv_path->ids_inflight_ref);
 }
@@ -175,6 +205,17 @@ static inline void rtrs_srv_put_ops_ids(struct rtrs_srv_path *srv_path)
 	percpu_ref_put(&srv_path->ids_inflight_ref);
 }
 
+=======
+{
+	percpu_ref_get(&srv_path->ids_inflight_ref);
+}
+
+static inline void rtrs_srv_put_ops_ids(struct rtrs_srv_path *srv_path)
+{
+	percpu_ref_put(&srv_path->ids_inflight_ref);
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtrs_srv_reg_mr_done(struct ib_cq *cq, struct ib_wc *wc)
 {
 	struct rtrs_srv_con *con = to_srv_con(wc->qp->qp_context);
@@ -374,6 +415,8 @@ static int send_io_resp_imm(struct rtrs_srv_con *con, struct rtrs_srv_op *id,
 			}
 		}
 	}
+
+	trace_send_io_resp_imm(id, need_inval, always_invalidate, errno);
 
 	if (need_inval && always_invalidate) {
 		wr = &inv_wr;
@@ -1024,7 +1067,11 @@ static void process_read(struct rtrs_srv_con *con,
 	usr_len = le16_to_cpu(msg->usr_len);
 	data_len = off - usr_len;
 	data = page_address(srv->chunks[buf_id]);
+<<<<<<< HEAD
+	ret = ctx->ops.rdma_ev(srv->priv, id, data, data_len,
+=======
 	ret = ctx->ops.rdma_ev(srv->priv, id, READ, data, data_len,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			   data + data_len, usr_len);
 
 	if (ret) {
@@ -1077,7 +1124,11 @@ static void process_write(struct rtrs_srv_con *con,
 	usr_len = le16_to_cpu(req->usr_len);
 	data_len = off - usr_len;
 	data = page_address(srv->chunks[buf_id]);
+<<<<<<< HEAD
+	ret = ctx->ops.rdma_ev(srv->priv, id, data, data_len,
+=======
 	ret = ctx->ops.rdma_ev(srv->priv, id, WRITE, data, data_len,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			       data + data_len, usr_len);
 	if (ret) {
 		rtrs_err_rl(s,

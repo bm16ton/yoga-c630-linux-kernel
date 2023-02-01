@@ -9,10 +9,18 @@
 
 #include "sc7280-herobrine.dtsi"
 #include "sc7280-herobrine-audio-wcd9385.dtsi"
+<<<<<<< HEAD
+#include "sc7280-herobrine-lte-sku.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. sc7280 CRD platform (rev5+)";
+	compatible = "google,zoglin", "google,hoglin", "qcom,sc7280";
+=======
 
 / {
 	model = "Qualcomm Technologies, Inc. sc7280 CRD platform (rev5+)";
 	compatible = "google,hoglin", "qcom,sc7280";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* FIXED REGULATORS */
 
@@ -167,7 +175,11 @@ ap_ts_pen_1v8: &i2c13 {
 			  "PMIC_EDP_BL_PWM",
 			  "";
 
+<<<<<<< HEAD
+	edp_bl_reg_en: edp-bl-reg-en-state {
+=======
 	edp_bl_reg_en: edp-bl-reg-en {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio6";
 		function = "normal";
 		bias-disable;
@@ -371,7 +383,10 @@ ap_ts_pen_1v8: &i2c13 {
 			  "",				/* 170 */
 			  "MOS_BLE_UART_TX",
 			  "MOS_BLE_UART_RX",
+<<<<<<< HEAD
+=======
 			  "",
 			  "",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			  "";
 };

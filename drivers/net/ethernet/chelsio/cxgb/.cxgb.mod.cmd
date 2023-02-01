@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/chelsio/cxgb/cxgb.mod := printf '%s\n'   cxgb2.o espi.o tp.o pm3393.o sge.o subr.o mv88x201x.o my3126.o mv88e1xxx.o vsc7326.o mv88e1xxx.o vsc7326.o | awk '!x[$$0]++ { print("drivers/net/ethernet/chelsio/cxgb/"$$0) }' > drivers/net/ethernet/chelsio/cxgb/cxgb.mod

@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/m62332.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/m62332.ko drivers/iio/dac/m62332.o drivers/iio/dac/m62332.mod.o;  true

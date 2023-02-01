@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/mb862xx/mb862xxfb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/fbdev/mb862xx/mb862xxfb.ko drivers/video/fbdev/mb862xx/mb862xxfb.o drivers/video/fbdev/mb862xx/mb862xxfb.mod.o;  true

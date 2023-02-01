@@ -1,0 +1,1 @@
+cmd_drivers/message/fusion/mptspi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/message/fusion/mptspi.ko drivers/message/fusion/mptspi.o drivers/message/fusion/mptspi.mod.o;  true

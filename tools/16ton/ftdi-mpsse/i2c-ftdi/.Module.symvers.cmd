@@ -1,0 +1,1 @@
+cmd_/Part/ft2232-mpsse-i2c-spi-kern-drivers/i2c-ftdi/Module.symvers := sed 's/\.ko$$/\.o/' /Part/ft2232-mpsse-i2c-spi-kern-drivers/i2c-ftdi/modules.order | scripts/mod/modpost -m    -o /Part/ft2232-mpsse-i2c-spi-kern-drivers/i2c-ftdi/Module.symvers -e -i Module.symvers  -N -T -

@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/adi-axi-adc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/adi-axi-adc.ko drivers/iio/adc/adi-axi-adc.o drivers/iio/adc/adi-axi-adc.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/w1/slaves/w1_ds2438.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/w1/slaves/w1_ds2438.ko drivers/w1/slaves/w1_ds2438.o drivers/w1/slaves/w1_ds2438.mod.o;  true

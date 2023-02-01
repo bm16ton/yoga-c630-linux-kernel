@@ -131,10 +131,8 @@ int inv_mpu6050_prepare_fifo(struct inv_mpu6050_state *st, bool enable)
 		if (ret)
 			return ret;
 		/* enable interrupt */
-
 		ret = regmap_write(st->map, st->reg->int_enable,
 				   INV_MPU6050_BIT_DATA_RDY_EN);
-
 	} else {
 		ret = regmap_write(st->map, st->reg->int_enable, 0);
 		if (ret)

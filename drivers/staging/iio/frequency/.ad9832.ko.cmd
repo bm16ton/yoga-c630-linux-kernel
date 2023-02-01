@@ -1,0 +1,1 @@
+cmd_drivers/staging/iio/frequency/ad9832.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/iio/frequency/ad9832.ko drivers/staging/iio/frequency/ad9832.o drivers/staging/iio/frequency/ad9832.mod.o;  true

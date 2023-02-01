@@ -292,7 +292,7 @@ static int imx_rngc_probe(struct platform_device *pdev)
 		}
 	}
 
-	ret = hwrng_register(&rngc->rng);
+	ret = devm_hwrng_register(&pdev->dev, &rngc->rng);
 	if (ret) {
 		dev_err(&pdev->dev, "hwrng registration failed\n");
 		return ret;
@@ -303,6 +303,8 @@ static int imx_rngc_probe(struct platform_device *pdev)
 		rng_type == RNGC_TYPE_RNGB ? 'B' : 'C',
 		(ver_id >> RNGC_VER_MAJ_SHIFT) & 0xff, ver_id & 0xff);
 	return 0;
+<<<<<<< HEAD
+=======
 }
 
 static int __exit imx_rngc_remove(struct platform_device *pdev)
@@ -312,6 +314,7 @@ static int __exit imx_rngc_remove(struct platform_device *pdev)
 	hwrng_unregister(&rngc->rng);
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused imx_rngc_suspend(struct device *dev)
@@ -342,11 +345,10 @@ MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
 
 static struct platform_driver imx_rngc_driver = {
 	.driver = {
-		.name = "imx_rngc",
+		.name = KBUILD_MODNAME,
 		.pm = &imx_rngc_pm_ops,
 		.of_match_table = imx_rngc_dt_ids,
 	},
-	.remove = __exit_p(imx_rngc_remove),
 };
 
 module_platform_driver_probe(imx_rngc_driver, imx_rngc_probe);

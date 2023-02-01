@@ -429,15 +429,25 @@ static inline int ti_sci_do_xfer(struct ti_sci_info *info,
 		 * during noirq phase, so we must manually poll the completion.
 		 */
 		ret = read_poll_timeout_atomic(try_wait_for_completion, done_state,
+<<<<<<< HEAD
+					       done_state, 1,
+=======
 					       true, 1,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					       info->desc->max_rx_timeout_ms * 1000,
 					       false, &xfer->done);
 	}
 
+<<<<<<< HEAD
+	if (ret == -ETIMEDOUT)
+		dev_err(dev, "Mbox timedout in resp(caller: %pS)\n",
+			(void *)_RET_IP_);
+=======
 	if (ret == -ETIMEDOUT || !done_state) {
 		dev_err(dev, "Mbox timedout in resp(caller: %pS)\n",
 			(void *)_RET_IP_);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * NOTE: we might prefer not to need the mailbox ticker to manage the

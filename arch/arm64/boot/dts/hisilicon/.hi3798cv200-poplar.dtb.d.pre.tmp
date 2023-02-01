@@ -1,0 +1,11 @@
+hi3798cv200-poplar.o: \
+ arch/arm64/boot/dts/hisilicon/hi3798cv200-poplar.dts \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ arch/arm64/boot/dts/hisilicon/hi3798cv200.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/histb-clock.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/phy/phy.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/ti-syscon.h \
+ arch/arm64/boot/dts/hisilicon/poplar-pinctrl.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/hisi.h

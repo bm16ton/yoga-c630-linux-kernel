@@ -939,13 +939,41 @@ bool dcn30_does_plane_fit_in_mall(struct dc *dc, struct dc_plane_state *plane, s
 
 void dcn30_hardware_release(struct dc *dc)
 {
+<<<<<<< HEAD
+	bool subvp_in_use = false;
+	uint32_t i;
+
+	dc_dmub_srv_p_state_delegate(dc, false, NULL);
+	dc_dmub_setup_subvp_dmub_command(dc, dc->current_state, false);
+
+	/* SubVP treated the same way as FPO. If driver disable and
+	 * we are using a SubVP config, disable and force on DCN side
+	 * to prevent P-State hang on driver enable.
+	 */
+	for (i = 0; i < dc->res_pool->pipe_count; i++) {
+		struct pipe_ctx *pipe = &dc->current_state->res_ctx.pipe_ctx[i];
+
+		if (!pipe->stream)
+			continue;
+
+		if (pipe->stream->mall_stream_config.type == SUBVP_MAIN) {
+			subvp_in_use = true;
+			break;
+		}
+	}
+=======
 	dc_dmub_srv_p_state_delegate(dc, false, NULL);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* If pstate unsupported, or still supported
 	 * by firmware, force it supported by dcn
 	 */
 	if (dc->current_state)
+<<<<<<< HEAD
+		if ((!dc->clk_mgr->clks.p_state_change_support || subvp_in_use ||
+=======
 		if ((!dc->clk_mgr->clks.p_state_change_support ||
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				dc->current_state->bw_ctx.bw.dcn.clk.fw_based_mclk_switching) &&
 				dc->res_pool->hubbub->funcs->force_pstate_change_control)
 			dc->res_pool->hubbub->funcs->force_pstate_change_control(
@@ -962,6 +990,7 @@ void dcn30_set_disp_pattern_generator(const struct dc *dc,
 {
 	pipe_ctx->stream_res.opp->funcs->opp_set_disp_pattern_generator(pipe_ctx->stream_res.opp, test_pattern,
 			color_space, color_depth, solid_color, width, height, offset);
+<<<<<<< HEAD
 }
 
 void dcn30_prepare_bandwidth(struct dc *dc,
@@ -978,3 +1007,21 @@ void dcn30_prepare_bandwidth(struct dc *dc,
 		context->bw_ctx.bw.dcn.clk.fw_based_mclk_switching, context);
 }
 
+=======
+}
+
+void dcn30_prepare_bandwidth(struct dc *dc,
+ 	struct dc_state *context)
+{
+	if (dc->clk_mgr->dc_mode_softmax_enabled)
+		if (dc->clk_mgr->clks.dramclk_khz <= dc->clk_mgr->bw_params->dc_mode_softmax_memclk * 1000 &&
+				context->bw_ctx.bw.dcn.clk.dramclk_khz > dc->clk_mgr->bw_params->dc_mode_softmax_memclk * 1000)
+			dc->clk_mgr->funcs->set_max_memclk(dc->clk_mgr, dc->clk_mgr->bw_params->clk_table.entries[dc->clk_mgr->bw_params->clk_table.num_entries - 1].memclk_mhz);
+
+	dcn20_prepare_bandwidth(dc, context);
+
+	dc_dmub_srv_p_state_delegate(dc,
+		context->bw_ctx.bw.dcn.clk.fw_based_mclk_switching, context);
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-pci-idio-16.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-pci-idio-16.ko drivers/gpio/gpio-pci-idio-16.o drivers/gpio/gpio-pci-idio-16.mod.o;  true

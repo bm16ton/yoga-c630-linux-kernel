@@ -1377,11 +1377,26 @@ void build_prologue(struct jit_context *ctx)
 	int stack, saved, locals, reserved;
 
 	/*
+<<<<<<< HEAD
+	 * In the unlikely event that the TCC limit is raised to more
+	 * than 16 bits, it is clamped to the maximum value allowed for
+	 * the generated code (0xffff). It is better fail to compile
+	 * instead of degrading gracefully.
+	 */
+	BUILD_BUG_ON(MAX_TAIL_CALL_CNT > 0xffff);
+
+	/*
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * The first two instructions initialize TCC in the reserved (for us)
 	 * 16-byte area in the parent's stack frame. On a tail call, the
 	 * calling function jumps into the prologue after these instructions.
 	 */
+<<<<<<< HEAD
+	emit(ctx, ori, MIPS_R_T9, MIPS_R_ZERO, MAX_TAIL_CALL_CNT);
+=======
 	emit(ctx, ori, MIPS_R_T9, MIPS_R_ZERO, min(MAX_TAIL_CALL_CNT, 0xffff));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	emit(ctx, sw, MIPS_R_T9, 0, MIPS_R_SP);
 
 	/*

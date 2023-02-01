@@ -304,6 +304,17 @@ static void ath_force_no_ir_chan(struct ieee80211_channel *ch)
 	ch->flags |= IEEE80211_CHAN_NO_IR;
 }
 
+static void ath_force_no_ir_freq(struct wiphy *wiphy, u16 center_freq)
+{
+	struct ieee80211_channel *ch;
+
+	ch = ieee80211_get_channel(wiphy, center_freq);
+	if (!ch)
+		return;
+
+	ath_force_no_ir_chan(ch);
+}
+
 static void
 __ath_reg_apply_beaconing_flags(struct wiphy *wiphy,
 				struct ath_regulatory *reg,
@@ -398,7 +409,7 @@ ath_reg_apply_ir_flags(struct wiphy *wiphy,
 	switch(initiator) {
 	case NL80211_REGDOM_SET_BY_COUNTRY_IE:
 		ath_force_clear_no_ir_freq(wiphy, 2467);
-  	ath_force_clear_no_ir_freq(wiphy, 2472);
+		ath_force_clear_no_ir_freq(wiphy, 2472);
 		break;
 	case NL80211_REGDOM_SET_BY_USER:
 		if (!ath_reg_dyn_country_user_allow(reg))

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/carl9170/carl9170.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/ath/carl9170/carl9170.ko drivers/net/wireless/ath/carl9170/carl9170.o drivers/net/wireless/ath/carl9170/carl9170.mod.o;  true

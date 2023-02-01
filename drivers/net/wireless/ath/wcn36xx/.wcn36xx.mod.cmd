@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/wcn36xx/wcn36xx.mod := printf '%s\n'   main.o dxe.o txrx.o smd.o pmc.o debug.o firmware.o testmode.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/wcn36xx/"$$0) }' > drivers/net/wireless/ath/wcn36xx/wcn36xx.mod

@@ -1,0 +1,1 @@
+cmd_sound/usb/line6/snd-usb-line6.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/usb/line6/snd-usb-line6.ko sound/usb/line6/snd-usb-line6.o sound/usb/line6/snd-usb-line6.mod.o;  true

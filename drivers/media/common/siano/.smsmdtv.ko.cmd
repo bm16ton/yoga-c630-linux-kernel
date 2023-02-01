@@ -1,0 +1,1 @@
+cmd_drivers/media/common/siano/smsmdtv.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/common/siano/smsmdtv.ko drivers/media/common/siano/smsmdtv.o drivers/media/common/siano/smsmdtv.mod.o;  true

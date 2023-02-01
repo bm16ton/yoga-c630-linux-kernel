@@ -11,6 +11,10 @@ struct lock_stat {
 
 	u64			addr;		/* address of lockdep_map, used as ID */
 	char			*name;		/* for strcpy(), we cannot use const */
+<<<<<<< HEAD
+	u64			*callstack;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	unsigned int		nr_acquire;
 	unsigned int		nr_acquired;
@@ -113,7 +117,13 @@ struct lock_contention {
 	struct machine *machine;
 	struct hlist_head *result;
 	unsigned long map_nr_entries;
+<<<<<<< HEAD
+	int lost;
+	int max_stack;
+	int stack_skip;
+=======
 	unsigned long lost;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #ifdef HAVE_BPF_SKEL

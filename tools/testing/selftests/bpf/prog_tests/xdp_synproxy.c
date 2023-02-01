@@ -82,7 +82,11 @@ static void test_synproxy(bool xdp)
 	SYS("ethtool -K tmp0 tx off");
 	if (xdp)
 		/* Workaround required for veth. */
+<<<<<<< HEAD
+		SYS("ip link set tmp0 xdp object xdp_dummy.bpf.o section xdp 2> /dev/null");
+=======
 		SYS("ip link set tmp0 xdp object xdp_dummy.o section xdp 2> /dev/null");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ns = open_netns("synproxy");
 	if (!ASSERT_OK_PTR(ns, "setns"))
@@ -174,7 +178,11 @@ out:
 	system("ip netns del synproxy");
 }
 
+<<<<<<< HEAD
+void serial_test_xdp_synproxy(void)
+=======
 void test_xdp_synproxy(void)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (test__start_subtest("xdp"))
 		test_synproxy(true);

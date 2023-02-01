@@ -1,0 +1,1 @@
+cmd_drivers/reset/hisilicon/built-in.a := rm -f drivers/reset/hisilicon/built-in.a;  printf "drivers/reset/hisilicon/%s " hi6220_reset.o reset-hi3660.o | xargs ar cDPrST drivers/reset/hisilicon/built-in.a

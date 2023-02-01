@@ -800,3 +800,7 @@ MODULE_AUTHOR("Brijesh Singh <brijesh.singh@amd.com>");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0.0");
 MODULE_DESCRIPTION("AMD SEV Guest Driver");
+<<<<<<< HEAD
+MODULE_ALIAS("platform:sev-guest");
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

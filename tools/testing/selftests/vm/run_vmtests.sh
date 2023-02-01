@@ -96,9 +96,97 @@ echo 4194304 > /proc/sys/kernel/shmall
 run_test ./hugepage-shm
 echo "$shmmax" > /proc/sys/kernel/shmmax
 echo "$shmall" > /proc/sys/kernel/shmall
+<<<<<<< HEAD
 
 run_test ./map_hugetlb
 
+run_test ./hugepage-mremap "$mnt"/huge_mremap
+rm -f "$mnt"/huge_mremap
+
+run_test ./hugepage-vmemmap
+
+run_test ./hugetlb-madvise "$mnt"/madvise-test
+rm -f "$mnt"/madvise-test
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+run_test ./map_hugetlb
+
+<<<<<<< HEAD
+run_test ./map_fixed_noreplace
+
+# get_user_pages_fast() benchmark
+run_test ./gup_test -u
+# pin_user_pages_fast() benchmark
+run_test ./gup_test -a
+# Dump pages 0, 19, and 4096, using pin_user_pages:
+run_test ./gup_test -ct -F 0x1 0 19 0x1000
+
+uffd_mods=("" ":dev")
+for mod in "${uffd_mods[@]}"; do
+	run_test ./userfaultfd anon${mod} 20 16
+	# Hugetlb tests require source and destination huge pages. Pass in half
+	# the size ($half_ufd_size_MB), which is used for *each*.
+	run_test ./userfaultfd hugetlb${mod} "$half_ufd_size_MB" 32
+	run_test ./userfaultfd hugetlb_shared${mod} "$half_ufd_size_MB" 32 "$mnt"/uffd-test
+	rm -f "$mnt"/uffd-test
+	run_test ./userfaultfd shmem${mod} 20 16
+done
+
+#cleanup
+umount "$mnt"
+rm -rf "$mnt"
+echo "$nr_hugepgs" > /proc/sys/vm/nr_hugepages
+
+run_test ./compaction_test
+
+run_test sudo -u nobody ./on-fault-limit
+
+run_test ./map_populate
+
+run_test ./mlock-random-test
+
+run_test ./mlock2-tests
+
+run_test ./mrelease_test
+
+run_test ./mremap_test
+
+run_test ./thuge-gen
+
+if [ $VADDR64 -ne 0 ]; then
+	run_test ./virtual_address_range
+
+	# virtual address 128TB switch test
+	run_test ./va_128TBswitch.sh
+fi # VADDR64
+
+# vmalloc stability smoke test
+run_test ./test_vmalloc.sh smoke
+
+run_test ./mremap_dontunmap
+
+run_test ./test_hmm.sh smoke
+
+# MADV_POPULATE_READ and MADV_POPULATE_WRITE tests
+run_test ./madv_populate
+
+run_test ./memfd_secret
+
+# KSM MADV_MERGEABLE test with 10 identical pages
+run_test ./ksm_tests -M -p 10
+# KSM unmerge test
+run_test ./ksm_tests -U
+# KSM test with 10 zero pages and use_zero_pages = 0
+run_test ./ksm_tests -Z -p 10 -z 0
+# KSM test with 10 zero pages and use_zero_pages = 1
+run_test ./ksm_tests -Z -p 10 -z 1
+# KSM test with 2 NUMA nodes and merge_across_nodes = 1
+run_test ./ksm_tests -N -m 1
+# KSM test with 2 NUMA nodes and merge_across_nodes = 0
+run_test ./ksm_tests -N -m 0
+
+=======
 run_test ./hugepage-mremap "$mnt"/huge_mremap
 rm -f "$mnt"/huge_mremap
 
@@ -179,6 +267,7 @@ run_test ./ksm_tests -N -m 1
 # KSM test with 2 NUMA nodes and merge_across_nodes = 0
 run_test ./ksm_tests -N -m 0
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # protection_keys tests
 if [ -x ./protection_keys_32 ]
 then

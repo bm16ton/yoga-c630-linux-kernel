@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/mantis/hopper.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/mantis/hopper.ko drivers/media/pci/mantis/hopper.o drivers/media/pci/mantis/hopper.mod.o;  true

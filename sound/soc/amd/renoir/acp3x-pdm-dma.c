@@ -363,12 +363,22 @@ static struct snd_soc_dai_driver acp_pdm_dai_driver = {
 };
 
 static const struct snd_soc_component_driver acp_pdm_component = {
+<<<<<<< HEAD
+	.name			= DRV_NAME,
+	.open			= acp_pdm_dma_open,
+	.close			= acp_pdm_dma_close,
+	.hw_params		= acp_pdm_dma_hw_params,
+	.pointer		= acp_pdm_dma_pointer,
+	.pcm_construct		= acp_pdm_dma_new,
+	.legacy_dai_naming	= 1,
+=======
 	.name		= DRV_NAME,
 	.open		= acp_pdm_dma_open,
 	.close		= acp_pdm_dma_close,
 	.hw_params	= acp_pdm_dma_hw_params,
 	.pointer	= acp_pdm_dma_pointer,
 	.pcm_construct	= acp_pdm_dma_new,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int acp_pdm_audio_probe(struct platform_device *pdev)

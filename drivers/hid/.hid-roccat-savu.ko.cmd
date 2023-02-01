@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-roccat-savu.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-roccat-savu.ko drivers/hid/hid-roccat-savu.o drivers/hid/hid-roccat-savu.mod.o;  true

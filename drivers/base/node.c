@@ -20,6 +20,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/swap.h>
 #include <linux/slab.h>
+#include <linux/hugetlb.h>
 
 static struct bus_type node_subsys = {
 	.name = "node",
@@ -433,6 +434,7 @@ static ssize_t node_read_meminfo(struct device *dev,
 			     "Node %d ShadowCallStack:%8lu kB\n"
 #endif
 			     "Node %d PageTables:     %8lu kB\n"
+			     "Node %d SecPageTables:  %8lu kB\n"
 			     "Node %d NFS_Unstable:   %8lu kB\n"
 			     "Node %d Bounce:         %8lu kB\n"
 			     "Node %d WritebackTmp:   %8lu kB\n"
@@ -459,6 +461,7 @@ static ssize_t node_read_meminfo(struct device *dev,
 			     nid, node_page_state(pgdat, NR_KERNEL_SCS_KB),
 #endif
 			     nid, K(node_page_state(pgdat, NR_PAGETABLE)),
+			     nid, K(node_page_state(pgdat, NR_SECONDARY_PAGETABLE)),
 			     nid, 0UL,
 			     nid, K(sum_zone_node_page_state(nid, NR_BOUNCE)),
 			     nid, K(node_page_state(pgdat, NR_WRITEBACK_TEMP)),
@@ -567,6 +570,28 @@ static struct attribute *node_dev_attrs[] = {
 	&dev_attr_vmstat.attr,
 	NULL
 };
+<<<<<<< HEAD
+=======
+
+static struct bin_attribute *node_dev_bin_attrs[] = {
+	&bin_attr_cpumap,
+	&bin_attr_cpulist,
+	NULL
+};
+
+static const struct attribute_group node_dev_group = {
+	.attrs = node_dev_attrs,
+	.bin_attrs = node_dev_bin_attrs
+};
+
+static const struct attribute_group *node_dev_groups[] = {
+	&node_dev_group,
+#ifdef CONFIG_HAVE_ARCH_NODE_DEV_GROUP
+	&arch_node_dev_group,
+#endif
+	NULL
+};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct bin_attribute *node_dev_bin_attrs[] = {
 	&bin_attr_cpumap,
@@ -587,49 +612,11 @@ static const struct attribute_group *node_dev_groups[] = {
 	NULL
 };
 
-#ifdef CONFIG_HUGETLBFS
-/*
- * hugetlbfs per node attributes registration interface:
- * When/if hugetlb[fs] subsystem initializes [sometime after this module],
- * it will register its per node attributes for all online nodes with
- * memory.  It will also call register_hugetlbfs_with_node(), below, to
- * register its attribute registration functions with this node driver.
- * Once these hooks have been initialized, the node driver will call into
- * the hugetlb module to [un]register attributes for hot-plugged nodes.
- */
-static node_registration_func_t __hugetlb_register_node;
-static node_registration_func_t __hugetlb_unregister_node;
-
-static inline bool hugetlb_register_node(struct node *node)
-{
-	if (__hugetlb_register_node &&
-			node_state(node->dev.id, N_MEMORY)) {
-		__hugetlb_register_node(node);
-		return true;
-	}
-	return false;
-}
-
-static inline void hugetlb_unregister_node(struct node *node)
-{
-	if (__hugetlb_unregister_node)
-		__hugetlb_unregister_node(node);
-}
-
-void register_hugetlbfs_with_node(node_registration_func_t doregister,
-				  node_registration_func_t unregister)
-{
-	__hugetlb_register_node   = doregister;
-	__hugetlb_unregister_node = unregister;
-}
-#else
-static inline void hugetlb_register_node(struct node *node) {}
-
-static inline void hugetlb_unregister_node(struct node *node) {}
-#endif
-
 static void node_device_release(struct device *dev)
 {
+<<<<<<< HEAD
+	kfree(to_node(dev));
+=======
 	struct node *node = to_node(dev);
 
 #if defined(CONFIG_MEMORY_HOTPLUG) && defined(CONFIG_HUGETLBFS)
@@ -645,6 +632,7 @@ static void node_device_release(struct device *dev)
 	flush_work(&node->node_work);
 #endif
 	kfree(node);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -663,13 +651,13 @@ static int register_node(struct node *node, int num)
 	node->dev.groups = node_dev_groups;
 	error = device_register(&node->dev);
 
-	if (error)
+	if (error) {
 		put_device(&node->dev);
-	else {
+	} else {
 		hugetlb_register_node(node);
-
 		compaction_register_node(node);
 	}
+
 	return error;
 }
 
@@ -682,8 +670,13 @@ static int register_node(struct node *node, int num)
  */
 void unregister_node(struct node *node)
 {
+<<<<<<< HEAD
+	hugetlb_unregister_node(node);
+	compaction_unregister_node(node);
+=======
 	compaction_unregister_node(node);
 	hugetlb_unregister_node(node);		/* no-op, if memoryless node */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	node_remove_accesses(node);
 	node_remove_caches(node);
 	device_unregister(&node->dev);
@@ -905,6 +898,9 @@ void register_memory_blocks_under_node(int nid, unsigned long start_pfn,
 			   (void *)&nid, func);
 	return;
 }
+<<<<<<< HEAD
+#endif /* CONFIG_MEMORY_HOTPLUG */
+=======
 
 #ifdef CONFIG_HUGETLBFS
 /*
@@ -972,6 +968,7 @@ static inline int node_memory_callback(struct notifier_block *self,
 static void init_node_hugetlb_work(int nid) { }
 
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int __register_one_node(int nid)
 {
@@ -991,8 +988,6 @@ int __register_one_node(int nid)
 	}
 
 	INIT_LIST_HEAD(&node_devices[nid]->access_list);
-	/* initialize work queue for memory hot plug */
-	init_node_hugetlb_work(nid);
 	node_init_caches(nid);
 
 	return error;
@@ -1063,6 +1058,10 @@ static const struct attribute_group *cpu_root_attr_groups[] = {
 	NULL,
 };
 
+<<<<<<< HEAD
+void __init node_dev_init(void)
+{
+=======
 #define NODE_CALLBACK_PRI	2	/* lower than SLAB */
 void __init node_dev_init(void)
 {
@@ -1070,6 +1069,7 @@ void __init node_dev_init(void)
 		.notifier_call = node_memory_callback,
 		.priority = NODE_CALLBACK_PRI,
 	};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret, i;
 
  	BUILD_BUG_ON(ARRAY_SIZE(node_state_attr) != NR_NODE_STATES);
@@ -1078,8 +1078,11 @@ void __init node_dev_init(void)
 	ret = subsys_system_register(&node_subsys, cpu_root_attr_groups);
 	if (ret)
 		panic("%s() failed to register subsystem: %d\n", __func__, ret);
+<<<<<<< HEAD
+=======
 
 	register_hotmemory_notifier(&node_memory_callback_nb);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Create all node devices, which will properly link the node

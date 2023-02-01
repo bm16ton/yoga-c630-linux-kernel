@@ -796,9 +796,15 @@ static int can327_netdev_close(struct net_device *dev)
 
 	netif_stop_queue(dev);
 
+<<<<<<< HEAD
+	/* We don't flush the UART TX queue here, as we want final stop
+	 * commands (like the above dummy char) to be flushed out.
+	 */
+=======
 	/* Give UART one final chance to flush. */
 	clear_bit(TTY_DO_WRITE_WAKEUP, &elm->tty->flags);
 	flush_work(&elm->tx_work);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	can_rx_offload_disable(&elm->offload);
 	elm->can.state = CAN_STATE_STOPPED;
@@ -1069,11 +1075,22 @@ static void can327_ldisc_close(struct tty_struct *tty)
 {
 	struct can327 *elm = (struct can327 *)tty->disc_data;
 
+<<<<<<< HEAD
+	/* unregister_netdev() calls .ndo_stop() so we don't have to. */
+	unregister_candev(elm->dev);
+
+	/* Give UART one final chance to flush.
+	 * No need to clear TTY_DO_WRITE_WAKEUP since .write_wakeup() is
+	 * serialised against .close() and will not be called once we return.
+	 */
+	flush_work(&elm->tx_work);
+=======
 	/* unregister_netdev() calls .ndo_stop() so we don't have to.
 	 * Our .ndo_stop() also flushes the TTY write wakeup handler,
 	 * so we can safely set elm->tty = NULL after this.
 	 */
 	unregister_candev(elm->dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Mark channel as dead */
 	spin_lock_bh(&elm->lock);

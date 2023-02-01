@@ -1,0 +1,1 @@
+cmd_drivers/usb/typec/tcpm/modules.order := {   echo drivers/usb/typec/tcpm/tcpm.ko;   echo drivers/usb/typec/tcpm/fusb302.ko;   echo drivers/usb/typec/tcpm/tcpci.ko;   echo drivers/usb/typec/tcpm/tcpci_rt1711h.ko;   echo drivers/usb/typec/tcpm/tcpci_maxim.ko; :; } > drivers/usb/typec/tcpm/modules.order

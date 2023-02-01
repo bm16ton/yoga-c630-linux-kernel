@@ -1,0 +1,19 @@
+sun50i-a64-teres-i.o: \
+ arch/arm64/boot/dts/allwinner/sun50i-a64-teres-i.dts \
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun50i-a64-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun6i-rtc.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun8i-de2.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun8i-r-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun50i-a64-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun8i-de2.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun8i-r-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ arch/arm64/boot/dts/allwinner/sun50i-a64-cpu-opp.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/input.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/linux-event-codes.h \
+ scripts/dtc/include-prefixes/dt-bindings/pwm/pwm.h \
+ arch/arm64/boot/dts/allwinner/axp803.dtsi

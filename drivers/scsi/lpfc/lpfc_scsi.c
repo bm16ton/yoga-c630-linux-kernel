@@ -110,6 +110,8 @@ lpfc_sli4_set_rsp_sgl_last(struct lpfc_hba *phba,
 }
 
 #define LPFC_INVALID_REFTAG ((u32)-1)
+<<<<<<< HEAD
+=======
 
 /**
  * lpfc_update_stats - Update statistical data for the command completion
@@ -166,6 +168,7 @@ lpfc_update_stats(struct lpfc_vport *vport, struct lpfc_io_buf *lpfc_cmd)
 	pnode->lat_data[i].cmd_count++;
 	spin_unlock_irqrestore(shost->host_lock, flags);
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * lpfc_rampdown_queue_depth - Post RAMP_DOWN_QUEUE event to worker thread
@@ -2949,6 +2952,7 @@ lpfc_parse_bg_err(struct lpfc_hba *phba, struct lpfc_io_buf *lpfc_cmd,
 	if (phba->sli_rev == LPFC_SLI_REV4) {
 		wcqe = &pIocbOut->wcqe_cmpl;
 		status = bf_get(lpfc_wcqe_c_status, wcqe);
+<<<<<<< HEAD
 
 		if (status == CQE_STATUS_DI_ERROR) {
 			/* Guard Check failed */
@@ -2963,6 +2967,22 @@ lpfc_parse_bg_err(struct lpfc_hba *phba, struct lpfc_io_buf *lpfc_cmd,
 			if (bf_get(lpfc_wcqe_c_bg_re, wcqe))
 				bgstat |= BGS_REFTAG_ERR_MASK;
 
+=======
+
+		if (status == CQE_STATUS_DI_ERROR) {
+			/* Guard Check failed */
+			if (bf_get(lpfc_wcqe_c_bg_ge, wcqe))
+				bgstat |= BGS_GUARD_ERR_MASK;
+
+			/* AppTag Check failed */
+			if (bf_get(lpfc_wcqe_c_bg_ae, wcqe))
+				bgstat |= BGS_APPTAG_ERR_MASK;
+
+			/* RefTag Check failed */
+			if (bf_get(lpfc_wcqe_c_bg_re, wcqe))
+				bgstat |= BGS_REFTAG_ERR_MASK;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			/* Check to see if there was any good data before the
 			 * error
 			 */
@@ -4335,8 +4355,6 @@ lpfc_fcp_io_cmd_wqe_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
 				 cmd->retries, scsi_get_resid(cmd));
 	}
 
-	lpfc_update_stats(vport, lpfc_cmd);
-
 	if (vport->cfg_max_scsicmpl_time &&
 	    time_after(jiffies, lpfc_cmd->start_time +
 	    msecs_to_jiffies(vport->cfg_max_scsicmpl_time))) {
@@ -4617,7 +4635,6 @@ lpfc_scsi_cmd_iocb_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pIocbIn,
 				 scsi_get_resid(cmd));
 	}
 
-	lpfc_update_stats(vport, lpfc_cmd);
 	if (vport->cfg_max_scsicmpl_time &&
 	   time_after(jiffies, lpfc_cmd->start_time +
 		msecs_to_jiffies(vport->cfg_max_scsicmpl_time))) {
@@ -6850,6 +6867,33 @@ struct scsi_host_template lpfc_template = {
 	.shost_groups		= lpfc_hba_groups,
 	.max_sectors		= 0xFFFFFFFF,
 	.vendor_id		= LPFC_NL_VENDOR_ID,
+	.change_queue_depth	= scsi_change_queue_depth,
+	.track_queue_depth	= 1,
+};
+
+struct scsi_host_template lpfc_vport_template = {
+	.module			= THIS_MODULE,
+	.name			= LPFC_DRIVER_NAME,
+	.proc_name		= LPFC_DRIVER_NAME,
+	.info			= lpfc_info,
+	.queuecommand		= lpfc_queuecommand,
+	.eh_timed_out		= fc_eh_timed_out,
+	.eh_should_retry_cmd    = fc_eh_should_retry_cmd,
+	.eh_abort_handler	= lpfc_abort_handler,
+	.eh_device_reset_handler = lpfc_device_reset_handler,
+	.eh_target_reset_handler = lpfc_target_reset_handler,
+	.eh_bus_reset_handler	= NULL,
+	.eh_host_reset_handler	= NULL,
+	.slave_alloc		= lpfc_slave_alloc,
+	.slave_configure	= lpfc_slave_configure,
+	.slave_destroy		= lpfc_slave_destroy,
+	.scan_finished		= lpfc_scan_finished,
+	.this_id		= -1,
+	.sg_tablesize		= LPFC_DEFAULT_SG_SEG_CNT,
+	.cmd_per_lun		= LPFC_CMD_PER_LUN,
+	.shost_groups		= lpfc_vport_groups,
+	.max_sectors		= 0xFFFFFFFF,
+	.vendor_id		= 0,
 	.change_queue_depth	= scsi_change_queue_depth,
 	.track_queue_depth	= 1,
 };

@@ -1,0 +1,1 @@
+cmd_drivers/net/mdio/of_mdio.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/mdio/of_mdio.ko drivers/net/mdio/of_mdio.o drivers/net/mdio/of_mdio.mod.o;  true

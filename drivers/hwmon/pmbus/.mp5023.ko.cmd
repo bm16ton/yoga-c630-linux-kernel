@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/mp5023.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/mp5023.ko drivers/hwmon/pmbus/mp5023.o drivers/hwmon/pmbus/mp5023.mod.o;  true

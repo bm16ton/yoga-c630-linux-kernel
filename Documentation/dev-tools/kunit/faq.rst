@@ -31,13 +31,23 @@ For the most part, the KUnit core framework (what we use to write the tests)
 can compile to any architecture. It compiles like just another part of the
 kernel and runs when the kernel boots, or when built as a module, when the
 module is loaded.  However, there is infrastructure, like the KUnit Wrapper
+<<<<<<< HEAD
+(``tools/testing/kunit/kunit.py``) that might not support some architectures
+(see :ref:`kunit-on-qemu`).
+=======
 (``tools/testing/kunit/kunit.py``) that does not support other architectures.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 In short, yes, you can run KUnit on other architectures, but it might require
 more work than using KUnit on UML.
 
 For more information, see :ref:`kunit-on-non-uml`.
 
+<<<<<<< HEAD
+.. _kinds-of-tests:
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 What is the difference between a unit test and other kinds of tests?
 ====================================================================
 Most existing tests for the Linux kernel would be categorized as an integration
@@ -95,8 +105,12 @@ things to try.
    seeing. When tests are built-in, they will execute when the kernel boots, and
    modules will automatically execute associated tests when loaded. Test results
    can be collected from ``/sys/kernel/debug/kunit/<test suite>/results``, and
+<<<<<<< HEAD
+   can be parsed with ``kunit.py parse``. For more details, see :ref:`kunit-on-qemu`.
+=======
    can be parsed with ``kunit.py parse``. For more details, see "KUnit on
    non-UML architectures" in Documentation/dev-tools/kunit/usage.rst.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 If none of the above tricks help, you are always welcome to email any issues to
 kunit-dev@googlegroups.com.

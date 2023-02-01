@@ -701,7 +701,11 @@ static void mpc32_power_on_shaper_3dlut(
 }
 
 
+<<<<<<< HEAD
+static bool mpc32_program_shaper(
+=======
 bool mpc32_program_shaper(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct mpc *mpc,
 		const struct pwl_params *params,
 		uint32_t mpcc_id)
@@ -726,7 +730,11 @@ bool mpc32_program_shaper(
 	else
 		next_mode = LUT_RAM_A;
 
+<<<<<<< HEAD
+	mpc32_configure_shaper_lut(mpc, next_mode == LUT_RAM_A, mpcc_id);
+=======
 	mpc32_configure_shaper_lut(mpc, next_mode == LUT_RAM_A ? true:false, mpcc_id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (next_mode == LUT_RAM_A)
 		mpc32_program_shaper_luta_settings(mpc, params, mpcc_id);
@@ -897,7 +905,11 @@ static void mpc32_set_3dlut_mode(
 }
 
 
+<<<<<<< HEAD
+static bool mpc32_program_3dlut(
+=======
 bool mpc32_program_3dlut(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct mpc *mpc,
 		const struct tetrahedral_params *params,
 		int mpcc_id)

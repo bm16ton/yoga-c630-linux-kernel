@@ -1,0 +1,1 @@
+cmd_drivers/ata/pata_atp867x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/ata/pata_atp867x.ko drivers/ata/pata_atp867x.o drivers/ata/pata_atp867x.mod.o;  true

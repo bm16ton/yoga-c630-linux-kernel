@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath5k/ath5k.mod := printf '%s\n'   caps.o initvals.o eeprom.o gpio.o desc.o dma.o qcu.o pcu.o phy.o reset.o attach.o base.o led.o rfkill.o ani.o sysfs.o mac80211-ops.o pci.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath5k/"$$0) }' > drivers/net/wireless/ath/ath5k/ath5k.mod

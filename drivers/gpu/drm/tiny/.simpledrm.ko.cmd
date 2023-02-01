@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/tiny/simpledrm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/tiny/simpledrm.ko drivers/gpu/drm/tiny/simpledrm.o drivers/gpu/drm/tiny/simpledrm.mod.o;  true

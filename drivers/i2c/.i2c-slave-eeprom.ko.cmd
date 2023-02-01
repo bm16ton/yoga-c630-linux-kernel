@@ -1,0 +1,1 @@
+cmd_drivers/i2c/i2c-slave-eeprom.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/i2c-slave-eeprom.ko drivers/i2c/i2c-slave-eeprom.o drivers/i2c/i2c-slave-eeprom.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_lib/crypto/libpoly1305.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o lib/crypto/libpoly1305.ko lib/crypto/libpoly1305.o lib/crypto/libpoly1305.mod.o;  true

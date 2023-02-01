@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/qcom/venus/modules.order := {   echo drivers/media/platform/qcom/venus/venus-core.ko;   echo drivers/media/platform/qcom/venus/venus-dec.ko;   echo drivers/media/platform/qcom/venus/venus-enc.ko; :; } > drivers/media/platform/qcom/venus/modules.order

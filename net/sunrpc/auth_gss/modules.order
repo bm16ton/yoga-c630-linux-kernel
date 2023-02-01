@@ -1,0 +1,2 @@
+net/sunrpc/auth_gss/auth_rpcgss.ko
+net/sunrpc/auth_gss/rpcsec_gss_krb5.ko

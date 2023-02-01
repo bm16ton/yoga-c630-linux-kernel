@@ -1,0 +1,1 @@
+cmd_sound/hda/snd-intel-dspcfg.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/hda/snd-intel-dspcfg.ko sound/hda/snd-intel-dspcfg.o sound/hda/snd-intel-dspcfg.mod.o;  true

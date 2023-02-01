@@ -1,0 +1,1 @@
+cmd_drivers/regulator/tps6105x-regulator.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/regulator/tps6105x-regulator.ko drivers/regulator/tps6105x-regulator.o drivers/regulator/tps6105x-regulator.mod.o;  true

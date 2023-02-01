@@ -848,6 +848,9 @@ static int __init eeh_pseries_init(void)
 	}
 
 	/* Initialize error log size */
+<<<<<<< HEAD
+	eeh_error_buf_size = rtas_get_error_log_max();
+=======
 	eeh_error_buf_size = rtas_token("rtas-error-log-max");
 	if (eeh_error_buf_size == RTAS_UNKNOWN_SERVICE) {
 		pr_info("%s: unknown EEH error log size\n",
@@ -858,6 +861,7 @@ static int __init eeh_pseries_init(void)
 			__func__, eeh_error_buf_size, RTAS_ERROR_LOG_MAX);
 		eeh_error_buf_size = RTAS_ERROR_LOG_MAX;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Set EEH probe mode */
 	eeh_add_flag(EEH_PROBE_MODE_DEVTREE | EEH_ENABLE_IO_FOR_LOG);

@@ -126,7 +126,16 @@ static u32 array_MAC_REG_8188E[] = {
 		0x70B, 0x00000087,
 };
 
+<<<<<<< HEAD
+static void odm_ConfigMAC_8188E(struct odm_dm_struct *pDM_Odm, u32 Addr, u8 Data)
+{
+	rtw_write8(pDM_Odm->Adapter, Addr, Data);
+}
+
+int ODM_ReadAndConfig_MAC_REG_8188E(struct odm_dm_struct *dm_odm)
+=======
 enum HAL_STATUS ODM_ReadAndConfig_MAC_REG_8188E(struct odm_dm_struct *dm_odm)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	#define READ_NEXT_PAIR(v1, v2, i) do { i += 2; v1 = array[i]; v2 = array[i + 1]; } while (0)
 
@@ -139,7 +148,10 @@ enum HAL_STATUS ODM_ReadAndConfig_MAC_REG_8188E(struct odm_dm_struct *dm_odm)
 	struct adapter *adapt =  dm_odm->Adapter;
 	struct xmit_frame	*pxmit_frame = NULL;
 	u8 bndy_cnt = 1;
+<<<<<<< HEAD
+=======
 	enum HAL_STATUS rst = HAL_STATUS_SUCCESS;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hex += ODM_ITRF_USB << 8;
 	hex += ODM_CE << 16;
 	hex += 0xFF000000;
@@ -150,7 +162,11 @@ enum HAL_STATUS ODM_ReadAndConfig_MAC_REG_8188E(struct odm_dm_struct *dm_odm)
 		pxmit_frame = rtw_IOL_accquire_xmit_frame(adapt);
 		if (!pxmit_frame) {
 			pr_info("rtw_IOL_accquire_xmit_frame failed\n");
+<<<<<<< HEAD
+			return -ENOMEM;
+=======
 			return HAL_STATUS_FAILURE;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -201,8 +217,15 @@ enum HAL_STATUS ODM_ReadAndConfig_MAC_REG_8188E(struct odm_dm_struct *dm_odm)
 	if (biol) {
 		if (!rtl8188e_IOL_exec_cmds_sync(dm_odm->Adapter, pxmit_frame, 1000, bndy_cnt)) {
 			pr_info("~~~ MAC IOL_exec_cmds Failed !!!\n");
+<<<<<<< HEAD
+			return -1;
+		}
+	}
+	return 0;
+=======
 			rst = HAL_STATUS_FAILURE;
 		}
 	}
 	return rst;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

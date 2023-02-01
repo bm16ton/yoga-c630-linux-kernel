@@ -22,7 +22,11 @@ EXPORT_SYMBOL(__virt_to_phys);
 phys_addr_t __phys_addr_symbol(unsigned long x)
 {
 	unsigned long kernel_start = kernel_map.virt_addr;
+<<<<<<< HEAD
+	unsigned long kernel_end = kernel_start + kernel_map.size;
+=======
 	unsigned long kernel_end = (unsigned long)_end;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Boundary checking aginst the kernel image mapping.

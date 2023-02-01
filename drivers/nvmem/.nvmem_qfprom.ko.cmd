@@ -1,0 +1,1 @@
+cmd_drivers/nvmem/nvmem_qfprom.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nvmem/nvmem_qfprom.ko drivers/nvmem/nvmem_qfprom.o drivers/nvmem/nvmem_qfprom.mod.o;  true

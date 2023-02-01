@@ -1,0 +1,1 @@
+cmd_drivers/nvdimm/libnvdimm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nvdimm/libnvdimm.ko drivers/nvdimm/libnvdimm.o drivers/nvdimm/libnvdimm.mod.o;  true

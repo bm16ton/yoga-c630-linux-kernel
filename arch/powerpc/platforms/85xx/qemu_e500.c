@@ -68,9 +68,13 @@ define_machine(qemu_e500) {
 	.get_irq		= mpic_get_coreint_irq,
 	.calibrate_decr		= generic_calibrate_decr,
 	.progress		= udbg_progress,
+<<<<<<< HEAD
+	.power_save		= e500_idle,
+=======
 #ifdef CONFIG_PPC64
 	.power_save		= book3e_idle,
 #else
 	.power_save		= e500_idle,
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

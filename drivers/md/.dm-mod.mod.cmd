@@ -1,0 +1,1 @@
+cmd_drivers/md/dm-mod.mod := printf '%s\n'   dm-uevent.o dm-zone.o dm-audit.o dm.o dm-table.o dm-target.o dm-linear.o dm-stripe.o dm-ioctl.o dm-io.o dm-kcopyd.o dm-sysfs.o dm-stats.o dm-rq.o dm-io-rewind.o | awk '!x[$$0]++ { print("drivers/md/"$$0) }' > drivers/md/dm-mod.mod

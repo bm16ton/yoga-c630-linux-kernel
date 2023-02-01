@@ -744,6 +744,71 @@ int raid5_calc_degraded(struct r5conf *conf)
 }
 
 static bool has_failed(struct r5conf *conf)
+<<<<<<< HEAD
+{
+	int degraded = conf->mddev->degraded;
+
+	if (test_bit(MD_BROKEN, &conf->mddev->flags))
+		return true;
+
+	if (conf->mddev->reshape_position != MaxSector)
+		degraded = raid5_calc_degraded(conf);
+
+	return degraded > conf->max_degraded;
+}
+
+enum stripe_result {
+	STRIPE_SUCCESS = 0,
+	STRIPE_RETRY,
+	STRIPE_SCHEDULE_AND_RETRY,
+	STRIPE_FAIL,
+};
+
+struct stripe_request_ctx {
+	/* a reference to the last stripe_head for batching */
+	struct stripe_head *batch_last;
+
+	/* first sector in the request */
+	sector_t first_sector;
+
+	/* last sector in the request */
+	sector_t last_sector;
+
+	/*
+	 * bitmap to track stripe sectors that have been added to stripes
+	 * add one to account for unaligned requests
+	 */
+	DECLARE_BITMAP(sectors_to_do, RAID5_MAX_REQ_STRIPES + 1);
+
+	/* the request had REQ_PREFLUSH, cleared after the first stripe_head */
+	bool do_flush;
+};
+
+/*
+ * Block until another thread clears R5_INACTIVE_BLOCKED or
+ * there are fewer than 3/4 the maximum number of active stripes
+ * and there is an inactive stripe available.
+ */
+static bool is_inactive_blocked(struct r5conf *conf, int hash)
+{
+	if (list_empty(conf->inactive_list + hash))
+		return false;
+
+	if (!test_bit(R5_INACTIVE_BLOCKED, &conf->cache_state))
+		return true;
+
+	return (atomic_read(&conf->active_stripes) <
+		(conf->max_nr_stripes * 3 / 4));
+}
+
+struct stripe_head *raid5_get_active_stripe(struct r5conf *conf,
+		struct stripe_request_ctx *ctx, sector_t sector,
+		unsigned int flags)
+{
+	struct stripe_head *sh;
+	int hash = stripe_hash_locks_hash(conf, sector);
+	int previous = !!(flags & R5_GAS_PREVIOUS);
+=======
 {
 	int degraded = conf->mddev->degraded;
 
@@ -807,11 +872,60 @@ static struct stripe_head *__raid5_get_active_stripe(struct r5conf *conf,
 {
 	struct stripe_head *sh;
 	int hash = stripe_hash_locks_hash(conf, sector);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pr_debug("get_stripe, sector %llu\n", (unsigned long long)sector);
 
 	spin_lock_irq(conf->hash_locks + hash);
 
+<<<<<<< HEAD
+	for (;;) {
+		if (!(flags & R5_GAS_NOQUIESCE) && conf->quiesce) {
+			/*
+			 * Must release the reference to batch_last before
+			 * waiting, on quiesce, otherwise the batch_last will
+			 * hold a reference to a stripe and raid5_quiesce()
+			 * will deadlock waiting for active_stripes to go to
+			 * zero.
+			 */
+			if (ctx && ctx->batch_last) {
+				raid5_release_stripe(ctx->batch_last);
+				ctx->batch_last = NULL;
+			}
+
+			wait_event_lock_irq(conf->wait_for_quiescent,
+					    !conf->quiesce,
+					    *(conf->hash_locks + hash));
+		}
+
+		sh = find_get_stripe(conf, sector, conf->generation - previous,
+				     hash);
+		if (sh)
+			break;
+
+		if (!test_bit(R5_INACTIVE_BLOCKED, &conf->cache_state)) {
+			sh = get_free_stripe(conf, hash);
+			if (sh) {
+				r5c_check_stripe_cache_usage(conf);
+				init_stripe(sh, sector, previous);
+				atomic_inc(&sh->count);
+				break;
+			}
+
+			if (!test_bit(R5_DID_ALLOC, &conf->cache_state))
+				set_bit(R5_ALLOC_MORE, &conf->cache_state);
+		}
+
+		if (flags & R5_GAS_NOBLOCK)
+			break;
+
+		set_bit(R5_INACTIVE_BLOCKED, &conf->cache_state);
+		r5l_wake_reclaim(conf->log, 0);
+		wait_event_lock_irq(conf->wait_for_stripe,
+				    is_inactive_blocked(conf, hash),
+				    *(conf->hash_locks + hash));
+		clear_bit(R5_INACTIVE_BLOCKED, &conf->cache_state);
+=======
 retry:
 	if (!noquiesce && conf->quiesce) {
 		/*
@@ -842,6 +956,7 @@ retry:
 		init_stripe(sh, sector, previous);
 		atomic_inc(&sh->count);
 		goto out;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!test_bit(R5_DID_ALLOC, &conf->cache_state))
@@ -3539,6 +3654,7 @@ static bool stripe_bio_overlaps(struct stripe_head *sh, struct bio *bi,
 
 		if (first + conf->chunk_sectors * (count - 1) != last)
 			return true;
+<<<<<<< HEAD
 	}
 
 	return false;
@@ -3559,6 +3675,28 @@ static void __add_stripe_bio(struct stripe_head *sh, struct bio *bi,
 		bip = &sh->dev[dd_idx].toread;
 	}
 
+=======
+	}
+
+	return false;
+}
+
+static void __add_stripe_bio(struct stripe_head *sh, struct bio *bi,
+			     int dd_idx, int forwrite, int previous)
+{
+	struct r5conf *conf = sh->raid_conf;
+	struct bio **bip;
+	int firstwrite = 0;
+
+	if (forwrite) {
+		bip = &sh->dev[dd_idx].towrite;
+		if (!*bip)
+			firstwrite = 1;
+	} else {
+		bip = &sh->dev[dd_idx].toread;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (*bip && (*bip)->bi_iter.bi_sector < bi->bi_iter.bi_sector)
 		bip = &(*bip)->bi_next;
 
@@ -3626,6 +3764,7 @@ static bool add_stripe_bio(struct stripe_head *sh, struct bio *bi,
 			   int dd_idx, int forwrite, int previous)
 {
 	spin_lock_irq(&sh->stripe_lock);
+<<<<<<< HEAD
 
 	if (stripe_bio_overlaps(sh, bi, dd_idx, forwrite)) {
 		set_bit(R5_Overlap, &sh->dev[dd_idx].flags);
@@ -3633,6 +3772,15 @@ static bool add_stripe_bio(struct stripe_head *sh, struct bio *bi,
 		return false;
 	}
 
+=======
+
+	if (stripe_bio_overlaps(sh, bi, dd_idx, forwrite)) {
+		set_bit(R5_Overlap, &sh->dev[dd_idx].flags);
+		spin_unlock_irq(&sh->stripe_lock);
+		return false;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__add_stripe_bio(sh, bi, dd_idx, forwrite, previous);
 	spin_unlock_irq(&sh->stripe_lock);
 	return true;
@@ -4637,7 +4785,8 @@ static void handle_stripe_expansion(struct r5conf *conf, struct stripe_head *sh)
 			sector_t bn = raid5_compute_blocknr(sh, i, 1);
 			sector_t s = raid5_compute_sector(conf, bn, 0,
 							  &dd_idx, NULL);
-			sh2 = raid5_get_active_stripe(conf, s, 0, 1, 1);
+			sh2 = raid5_get_active_stripe(conf, NULL, s,
+				R5_GAS_NOBLOCK | R5_GAS_NOQUIESCE);
 			if (sh2 == NULL)
 				/* so far only the early blocks of this stripe
 				 * have been requested.  When later blocks
@@ -5274,7 +5423,9 @@ static void handle_stripe(struct stripe_head *sh)
 	/* Finish reconstruct operations initiated by the expansion process */
 	if (sh->reconstruct_state == reconstruct_state_result) {
 		struct stripe_head *sh_src
-			= raid5_get_active_stripe(conf, sh->sector, 1, 1, 1);
+			= raid5_get_active_stripe(conf, NULL, sh->sector,
+					R5_GAS_PREVIOUS | R5_GAS_NOBLOCK |
+					R5_GAS_NOQUIESCE);
 		if (sh_src && test_bit(STRIPE_EXPAND_SOURCE, &sh_src->state)) {
 			/* sh cannot be written until sh_src has been read.
 			 * so arrange for sh to be delayed a little
@@ -5823,7 +5974,7 @@ static void make_discard_request(struct mddev *mddev, struct bio *bi)
 		DEFINE_WAIT(w);
 		int d;
 	again:
-		sh = raid5_get_active_stripe(conf, logical_sector, 0, 0, 0);
+		sh = raid5_get_active_stripe(conf, NULL, logical_sector, 0);
 		prepare_to_wait(&conf->wait_for_overlap, &w,
 				TASK_UNINTERRUPTIBLE);
 		set_bit(R5_Overlap, &sh->dev[sh->pd_idx].flags);
@@ -5978,7 +6129,11 @@ static enum stripe_result make_stripe_request(struct mddev *mddev,
 	enum stripe_result ret;
 	struct stripe_head *sh;
 	sector_t new_sector;
+<<<<<<< HEAD
+	int previous = 0, flags = 0;
+=======
 	int previous = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int seq, dd_idx;
 
 	seq = read_seqcount_begin(&conf->gen_lock);
@@ -6012,8 +6167,16 @@ static enum stripe_result make_stripe_request(struct mddev *mddev,
 	pr_debug("raid456: %s, sector %llu logical %llu\n", __func__,
 		 new_sector, logical_sector);
 
+<<<<<<< HEAD
+	if (previous)
+		flags |= R5_GAS_PREVIOUS;
+	if (bi->bi_opf & REQ_RAHEAD)
+		flags |= R5_GAS_NOBLOCK;
+	sh = raid5_get_active_stripe(conf, ctx, new_sector, flags);
+=======
 	sh = __raid5_get_active_stripe(conf, ctx, new_sector, previous,
 				       (bi->bi_opf & REQ_RAHEAD), 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (unlikely(!sh)) {
 		/* cannot get stripe, just give-up */
 		bi->bi_status = BLK_STS_IOERR;
@@ -6362,7 +6525,8 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr, int *sk
 	for (i = 0; i < reshape_sectors; i += RAID5_STRIPE_SECTORS(conf)) {
 		int j;
 		int skipped_disk = 0;
-		sh = raid5_get_active_stripe(conf, stripe_addr+i, 0, 0, 1);
+		sh = raid5_get_active_stripe(conf, NULL, stripe_addr+i,
+					     R5_GAS_NOQUIESCE);
 		set_bit(STRIPE_EXPANDING, &sh->state);
 		atomic_inc(&conf->reshape_stripes);
 		/* If any of this stripe is beyond the end of the old
@@ -6411,7 +6575,8 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr, int *sk
 	if (last_sector >= mddev->dev_sectors)
 		last_sector = mddev->dev_sectors - 1;
 	while (first_sector <= last_sector) {
-		sh = raid5_get_active_stripe(conf, first_sector, 1, 0, 1);
+		sh = raid5_get_active_stripe(conf, NULL, first_sector,
+				R5_GAS_PREVIOUS | R5_GAS_NOQUIESCE);
 		set_bit(STRIPE_EXPAND_SOURCE, &sh->state);
 		set_bit(STRIPE_HANDLE, &sh->state);
 		raid5_release_stripe(sh);
@@ -6531,9 +6696,10 @@ static inline sector_t raid5_sync_request(struct mddev *mddev, sector_t sector_n
 
 	md_bitmap_cond_end_sync(mddev->bitmap, sector_nr, false);
 
-	sh = raid5_get_active_stripe(conf, sector_nr, 0, 1, 0);
+	sh = raid5_get_active_stripe(conf, NULL, sector_nr,
+				     R5_GAS_NOBLOCK);
 	if (sh == NULL) {
-		sh = raid5_get_active_stripe(conf, sector_nr, 0, 0, 0);
+		sh = raid5_get_active_stripe(conf, NULL, sector_nr, 0);
 		/* make sure we don't swamp the stripe cache if someone else
 		 * is trying to get access
 		 */
@@ -6596,8 +6762,8 @@ static int  retry_aligned_read(struct r5conf *conf, struct bio *raid_bio,
 			/* already done this stripe */
 			continue;
 
-		sh = raid5_get_active_stripe(conf, sector, 0, 1, 1);
-
+		sh = raid5_get_active_stripe(conf, NULL, sector,
+				R5_GAS_NOBLOCK | R5_GAS_NOQUIESCE);
 		if (!sh) {
 			/* failed to get a stripe - must wait */
 			conf->retry_read_aligned = raid_bio;
@@ -8052,6 +8218,7 @@ static int raid5_run(struct mddev *mddev)
 		    mddev->queue->limits.max_discard_sectors < (stripe >> 9) ||
 		    mddev->queue->limits.discard_granularity < stripe)
 			blk_queue_max_discard_sectors(mddev->queue, 0);
+<<<<<<< HEAD
 
 		/*
 		 * Requests require having a bitmap for each stripe.
@@ -8060,6 +8227,16 @@ static int raid5_run(struct mddev *mddev)
 		blk_queue_max_hw_sectors(mddev->queue,
 			RAID5_MAX_REQ_STRIPES << RAID5_STRIPE_SHIFT(conf));
 
+=======
+
+		/*
+		 * Requests require having a bitmap for each stripe.
+		 * Limit the max sectors based on this.
+		 */
+		blk_queue_max_hw_sectors(mddev->queue,
+			RAID5_MAX_REQ_STRIPES << RAID5_STRIPE_SHIFT(conf));
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* No restrictions on the number of segments in the request */
 		blk_queue_max_segments(mddev->queue, USHRT_MAX);
 	}

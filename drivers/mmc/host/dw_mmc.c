@@ -1858,7 +1858,11 @@ static void dw_mci_start_fault_timer(struct dw_mci *host)
 	 * Try to inject the error at random points during the data transfer.
 	 */
 	hrtimer_start(&host->fault_timer,
+<<<<<<< HEAD
+		      ms_to_ktime(prandom_u32_max(25)),
+=======
 		      ms_to_ktime(prandom_u32() % 25),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		      HRTIMER_MODE_REL);
 }
 

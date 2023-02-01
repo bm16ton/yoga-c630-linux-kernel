@@ -1,0 +1,1 @@
+cmd_drivers/iio/chemical/bme680_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/chemical/bme680_spi.ko drivers/iio/chemical/bme680_spi.o drivers/iio/chemical/bme680_spi.mod.o;  true

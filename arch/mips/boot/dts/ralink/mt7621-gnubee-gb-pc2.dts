@@ -20,12 +20,15 @@
 		bootargs = "console=ttyS0,57600";
 	};
 
+<<<<<<< HEAD
+=======
 	palmbus: palmbus@1e000000 {
 		i2c@900 {
 			status = "okay";
 		};
 	};
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpio-keys {
 		compatible = "gpio-keys";
 
@@ -35,9 +38,51 @@
 			linux,code = <KEY_RESTART>;
 		};
 	};
+<<<<<<< HEAD
+
+	gpio-leds {
+		compatible = "gpio-leds";
+
+		ethblack-green {
+			label = "green:ethblack";
+			gpios = <&gpio 3 GPIO_ACTIVE_LOW>;
+		};
+
+		ethblue-green {
+			label = "green:ethblue";
+			gpios = <&gpio 4 GPIO_ACTIVE_LOW>;
+		};
+
+		ethyellow-green {
+			label = "green:ethyellow";
+			gpios = <&gpio 15 GPIO_ACTIVE_LOW>;
+		};
+
+		ethyellow-orange {
+			label = "orange:ethyellow";
+			gpios = <&gpio 13 GPIO_ACTIVE_LOW>;
+		};
+
+		power {
+			label = "green:power";
+			gpios = <&gpio 6 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "default-on";
+		};
+
+		system {
+			label = "green:system";
+			gpios = <&gpio 8 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "disk-activity";
+		};
+	};
+};
+
+&mmc {
+=======
 };
 
 &sdhci {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = "okay";
 };
 

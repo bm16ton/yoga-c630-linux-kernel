@@ -114,8 +114,13 @@ static ssize_t module_gzip_decompress(struct load_info *info,
 	do {
 		struct page *page = module_get_next_page(info);
 
+<<<<<<< HEAD
+		if (IS_ERR(page)) {
+			retval = PTR_ERR(page);
+=======
 		if (!page) {
 			retval = -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto out_inflate_end;
 		}
 
@@ -173,8 +178,13 @@ static ssize_t module_xz_decompress(struct load_info *info,
 	do {
 		struct page *page = module_get_next_page(info);
 
+<<<<<<< HEAD
+		if (IS_ERR(page)) {
+			retval = PTR_ERR(page);
+=======
 		if (!page) {
 			retval = -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto out;
 		}
 
@@ -256,7 +266,11 @@ void module_decompress_cleanup(struct load_info *info)
 static ssize_t compression_show(struct kobject *kobj,
 				struct kobj_attribute *attr, char *buf)
 {
+<<<<<<< HEAD
+	return sysfs_emit(buf, __stringify(MODULE_COMPRESSION) "\n");
+=======
 	return sysfs_emit(buf, "%s\n", __stringify(MODULE_COMPRESSION));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct kobj_attribute module_compression_attr = __ATTR_RO(compression);

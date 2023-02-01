@@ -50,6 +50,10 @@ static ssize_t name_show(struct device *dev, struct device_attribute *attr,
 			 char *buf)
 {
 	struct iio_trigger *trig = to_iio_trigger(dev);
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sysfs_emit(buf, "%s\n", trig->name);
 }
 

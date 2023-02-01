@@ -90,7 +90,7 @@ static int pl_reset(struct usbnet *dev)
 }
 
 static const struct driver_info	prolific_info = {
-	.description =	"Prolific PL-2301/PL-2302/PL-25A1/PL-2501/PL-27A1",
+	.description =	"Prolific PL-2301/PL-2302/PL-25A1/PL-27A1",
 	.flags =	FLAG_POINTTOPOINT | FLAG_NO_SETINT,
 		/* some PL-2302 versions seem to fail usb_set_interface() */
 	.reset =	pl_reset,
@@ -117,13 +117,7 @@ static const struct usb_device_id	products [] = {
 
 /* high speed cables */
 {
-	USB_DEVICE(0x067b, 0x2501),     /* PL-2501 */
-	.driver_info =  (unsigned long) &prolific_info,
-}, {
 	USB_DEVICE(0x067b, 0x25a1),     /* PL-25A1, no eeprom */
-	.driver_info =  (unsigned long) &prolific_info,
-}, {
-	USB_DEVICE(0x0576, 0x1254),     /* laplink PL-25A1 */
 	.driver_info =  (unsigned long) &prolific_info,
 }, {
 	USB_DEVICE(0x050d, 0x258a),     /* Belkin F5U258/F5U279 (PL-25A1) */
@@ -163,5 +157,5 @@ static struct usb_driver plusb_driver = {
 module_usb_driver(plusb_driver);
 
 MODULE_AUTHOR("David Brownell");
-MODULE_DESCRIPTION("Prolific PL-2301/2302/2501/25A1/27A1 USB Host to Host Link Driver");
+MODULE_DESCRIPTION("Prolific PL-2301/2302/25A1/27A1 USB Host to Host Link Driver");
 MODULE_LICENSE("GPL");

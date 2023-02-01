@@ -1,0 +1,1 @@
+cmd_drivers/extcon/modules.order := {   echo drivers/extcon/extcon-qcom-spmi-misc.ko;   echo drivers/extcon/extcon-usb-gpio.ko;   echo drivers/extcon/extcon-usbc-cros-ec.ko; :; } > drivers/extcon/modules.order

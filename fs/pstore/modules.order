@@ -1,0 +1,3 @@
+fs/pstore/ramoops.ko
+fs/pstore/pstore_zone.ko
+fs/pstore/pstore_blk.ko

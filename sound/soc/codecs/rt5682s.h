@@ -1451,6 +1451,10 @@ struct rt5682s_priv {
 	struct delayed_work jd_check_work;
 	struct mutex calibrate_mutex;
 	struct mutex sar_mutex;
+<<<<<<< HEAD
+	struct mutex wclk_mutex;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_COMMON_CLK
 	struct clk_hw dai_clks_hw[RT5682S_DAI_NUM_CLKS];
@@ -1470,6 +1474,10 @@ struct rt5682s_priv {
 
 	int jack_type;
 	int irq_work_delay_time;
+<<<<<<< HEAD
+	int wclk_enabled;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 int rt5682s_sel_asrc_clk_src(struct snd_soc_component *component,

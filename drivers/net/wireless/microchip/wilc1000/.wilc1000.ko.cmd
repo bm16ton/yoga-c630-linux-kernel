@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/microchip/wilc1000/wilc1000.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/microchip/wilc1000/wilc1000.ko drivers/net/wireless/microchip/wilc1000/wilc1000.o drivers/net/wireless/microchip/wilc1000/wilc1000.mod.o;  true

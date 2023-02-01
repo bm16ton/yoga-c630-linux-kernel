@@ -14,6 +14,10 @@
 #include "ef100_nic.h"
 #include "mae.h"
 #include "rx_common.h"
+<<<<<<< HEAD
+#include "tc_bindings.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define EFX_EF100_REP_DRIVER	"efx_ef100_rep"
 
@@ -42,8 +46,12 @@ static int efx_ef100_rep_open(struct net_device *net_dev)
 {
 	struct efx_rep *efv = netdev_priv(net_dev);
 
+<<<<<<< HEAD
+	netif_napi_add(net_dev, &efv->napi, efx_ef100_rep_poll);
+=======
 	netif_napi_add(net_dev, &efv->napi, efx_ef100_rep_poll,
 		       NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	napi_enable(&efv->napi);
 	return 0;
 }
@@ -107,6 +115,23 @@ static int efx_ef100_rep_get_phys_port_name(struct net_device *dev,
 	return 0;
 }
 
+<<<<<<< HEAD
+static int efx_ef100_rep_setup_tc(struct net_device *net_dev,
+				  enum tc_setup_type type, void *type_data)
+{
+	struct efx_rep *efv = netdev_priv(net_dev);
+	struct efx_nic *efx = efv->parent;
+
+	if (type == TC_SETUP_CLSFLOWER)
+		return efx_tc_flower(efx, net_dev, type_data, efv);
+	if (type == TC_SETUP_BLOCK)
+		return efx_tc_setup_block(net_dev, efx, type_data, efv);
+
+	return -EOPNOTSUPP;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void efx_ef100_rep_get_stats64(struct net_device *dev,
 				      struct rtnl_link_stats64 *stats)
 {
@@ -120,13 +145,21 @@ static void efx_ef100_rep_get_stats64(struct net_device *dev,
 	stats->tx_errors = atomic64_read(&efv->stats.tx_errors);
 }
 
+<<<<<<< HEAD
+const struct net_device_ops efx_ef100_rep_netdev_ops = {
+=======
 static const struct net_device_ops efx_ef100_rep_netdev_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ndo_open		= efx_ef100_rep_open,
 	.ndo_stop		= efx_ef100_rep_close,
 	.ndo_start_xmit		= efx_ef100_rep_xmit,
 	.ndo_get_port_parent_id	= efx_ef100_rep_get_port_parent_id,
 	.ndo_get_phys_port_name	= efx_ef100_rep_get_phys_port_name,
 	.ndo_get_stats64	= efx_ef100_rep_get_stats64,
+<<<<<<< HEAD
+	.ndo_setup_tc		= efx_ef100_rep_setup_tc,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void efx_ef100_rep_get_drvinfo(struct net_device *dev,

@@ -387,7 +387,7 @@ struct uart_ops {
 	void		(*shutdown)(struct uart_port *);
 	void		(*flush_buffer)(struct uart_port *);
 	void		(*set_termios)(struct uart_port *, struct ktermios *new,
-				       struct ktermios *old);
+				       const struct ktermios *old);
 	void		(*set_ldisc)(struct uart_port *, struct ktermios *);
 	void		(*pm)(struct uart_port *, unsigned int state,
 			      unsigned int oldstate);
@@ -433,7 +433,7 @@ struct uart_port {
 	void			(*serial_out)(struct uart_port *, int, int);
 	void			(*set_termios)(struct uart_port *,
 				               struct ktermios *new,
-				               struct ktermios *old);
+				               const struct ktermios *old);
 	void			(*set_ldisc)(struct uart_port *,
 					     struct ktermios *);
 	unsigned int		(*get_mctrl)(struct uart_port *);
@@ -513,24 +513,33 @@ struct uart_port {
 #define UPF_BUGGY_UART		((__force upf_t) ASYNC_BUGGY_UART     /* 14 */ )
 #define UPF_MAGIC_MULTIPLIER	((__force upf_t) ASYNC_MAGIC_MULTIPLIER /* 16 */ )
 
-#define UPF_NO_THRE_TEST	((__force upf_t) (1 << 19))
+#define UPF_NO_THRE_TEST	((__force upf_t) BIT_ULL(19))
 /* Port has hardware-assisted h/w flow control */
-#define UPF_AUTO_CTS		((__force upf_t) (1 << 20))
-#define UPF_AUTO_RTS		((__force upf_t) (1 << 21))
+#define UPF_AUTO_CTS		((__force upf_t) BIT_ULL(20))
+#define UPF_AUTO_RTS		((__force upf_t) BIT_ULL(21))
 #define UPF_HARD_FLOW		((__force upf_t) (UPF_AUTO_CTS | UPF_AUTO_RTS))
 /* Port has hardware-assisted s/w flow control */
-#define UPF_SOFT_FLOW		((__force upf_t) (1 << 22))
-#define UPF_CONS_FLOW		((__force upf_t) (1 << 23))
-#define UPF_SHARE_IRQ		((__force upf_t) (1 << 24))
-#define UPF_EXAR_EFR		((__force upf_t) (1 << 25))
-#define UPF_BUG_THRE		((__force upf_t) (1 << 26))
+#define UPF_SOFT_FLOW		((__force upf_t) BIT_ULL(22))
+#define UPF_CONS_FLOW		((__force upf_t) BIT_ULL(23))
+#define UPF_SHARE_IRQ		((__force upf_t) BIT_ULL(24))
+#define UPF_EXAR_EFR		((__force upf_t) BIT_ULL(25))
+#define UPF_BUG_THRE		((__force upf_t) BIT_ULL(26))
 /* The exact UART type is known and should not be probed.  */
+<<<<<<< HEAD
+#define UPF_FIXED_TYPE		((__force upf_t) BIT_ULL(27))
+#define UPF_BOOT_AUTOCONF	((__force upf_t) BIT_ULL(28))
+#define UPF_FIXED_PORT		((__force upf_t) BIT_ULL(29))
+#define UPF_DEAD		((__force upf_t) BIT_ULL(30))
+#define UPF_IOREMAP		((__force upf_t) BIT_ULL(31))
+#define UPF_FULL_PROBE		((__force upf_t) BIT_ULL(32))
+=======
 #define UPF_FIXED_TYPE		((__force upf_t) (1 << 27))
 #define UPF_BOOT_AUTOCONF	((__force upf_t) (1 << 28))
 #define UPF_FIXED_PORT		((__force upf_t) (1 << 29))
 #define UPF_DEAD		((__force upf_t) (1 << 30))
 #define UPF_IOREMAP		((__force upf_t) (1 << 31))
 #define UPF_FULL_PROBE		((__force upf_t) (1ULL << 32))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define __UPF_CHANGE_MASK	0x17fff
 #define UPF_CHANGE_MASK		((__force upf_t) __UPF_CHANGE_MASK)
@@ -625,6 +634,23 @@ struct uart_state {
 /* number of characters left in xmit buffer before we ask for more */
 #define WAKEUP_CHARS		256
 
+/**
+ * uart_xmit_advance - Advance xmit buffer and account Tx'ed chars
+ * @up: uart_port structure describing the port
+ * @chars: number of characters sent
+ *
+ * This function advances the tail of circular xmit buffer by the number of
+ * @chars transmitted and handles accounting of transmitted bytes (into
+ * @up's icount.tx).
+ */
+static inline void uart_xmit_advance(struct uart_port *up, unsigned int chars)
+{
+	struct circ_buf *xmit = &up->state->xmit;
+
+	xmit->tail = (xmit->tail + chars) & (UART_XMIT_SIZE - 1);
+	up->icount.tx += chars;
+}
+
 struct module;
 struct tty_driver;
 
@@ -653,7 +679,7 @@ void uart_write_wakeup(struct uart_port *port);
 void uart_update_timeout(struct uart_port *port, unsigned int cflag,
 			 unsigned int baud);
 unsigned int uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
-				struct ktermios *old, unsigned int min,
+				const struct ktermios *old, unsigned int min,
 				unsigned int max);
 unsigned int uart_get_divisor(struct uart_port *port, unsigned int baud);
 
@@ -847,6 +873,7 @@ static inline int uart_prepare_sysrq_char(struct uart_port *port, unsigned int c
 }
 
 static inline void uart_unlock_and_check_sysrq(struct uart_port *port)
+<<<<<<< HEAD
 {
 	int sysrq_ch;
 
@@ -866,6 +893,33 @@ static inline void uart_unlock_and_check_sysrq(struct uart_port *port)
 
 static inline void uart_unlock_and_check_sysrq_irqrestore(struct uart_port *port,
 		unsigned long flags)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+{
+	int sysrq_ch;
+
+	if (!port->has_sysrq) {
+<<<<<<< HEAD
+		spin_unlock_irqrestore(&port->lock, flags);
+=======
+		spin_unlock(&port->lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		return;
+	}
+
+	sysrq_ch = port->sysrq_ch;
+	port->sysrq_ch = 0;
+
+<<<<<<< HEAD
+=======
+	spin_unlock(&port->lock);
+
+	if (sysrq_ch)
+		handle_sysrq(sysrq_ch);
+}
+
+static inline void uart_unlock_and_check_sysrq_irqrestore(struct uart_port *port,
+		unsigned long flags)
 {
 	int sysrq_ch;
 
@@ -877,6 +931,7 @@ static inline void uart_unlock_and_check_sysrq_irqrestore(struct uart_port *port
 	sysrq_ch = port->sysrq_ch;
 	port->sysrq_ch = 0;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	spin_unlock_irqrestore(&port->lock, flags);
 
 	if (sysrq_ch)

@@ -121,11 +121,14 @@ static void lpc18xx_clear_cr_reg(void *data)
 	writel(0, adc->base + LPC18XX_ADC_CR);
 }
 
+<<<<<<< HEAD
+=======
 static void lpc18xx_clk_disable(void *clk)
 {
 	clk_disable_unprepare(clk);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void lpc18xx_regulator_disable(void *vref)
 {
 	regulator_disable(vref);
@@ -151,7 +154,11 @@ static int lpc18xx_adc_probe(struct platform_device *pdev)
 	if (IS_ERR(adc->base))
 		return PTR_ERR(adc->base);
 
+<<<<<<< HEAD
+	adc->clk = devm_clk_get_enabled(&pdev->dev, NULL);
+=======
 	adc->clk = devm_clk_get(&pdev->dev, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(adc->clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(adc->clk),
 				     "error getting clock\n");
@@ -177,11 +184,16 @@ static int lpc18xx_adc_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	rate = clk_get_rate(adc->clk);
+	clkdiv = DIV_ROUND_UP(rate, LPC18XX_ADC_CLK_TARGET);
+=======
 	ret = clk_prepare_enable(adc->clk);
 	if (ret) {
 		dev_err(&pdev->dev, "unable to enable clock\n");
 		return ret;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = devm_add_action_or_reset(&pdev->dev, lpc18xx_clk_disable,
 				       adc->clk);

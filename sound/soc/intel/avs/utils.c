@@ -7,6 +7,10 @@
 //
 
 #include <linux/firmware.h>
+<<<<<<< HEAD
+#include <linux/kfifo.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/slab.h>
 #include "avs.h"
 #include "messages.h"
@@ -299,3 +303,28 @@ void avs_release_firmwares(struct avs_dev *adev)
 		kfree(entry);
 	}
 }
+<<<<<<< HEAD
+
+unsigned int __kfifo_fromio_locked(struct kfifo *fifo, const void __iomem *src, unsigned int len,
+				   spinlock_t *lock)
+{
+	struct __kfifo *__fifo = &fifo->kfifo;
+	unsigned long flags;
+	unsigned int l, off;
+
+	spin_lock_irqsave(lock, flags);
+	len = min(len, kfifo_avail(fifo));
+	off = __fifo->in & __fifo->mask;
+	l = min(len, kfifo_size(fifo) - off);
+
+	memcpy_fromio(__fifo->data + off, src, l);
+	memcpy_fromio(__fifo->data, src + l, len - l);
+	/* Make sure data copied from SRAM is visible to all CPUs. */
+	smp_mb();
+	__fifo->in += len;
+	spin_unlock_irqrestore(lock, flags);
+
+	return len;
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

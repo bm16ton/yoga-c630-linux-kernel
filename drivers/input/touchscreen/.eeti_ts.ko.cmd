@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/eeti_ts.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/eeti_ts.ko drivers/input/touchscreen/eeti_ts.o drivers/input/touchscreen/eeti_ts.mod.o;  true

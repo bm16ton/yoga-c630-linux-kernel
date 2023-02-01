@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/cx23885/cx23885.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/cx23885/cx23885.ko drivers/media/pci/cx23885/cx23885.o drivers/media/pci/cx23885/cx23885.mod.o;  true

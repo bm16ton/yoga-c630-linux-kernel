@@ -280,10 +280,17 @@ static struct sk_buff *sja1105_xmit(struct sk_buff *skb,
 		skb = sja1105_pvid_tag_control_pkt(dp, skb, pcp);
 		if (!skb)
 			return NULL;
+<<<<<<< HEAD
 
 		return sja1105_defer_xmit(dp, skb);
 	}
 
+=======
+
+		return sja1105_defer_xmit(dp, skb);
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return dsa_8021q_xmit(skb, netdev, sja1105_xmit_tpid(dp),
 			     ((pcp << VLAN_PRIO_SHIFT) | tx_vid));
 }
@@ -477,12 +484,21 @@ static bool sja1105_rxtstamp_get_state(struct dsa_switch *ds)
 static void sja1105_rxtstamp_set_state(struct dsa_switch *ds, bool on)
 {
 	struct sja1105_tagger_private *priv = sja1105_tagger_private(ds);
+<<<<<<< HEAD
 
 	if (on)
 		set_bit(SJA1105_HWTS_RX_EN, &priv->state);
 	else
 		clear_bit(SJA1105_HWTS_RX_EN, &priv->state);
 
+=======
+
+	if (on)
+		set_bit(SJA1105_HWTS_RX_EN, &priv->state);
+	else
+		clear_bit(SJA1105_HWTS_RX_EN, &priv->state);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Initialize the meta state machine to a known state */
 	if (!priv->stampable_skb)
 		return;
@@ -665,7 +681,12 @@ static struct sk_buff *sja1110_rcv_inband_control_extension(struct sk_buff *skb,
 		 * padding and trailer we need to account for the fact that
 		 * skb->data points to skb_mac_header(skb) + ETH_HLEN.
 		 */
+<<<<<<< HEAD
+		if (pskb_trim_rcsum(skb, start_of_padding - ETH_HLEN))
+			return NULL;
+=======
 		pskb_trim_rcsum(skb, start_of_padding - ETH_HLEN);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Trap-to-host frame, no timestamp trailer */
 	} else {
 		*source_port = SJA1110_RX_HEADER_SRC_PORT(rx_header);

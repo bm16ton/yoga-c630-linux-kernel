@@ -1,0 +1,1 @@
+cmd_drivers/watchdog/meson_gxbb_wdt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/watchdog/meson_gxbb_wdt.ko drivers/watchdog/meson_gxbb_wdt.o drivers/watchdog/meson_gxbb_wdt.mod.o;  true

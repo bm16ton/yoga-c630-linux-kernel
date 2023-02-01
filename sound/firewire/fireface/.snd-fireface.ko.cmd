@@ -1,0 +1,1 @@
+cmd_sound/firewire/fireface/snd-fireface.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/fireface/snd-fireface.ko sound/firewire/fireface/snd-fireface.o sound/firewire/fireface/snd-fireface.mod.o;  true

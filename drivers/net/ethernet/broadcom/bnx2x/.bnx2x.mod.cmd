@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/broadcom/bnx2x/bnx2x.mod := printf '%s\n'   bnx2x_main.o bnx2x_link.o bnx2x_cmn.o bnx2x_ethtool.o bnx2x_stats.o bnx2x_dcb.o bnx2x_sp.o bnx2x_self_test.o bnx2x_vfpf.o bnx2x_sriov.o | awk '!x[$$0]++ { print("drivers/net/ethernet/broadcom/bnx2x/"$$0) }' > drivers/net/ethernet/broadcom/bnx2x/bnx2x.mod

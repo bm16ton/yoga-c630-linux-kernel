@@ -1,0 +1,1 @@
+cmd_drivers/scsi/pm8001/pm80xx.mod := printf '%s\n'   pm8001_init.o pm8001_sas.o pm8001_ctl.o pm8001_hwi.o pm80xx_hwi.o pm80xx_tracepoints.o | awk '!x[$$0]++ { print("drivers/scsi/pm8001/"$$0) }' > drivers/scsi/pm8001/pm80xx.mod

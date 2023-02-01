@@ -95,7 +95,12 @@ union ctlreg0 {
 					   Interruption-Filtering Override */
 		unsigned long	   : 3;
 		unsigned long ccc  : 1; /* Cryptography counter control */
+<<<<<<< HEAD
+		unsigned long pec  : 1; /* PAI extension control */
+		unsigned long	   : 17;
+=======
 		unsigned long	   : 18;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		unsigned long	   : 3;
 		unsigned long lap  : 1; /* Low-address-protection control */
 		unsigned long	   : 4;

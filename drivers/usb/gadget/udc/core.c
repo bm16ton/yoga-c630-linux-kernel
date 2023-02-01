@@ -734,13 +734,21 @@ int usb_gadget_disconnect(struct usb_gadget *gadget)
 	}
 
 	ret = gadget->ops->pullup(gadget, 0);
-	if (!ret) {
+	if (!ret)
 		gadget->connected = 0;
+<<<<<<< HEAD
+
+	mutex_lock(&udc_lock);
+	if (gadget->udc->driver)
+		gadget->udc->driver->disconnect(gadget);
+	mutex_unlock(&udc_lock);
+=======
 		mutex_lock(&udc_lock);
 		if (gadget->udc->driver)
 			gadget->udc->driver->disconnect(gadget);
 		mutex_unlock(&udc_lock);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	trace_usb_gadget_disconnect(gadget, ret);
@@ -1457,6 +1465,7 @@ static int gadget_match_driver(struct device *dev, struct device_driver *drv)
 	struct usb_udc *udc = gadget->udc;
 	struct usb_gadget_driver *driver = container_of(drv,
 			struct usb_gadget_driver, driver);
+<<<<<<< HEAD
 
 	/* If the driver specifies a udc_name, it must match the UDC's name */
 	if (driver->udc_name &&
@@ -1471,6 +1480,22 @@ static int gadget_match_driver(struct device *dev, struct device_driver *drv)
 	return 1;
 }
 
+=======
+
+	/* If the driver specifies a udc_name, it must match the UDC's name */
+	if (driver->udc_name &&
+			strcmp(driver->udc_name, dev_name(&udc->dev)) != 0)
+		return 0;
+
+	/* If the driver is already bound to a gadget, it doesn't match */
+	if (driver->is_bound)
+		return 0;
+
+	/* Otherwise any gadget driver matches any UDC */
+	return 1;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int gadget_bind_driver(struct device *dev)
 {
 	struct usb_gadget *gadget = dev_to_usb_gadget(dev);
@@ -1522,6 +1547,7 @@ static int gadget_bind_driver(struct device *dev)
 }
 
 static void gadget_unbind_driver(struct device *dev)
+<<<<<<< HEAD
 {
 	struct usb_gadget *gadget = dev_to_usb_gadget(dev);
 	struct usb_udc *udc = gadget->udc;
@@ -1549,6 +1575,35 @@ static void gadget_unbind_driver(struct device *dev)
 int usb_gadget_register_driver_owner(struct usb_gadget_driver *driver,
 		struct module *owner, const char *mod_name)
 {
+=======
+{
+	struct usb_gadget *gadget = dev_to_usb_gadget(dev);
+	struct usb_udc *udc = gadget->udc;
+	struct usb_gadget_driver *driver = udc->driver;
+
+	dev_dbg(&udc->dev, "unbinding gadget driver [%s]\n", driver->function);
+
+	kobject_uevent(&udc->dev.kobj, KOBJ_CHANGE);
+
+	usb_gadget_disconnect(gadget);
+	usb_gadget_disable_async_callbacks(udc);
+	if (gadget->irq)
+		synchronize_irq(gadget->irq);
+	udc->driver->unbind(gadget);
+	usb_gadget_udc_stop(udc);
+
+	mutex_lock(&udc_lock);
+	driver->is_bound = false;
+	udc->driver = NULL;
+	mutex_unlock(&udc_lock);
+}
+
+/* ------------------------------------------------------------------------- */
+
+int usb_gadget_register_driver_owner(struct usb_gadget_driver *driver,
+		struct module *owner, const char *mod_name)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (!driver || !driver->bind || !driver->setup)

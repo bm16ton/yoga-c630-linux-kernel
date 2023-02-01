@@ -1,0 +1,1 @@
+cmd_drivers/mtd/parsers/cmdlinepart.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/parsers/cmdlinepart.ko drivers/mtd/parsers/cmdlinepart.o drivers/mtd/parsers/cmdlinepart.mod.o;  true

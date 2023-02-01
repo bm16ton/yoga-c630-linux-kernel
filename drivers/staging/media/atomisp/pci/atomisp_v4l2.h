@@ -22,16 +22,17 @@
 #define __ATOMISP_V4L2_H__
 
 struct atomisp_video_pipe;
-struct atomisp_acc_pipe;
 struct v4l2_device;
 struct atomisp_device;
 struct firmware;
 
 int atomisp_video_init(struct atomisp_video_pipe *video, const char *name,
 		       unsigned int run_mode);
+<<<<<<< HEAD
+=======
 void atomisp_acc_init(struct atomisp_acc_pipe *video, const char *name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void atomisp_video_unregister(struct atomisp_video_pipe *video);
-void atomisp_acc_unregister(struct atomisp_acc_pipe *video);
 const struct firmware *atomisp_load_firmware(struct atomisp_device *isp);
 int atomisp_csi_lane_config(struct atomisp_device *isp);
 

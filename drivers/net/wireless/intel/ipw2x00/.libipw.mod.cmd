@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/ipw2x00/libipw.mod := printf '%s\n'   libipw_module.o libipw_tx.o libipw_rx.o libipw_wx.o libipw_geo.o | awk '!x[$$0]++ { print("drivers/net/wireless/intel/ipw2x00/"$$0) }' > drivers/net/wireless/intel/ipw2x00/libipw.mod

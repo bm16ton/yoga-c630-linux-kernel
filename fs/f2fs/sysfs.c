@@ -128,6 +128,15 @@ static ssize_t sb_status_show(struct f2fs_attr *a,
 	return sprintf(buf, "%lx\n", sbi->s_flag);
 }
 
+<<<<<<< HEAD
+static ssize_t cp_status_show(struct f2fs_attr *a,
+		struct f2fs_sb_info *sbi, char *buf)
+{
+	return sprintf(buf, "%x\n", le32_to_cpu(F2FS_CKPT(sbi)->ckpt_flags));
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static ssize_t pending_discard_show(struct f2fs_attr *a,
 		struct f2fs_sb_info *sbi, char *buf)
 {
@@ -527,7 +536,10 @@ out:
 
 	if (!strcmp(a->attr.name, "gc_urgent_high_remaining")) {
 		spin_lock(&sbi->gc_urgent_high_lock);
+<<<<<<< HEAD
+=======
 		sbi->gc_urgent_high_limited = t != 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sbi->gc_urgent_high_remaining = t;
 		spin_unlock(&sbi->gc_urgent_high_lock);
 
@@ -865,11 +877,19 @@ F2FS_FEATURE_RO_ATTR(inode_crtime);
 F2FS_FEATURE_RO_ATTR(lost_found);
 #ifdef CONFIG_FS_VERITY
 F2FS_FEATURE_RO_ATTR(verity);
+<<<<<<< HEAD
 #endif
 F2FS_FEATURE_RO_ATTR(sb_checksum);
 #if IS_ENABLED(CONFIG_UNICODE)
 F2FS_FEATURE_RO_ATTR(casefold);
 #endif
+=======
+#endif
+F2FS_FEATURE_RO_ATTR(sb_checksum);
+#if IS_ENABLED(CONFIG_UNICODE)
+F2FS_FEATURE_RO_ATTR(casefold);
+#endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 F2FS_FEATURE_RO_ATTR(readonly);
 #ifdef CONFIG_F2FS_FS_COMPRESSION
 F2FS_FEATURE_RO_ATTR(compression);
@@ -1030,8 +1050,10 @@ static struct attribute *f2fs_feat_attrs[] = {
 ATTRIBUTE_GROUPS(f2fs_feat);
 
 F2FS_GENERAL_RO_ATTR(sb_status);
+F2FS_GENERAL_RO_ATTR(cp_status);
 static struct attribute *f2fs_stat_attrs[] = {
 	ATTR_LIST(sb_status),
+	ATTR_LIST(cp_status),
 	NULL,
 };
 ATTRIBUTE_GROUPS(f2fs_stat);

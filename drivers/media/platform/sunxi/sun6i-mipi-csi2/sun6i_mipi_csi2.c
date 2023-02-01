@@ -498,6 +498,10 @@ static int sun6i_mipi_csi2_bridge_setup(struct sun6i_mipi_csi2_device *csi2_dev)
 	struct v4l2_async_notifier *notifier = &bridge->notifier;
 	struct media_pad *pads = bridge->pads;
 	struct device *dev = csi2_dev->dev;
+<<<<<<< HEAD
+	bool notifier_registered = false;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	mutex_init(&bridge->lock);
@@ -519,8 +523,15 @@ static int sun6i_mipi_csi2_bridge_setup(struct sun6i_mipi_csi2_device *csi2_dev)
 
 	/* Media Pads */
 
+<<<<<<< HEAD
+	pads[SUN6I_MIPI_CSI2_PAD_SINK].flags = MEDIA_PAD_FL_SINK |
+					       MEDIA_PAD_FL_MUST_CONNECT;
+	pads[SUN6I_MIPI_CSI2_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE |
+						 MEDIA_PAD_FL_MUST_CONNECT;
+=======
 	pads[SUN6I_MIPI_CSI2_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
 	pads[SUN6I_MIPI_CSI2_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = media_entity_pads_init(&subdev->entity, SUN6I_MIPI_CSI2_PAD_COUNT,
 				     pads);
@@ -533,12 +544,26 @@ static int sun6i_mipi_csi2_bridge_setup(struct sun6i_mipi_csi2_device *csi2_dev)
 	notifier->ops = &sun6i_mipi_csi2_notifier_ops;
 
 	ret = sun6i_mipi_csi2_bridge_source_setup(csi2_dev);
+<<<<<<< HEAD
+	if (ret && ret != -ENODEV)
+		goto error_v4l2_notifier_cleanup;
+
+	/* Only register the notifier when a sensor is connected. */
+	if (ret != -ENODEV) {
+		ret = v4l2_async_subdev_nf_register(subdev, notifier);
+		if (ret < 0)
+			goto error_v4l2_notifier_cleanup;
+
+		notifier_registered = true;
+	}
+=======
 	if (ret)
 		goto error_v4l2_notifier_cleanup;
 
 	ret = v4l2_async_subdev_nf_register(subdev, notifier);
 	if (ret < 0)
 		goto error_v4l2_notifier_cleanup;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* V4L2 Subdev */
 
@@ -549,7 +574,12 @@ static int sun6i_mipi_csi2_bridge_setup(struct sun6i_mipi_csi2_device *csi2_dev)
 	return 0;
 
 error_v4l2_notifier_unregister:
+<<<<<<< HEAD
+	if (notifier_registered)
+		v4l2_async_nf_unregister(notifier);
+=======
 	v4l2_async_nf_unregister(notifier);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 error_v4l2_notifier_cleanup:
 	v4l2_async_nf_cleanup(notifier);

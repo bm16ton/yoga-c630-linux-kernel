@@ -1,0 +1,1 @@
+cmd_drivers/cpufreq/tegra20-cpufreq.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/cpufreq/tegra20-cpufreq.ko drivers/cpufreq/tegra20-cpufreq.o drivers/cpufreq/tegra20-cpufreq.mod.o;  true

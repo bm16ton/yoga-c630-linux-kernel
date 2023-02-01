@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/emulex/benet/be2net.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/emulex/benet/be2net.ko drivers/net/ethernet/emulex/benet/be2net.o drivers/net/ethernet/emulex/benet/be2net.mod.o;  true

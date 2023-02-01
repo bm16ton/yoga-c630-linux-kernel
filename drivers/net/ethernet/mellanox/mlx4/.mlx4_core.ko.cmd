@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/mellanox/mlx4/mlx4_core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/mellanox/mlx4/mlx4_core.ko drivers/net/ethernet/mellanox/mlx4/mlx4_core.o drivers/net/ethernet/mellanox/mlx4/mlx4_core.mod.o;  true

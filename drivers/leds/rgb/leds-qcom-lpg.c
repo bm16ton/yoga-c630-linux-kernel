@@ -602,8 +602,13 @@ static void lpg_brightness_set(struct lpg_led *led, struct led_classdev *cdev,
 		lpg_lut_sync(lpg, lut_mask);
 }
 
+<<<<<<< HEAD
+static int lpg_brightness_single_set(struct led_classdev *cdev,
+				     enum led_brightness value)
+=======
 static void lpg_brightness_single_set(struct led_classdev *cdev,
 				      enum led_brightness value)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct lpg_led *led = container_of(cdev, struct lpg_led, cdev);
 	struct mc_subled info;
@@ -614,10 +619,19 @@ static void lpg_brightness_single_set(struct led_classdev *cdev,
 	lpg_brightness_set(led, cdev, &info);
 
 	mutex_unlock(&led->lpg->lock);
+<<<<<<< HEAD
+
+	return 0;
+}
+
+static int lpg_brightness_mc_set(struct led_classdev *cdev,
+				 enum led_brightness value)
+=======
 }
 
 static void lpg_brightness_mc_set(struct led_classdev *cdev,
 				  enum led_brightness value)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct led_classdev_mc *mc = lcdev_to_mccdev(cdev);
 	struct lpg_led *led = container_of(mc, struct lpg_led, mcdev);
@@ -628,6 +642,11 @@ static void lpg_brightness_mc_set(struct led_classdev *cdev,
 	lpg_brightness_set(led, cdev, mc->subled_info);
 
 	mutex_unlock(&led->lpg->lock);
+<<<<<<< HEAD
+
+	return 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int lpg_blink_set(struct lpg_led *led,
@@ -1118,7 +1137,11 @@ static int lpg_add_led(struct lpg *lpg, struct device_node *np)
 		led->mcdev.num_colors = num_channels;
 
 		cdev = &led->mcdev.led_cdev;
+<<<<<<< HEAD
+		cdev->brightness_set_blocking = lpg_brightness_mc_set;
+=======
 		cdev->brightness_set = lpg_brightness_mc_set;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		cdev->blink_set = lpg_blink_mc_set;
 
 		/* Register pattern accessors only if we have a LUT block */
@@ -1132,7 +1155,11 @@ static int lpg_add_led(struct lpg *lpg, struct device_node *np)
 			return ret;
 
 		cdev = &led->cdev;
+<<<<<<< HEAD
+		cdev->brightness_set_blocking = lpg_brightness_single_set;
+=======
 		cdev->brightness_set = lpg_brightness_single_set;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		cdev->blink_set = lpg_blink_single_set;
 
 		/* Register pattern accessors only if we have a LUT block */
@@ -1151,7 +1178,11 @@ static int lpg_add_led(struct lpg *lpg, struct device_node *np)
 	else
 		cdev->brightness = LED_OFF;
 
+<<<<<<< HEAD
+	cdev->brightness_set_blocking(cdev, cdev->brightness);
+=======
 	cdev->brightness_set(cdev, cdev->brightness);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	init_data.fwnode = of_fwnode_handle(np);
 

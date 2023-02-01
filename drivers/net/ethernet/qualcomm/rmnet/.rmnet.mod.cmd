@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qualcomm/rmnet/rmnet.mod := printf '%s\n'   rmnet_config.o rmnet_vnd.o rmnet_handlers.o rmnet_map_data.o rmnet_map_command.o | awk '!x[$$0]++ { print("drivers/net/ethernet/qualcomm/rmnet/"$$0) }' > drivers/net/ethernet/qualcomm/rmnet/rmnet.mod

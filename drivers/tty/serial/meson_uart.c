@@ -335,7 +335,7 @@ static void meson_uart_change_speed(struct uart_port *port, unsigned long baud)
 
 static void meson_uart_set_termios(struct uart_port *port,
 				   struct ktermios *termios,
-				   struct ktermios *old)
+				   const struct ktermios *old)
 {
 	unsigned int cflags, iflags, baud;
 	unsigned long flags;
@@ -667,6 +667,8 @@ static struct uart_driver meson_uart_driver = {
 	.cons		= MESON_SERIAL_CONSOLE,
 };
 
+<<<<<<< HEAD
+=======
 static inline struct clk *meson_uart_probe_clock(struct device *dev,
 						 const char *id)
 {
@@ -690,6 +692,7 @@ static inline struct clk *meson_uart_probe_clock(struct device *dev,
 	return clk;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int meson_uart_probe_clocks(struct platform_device *pdev,
 				   struct uart_port *port)
 {
@@ -697,15 +700,15 @@ static int meson_uart_probe_clocks(struct platform_device *pdev,
 	struct clk *clk_pclk = NULL;
 	struct clk *clk_baud = NULL;
 
-	clk_pclk = meson_uart_probe_clock(&pdev->dev, "pclk");
+	clk_pclk = devm_clk_get_enabled(&pdev->dev, "pclk");
 	if (IS_ERR(clk_pclk))
 		return PTR_ERR(clk_pclk);
 
-	clk_xtal = meson_uart_probe_clock(&pdev->dev, "xtal");
+	clk_xtal = devm_clk_get_enabled(&pdev->dev, "xtal");
 	if (IS_ERR(clk_xtal))
 		return PTR_ERR(clk_xtal);
 
-	clk_baud = meson_uart_probe_clock(&pdev->dev, "baud");
+	clk_baud = devm_clk_get_enabled(&pdev->dev, "baud");
 	if (IS_ERR(clk_baud))
 		return PTR_ERR(clk_baud);
 

@@ -111,7 +111,7 @@ static void neigh_cleanup_and_release(struct neighbour *neigh)
 
 unsigned long neigh_rand_reach_time(unsigned long base)
 {
-	return base ? (prandom_u32() % base) + (base >> 1) : 0;
+	return base ? prandom_u32_max(base) + (base >> 1) : 0;
 }
 EXPORT_SYMBOL(neigh_rand_reach_time);
 
@@ -154,6 +154,7 @@ out:
 	write_unlock(&n->lock);
 	write_unlock_bh(&n->tbl->lock);
 }
+<<<<<<< HEAD
 
 static void neigh_update_managed_list(struct neighbour *n)
 {
@@ -164,6 +165,18 @@ static void neigh_update_managed_list(struct neighbour *n)
 	if (n->dead)
 		goto out;
 
+=======
+
+static void neigh_update_managed_list(struct neighbour *n)
+{
+	bool on_managed_list, add_to_managed;
+
+	write_lock_bh(&n->tbl->lock);
+	write_lock(&n->lock);
+	if (n->dead)
+		goto out;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	add_to_managed = n->flags & NTF_MANAGED;
 	on_managed_list = !list_empty(&n->managed_list);
 
@@ -183,10 +196,17 @@ static void neigh_update_flags(struct neighbour *neigh, u32 flags, int *notify,
 
 	if (!(flags & NEIGH_UPDATE_F_ADMIN))
 		return;
+<<<<<<< HEAD
 
 	ndm_flags  = (flags & NEIGH_UPDATE_F_EXT_LEARNED) ? NTF_EXT_LEARNED : 0;
 	ndm_flags |= (flags & NEIGH_UPDATE_F_MANAGED) ? NTF_MANAGED : 0;
 
+=======
+
+	ndm_flags  = (flags & NEIGH_UPDATE_F_EXT_LEARNED) ? NTF_EXT_LEARNED : 0;
+	ndm_flags |= (flags & NEIGH_UPDATE_F_MANAGED) ? NTF_MANAGED : 0;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if ((old_flags ^ ndm_flags) & NTF_EXT_LEARNED) {
 		if (ndm_flags & NTF_EXT_LEARNED)
 			neigh->flags |= NTF_EXT_LEARNED;
@@ -309,6 +329,7 @@ static int neigh_del_timer(struct neighbour *n)
 
 static struct neigh_parms *neigh_get_dev_parms_rcu(struct net_device *dev,
 						   int family)
+<<<<<<< HEAD
 {
 	switch (family) {
 	case AF_INET:
@@ -333,6 +354,32 @@ static void neigh_parms_qlen_dec(struct net_device *dev, int family)
 static void pneigh_queue_purge(struct sk_buff_head *list, struct net *net,
 			       int family)
 {
+=======
+{
+	switch (family) {
+	case AF_INET:
+		return __in_dev_arp_parms_get_rcu(dev);
+	case AF_INET6:
+		return __in6_dev_nd_parms_get_rcu(dev);
+	}
+	return NULL;
+}
+
+static void neigh_parms_qlen_dec(struct net_device *dev, int family)
+{
+	struct neigh_parms *p;
+
+	rcu_read_lock();
+	p = neigh_get_dev_parms_rcu(dev, family);
+	if (p)
+		p->qlen--;
+	rcu_read_unlock();
+}
+
+static void pneigh_queue_purge(struct sk_buff_head *list, struct net *net,
+			       int family)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sk_buff_head tmp;
 	unsigned long flags;
 	struct sk_buff *skb;
@@ -1866,9 +1913,6 @@ static struct neigh_table *neigh_find_table(int family)
 		break;
 	case AF_INET6:
 		tbl = neigh_tables[NEIGH_ND_TABLE];
-		break;
-	case AF_DECnet:
-		tbl = neigh_tables[NEIGH_DN_TABLE];
 		break;
 	}
 

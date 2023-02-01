@@ -1,5 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
+<<<<<<< HEAD
+ * psci_test - Tests relating to KVM's PSCI implementation.
+ *
+ * Copyright (c) 2021 Google LLC.
+ *
+ * This test includes:
+ *  - A regression test for a race between KVM servicing the PSCI CPU_ON call
+ *    and userspace reading the targeted vCPU's registers.
+ *  - A test for KVM's handling of PSCI SYSTEM_SUSPEND and the associated
+ *    KVM_SYSTEM_EVENT_SUSPEND UAPI.
+=======
  * psci_cpu_on_test - Test that the observable state of a vCPU targeted by the
  * CPU_ON PSCI call matches what the caller requested.
  *
@@ -7,6 +18,7 @@
  *
  * This is a regression test for a race between KVM servicing the PSCI call and
  * userspace reading the vCPUs registers.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #define _GNU_SOURCE

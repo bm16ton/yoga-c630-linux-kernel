@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/legacy/g_webcam.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/legacy/g_webcam.ko drivers/usb/gadget/legacy/g_webcam.o drivers/usb/gadget/legacy/g_webcam.mod.o;  true

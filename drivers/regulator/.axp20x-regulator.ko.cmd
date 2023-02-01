@@ -1,0 +1,1 @@
+cmd_drivers/regulator/axp20x-regulator.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/regulator/axp20x-regulator.ko drivers/regulator/axp20x-regulator.o drivers/regulator/axp20x-regulator.mod.o;  true

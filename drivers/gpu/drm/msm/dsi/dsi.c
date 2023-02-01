@@ -13,7 +13,11 @@ bool msm_dsi_is_cmd_mode(struct msm_dsi *msm_dsi)
 	return !(host_flags & MIPI_DSI_MODE_VIDEO);
 }
 
+<<<<<<< HEAD
+struct drm_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi)
+=======
 struct msm_display_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return msm_dsi_host_get_dsc_config(msm_dsi->host);
 }
@@ -212,13 +216,22 @@ int msm_dsi_modeset_init(struct msm_dsi *msm_dsi, struct drm_device *dev,
 			 struct drm_encoder *encoder)
 {
 	struct msm_drm_private *priv;
+<<<<<<< HEAD
+=======
 	struct drm_connector *connector;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (WARN_ON(!encoder) || WARN_ON(!msm_dsi) || WARN_ON(!dev))
 		return -EINVAL;
 
 	priv = dev->dev_private;
+
+	if (priv->num_bridges == ARRAY_SIZE(priv->bridges)) {
+		DRM_DEV_ERROR(dev->dev, "too many bridges\n");
+		return -ENOSPC;
+	}
+
 	msm_dsi->dev = dev;
 
 	ret = msm_dsi_host_modeset_init(msm_dsi->host, dev);
@@ -246,10 +259,15 @@ int msm_dsi_modeset_init(struct msm_dsi *msm_dsi, struct drm_device *dev,
 		goto fail;
 	}
 
+<<<<<<< HEAD
+	ret = msm_dsi_manager_ext_bridge_init(msm_dsi->id);
+	if (ret) {
+=======
 	connector = msm_dsi_manager_ext_bridge_init(msm_dsi->id);
 
 	if (IS_ERR(connector)) {
 		ret = PTR_ERR(connector);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DRM_DEV_ERROR(dev->dev,
 			"failed to create dsi connector: %d\n", ret);
 		goto fail;

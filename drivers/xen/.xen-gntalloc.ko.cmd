@@ -1,0 +1,1 @@
+cmd_drivers/xen/xen-gntalloc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/xen/xen-gntalloc.ko drivers/xen/xen-gntalloc.o drivers/xen/xen-gntalloc.mod.o;  true

@@ -191,7 +191,11 @@ static int tegra210_adx_put_byte_map(struct snd_kcontrol *kcontrol,
 	unsigned char *bytes_map = (unsigned char *)&adx->map;
 	int value = ucontrol->value.integer.value[0];
 	struct soc_mixer_control *mc =
+<<<<<<< HEAD
+		(struct soc_mixer_control *)kcontrol->private_value;
+=======
 		(struct soc_mixer_control *)kcontrol->private_value;;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (value == bytes_map[mc->reg])
 		return 0;

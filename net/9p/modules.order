@@ -1,0 +1,5 @@
+net/9p/9pnet.ko
+net/9p/9pnet_fd.ko
+net/9p/9pnet_xen.ko
+net/9p/9pnet_virtio.ko
+net/9p/9pnet_rdma.ko

@@ -464,8 +464,12 @@ static int lan966x_ptp_settime64(struct ptp_clock_info *ptp,
 	return 0;
 }
 
+<<<<<<< HEAD
+int lan966x_ptp_gettime64(struct ptp_clock_info *ptp, struct timespec64 *ts)
+=======
 static int lan966x_ptp_gettime64(struct ptp_clock_info *ptp,
 				 struct timespec64 *ts)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct lan966x_phc *phc = container_of(ptp, struct lan966x_phc, info);
 	struct lan966x *lan966x = phc->lan966x;
@@ -854,6 +858,12 @@ void lan966x_ptp_deinit(struct lan966x *lan966x)
 	struct lan966x_port *port;
 	int i;
 
+<<<<<<< HEAD
+	if (!lan966x->ptp)
+		return;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < lan966x->num_phys_ports; i++) {
 		port = lan966x->ports[i];
 		if (!port)
@@ -890,3 +900,12 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
 	shhwtstamps = skb_hwtstamps(skb);
 	shhwtstamps->hwtstamp = full_ts_in_ns;
 }
+<<<<<<< HEAD
+
+u32 lan966x_ptp_get_period_ps(void)
+{
+	/* This represents the system clock period in picoseconds */
+	return 15125;
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -1,0 +1,1 @@
+cmd_net/vmw_vsock/vmw_vsock_virtio_transport_common.mod := printf '%s\n'   virtio_transport_common.o | awk '!x[$$0]++ { print("net/vmw_vsock/"$$0) }' > net/vmw_vsock/vmw_vsock_virtio_transport_common.mod

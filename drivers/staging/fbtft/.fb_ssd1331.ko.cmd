@@ -1,0 +1,1 @@
+cmd_drivers/staging/fbtft/fb_ssd1331.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/fbtft/fb_ssd1331.ko drivers/staging/fbtft/fb_ssd1331.o drivers/staging/fbtft/fb_ssd1331.mod.o;  true

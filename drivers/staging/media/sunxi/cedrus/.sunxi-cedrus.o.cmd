@@ -1,0 +1,1 @@
+cmd_drivers/staging/media/sunxi/cedrus/sunxi-cedrus.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/staging/media/sunxi/cedrus/sunxi-cedrus.o @drivers/staging/media/sunxi/cedrus/sunxi-cedrus.mod 

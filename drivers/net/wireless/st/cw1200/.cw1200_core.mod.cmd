@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/st/cw1200/cw1200_core.mod := printf '%s\n'   fwio.o txrx.o main.o queue.o hwio.o bh.o wsm.o sta.o scan.o debug.o pm.o | awk '!x[$$0]++ { print("drivers/net/wireless/st/cw1200/"$$0) }' > drivers/net/wireless/st/cw1200/cw1200_core.mod

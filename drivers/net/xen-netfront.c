@@ -673,7 +673,11 @@ static int xennet_xdp_xmit(struct net_device *dev, int n,
 	return nxmit;
 }
 
+<<<<<<< HEAD
+static struct sk_buff *bounce_skb(const struct sk_buff *skb)
+=======
 struct sk_buff *bounce_skb(const struct sk_buff *skb)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned int headerlen = skb_headroom(skb);
 	/* Align size to allocate full pages and avoid contiguous data leaks */
@@ -1533,6 +1537,7 @@ static bool xennet_handle_rx(struct netfront_queue *queue, unsigned int *eoi)
 {
 	unsigned int work_queued;
 	unsigned long flags;
+<<<<<<< HEAD
 
 	if (unlikely(queue->info->broken))
 		return false;
@@ -1553,6 +1558,28 @@ static bool xennet_handle_rx(struct netfront_queue *queue, unsigned int *eoi)
 	}
 	spin_unlock_irqrestore(&queue->rx_cons_lock, flags);
 
+=======
+
+	if (unlikely(queue->info->broken))
+		return false;
+
+	spin_lock_irqsave(&queue->rx_cons_lock, flags);
+	work_queued = XEN_RING_NR_UNCONSUMED_RESPONSES(&queue->rx);
+	if (work_queued > queue->rx_rsp_unconsumed) {
+		queue->rx_rsp_unconsumed = work_queued;
+		*eoi = 0;
+	} else if (unlikely(work_queued < queue->rx_rsp_unconsumed)) {
+		const struct device *dev = &queue->info->netdev->dev;
+
+		spin_unlock_irqrestore(&queue->rx_cons_lock, flags);
+		dev_alert(dev, "RX producer index going backwards\n");
+		dev_alert(dev, "Disabled for further use\n");
+		queue->info->broken = true;
+		return false;
+	}
+	spin_unlock_irqrestore(&queue->rx_cons_lock, flags);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (likely(netif_carrier_ok(queue->info->netdev) && work_queued))
 		napi_schedule(&queue->napi);
 
@@ -1862,6 +1889,12 @@ static int netfront_resume(struct xenbus_device *dev)
 	netif_tx_unlock_bh(info->netdev);
 
 	xennet_disconnect_backend(info);
+
+	rtnl_lock();
+	if (info->queues)
+		xennet_destroy_queues(info);
+	rtnl_unlock();
+
 	return 0;
 }
 
@@ -2224,8 +2257,7 @@ static int xennet_create_queues(struct netfront_info *info,
 			return ret;
 		}
 
-		netif_napi_add(queue->info->netdev, &queue->napi,
-			       xennet_poll, 64);
+		netif_napi_add(queue->info->netdev, &queue->napi, xennet_poll);
 		if (netif_running(info->netdev))
 			napi_enable(&queue->napi);
 	}

@@ -13,7 +13,11 @@
 #define BATADV_DRIVER_DEVICE "batman-adv"
 
 #ifndef BATADV_SOURCE_VERSION
+<<<<<<< HEAD
+#define BATADV_SOURCE_VERSION "2022.3"
+=======
 #define BATADV_SOURCE_VERSION "2022.2"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 /* B.A.T.M.A.N. parameters */

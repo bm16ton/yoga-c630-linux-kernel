@@ -1,0 +1,3 @@
+drivers/firmware/google/coreboot_table.ko
+drivers/firmware/google/memconsole.ko
+drivers/firmware/google/memconsole-coreboot.ko

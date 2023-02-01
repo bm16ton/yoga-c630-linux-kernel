@@ -2209,7 +2209,11 @@ static int elf_core_dump(struct coredump_params *cprm)
 	 * The number of segs are recored into ELF header as 16bit value.
 	 * Please check DEFAULT_MAX_MAP_COUNT definition when you modify here.
 	 */
+<<<<<<< HEAD
+	segs = cprm->vma_count + elf_core_extra_phdrs(cprm);
+=======
 	segs = cprm->vma_count + elf_core_extra_phdrs();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* for notes section */
 	segs++;
@@ -2249,7 +2253,11 @@ static int elf_core_dump(struct coredump_params *cprm)
 	dataoff = offset = roundup(offset, ELF_EXEC_PAGESIZE);
 
 	offset += cprm->vma_data_size;
+<<<<<<< HEAD
+	offset += elf_core_extra_data_size(cprm);
+=======
 	offset += elf_core_extra_data_size();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	e_shoff = offset;
 
 	if (e_phnum == PN_XNUM) {

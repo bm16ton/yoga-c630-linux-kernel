@@ -1,0 +1,1 @@
+cmd_lib/memory-notifier-error-inject.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o lib/memory-notifier-error-inject.ko lib/memory-notifier-error-inject.o lib/memory-notifier-error-inject.mod.o;  true

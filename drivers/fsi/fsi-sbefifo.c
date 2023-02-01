@@ -477,7 +477,12 @@ static int sbefifo_wait(struct sbefifo *sbefifo, bool up,
 	if (!ready) {
 		sysfs_notify(&sbefifo->dev.kobj, NULL, dev_attr_timeout.attr.name);
 		sbefifo->timed_out = true;
+<<<<<<< HEAD
+		dev_err(dev, "%s FIFO Timeout (%u ms)! status=%08x\n",
+			up ? "UP" : "DOWN", jiffies_to_msecs(timeout), sts);
+=======
 		dev_err(dev, "%s FIFO Timeout ! status=%08x\n", up ? "UP" : "DOWN", sts);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ETIMEDOUT;
 	}
 	dev_vdbg(dev, "End of wait status: %08x\n", sts);
@@ -497,8 +502,8 @@ static int sbefifo_send_command(struct sbefifo *sbefifo,
 	u32 status;
 	int rc;
 
-	dev_vdbg(dev, "sending command (%zd words, cmd=%04x)\n",
-		 cmd_len, be32_to_cpu(command[1]));
+	dev_dbg(dev, "sending command (%zd words, cmd=%04x)\n",
+		cmd_len, be32_to_cpu(command[1]));
 
 	/* As long as there's something to send */
 	timeout = msecs_to_jiffies(SBEFIFO_TIMEOUT_START_CMD);
@@ -551,21 +556,23 @@ static int sbefifo_read_response(struct sbefifo *sbefifo, struct iov_iter *respo
 	size_t len;
 	int rc;
 
-	dev_vdbg(dev, "reading response, buflen = %zd\n", iov_iter_count(response));
+	dev_dbg(dev, "reading response, buflen = %zd\n", iov_iter_count(response));
 
 	timeout = msecs_to_jiffies(sbefifo->timeout_start_rsp_ms);
 	for (;;) {
 		/* Grab FIFO status (this will handle parity errors) */
 		rc = sbefifo_wait(sbefifo, false, &status, timeout);
-		if (rc < 0)
+		if (rc < 0) {
+			dev_dbg(dev, "timeout waiting (%u ms)\n", jiffies_to_msecs(timeout));
 			return rc;
+		}
 		timeout = msecs_to_jiffies(SBEFIFO_TIMEOUT_IN_RSP);
 
 		/* Decode status */
 		len = sbefifo_populated(status);
 		eot_set = sbefifo_eot_set(status);
 
-		dev_vdbg(dev, "  chunk size %zd eot_set=0x%x\n", len, eot_set);
+		dev_dbg(dev, "  chunk size %zd eot_set=0x%x\n", len, eot_set);
 
 		/* Go through the chunk */
 		while(len--) {

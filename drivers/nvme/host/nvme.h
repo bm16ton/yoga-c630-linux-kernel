@@ -233,6 +233,12 @@ struct nvme_fault_inject {
 #endif
 };
 
+enum nvme_ctrl_flags {
+	NVME_CTRL_FAILFAST_EXPIRED	= 0,
+	NVME_CTRL_ADMIN_Q_STOPPED	= 1,
+	NVME_CTRL_STARTED_ONCE		= 2,
+};
+
 struct nvme_ctrl {
 	bool comp_seen;
 	enum nvme_ctrl_state state;
@@ -354,8 +360,11 @@ struct nvme_ctrl {
 	u16 maxcmd;
 	int nr_reconnects;
 	unsigned long flags;
+<<<<<<< HEAD
+=======
 #define NVME_CTRL_FAILFAST_EXPIRED	0
 #define NVME_CTRL_ADMIN_Q_STOPPED	1
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct nvmf_ctrl_options *opts;
 
 	struct page *discard_page;
@@ -733,6 +742,17 @@ void nvme_uninit_ctrl(struct nvme_ctrl *ctrl);
 void nvme_start_ctrl(struct nvme_ctrl *ctrl);
 void nvme_stop_ctrl(struct nvme_ctrl *ctrl);
 int nvme_init_ctrl_finish(struct nvme_ctrl *ctrl);
+<<<<<<< HEAD
+int nvme_alloc_admin_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+		const struct blk_mq_ops *ops, unsigned int flags,
+		unsigned int cmd_size);
+void nvme_remove_admin_tag_set(struct nvme_ctrl *ctrl);
+int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+		const struct blk_mq_ops *ops, unsigned int flags,
+		unsigned int nr_maps, unsigned int cmd_size);
+void nvme_remove_io_tag_set(struct nvme_ctrl *ctrl);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void nvme_remove_namespaces(struct nvme_ctrl *ctrl);
 
@@ -831,6 +851,13 @@ long nvme_ns_head_chr_ioctl(struct file *file, unsigned int cmd,
 		unsigned long arg);
 long nvme_dev_ioctl(struct file *file, unsigned int cmd,
 		unsigned long arg);
+<<<<<<< HEAD
+int nvme_ns_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
+		struct io_comp_batch *iob, unsigned int poll_flags);
+int nvme_ns_head_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
+		struct io_comp_batch *iob, unsigned int poll_flags);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int nvme_ns_chr_uring_cmd(struct io_uring_cmd *ioucmd,
 		unsigned int issue_flags);
 int nvme_ns_head_chr_uring_cmd(struct io_uring_cmd *ioucmd,
@@ -872,7 +899,7 @@ static inline void nvme_trace_bio_complete(struct request *req)
 {
 	struct nvme_ns *ns = req->q->queuedata;
 
-	if (req->cmd_flags & REQ_NVME_MPATH)
+	if ((req->cmd_flags & REQ_NVME_MPATH) && req->bio)
 		trace_block_bio_complete(ns->head->disk->queue, req->bio);
 }
 
@@ -978,6 +1005,8 @@ static inline int nvme_update_zone_info(struct nvme_ns *ns, unsigned lbaf)
 }
 #endif
 
+<<<<<<< HEAD
+=======
 static inline int nvme_ctrl_init_connect_q(struct nvme_ctrl *ctrl)
 {
 	ctrl->connect_q = blk_mq_init_queue(ctrl->tagset);
@@ -986,6 +1015,7 @@ static inline int nvme_ctrl_init_connect_q(struct nvme_ctrl *ctrl)
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
 {
 	return dev_to_disk(dev)->private_data;

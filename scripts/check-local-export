@@ -1,12 +1,23 @@
+<<<<<<< HEAD
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
+# Copyright (C) 2022 Owen Rafferty <owen@owenrafferty.com>
+=======
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Copyright (C) 2022 Masahiro Yamada <masahiroy@kernel.org>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #
 # Exit with error if a local exported symbol is found.
 # EXPORT_SYMBOL should be used for global symbols.
 
 set -e
+<<<<<<< HEAD
+pid=$$
+=======
 
 # catch errors from ${NM}
 set -o pipefail
@@ -20,6 +31,7 @@ declare -A symbol_types
 declare -a export_symbols
 
 exit_code=0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # If there is no symbol in the object, ${NM} (both GNU nm and llvm-nm) shows
 # 'no symbols' diagnostic (but exits with 0). It is harmless and hidden by
@@ -29,6 +41,58 @@ exit_code=0
 # TODO:
 # Use --quiet instead of 2>/dev/null when we upgrade the minimum version of
 # binutils to 2.37, llvm to 13.0.0.
+<<<<<<< HEAD
+# Then, the following line will be simpler:
+#   { ${NM} --quiet ${1} || kill 0; } |
+
+{ ${NM} ${1} 2>/dev/null || { echo "${0}: ${NM} failed" >&2; kill $pid; } } |
+${AWK} -v "file=${1}" '
+BEGIN {
+	i = 0
+}
+
+# Skip the line if the number of fields is less than 3.
+#
+# case 1)
+#   For undefined symbols, the first field (value) is empty.
+#   The outout looks like this:
+#     "                 U _printk"
+#   It is unneeded to record undefined symbols.
+#
+# case 2)
+#   For Clang LTO, llvm-nm outputs a line with type t but empty name:
+#     "---------------- t"
+!length($3) {
+	next
+}
+
+# save (name, type) in the associative array
+{ symbol_types[$3]=$2 }
+
+# append the exported symbol to the array
+($3 ~ /^__ksymtab_/) {
+	export_symbols[i] = $3
+	sub(/^__ksymtab_/, "", export_symbols[i])
+	i++
+}
+
+END {
+	exit_code = 0
+	for (j = 0; j < i; ++j) {
+		name = export_symbols[j]
+		# nm(3) says "If lowercase, the symbol is usually local"
+		if (symbol_types[name] ~ /[a-z]/) {
+			printf "%s: error: local symbol %s was exported\n",
+				file, name | "cat 1>&2"
+			exit_code = 1
+		}
+	}
+
+	exit exit_code
+}'
+
+exit $?
+=======
 # Then, the following line will be really simple:
 #   ${NM} --quiet ${1} |
 
@@ -69,3 +133,4 @@ do
 done
 
 exit ${exit_code}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/dw_mmc-k3.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/dw_mmc-k3.ko drivers/mmc/host/dw_mmc-k3.o drivers/mmc/host/dw_mmc-k3.mod.o;  true

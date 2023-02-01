@@ -1,0 +1,5 @@
+net/dsa/dsa_core.ko
+net/dsa/tag_dsa.ko
+net/dsa/tag_ocelot.ko
+net/dsa/tag_ocelot_8021q.ko
+net/dsa/tag_trailer.ko

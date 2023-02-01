@@ -20,6 +20,16 @@ dynamic_events is the same as the ioctl with the u: prefix applied.
 
 Typically programs will register a set of events that they wish to expose to
 tools that can read trace_events (such as ftrace and perf). The registration
+<<<<<<< HEAD
+process gives back two ints to the program for each event. The first int is
+the status bit. This describes which bit in little-endian format in the
+/sys/kernel/debug/tracing/user_events_status file represents this event. The
+second int is the write index which describes the data when a write() or
+writev() is called on the /sys/kernel/debug/tracing/user_events_data file.
+
+The structures referenced in this document are contained within the
+/include/uapi/linux/user_events.h file in the source tree.
+=======
 process gives back two ints to the program for each event. The first int is the
 status index. This index describes which byte in the
 /sys/kernel/debug/tracing/user_events_status file represents this event. The
@@ -28,6 +38,7 @@ writev() is called on the /sys/kernel/debug/tracing/user_events_data file.
 
 The structures referenced in this document are contained with the
 /include/uap/linux/user_events.h file in the source tree.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 **NOTE:** *Both user_events_status and user_events_data are under the tracefs
 filesystem and may be mounted at different paths than above.*
@@ -38,18 +49,30 @@ Registering within a user process is done via ioctl() out to the
 /sys/kernel/debug/tracing/user_events_data file. The command to issue is
 DIAG_IOCSREG.
 
+<<<<<<< HEAD
+This command takes a packed struct user_reg as an argument::
+=======
 This command takes a struct user_reg as an argument::
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   struct user_reg {
         u32 size;
         u64 name_args;
+<<<<<<< HEAD
+        u32 status_bit;
+=======
         u32 status_index;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         u32 write_index;
   };
 
 The struct user_reg requires two inputs, the first is the size of the structure
 to ensure forward and backward compatibility. The second is the command string
+<<<<<<< HEAD
+to issue for registering. Upon success two outputs are set, the status bit
+=======
 to issue for registering. Upon success two outputs are set, the status index
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 and the write index.
 
 User based events show up under tracefs like any other event under the
@@ -111,15 +134,67 @@ in realtime. This allows user programs to only incur the cost of the write() or
 writev() calls when something is actively attached to the event.
 
 User programs call mmap() on /sys/kernel/debug/tracing/user_events_status to
+<<<<<<< HEAD
+check the status for each event that is registered. The bit to check in the
+file is given back after the register ioctl() via user_reg.status_bit. The bit
+is always in little-endian format. Programs can check if the bit is set either
+using a byte-wise index with a mask or a long-wise index with a little-endian
+mask.
+
+=======
 check the status for each event that is registered. The byte to check in the
 file is given back after the register ioctl() via user_reg.status_index.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Currently the size of user_events_status is a single page, however, custom
 kernel configurations can change this size to allow more user based events. In
 all cases the size of the file is a multiple of a page size.
 
+<<<<<<< HEAD
+For example, if the register ioctl() gives back a status_bit of 3 you would
+check byte 0 (3 / 8) of the returned mmap data and then AND the result with 8
+(1 << (3 % 8)) to see if anything is attached to that event.
+
+A byte-wise index check is performed as follows::
+
+  int index, mask;
+  char *status_page;
+
+  index = status_bit / 8;
+  mask = 1 << (status_bit % 8);
+
+  ...
+
+  if (status_page[index] & mask) {
+        /* Enabled */
+  }
+
+A long-wise index check is performed as follows::
+
+  #include <asm/bitsperlong.h>
+  #include <endian.h>
+
+  #if __BITS_PER_LONG == 64
+  #define endian_swap(x) htole64(x)
+  #else
+  #define endian_swap(x) htole32(x)
+  #endif
+
+  long index, mask, *status_page;
+
+  index = status_bit / __BITS_PER_LONG;
+  mask = 1L << (status_bit % __BITS_PER_LONG);
+  mask = endian_swap(mask);
+
+  ...
+
+  if (status_page[index] & mask) {
+        /* Enabled */
+  }
+=======
 For example, if the register ioctl() gives back a status_index of 3 you would
 check byte 3 of the returned mmap data to see if anything is attached to that
 event.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Administrators can easily check the status of all registered events by reading
 the user_events_status file directly via a terminal. The output is as follows::
@@ -137,7 +212,11 @@ For example, on a system that has a single event the output looks like this::
 
   Active: 1
   Busy: 0
+<<<<<<< HEAD
+  Max: 32768
+=======
   Max: 4096
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 If a user enables the user event via ftrace, the output would change to this::
 
@@ -145,6 +224,12 @@ If a user enables the user event via ftrace, the output would change to this::
 
   Active: 1
   Busy: 1
+<<<<<<< HEAD
+  Max: 32768
+
+**NOTE:** *A status bit of 0 will never be returned. This allows user programs
+to have a bit that can be used on error cases.*
+=======
   Max: 4096
 
 **NOTE:** *A status index of 0 will never be returned. This allows user
@@ -160,6 +245,7 @@ The following values are defined to aid in checking what has been attached:
 **EVENT_STATUS_FTRACE** - Bit set if ftrace has been attached (Bit 0).
 
 **EVENT_STATUS_PERF** - Bit set if perf has been attached (Bit 1).
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Writing Data
 ------------

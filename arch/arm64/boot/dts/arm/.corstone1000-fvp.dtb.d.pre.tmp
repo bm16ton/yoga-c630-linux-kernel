@@ -1,0 +1,4 @@
+corstone1000-fvp.o: arch/arm64/boot/dts/arm/corstone1000-fvp.dts \
+ arch/arm64/boot/dts/arm/corstone1000.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

@@ -1,0 +1,13 @@
+drivers/net/wireless/ralink/rt2x00/rt2x00lib.ko
+drivers/net/wireless/ralink/rt2x00/rt2x00mmio.ko
+drivers/net/wireless/ralink/rt2x00/rt2x00pci.ko
+drivers/net/wireless/ralink/rt2x00/rt2x00usb.ko
+drivers/net/wireless/ralink/rt2x00/rt2800lib.ko
+drivers/net/wireless/ralink/rt2x00/rt2800mmio.ko
+drivers/net/wireless/ralink/rt2x00/rt2400pci.ko
+drivers/net/wireless/ralink/rt2x00/rt2500pci.ko
+drivers/net/wireless/ralink/rt2x00/rt61pci.ko
+drivers/net/wireless/ralink/rt2x00/rt2800pci.ko
+drivers/net/wireless/ralink/rt2x00/rt2500usb.ko
+drivers/net/wireless/ralink/rt2x00/rt73usb.ko
+drivers/net/wireless/ralink/rt2x00/rt2800usb.ko

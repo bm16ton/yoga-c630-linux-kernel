@@ -1,0 +1,1 @@
+cmd_lib/reed_solomon/reed_solomon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o lib/reed_solomon/reed_solomon.ko lib/reed_solomon/reed_solomon.o lib/reed_solomon/reed_solomon.mod.o;  true

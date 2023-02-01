@@ -24,20 +24,48 @@ static bool can_swap(void)
 	return enable_eviction && get_nr_swap_pages() > 0;
 }
 
+<<<<<<< HEAD
+static bool can_block(struct shrink_control *sc)
+{
+	if (!(sc->gfp_mask & __GFP_DIRECT_RECLAIM))
+		return false;
+	return current_is_kswapd() || (sc->gfp_mask & __GFP_RECLAIM);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static unsigned long
 msm_gem_shrinker_count(struct shrinker *shrinker, struct shrink_control *sc)
 {
 	struct msm_drm_private *priv =
 		container_of(shrinker, struct msm_drm_private, shrinker);
+<<<<<<< HEAD
+	unsigned count = priv->lru.dontneed.count;
+
+	if (can_swap())
+		count += priv->lru.willneed.count;
+=======
 	unsigned count = priv->shrinkable_count;
 
 	if (can_swap())
 		count += priv->evictable_count;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return count;
 }
 
 static bool
+<<<<<<< HEAD
+purge(struct drm_gem_object *obj)
+{
+	if (!is_purgeable(to_msm_bo(obj)))
+		return false;
+
+	if (msm_gem_active(obj))
+		return false;
+
+	msm_gem_purge(obj);
+=======
 purge(struct msm_gem_object *msm_obj)
 {
 	if (!is_purgeable(msm_obj))
@@ -48,11 +76,50 @@ purge(struct msm_gem_object *msm_obj)
 	 * the purged list
 	 */
 	msm_gem_purge(&msm_obj->base);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return true;
 }
 
 static bool
+<<<<<<< HEAD
+evict(struct drm_gem_object *obj)
+{
+	if (is_unevictable(to_msm_bo(obj)))
+		return false;
+
+	if (msm_gem_active(obj))
+		return false;
+
+	msm_gem_evict(obj);
+
+	return true;
+}
+
+static bool
+wait_for_idle(struct drm_gem_object *obj)
+{
+	enum dma_resv_usage usage = dma_resv_usage_rw(true);
+	return dma_resv_wait_timeout(obj->resv, usage, false, 1000) > 0;
+}
+
+static bool
+active_purge(struct drm_gem_object *obj)
+{
+	if (!wait_for_idle(obj))
+		return false;
+
+	return purge(obj);
+}
+
+static bool
+active_evict(struct drm_gem_object *obj)
+{
+	if (!wait_for_idle(obj))
+		return false;
+
+	return evict(obj);
+=======
 evict(struct msm_gem_object *msm_obj)
 {
 	if (is_unevictable(msm_obj))
@@ -61,12 +128,65 @@ evict(struct msm_gem_object *msm_obj)
 	msm_gem_evict(&msm_obj->base);
 
 	return true;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static unsigned long
 scan(struct msm_drm_private *priv, unsigned nr_to_scan, struct list_head *list,
 		bool (*shrink)(struct msm_gem_object *msm_obj))
 {
+<<<<<<< HEAD
+	struct msm_drm_private *priv =
+		container_of(shrinker, struct msm_drm_private, shrinker);
+	struct {
+		struct drm_gem_lru *lru;
+		bool (*shrink)(struct drm_gem_object *obj);
+		bool cond;
+		unsigned long freed;
+	} stages[] = {
+		/* Stages of progressively more aggressive/expensive reclaim: */
+		{ &priv->lru.dontneed, purge,        true },
+		{ &priv->lru.willneed, evict,        can_swap() },
+		{ &priv->lru.dontneed, active_purge, can_block(sc) },
+		{ &priv->lru.willneed, active_evict, can_swap() && can_block(sc) },
+	};
+	long nr = sc->nr_to_scan;
+	unsigned long freed = 0;
+
+	for (unsigned i = 0; (nr > 0) && (i < ARRAY_SIZE(stages)); i++) {
+		if (!stages[i].cond)
+			continue;
+		stages[i].freed =
+			drm_gem_lru_scan(stages[i].lru, nr, stages[i].shrink);
+		nr -= stages[i].freed;
+		freed += stages[i].freed;
+	}
+
+	if (freed) {
+		trace_msm_gem_shrink(sc->nr_to_scan, stages[0].freed,
+				     stages[1].freed, stages[2].freed,
+				     stages[3].freed);
+	}
+
+	return (freed > 0) ? freed : SHRINK_STOP;
+}
+
+#ifdef CONFIG_DEBUG_FS
+unsigned long
+msm_gem_shrinker_shrink(struct drm_device *dev, unsigned long nr_to_scan)
+{
+	struct msm_drm_private *priv = dev->dev_private;
+	struct shrink_control sc = {
+		.nr_to_scan = nr_to_scan,
+	};
+	int ret;
+
+	fs_reclaim_acquire(GFP_KERNEL);
+	ret = msm_gem_shrinker_scan(&priv->shrinker, &sc);
+	fs_reclaim_release(GFP_KERNEL);
+
+	return ret;
+=======
 	unsigned freed = 0;
 	struct list_head still_in_list;
 
@@ -146,7 +266,9 @@ msm_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
 	}
 
 	return (freed > 0) ? freed : SHRINK_STOP;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
+#endif
 
 #ifdef CONFIG_DEBUG_FS
 unsigned long
@@ -173,12 +295,21 @@ msm_gem_shrinker_shrink(struct drm_device *dev, unsigned long nr_to_scan)
 static const int vmap_shrink_limit = 15;
 
 static bool
+<<<<<<< HEAD
+vmap_shrink(struct drm_gem_object *obj)
+{
+	if (!is_vunmapable(to_msm_bo(obj)))
+		return false;
+
+	msm_gem_vunmap(obj);
+=======
 vmap_shrink(struct msm_gem_object *msm_obj)
 {
 	if (!is_vunmapable(msm_obj))
 		return false;
 
 	msm_gem_vunmap(&msm_obj->base);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return true;
 }
@@ -188,17 +319,24 @@ msm_gem_shrinker_vmap(struct notifier_block *nb, unsigned long event, void *ptr)
 {
 	struct msm_drm_private *priv =
 		container_of(nb, struct msm_drm_private, vmap_notifier);
-	struct list_head *mm_lists[] = {
-		&priv->inactive_dontneed,
-		&priv->inactive_willneed,
-		priv->gpu ? &priv->gpu->active_list : NULL,
+	struct drm_gem_lru *lrus[] = {
+		&priv->lru.dontneed,
+		&priv->lru.willneed,
+		&priv->lru.pinned,
 		NULL,
 	};
 	unsigned idx, unmapped = 0;
 
+<<<<<<< HEAD
+	for (idx = 0; lrus[idx] && unmapped < vmap_shrink_limit; idx++) {
+		unmapped += drm_gem_lru_scan(lrus[idx],
+					     vmap_shrink_limit - unmapped,
+					     vmap_shrink);
+=======
 	for (idx = 0; mm_lists[idx] && unmapped < vmap_shrink_limit; idx++) {
 		unmapped += scan(priv, vmap_shrink_limit - unmapped,
 				mm_lists[idx], vmap_shrink);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	*(unsigned long *)ptr += unmapped;

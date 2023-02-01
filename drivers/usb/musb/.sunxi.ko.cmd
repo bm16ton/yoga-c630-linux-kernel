@@ -1,0 +1,1 @@
+cmd_drivers/usb/musb/sunxi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/musb/sunxi.ko drivers/usb/musb/sunxi.o drivers/usb/musb/sunxi.mod.o;  true

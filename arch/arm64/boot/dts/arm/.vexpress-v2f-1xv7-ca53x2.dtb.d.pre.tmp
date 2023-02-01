@@ -1,0 +1,5 @@
+vexpress-v2f-1xv7-ca53x2.o: \
+ arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ arch/arm64/boot/dts/arm/vexpress-v2m-rs1.dtsi

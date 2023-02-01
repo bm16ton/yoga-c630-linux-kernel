@@ -622,25 +622,55 @@ static int mlx5e_ptp_set_state(struct mlx5e_ptp *c, struct mlx5e_params *params)
 	return bitmap_empty(c->state, MLX5E_PTP_STATE_NUM_STATES) ? -EINVAL : 0;
 }
 
+<<<<<<< HEAD
+static void mlx5e_ptp_rx_unset_fs(struct mlx5e_flow_steering *fs)
+{
+	struct mlx5e_ptp_fs *ptp_fs = mlx5e_fs_get_ptp(fs);
+=======
 static void mlx5e_ptp_rx_unset_fs(struct mlx5e_priv *priv)
 {
 	struct mlx5e_ptp_fs *ptp_fs = priv->fs->ptp_fs;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!ptp_fs->valid)
 		return;
 
 	mlx5e_fs_tt_redirect_del_rule(ptp_fs->l2_rule);
+<<<<<<< HEAD
+	mlx5e_fs_tt_redirect_any_destroy(fs);
+
+	mlx5e_fs_tt_redirect_del_rule(ptp_fs->udp_v6_rule);
+	mlx5e_fs_tt_redirect_del_rule(ptp_fs->udp_v4_rule);
+	mlx5e_fs_tt_redirect_udp_destroy(fs);
+=======
 	mlx5e_fs_tt_redirect_any_destroy(priv);
 
 	mlx5e_fs_tt_redirect_del_rule(ptp_fs->udp_v6_rule);
 	mlx5e_fs_tt_redirect_del_rule(ptp_fs->udp_v4_rule);
 	mlx5e_fs_tt_redirect_udp_destroy(priv);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ptp_fs->valid = false;
 }
 
 static int mlx5e_ptp_rx_set_fs(struct mlx5e_priv *priv)
 {
 	u32 tirn = mlx5e_rx_res_get_tirn_ptp(priv->rx_res);
+<<<<<<< HEAD
+	struct mlx5e_flow_steering *fs = priv->fs;
+	struct mlx5_flow_handle *rule;
+	struct mlx5e_ptp_fs *ptp_fs;
+	int err;
+
+	ptp_fs = mlx5e_fs_get_ptp(fs);
+	if (ptp_fs->valid)
+		return 0;
+
+	err = mlx5e_fs_tt_redirect_udp_create(fs);
+	if (err)
+		goto out_free;
+
+	rule = mlx5e_fs_tt_redirect_udp_add_rule(fs, MLX5_TT_IPV4_UDP,
+=======
 	struct mlx5e_ptp_fs *ptp_fs = priv->fs->ptp_fs;
 	struct mlx5_flow_handle *rule;
 	int err;
@@ -653,6 +683,7 @@ static int mlx5e_ptp_rx_set_fs(struct mlx5e_priv *priv)
 		goto out_free;
 
 	rule = mlx5e_fs_tt_redirect_udp_add_rule(priv, MLX5_TT_IPV4_UDP,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						 tirn, PTP_EV_PORT);
 	if (IS_ERR(rule)) {
 		err = PTR_ERR(rule);
@@ -660,7 +691,11 @@ static int mlx5e_ptp_rx_set_fs(struct mlx5e_priv *priv)
 	}
 	ptp_fs->udp_v4_rule = rule;
 
+<<<<<<< HEAD
+	rule = mlx5e_fs_tt_redirect_udp_add_rule(fs, MLX5_TT_IPV6_UDP,
+=======
 	rule = mlx5e_fs_tt_redirect_udp_add_rule(priv, MLX5_TT_IPV6_UDP,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						 tirn, PTP_EV_PORT);
 	if (IS_ERR(rule)) {
 		err = PTR_ERR(rule);
@@ -668,11 +703,19 @@ static int mlx5e_ptp_rx_set_fs(struct mlx5e_priv *priv)
 	}
 	ptp_fs->udp_v6_rule = rule;
 
+<<<<<<< HEAD
+	err = mlx5e_fs_tt_redirect_any_create(fs);
+	if (err)
+		goto out_destroy_udp_v6_rule;
+
+	rule = mlx5e_fs_tt_redirect_any_add_rule(fs, tirn, ETH_P_1588);
+=======
 	err = mlx5e_fs_tt_redirect_any_create(priv);
 	if (err)
 		goto out_destroy_udp_v6_rule;
 
 	rule = mlx5e_fs_tt_redirect_any_add_rule(priv, tirn, ETH_P_1588);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(rule)) {
 		err = PTR_ERR(rule);
 		goto out_destroy_fs_any;
@@ -683,13 +726,21 @@ static int mlx5e_ptp_rx_set_fs(struct mlx5e_priv *priv)
 	return 0;
 
 out_destroy_fs_any:
+<<<<<<< HEAD
+	mlx5e_fs_tt_redirect_any_destroy(fs);
+=======
 	mlx5e_fs_tt_redirect_any_destroy(priv);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_destroy_udp_v6_rule:
 	mlx5e_fs_tt_redirect_del_rule(ptp_fs->udp_v6_rule);
 out_destroy_udp_v4_rule:
 	mlx5e_fs_tt_redirect_del_rule(ptp_fs->udp_v4_rule);
 out_destroy_fs_udp:
+<<<<<<< HEAD
+	mlx5e_fs_tt_redirect_udp_destroy(fs);
+=======
 	mlx5e_fs_tt_redirect_udp_destroy(priv);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_free:
 	return err;
 }
@@ -723,7 +774,11 @@ int mlx5e_ptp_open(struct mlx5e_priv *priv, struct mlx5e_params *params,
 	if (err)
 		goto err_free;
 
+<<<<<<< HEAD
+	netif_napi_add(netdev, &c->napi, mlx5e_ptp_napi_poll);
+=======
 	netif_napi_add(netdev, &c->napi, mlx5e_ptp_napi_poll, 64);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mlx5e_ptp_build_params(c, cparams, params);
 
@@ -797,16 +852,41 @@ int mlx5e_ptp_get_rqn(struct mlx5e_ptp *c, u32 *rqn)
 	return 0;
 }
 
+<<<<<<< HEAD
+int mlx5e_ptp_alloc_rx_fs(struct mlx5e_flow_steering *fs,
+			  const struct mlx5e_profile *profile)
+{
+	struct mlx5e_ptp_fs *ptp_fs;
+
+	if (!mlx5e_profile_feature_cap(profile, PTP_RX))
+=======
 int mlx5e_ptp_alloc_rx_fs(struct mlx5e_priv *priv)
 {
 	struct mlx5e_ptp_fs *ptp_fs;
 
 	if (!mlx5e_profile_feature_cap(priv->profile, PTP_RX))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 
 	ptp_fs = kzalloc(sizeof(*ptp_fs), GFP_KERNEL);
 	if (!ptp_fs)
 		return -ENOMEM;
+<<<<<<< HEAD
+	mlx5e_fs_set_ptp(fs, ptp_fs);
+
+	return 0;
+}
+
+void mlx5e_ptp_free_rx_fs(struct mlx5e_flow_steering *fs,
+			  const struct mlx5e_profile *profile)
+{
+	struct mlx5e_ptp_fs *ptp_fs = mlx5e_fs_get_ptp(fs);
+
+	if (!mlx5e_profile_feature_cap(profile, PTP_RX))
+		return;
+
+	mlx5e_ptp_rx_unset_fs(fs);
+=======
 
 	priv->fs->ptp_fs = ptp_fs;
 	return 0;
@@ -820,6 +900,7 @@ void mlx5e_ptp_free_rx_fs(struct mlx5e_priv *priv)
 		return;
 
 	mlx5e_ptp_rx_unset_fs(priv);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(ptp_fs);
 }
 
@@ -845,6 +926,10 @@ int mlx5e_ptp_rx_manage_fs(struct mlx5e_priv *priv, bool set)
 		netdev_WARN_ONCE(priv->netdev, "Don't try to remove PTP RX-FS rules");
 		return -EINVAL;
 	}
+<<<<<<< HEAD
+	mlx5e_ptp_rx_unset_fs(priv->fs);
+=======
 	mlx5e_ptp_rx_unset_fs(priv);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }

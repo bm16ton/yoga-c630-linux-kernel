@@ -1,0 +1,12 @@
+drivers/accessibility/speakup/speakup_acntsa.ko
+drivers/accessibility/speakup/speakup_apollo.ko
+drivers/accessibility/speakup/speakup_audptr.ko
+drivers/accessibility/speakup/speakup_bns.ko
+drivers/accessibility/speakup/speakup_dectlk.ko
+drivers/accessibility/speakup/speakup_decext.ko
+drivers/accessibility/speakup/speakup_ltlk.ko
+drivers/accessibility/speakup/speakup_soft.ko
+drivers/accessibility/speakup/speakup_spkout.ko
+drivers/accessibility/speakup/speakup_txprt.ko
+drivers/accessibility/speakup/speakup_dummy.ko
+drivers/accessibility/speakup/speakup.ko

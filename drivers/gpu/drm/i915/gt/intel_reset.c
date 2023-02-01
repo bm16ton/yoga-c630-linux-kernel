@@ -278,6 +278,7 @@ out:
 static int gen6_hw_domain_reset(struct intel_gt *gt, u32 hw_domain_mask)
 {
 	struct intel_uncore *uncore = gt->uncore;
+	int loops = 2;
 	int err;
 
 	/*
@@ -285,17 +286,38 @@ static int gen6_hw_domain_reset(struct intel_gt *gt, u32 hw_domain_mask)
 	 * for fifo space for the write or forcewake the chip for
 	 * the read
 	 */
-	intel_uncore_write_fw(uncore, GEN6_GDRST, hw_domain_mask);
+	do {
+		intel_uncore_write_fw(uncore, GEN6_GDRST, hw_domain_mask);
 
-	/* Wait for the device to ack the reset requests */
-	err = __intel_wait_for_register_fw(uncore,
-					   GEN6_GDRST, hw_domain_mask, 0,
-					   500, 0,
-					   NULL);
+		/*
+		 * Wait for the device to ack the reset requests.
+		 *
+		 * On some platforms, e.g. Jasperlake, we see that the
+		 * engine register state is not cleared until shortly after
+		 * GDRST reports completion, causing a failure as we try
+		 * to immediately resume while the internal state is still
+		 * in flux. If we immediately repeat the reset, the second
+		 * reset appears to serialise with the first, and since
+		 * it is a no-op, the registers should retain their reset
+		 * value. However, there is still a concern that upon
+		 * leaving the second reset, the internal engine state
+		 * is still in flux and not ready for resuming.
+		 */
+		err = __intel_wait_for_register_fw(uncore, GEN6_GDRST,
+						   hw_domain_mask, 0,
+						   2000, 0,
+						   NULL);
+	} while (err == 0 && --loops);
 	if (err)
 		GT_TRACE(gt,
 			 "Wait for 0x%08x engines reset failed\n",
 			 hw_domain_mask);
+
+	/*
+	 * As we have observed that the engine state is still volatile
+	 * after GDRST is acked, impose a small delay to let everything settle.
+	 */
+	udelay(50);
 
 	return err;
 }
@@ -389,6 +411,7 @@ static void get_sfc_forced_lock_data(struct intel_engine_cs *engine,
 		break;
 	}
 }
+<<<<<<< HEAD
 
 static int gen11_lock_sfc(struct intel_engine_cs *engine,
 			  u32 *reset_mask,
@@ -405,6 +428,24 @@ static int gen11_lock_sfc(struct intel_engine_cs *engine,
 		if ((BIT(engine->instance) & vdbox_sfc_access) == 0)
 			return 0;
 
+=======
+
+static int gen11_lock_sfc(struct intel_engine_cs *engine,
+			  u32 *reset_mask,
+			  u32 *unlock_mask)
+{
+	struct intel_uncore *uncore = engine->uncore;
+	u8 vdbox_sfc_access = engine->gt->info.vdbox_sfc_access;
+	struct sfc_lock_data sfc_lock;
+	bool lock_obtained, lock_to_other = false;
+	int ret;
+
+	switch (engine->class) {
+	case VIDEO_DECODE_CLASS:
+		if ((BIT(engine->instance) & vdbox_sfc_access) == 0)
+			return 0;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		fallthrough;
 	case VIDEO_ENHANCEMENT_CLASS:
 		get_sfc_forced_lock_data(engine, &sfc_lock);
@@ -776,7 +817,7 @@ static void revoke_mmaps(struct intel_gt *gt)
 			continue;
 
 		node = &vma->mmo->vma_node;
-		vma_offset = vma->ggtt_view.partial.offset << PAGE_SHIFT;
+		vma_offset = vma->gtt_view.partial.offset << PAGE_SHIFT;
 
 		unmap_mapping_range(gt->i915->drm.anon_inode->i_mapping,
 				    drm_vma_node_offset_addr(node) + vma_offset,
@@ -1281,9 +1322,6 @@ static void intel_gt_reset_global(struct intel_gt *gt,
 	intel_wedge_on_timeout(&w, gt, 5 * HZ) {
 		intel_display_prepare_reset(gt->i915);
 
-		/* Flush everyone using a resource about to be clobbered */
-		synchronize_srcu_expedited(&gt->reset.backoff_srcu);
-
 		intel_gt_reset(gt, engine_mask, reason);
 
 		intel_display_finish_reset(gt->i915);
@@ -1391,6 +1429,9 @@ void intel_gt_handle_error(struct intel_gt *gt,
 					    TASK_UNINTERRUPTIBLE);
 		}
 	}
+
+	/* Flush everyone using a resource about to be clobbered */
+	synchronize_srcu_expedited(&gt->reset.backoff_srcu);
 
 	intel_gt_reset_global(gt, engine_mask, msg);
 

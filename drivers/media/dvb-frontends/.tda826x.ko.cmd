@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/tda826x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/dvb-frontends/tda826x.ko drivers/media/dvb-frontends/tda826x.o drivers/media/dvb-frontends/tda826x.mod.o;  true

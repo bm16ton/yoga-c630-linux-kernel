@@ -1,0 +1,1 @@
+cmd_drivers/bus/mhi/ep/mhi_ep.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/bus/mhi/ep/mhi_ep.ko drivers/bus/mhi/ep/mhi_ep.o drivers/bus/mhi/ep/mhi_ep.mod.o;  true

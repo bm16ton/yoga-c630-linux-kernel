@@ -13,7 +13,11 @@ a) waiting for a CPU (while being runnable)
 b) completion of synchronous block I/O initiated by the task
 c) swapping in pages
 d) memory reclaim
+<<<<<<< HEAD
+e) thrashing
+=======
 e) thrashing page cache
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 f) direct compact
 g) write-protect copy
 

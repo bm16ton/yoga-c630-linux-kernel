@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_flow_table.mod := printf '%s\n'   nf_flow_table_core.o nf_flow_table_ip.o nf_flow_table_offload.o | awk '!x[$$0]++ { print("net/netfilter/"$$0) }' > net/netfilter/nf_flow_table.mod

@@ -1,0 +1,1 @@
+cmd_drivers/i2c/muxes/i2c-mux-gpmux.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/muxes/i2c-mux-gpmux.ko drivers/i2c/muxes/i2c-mux-gpmux.o drivers/i2c/muxes/i2c-mux-gpmux.mod.o;  true

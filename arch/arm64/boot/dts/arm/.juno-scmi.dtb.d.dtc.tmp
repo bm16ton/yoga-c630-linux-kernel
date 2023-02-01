@@ -1,0 +1,1 @@
+arch/arm64/boot/dts/arm/juno-scmi.dtb: arch/arm64/boot/dts/arm/.juno-scmi.dtb.dts.tmp

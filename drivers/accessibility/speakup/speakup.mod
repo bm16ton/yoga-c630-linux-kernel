@@ -1,0 +1,12 @@
+drivers/accessibility/speakup/buffers.o
+drivers/accessibility/speakup/devsynth.o
+drivers/accessibility/speakup/i18n.o
+drivers/accessibility/speakup/fakekey.o
+drivers/accessibility/speakup/main.o
+drivers/accessibility/speakup/keyhelp.o
+drivers/accessibility/speakup/kobjects.o
+drivers/accessibility/speakup/selection.o
+drivers/accessibility/speakup/spk_ttyio.o
+drivers/accessibility/speakup/synth.o
+drivers/accessibility/speakup/thread.o
+drivers/accessibility/speakup/varhandlers.o

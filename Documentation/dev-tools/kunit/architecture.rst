@@ -6,8 +6,13 @@ KUnit Architecture
 
 The KUnit architecture can be divided into two parts:
 
+<<<<<<< HEAD
+- `In-Kernel Testing Framework`_
+- `kunit_tool (Command Line Test Harness)`_
+=======
 - Kernel testing library
 - kunit_tool (Command line test harness)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 In-Kernel Testing Framework
 ===========================

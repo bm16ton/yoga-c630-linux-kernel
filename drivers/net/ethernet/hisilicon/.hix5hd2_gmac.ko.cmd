@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hix5hd2_gmac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/hisilicon/hix5hd2_gmac.ko drivers/net/ethernet/hisilicon/hix5hd2_gmac.o drivers/net/ethernet/hisilicon/hix5hd2_gmac.mod.o;  true

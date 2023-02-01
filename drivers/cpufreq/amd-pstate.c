@@ -36,6 +36,10 @@
 #include <linux/delay.h>
 #include <linux/uaccess.h>
 #include <linux/static_call.h>
+<<<<<<< HEAD
+#include <linux/amd-pstate.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include <acpi/processor.h>
 #include <acpi/cppc_acpi.h>
@@ -46,8 +50,13 @@
 #include <asm/cpu_device_id.h>
 #include "amd-pstate-trace.h"
 
+<<<<<<< HEAD
+#define AMD_PSTATE_TRANSITION_LATENCY	20000
+#define AMD_PSTATE_TRANSITION_DELAY	1000
+=======
 #define AMD_PSTATE_TRANSITION_LATENCY	0x20000
 #define AMD_PSTATE_TRANSITION_DELAY	500
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * TODO: We need more time to fine tune processors with shared memory solution
@@ -58,6 +67,10 @@
  * we disable it by default to go acpi-cpufreq on these processors and add a
  * module parameter to be able to enable it manually for debugging.
  */
+<<<<<<< HEAD
+static struct cpufreq_driver amd_pstate_driver;
+static int cppc_load __initdata;
+=======
 static bool shared_mem = false;
 module_param(shared_mem, bool, 0444);
 MODULE_PARM_DESC(shared_mem,
@@ -123,6 +136,7 @@ struct amd_cpudata {
 	u64 freq;
 	bool	boost_supported;
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline int pstate_enable(bool enable)
 {
@@ -279,6 +293,10 @@ static void amd_pstate_update(struct amd_cpudata *cpudata, u32 min_perf,
 	u64 prev = READ_ONCE(cpudata->cppc_req_cached);
 	u64 value = prev;
 
+<<<<<<< HEAD
+	des_perf = clamp_t(unsigned long, des_perf, min_perf, max_perf);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	value &= ~AMD_CPPC_MIN_PERF(~0L);
 	value |= AMD_CPPC_MIN_PERF(min_perf);
 
@@ -367,9 +385,14 @@ static void amd_pstate_adjust_perf(unsigned int cpu,
 	if (max_perf < min_perf)
 		max_perf = min_perf;
 
+<<<<<<< HEAD
+	amd_pstate_update(cpudata, min_perf, des_perf, max_perf, true);
+	cpufreq_cpu_put(policy);
+=======
 	des_perf = clamp_t(unsigned long, des_perf, min_perf, max_perf);
 
 	amd_pstate_update(cpudata, min_perf, des_perf, max_perf, true);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int amd_get_min_freq(struct amd_cpudata *cpudata)
@@ -575,9 +598,13 @@ free_cpudata1:
 
 static int amd_pstate_cpu_exit(struct cpufreq_policy *policy)
 {
+<<<<<<< HEAD
+	struct amd_cpudata *cpudata = policy->driver_data;
+=======
 	struct amd_cpudata *cpudata;
 
 	cpudata = policy->driver_data;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	freq_qos_remove_request(&cpudata->req[1]);
 	freq_qos_remove_request(&cpudata->req[0]);
@@ -619,9 +646,13 @@ static ssize_t show_amd_pstate_max_freq(struct cpufreq_policy *policy,
 					char *buf)
 {
 	int max_freq;
+<<<<<<< HEAD
+	struct amd_cpudata *cpudata = policy->driver_data;
+=======
 	struct amd_cpudata *cpudata;
 
 	cpudata = policy->driver_data;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	max_freq = amd_get_max_freq(cpudata);
 	if (max_freq < 0)
@@ -634,9 +665,13 @@ static ssize_t show_amd_pstate_lowest_nonlinear_freq(struct cpufreq_policy *poli
 						     char *buf)
 {
 	int freq;
+<<<<<<< HEAD
+	struct amd_cpudata *cpudata = policy->driver_data;
+=======
 	struct amd_cpudata *cpudata;
 
 	cpudata = policy->driver_data;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	freq = amd_get_lowest_nonlinear_freq(cpudata);
 	if (freq < 0)
@@ -682,7 +717,11 @@ static struct cpufreq_driver amd_pstate_driver = {
 	.resume		= amd_pstate_cpu_resume,
 	.set_boost	= amd_pstate_set_boost,
 	.name		= "amd-pstate",
+<<<<<<< HEAD
+	.attr		= amd_pstate_attr,
+=======
 	.attr           = amd_pstate_attr,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int __init amd_pstate_init(void)
@@ -691,9 +730,24 @@ static int __init amd_pstate_init(void)
 
 	if (boot_cpu_data.x86_vendor != X86_VENDOR_AMD)
 		return -ENODEV;
+<<<<<<< HEAD
+	/*
+	 * by default the pstate driver is disabled to load
+	 * enable the amd_pstate passive mode driver explicitly
+	 * with amd_pstate=passive in kernel command line
+	 */
+	if (!cppc_load) {
+		pr_debug("driver load is disabled, boot with amd_pstate=passive to enable this\n");
+		return -ENODEV;
+	}
+
+	if (!acpi_cpc_valid()) {
+		pr_warn_once("the _CPC object is not present in SBIOS or ACPI disabled\n");
+=======
 
 	if (!acpi_cpc_valid()) {
 		pr_debug("the _CPC object is not present in SBIOS\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENODEV;
 	}
 
@@ -705,6 +759,13 @@ static int __init amd_pstate_init(void)
 	if (boot_cpu_has(X86_FEATURE_CPPC)) {
 		pr_debug("AMD CPPC MSR based functionality is supported\n");
 		amd_pstate_driver.adjust_perf = amd_pstate_adjust_perf;
+<<<<<<< HEAD
+	} else {
+		pr_debug("AMD CPPC shared memory based functionality is supported\n");
+		static_call_update(amd_pstate_enable, cppc_enable);
+		static_call_update(amd_pstate_init_perf, cppc_init_perf);
+		static_call_update(amd_pstate_update_perf, cppc_update_perf);
+=======
 	} else if (shared_mem) {
 		static_call_update(amd_pstate_enable, cppc_enable);
 		static_call_update(amd_pstate_init_perf, cppc_init_perf);
@@ -712,6 +773,7 @@ static int __init amd_pstate_init(void)
 	} else {
 		pr_info("This processor supports shared memory solution, you can enable it with amd_pstate.shared_mem=1\n");
 		return -ENODEV;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* enable amd pstate feature */
@@ -730,6 +792,24 @@ static int __init amd_pstate_init(void)
 }
 device_initcall(amd_pstate_init);
 
+<<<<<<< HEAD
+static int __init amd_pstate_param(char *str)
+{
+	if (!str)
+		return -EINVAL;
+
+	if (!strcmp(str, "disable")) {
+		cppc_load = 0;
+		pr_info("driver is explicitly disabled\n");
+	} else if (!strcmp(str, "passive"))
+		cppc_load = 1;
+
+	return 0;
+}
+early_param("amd_pstate", amd_pstate_param);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_AUTHOR("Huang Rui <ray.huang@amd.com>");
 MODULE_DESCRIPTION("AMD Processor P-state Frequency Driver");
 MODULE_LICENSE("GPL");

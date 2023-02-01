@@ -87,6 +87,8 @@
 #define PEH_AXUSER_CFG			0x401001
 #define PEH_AXUSER_CFG_ENABLE		0xffffffff
 
+<<<<<<< HEAD
+=======
 #define QM_AXI_RRESP			BIT(0)
 #define QM_AXI_BRESP			BIT(1)
 #define QM_ECC_MBIT			BIT(2)
@@ -110,6 +112,7 @@
 #define QM_BASE_CE			QM_ECC_1BIT
 
 #define QM_Q_DEPTH			1024
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define QM_MIN_QNUM                     2
 #define HISI_ACC_SGL_SGE_NR_MAX		255
 #define QM_SHAPER_CFG			0x100164
@@ -168,6 +171,18 @@ enum qm_vf_state {
 	QM_NOT_READY,
 };
 
+<<<<<<< HEAD
+enum qm_cap_bits {
+	QM_SUPPORT_DB_ISOLATION = 0x0,
+	QM_SUPPORT_FUNC_QOS,
+	QM_SUPPORT_STOP_QP,
+	QM_SUPPORT_MB_COMMAND,
+	QM_SUPPORT_SVA_PREFETCH,
+	QM_SUPPORT_RPM,
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dfx_diff_registers {
 	u32 *regs;
 	u32 reg_offset;
@@ -232,7 +247,14 @@ struct hisi_qm_err_info {
 	char *acpi_rst;
 	u32 msi_wr_port;
 	u32 ecc_2bits_mask;
+<<<<<<< HEAD
+	u32 qm_shutdown_mask;
+	u32 dev_shutdown_mask;
+	u32 qm_reset_mask;
+	u32 dev_reset_mask;
+=======
 	u32 dev_ce_mask;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 ce;
 	u32 nfe;
 	u32 fe;
@@ -258,6 +280,21 @@ struct hisi_qm_err_ini {
 	void (*err_info_init)(struct hisi_qm *qm);
 };
 
+<<<<<<< HEAD
+struct hisi_qm_cap_info {
+	u32 type;
+	/* Register offset */
+	u32 offset;
+	/* Bit offset in register */
+	u32 shift;
+	u32 mask;
+	u32 v1_val;
+	u32 v2_val;
+	u32 v3_val;
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct hisi_qm_list {
 	struct mutex lock;
 	struct list_head list;
@@ -278,6 +315,12 @@ struct hisi_qm {
 	struct pci_dev *pdev;
 	void __iomem *io_base;
 	void __iomem *db_io_base;
+<<<<<<< HEAD
+
+	/* Capbility version, 0: not supports */
+	u32 cap_ver;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 sqe_size;
 	u32 qp_base;
 	u32 qp_num;
@@ -286,6 +329,11 @@ struct hisi_qm {
 	u32 max_qp_num;
 	u32 vfs_num;
 	u32 db_interval;
+<<<<<<< HEAD
+	u16 eq_depth;
+	u16 aeq_depth;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct list_head list;
 	struct hisi_qm_list *qm_list;
 
@@ -304,6 +352,11 @@ struct hisi_qm {
 	struct hisi_qm_err_info err_info;
 	struct hisi_qm_err_status err_status;
 	unsigned long misc_ctl; /* driver removing and reset sched */
+<<<<<<< HEAD
+	/* Device capability bit */
+	unsigned long caps;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct rw_semaphore qps_lock;
 	struct idr qp_idr;
@@ -326,8 +379,11 @@ struct hisi_qm {
 	bool use_sva;
 	bool is_frozen;
 
+<<<<<<< HEAD
+=======
 	/* doorbell isolation enable */
 	bool use_db_isolation;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	resource_size_t phys_base;
 	resource_size_t db_phys_base;
 	struct uacce_device *uacce;
@@ -351,6 +407,11 @@ struct hisi_qp_ops {
 
 struct hisi_qp {
 	u32 qp_id;
+<<<<<<< HEAD
+	u16 sq_depth;
+	u16 cq_depth;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 alg_type;
 	u8 req_type;
 
@@ -376,14 +437,22 @@ struct hisi_qp {
 static inline int q_num_set(const char *val, const struct kernel_param *kp,
 			    unsigned int device)
 {
+<<<<<<< HEAD
+	struct pci_dev *pdev;
+=======
 	struct pci_dev *pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI,
 					      device, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 n, q_num;
 	int ret;
 
 	if (!val)
 		return -EINVAL;
 
+<<<<<<< HEAD
+	pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI, device, NULL);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!pdev) {
 		q_num = min_t(u32, QM_QNUM_V1, QM_QNUM_V2);
 		pr_info("No device found currently, suppose queue number is %u\n",
@@ -393,6 +462,11 @@ static inline int q_num_set(const char *val, const struct kernel_param *kp,
 			q_num = QM_QNUM_V1;
 		else
 			q_num = QM_QNUM_V2;
+<<<<<<< HEAD
+
+		pci_dev_put(pdev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ret = kstrtou32(val, 10, &n);
@@ -501,6 +575,12 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
 int hisi_qm_get_dfx_access(struct hisi_qm *qm);
 void hisi_qm_put_dfx_access(struct hisi_qm *qm);
 void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
+<<<<<<< HEAD
+u32 hisi_qm_get_hw_info(struct hisi_qm *qm,
+			const struct hisi_qm_cap_info *info_table,
+			u32 index, bool is_read);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Used by VFIO ACC live migration driver */
 struct pci_driver *hisi_sec_get_pf_driver(void);

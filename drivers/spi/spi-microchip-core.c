@@ -548,12 +548,20 @@ static int mchp_corespi_probe(struct platform_device *pdev)
 			       IRQF_SHARED, dev_name(&pdev->dev), master);
 	if (ret)
 		return dev_err_probe(&pdev->dev, ret,
+<<<<<<< HEAD
+				     "could not request irq\n");
+=======
 				     "could not request irq: %d\n", ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	spi->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(spi->clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(spi->clk),
+<<<<<<< HEAD
+				     "could not get clk\n");
+=======
 				     "could not get clk: %d\n", ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = clk_prepare_enable(spi->clk);
 	if (ret)

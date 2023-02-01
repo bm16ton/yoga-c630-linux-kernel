@@ -144,7 +144,11 @@ static int get_pfrt_log_data_info(struct pfrt_log_data_info *data_info,
 	ret = 0;
 
 free_acpi_buffer:
+<<<<<<< HEAD
+	ACPI_FREE(out_obj);
+=======
 	kfree(out_obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -180,7 +184,11 @@ static int set_pfrt_log_level(int level, struct pfrt_log_device *pfrt_log_dev)
 		ret = -EBUSY;
 	}
 
+<<<<<<< HEAD
+	ACPI_FREE(out_obj);
+=======
 	kfree(out_obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -218,7 +226,11 @@ static int get_pfrt_log_level(struct pfrt_log_device *pfrt_log_dev)
 	ret = obj->integer.value;
 
 free_acpi_buffer:
+<<<<<<< HEAD
+	ACPI_FREE(out_obj);
+=======
 	kfree(out_obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }

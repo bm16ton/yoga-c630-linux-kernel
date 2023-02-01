@@ -24,6 +24,18 @@ properties:
     maxItems: 1
     description: virtual channel number of a DSI peripheral
 
+<<<<<<< HEAD
+  clock-names:
+    const: refclk
+
+  clocks:
+    maxItems: 1
+    description: |
+        Optional external clock connected to REF_CLK input.
+        The clock rate must be in 10..154 MHz range.
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   enable-gpios:
     description: Bridge EN pin, chip is reset when EN is low.
 

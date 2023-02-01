@@ -134,6 +134,12 @@ static const char * const iio_modifier_names[] = {
 	[IIO_MOD_ETHANOL] = "ethanol",
 	[IIO_MOD_H2] = "h2",
 	[IIO_MOD_O2] = "o2",
+	[IIO_MOD_LINEAR_X] = "linear_x",
+	[IIO_MOD_LINEAR_Y] = "linear_y",
+	[IIO_MOD_LINEAR_Z] = "linear_z",
+	[IIO_MOD_PITCH] = "pitch",
+	[IIO_MOD_YAW] = "yaw",
+	[IIO_MOD_ROLL] = "roll",
 };
 
 /* relies on pairs of these shared then separate */
@@ -168,6 +174,7 @@ static const char * const iio_chan_info_postfix[] = {
 	[IIO_CHAN_INFO_OVERSAMPLING_RATIO] = "oversampling_ratio",
 	[IIO_CHAN_INFO_THERMOCOUPLE_TYPE] = "thermocouple_type",
 	[IIO_CHAN_INFO_CALIBAMBIENT] = "calibambient",
+	[IIO_CHAN_INFO_ZEROPOINT] = "zeropoint",
 };
 /**
  * iio_device_id() - query the unique ID for the device
@@ -236,6 +243,7 @@ static int iio_sysfs_match_string_with_gaps(const char * const *array, size_t n,
 struct dentry *iio_get_debugfs_dentry(struct iio_dev *indio_dev)
 {
 	struct iio_dev_opaque *iio_dev_opaque = to_iio_dev_opaque(indio_dev);
+
 	return iio_dev_opaque->debugfs_dentry;
 }
 EXPORT_SYMBOL_GPL(iio_get_debugfs_dentry);
@@ -447,6 +455,7 @@ static const struct file_operations iio_debugfs_reg_fops = {
 static void iio_device_unregister_debugfs(struct iio_dev *indio_dev)
 {
 	struct iio_dev_opaque *iio_dev_opaque = to_iio_dev_opaque(indio_dev);
+
 	debugfs_remove_recursive(iio_dev_opaque->debugfs_dentry);
 }
 
@@ -1021,6 +1030,7 @@ int __iio_device_attr_init(struct device_attribute *dev_attr,
 	int ret = 0;
 	char *name = NULL;
 	char *full_postfix;
+
 	sysfs_attr_init(&dev_attr->attr);
 
 	/* Build up postfix of <extend_name>_<modifier>_postfix */
@@ -1299,8 +1309,7 @@ static int iio_device_add_channel_sysfs(struct iio_dev *indio_dev,
 
 	ret = iio_device_add_info_mask_type_avail(indio_dev, chan,
 						  IIO_SEPARATE,
-						  &chan->
-						  info_mask_separate_available);
+						  &chan->info_mask_separate_available);
 	if (ret < 0)
 		return ret;
 	attrcount += ret;
@@ -1314,8 +1323,7 @@ static int iio_device_add_channel_sysfs(struct iio_dev *indio_dev,
 
 	ret = iio_device_add_info_mask_type_avail(indio_dev, chan,
 						  IIO_SHARED_BY_TYPE,
-						  &chan->
-						  info_mask_shared_by_type_available);
+						  &chan->info_mask_shared_by_type_available);
 	if (ret < 0)
 		return ret;
 	attrcount += ret;
@@ -1355,6 +1363,7 @@ static int iio_device_add_channel_sysfs(struct iio_dev *indio_dev,
 
 	if (chan->ext_info) {
 		unsigned int i = 0;
+
 		for (ext_info = chan->ext_info; ext_info->name; ext_info++) {
 			ret = __iio_add_chan_devattr(ext_info->name,
 					chan,
@@ -1403,6 +1412,10 @@ static ssize_t name_show(struct device *dev, struct device_attribute *attr,
 			 char *buf)
 {
 	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sysfs_emit(buf, "%s\n", indio_dev->name);
 }
 
@@ -1412,6 +1425,10 @@ static ssize_t label_show(struct device *dev, struct device_attribute *attr,
 			  char *buf)
 {
 	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return sysfs_emit(buf, "%s\n", indio_dev->label);
 }
 
@@ -1565,7 +1582,7 @@ static int iio_device_register_sysfs(struct iio_dev *indio_dev)
 		ret = -ENOMEM;
 		goto error_clear_attrs;
 	}
-	/* Copy across original attributes */
+	/* Copy across original attributes, and point to original binary attributes */
 	if (indio_dev->info->attrs) {
 		memcpy(iio_dev_opaque->chan_attr_group.attrs,
 		       indio_dev->info->attrs->attrs,
@@ -1573,6 +1590,8 @@ static int iio_device_register_sysfs(struct iio_dev *indio_dev)
 		       *attrcount_orig);
 		iio_dev_opaque->chan_attr_group.is_visible =
 			indio_dev->info->attrs->is_visible;
+		iio_dev_opaque->chan_attr_group.bin_attrs =
+			indio_dev->info->attrs->bin_attrs;
 	}
 	attrn = attrcount_orig;
 	/* Add all elements from the list. */
@@ -1782,6 +1801,10 @@ static int iio_chrdev_release(struct inode *inode, struct file *filp)
 	struct iio_dev_opaque *iio_dev_opaque =
 		container_of(inode->i_cdev, struct iio_dev_opaque, chrdev);
 	struct iio_dev *indio_dev = &iio_dev_opaque->indio_dev;
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(ib);
 	clear_bit(IIO_BUSY_BIT_POS, &iio_dev_opaque->flags);
 	iio_device_put(indio_dev);
@@ -1909,6 +1932,7 @@ int __iio_device_register(struct iio_dev *indio_dev, struct module *this_mod)
 		return -EINVAL;
 
 	iio_dev_opaque->driver_module = this_mod;
+<<<<<<< HEAD
 
 	/* If the calling driver did not initialize firmware node, do it here */
 	if (dev_fwnode(&indio_dev->dev))
@@ -1917,6 +1941,16 @@ int __iio_device_register(struct iio_dev *indio_dev, struct module *this_mod)
 		fwnode = dev_fwnode(indio_dev->dev.parent);
 	device_set_node(&indio_dev->dev, fwnode);
 
+=======
+
+	/* If the calling driver did not initialize firmware node, do it here */
+	if (dev_fwnode(&indio_dev->dev))
+		fwnode = dev_fwnode(&indio_dev->dev);
+	else
+		fwnode = dev_fwnode(indio_dev->dev.parent);
+	device_set_node(&indio_dev->dev, fwnode);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fwnode_property_read_string(fwnode, "label", &indio_dev->label);
 
 	ret = iio_check_unique_scan_index(indio_dev);
@@ -1959,12 +1993,21 @@ int __iio_device_register(struct iio_dev *indio_dev, struct module *this_mod)
 		cdev_init(&iio_dev_opaque->chrdev, &iio_buffer_fileops);
 	else if (iio_dev_opaque->event_interface)
 		cdev_init(&iio_dev_opaque->chrdev, &iio_event_fileops);
+<<<<<<< HEAD
 
 	if (iio_dev_opaque->attached_buffers_cnt || iio_dev_opaque->event_interface) {
 		indio_dev->dev.devt = MKDEV(MAJOR(iio_devt), iio_dev_opaque->id);
 		iio_dev_opaque->chrdev.owner = this_mod;
 	}
 
+=======
+
+	if (iio_dev_opaque->attached_buffers_cnt || iio_dev_opaque->event_interface) {
+		indio_dev->dev.devt = MKDEV(MAJOR(iio_devt), iio_dev_opaque->id);
+		iio_dev_opaque->chrdev.owner = this_mod;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* assign device groups now; they should be all registered now */
 	indio_dev->dev.groups = iio_dev_opaque->groups;
 
@@ -1993,9 +2036,15 @@ EXPORT_SYMBOL(__iio_device_register);
 void iio_device_unregister(struct iio_dev *indio_dev)
 {
 	struct iio_dev_opaque *iio_dev_opaque = to_iio_dev_opaque(indio_dev);
+<<<<<<< HEAD
 
 	cdev_device_del(&iio_dev_opaque->chrdev, &indio_dev->dev);
 
+=======
+
+	cdev_device_del(&iio_dev_opaque->chrdev, &indio_dev->dev);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&iio_dev_opaque->info_exist_lock);
 
 	iio_device_unregister_debugfs(indio_dev);

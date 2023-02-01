@@ -1,0 +1,1 @@
+cmd_drivers/regulator/built-in.a := rm -f drivers/regulator/built-in.a;  printf "drivers/regulator/%s " core.o dummy.o fixed-helper.o helpers.o devres.o irq_helpers.o of_regulator.o fixed.o gpio-regulator.o qcom-rpmh-regulator.o qcom_smd-regulator.o qcom_spmi-regulator.o pwm-regulator.o | xargs ar cDPrST drivers/regulator/built-in.a

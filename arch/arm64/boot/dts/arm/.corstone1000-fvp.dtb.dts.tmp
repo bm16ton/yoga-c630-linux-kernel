@@ -1,0 +1,224 @@
+# 1 "arch/arm64/boot/dts/arm/corstone1000-fvp.dts"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "arch/arm64/boot/dts/arm/corstone1000-fvp.dts"
+
+
+
+
+
+
+
+/dts-v1/;
+
+# 1 "arch/arm64/boot/dts/arm/corstone1000.dtsi" 1
+
+
+
+
+
+
+
+# 1 "./scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h" 1
+# 9 "./scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h"
+# 1 "./scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h" 1
+# 10 "./scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h" 2
+# 9 "arch/arm64/boot/dts/arm/corstone1000.dtsi" 2
+
+/ {
+ interrupt-parent = <&gic>;
+ #address-cells = <1>;
+ #size-cells = <1>;
+
+ aliases {
+  serial0 = &uart0;
+  serial1 = &uart1;
+ };
+
+ chosen {
+  stdout-path = "serial0:115200n8";
+ };
+
+ cpus {
+  #address-cells = <1>;
+  #size-cells = <0>;
+
+  cpu: cpu@0 {
+   device_type = "cpu";
+   compatible = "arm,cortex-a35";
+   reg = <0>;
+   next-level-cache = <&L2_0>;
+  };
+ };
+
+ memory@88200000 {
+  device_type = "memory";
+  reg = <0x88200000 0x77e00000>;
+ };
+
+ gic: interrupt-controller@1c000000 {
+  compatible = "arm,gic-400";
+  #interrupt-cells = <3>;
+  #address-cells = <0>;
+  interrupt-controller;
+  reg = <0x1c010000 0x1000>,
+   <0x1c02f000 0x2000>,
+   <0x1c04f000 0x1000>,
+   <0x1c06f000 0x2000>;
+  interrupts = <1 9 ((((1 << (1)) - 1) << 8) |
+         8)>;
+ };
+
+ L2_0: l2-cache0 {
+  compatible = "cache";
+  cache-level = <2>;
+  cache-size = <0x80000>;
+  cache-line-size = <64>;
+  cache-sets = <1024>;
+ };
+
+ refclk100mhz: refclk100mhz {
+  compatible = "fixed-clock";
+  #clock-cells = <0>;
+  clock-frequency = <100000000>;
+  clock-output-names = "apb_pclk";
+ };
+
+ smbclk: refclk24mhzx2 {
+
+  compatible = "fixed-clock";
+  #clock-cells = <0>;
+  clock-frequency = <48000000>;
+  clock-output-names = "smclk";
+ };
+
+ timer {
+  compatible = "arm,armv8-timer";
+  interrupts = <1 13 ((((1 << (1)) - 1) << 8) |
+     8)>,
+    <1 14 ((((1 << (1)) - 1) << 8) |
+     8)>,
+    <1 11 ((((1 << (1)) - 1) << 8) |
+     8)>,
+    <1 10 ((((1 << (1)) - 1) << 8) |
+     8)>;
+ };
+
+ uartclk: uartclk {
+
+  compatible = "fixed-clock";
+  #clock-cells = <0>;
+  clock-frequency = <50000000>;
+  clock-output-names = "uartclk";
+ };
+
+ psci {
+  compatible = "arm,psci-1.0", "arm,psci-0.2";
+  method = "smc";
+ };
+
+ soc {
+  compatible = "simple-bus";
+  #address-cells = <1>;
+  #size-cells = <1>;
+  interrupt-parent = <&gic>;
+  ranges;
+
+  timer@1a220000 {
+   compatible = "arm,armv7-timer-mem";
+   reg = <0x1a220000 0x1000>;
+   #address-cells = <1>;
+   #size-cells = <1>;
+   clock-frequency = <50000000>;
+   ranges;
+
+   frame@1a230000 {
+    frame-number = <0>;
+    interrupts = <0 2 4>;
+    reg = <0x1a230000 0x1000>;
+   };
+  };
+
+  uart0: serial@1a510000 {
+   compatible = "arm,pl011", "arm,primecell";
+   reg = <0x1a510000 0x1000>;
+   interrupts = <0 19 4>;
+   clocks = <&uartclk>, <&refclk100mhz>;
+   clock-names = "uartclk", "apb_pclk";
+  };
+
+  uart1: serial@1a520000 {
+   compatible = "arm,pl011", "arm,primecell";
+   reg = <0x1a520000 0x1000>;
+   interrupts = <0 20 4>;
+   clocks = <&uartclk>, <&refclk100mhz>;
+   clock-names = "uartclk", "apb_pclk";
+  };
+
+  mhu_hse1: mailbox@1b820000 {
+   compatible = "arm,mhuv2-tx", "arm,primecell";
+   reg = <0x1b820000 0x1000>;
+   clocks = <&refclk100mhz>;
+   clock-names = "apb_pclk";
+   interrupts = <0 45 4>;
+   #mbox-cells = <2>;
+   arm,mhuv2-protocols = <0 0>;
+   secure-status = "okay";
+   status = "disabled";
+  };
+
+  mhu_seh1: mailbox@1b830000 {
+   compatible = "arm,mhuv2-rx", "arm,primecell";
+   reg = <0x1b830000 0x1000>;
+   clocks = <&refclk100mhz>;
+   clock-names = "apb_pclk";
+   interrupts = <0 46 4>;
+   #mbox-cells = <2>;
+   arm,mhuv2-protocols = <0 0>;
+   secure-status = "okay";
+   status = "disabled";
+  };
+ };
+};
+# 11 "arch/arm64/boot/dts/arm/corstone1000-fvp.dts" 2
+
+/ {
+ model = "ARM Corstone1000 FVP (Fixed Virtual Platform)";
+ compatible = "arm,corstone1000-fvp";
+
+ smsc: ethernet@4010000 {
+  compatible = "smsc,lan91c111";
+  reg = <0x40100000 0x10000>;
+  phy-mode = "mii";
+  interrupts = <0 116 4>;
+  reg-io-width = <2>;
+ };
+
+ vmmc_v3_3d: fixed_v3_3d {
+  compatible = "regulator-fixed";
+  regulator-name = "vmmc_supply";
+  regulator-min-microvolt = <3300000>;
+  regulator-max-microvolt = <3300000>;
+  regulator-always-on;
+ };
+
+ sdmmc0: mmc@40300000 {
+  compatible = "arm,pl18x", "arm,primecell";
+  reg = <0x40300000 0x1000>;
+  interrupts = <0 117 4>;
+  max-frequency = <12000000>;
+  vmmc-supply = <&vmmc_v3_3d>;
+  clocks = <&smbclk>, <&refclk100mhz>;
+  clock-names = "smclk", "apb_pclk";
+ };
+
+ sdmmc1: mmc@50000000 {
+  compatible = "arm,pl18x", "arm,primecell";
+  reg = <0x50000000 0x10000>;
+  interrupts = <0 115 4>;
+  max-frequency = <12000000>;
+  vmmc-supply = <&vmmc_v3_3d>;
+  clocks = <&smbclk>, <&refclk100mhz>;
+  clock-names = "smclk", "apb_pclk";
+ };
+};

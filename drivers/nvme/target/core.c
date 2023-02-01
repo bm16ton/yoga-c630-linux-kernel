@@ -15,6 +15,7 @@
 
 #include "nvmet.h"
 
+struct kmem_cache *nvmet_bvec_cache;
 struct workqueue_struct *buffered_io_wq;
 struct workqueue_struct *zbd_wq;
 static const struct nvmet_fabrics_ops *nvmet_transports[NVMF_TRTYPE_MAX];
@@ -1631,10 +1632,30 @@ void nvmet_subsys_put(struct nvmet_subsys *subsys)
 
 static int __init nvmet_init(void)
 {
-	int error;
+	int error = -ENOMEM;
 
 	nvmet_ana_group_enabled[NVMET_DEFAULT_ANA_GRPID] = 1;
 
+<<<<<<< HEAD
+	nvmet_bvec_cache = kmem_cache_create("nvmet-bvec",
+			NVMET_MAX_MPOOL_BVEC * sizeof(struct bio_vec), 0,
+			SLAB_HWCACHE_ALIGN, NULL);
+	if (!nvmet_bvec_cache)
+		return -ENOMEM;
+
+	zbd_wq = alloc_workqueue("nvmet-zbd-wq", WQ_MEM_RECLAIM, 0);
+	if (!zbd_wq)
+		goto out_destroy_bvec_cache;
+
+	buffered_io_wq = alloc_workqueue("nvmet-buffered-io-wq",
+			WQ_MEM_RECLAIM, 0);
+	if (!buffered_io_wq)
+		goto out_free_zbd_work_queue;
+
+	nvmet_wq = alloc_workqueue("nvmet-wq", WQ_MEM_RECLAIM, 0);
+	if (!nvmet_wq)
+		goto out_free_buffered_work_queue;
+=======
 	zbd_wq = alloc_workqueue("nvmet-zbd-wq", WQ_MEM_RECLAIM, 0);
 	if (!zbd_wq)
 		return -ENOMEM;
@@ -1651,6 +1672,7 @@ static int __init nvmet_init(void)
 		error = -ENOMEM;
 		goto out_free_buffered_work_queue;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	error = nvmet_init_discovery();
 	if (error)
@@ -1669,6 +1691,11 @@ out_free_buffered_work_queue:
 	destroy_workqueue(buffered_io_wq);
 out_free_zbd_work_queue:
 	destroy_workqueue(zbd_wq);
+<<<<<<< HEAD
+out_destroy_bvec_cache:
+	kmem_cache_destroy(nvmet_bvec_cache);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return error;
 }
 
@@ -1680,6 +1707,10 @@ static void __exit nvmet_exit(void)
 	destroy_workqueue(nvmet_wq);
 	destroy_workqueue(buffered_io_wq);
 	destroy_workqueue(zbd_wq);
+<<<<<<< HEAD
+	kmem_cache_destroy(nvmet_bvec_cache);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	BUILD_BUG_ON(sizeof(struct nvmf_disc_rsp_page_entry) != 1024);
 	BUILD_BUG_ON(sizeof(struct nvmf_disc_rsp_page_hdr) != 1024);

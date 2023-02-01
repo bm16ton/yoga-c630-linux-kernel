@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/bt8xx/modules.order := {   echo drivers/media/pci/bt8xx/bttv.ko;   echo drivers/media/pci/bt8xx/bt878.ko;   echo drivers/media/pci/bt8xx/dvb-bt8xx.ko;   echo drivers/media/pci/bt8xx/dst.ko;   echo drivers/media/pci/bt8xx/dst_ca.ko; :; } > drivers/media/pci/bt8xx/modules.order

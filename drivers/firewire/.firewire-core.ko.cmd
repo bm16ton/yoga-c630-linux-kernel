@@ -1,0 +1,1 @@
+cmd_drivers/firewire/firewire-core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/firewire/firewire-core.ko drivers/firewire/firewire-core.o drivers/firewire/firewire-core.mod.o;  true

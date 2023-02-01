@@ -1,0 +1,1 @@
+cmd_fs/freevxfs/freevxfs.mod := printf '%s\n'   vxfs_bmap.o vxfs_fshead.o vxfs_immed.o vxfs_inode.o vxfs_lookup.o vxfs_olt.o vxfs_subr.o vxfs_super.o | awk '!x[$$0]++ { print("fs/freevxfs/"$$0) }' > fs/freevxfs/freevxfs.mod

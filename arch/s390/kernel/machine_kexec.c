@@ -21,6 +21,7 @@
 #include <asm/elf.h>
 #include <asm/asm-offsets.h>
 #include <asm/cacheflush.h>
+#include <asm/abs_lowcore.h>
 #include <asm/os_info.h>
 #include <asm/set_memory.h>
 #include <asm/stacktrace.h>
@@ -222,13 +223,22 @@ void machine_kexec_cleanup(struct kimage *image)
 
 void arch_crash_save_vmcoreinfo(void)
 {
+	struct lowcore *abs_lc;
+	unsigned long flags;
+
 	VMCOREINFO_SYMBOL(lowcore_ptr);
 	VMCOREINFO_SYMBOL(high_memory);
 	VMCOREINFO_LENGTH(lowcore_ptr, NR_CPUS);
 	vmcoreinfo_append_str("SAMODE31=%lx\n", __samode31);
 	vmcoreinfo_append_str("EAMODE31=%lx\n", __eamode31);
 	vmcoreinfo_append_str("KERNELOFFSET=%lx\n", kaslr_offset());
+<<<<<<< HEAD
+	abs_lc = get_abs_lowcore(&flags);
+	abs_lc->vmcore_info = paddr_vmcoreinfo_note();
+	put_abs_lowcore(abs_lc, flags);
+=======
 	put_abs_lowcore(vmcore_info, paddr_vmcoreinfo_note());
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void machine_shutdown(void)

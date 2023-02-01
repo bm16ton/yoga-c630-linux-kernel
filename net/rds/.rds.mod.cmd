@@ -1,0 +1,1 @@
+cmd_net/rds/rds.mod := printf '%s\n'   af_rds.o bind.o cong.o connection.o info.o message.o recv.o send.o stats.o sysctl.o threads.o transport.o loop.o page.o rdma.o | awk '!x[$$0]++ { print("net/rds/"$$0) }' > net/rds/rds.mod

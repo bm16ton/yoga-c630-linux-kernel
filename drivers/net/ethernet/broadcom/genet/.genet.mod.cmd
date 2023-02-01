@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/broadcom/genet/genet.mod := printf '%s\n'   bcmgenet.o bcmmii.o bcmgenet_wol.o | awk '!x[$$0]++ { print("drivers/net/ethernet/broadcom/genet/"$$0) }' > drivers/net/ethernet/broadcom/genet/genet.mod

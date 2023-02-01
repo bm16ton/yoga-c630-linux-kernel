@@ -93,6 +93,10 @@ config PEAQ_WMI
 
 config NVIDIA_WMI_EC_BACKLIGHT
 	tristate "EC Backlight Driver for Hybrid Graphics Notebook Systems"
+<<<<<<< HEAD
+	depends on ACPI_VIDEO
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on ACPI_WMI
 	depends on BACKLIGHT_CLASS_DEVICE
 	help
@@ -195,6 +199,7 @@ config ACER_WMI
 	  here.
 
 source "drivers/platform/x86/amd/Kconfig"
+<<<<<<< HEAD
 
 config ADV_SWBUTTON
 	tristate "Advantech ACPI Software Button Driver"
@@ -204,6 +209,17 @@ config ADV_SWBUTTON
 	  button feature. More information can be found at
 	  <http://www.advantech.com.tw/products/>
 
+=======
+
+config ADV_SWBUTTON
+	tristate "Advantech ACPI Software Button Driver"
+	depends on ACPI && INPUT
+	help
+	  Say Y here to enable support for Advantech software defined
+	  button feature. More information can be found at
+	  <http://www.advantech.com.tw/products/>
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	  To compile this driver as a module, choose M here. The module will
 	  be called adv_swbutton.
 
@@ -790,6 +806,7 @@ config SAMSUNG_Q10
 config ACPI_TOSHIBA
 	tristate "Toshiba Laptop Extras"
 	depends on ACPI
+	depends on ACPI_BATTERY
 	depends on ACPI_WMI
 	select LEDS_CLASS
 	select NEW_LEDS
@@ -797,6 +814,7 @@ config ACPI_TOSHIBA
 	depends on INPUT
 	depends on SERIO_I8042 || SERIO_I8042 = n
 	depends on ACPI_VIDEO || ACPI_VIDEO = n
+	depends on HWMON || HWMON = n
 	depends on RFKILL || RFKILL = n
 	depends on IIO
 	select INPUT_SPARSEKMAP

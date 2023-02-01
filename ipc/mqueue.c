@@ -986,8 +986,7 @@ SYSCALL_DEFINE1(mq_unlink, const char __user *, u_name)
 
 out_unlock:
 	inode_unlock(d_inode(mnt->mnt_root));
-	if (inode)
-		iput(inode);
+	iput(inode);
 	mnt_drop_write(mnt);
 out_name:
 	putname(name);
@@ -1727,7 +1726,12 @@ static int __init init_mqueue_fs(void)
 
 	if (!setup_mq_sysctls(&init_ipc_ns)) {
 		pr_warn("sysctl registration failed\n");
+<<<<<<< HEAD
+		error = -ENOMEM;
+		goto out_kmem;
+=======
 		return -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	error = register_filesystem(&mqueue_fs_type);
@@ -1745,6 +1749,11 @@ static int __init init_mqueue_fs(void)
 out_filesystem:
 	unregister_filesystem(&mqueue_fs_type);
 out_sysctl:
+<<<<<<< HEAD
+	retire_mq_sysctls(&init_ipc_ns);
+out_kmem:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kmem_cache_destroy(mqueue_inode_cachep);
 	retire_mq_sysctls(&init_ipc_ns);
 	return error;

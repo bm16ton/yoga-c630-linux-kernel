@@ -9,7 +9,10 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_fourcc.h>
 #include <drm/drm_plane.h>
+<<<<<<< HEAD
+=======
 #include <drm/drm_plane_helper.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_vblank_work.h>
 
 #include "i915_irq.h"

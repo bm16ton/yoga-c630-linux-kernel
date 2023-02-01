@@ -7,6 +7,10 @@
 #include <linux/kref.h>
 #include <linux/list.h>
 #include <linux/cdev.h>
+<<<<<<< HEAD
+#include <linux/uaccess.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/termios.h>
 #include <linux/seq_file.h>
 
@@ -141,7 +145,11 @@ struct serial_struct;
  *
  *	Optional.
  *
+<<<<<<< HEAD
+ * @set_termios: ``void ()(struct tty_struct *tty, const struct ktermios *old)``
+=======
  * @set_termios: ``void ()(struct tty_struct *tty, struct ktermios *old)``
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  *	This routine allows the @tty driver to be notified when device's
  *	termios settings have changed. New settings are in @tty->termios.
@@ -365,7 +373,7 @@ struct tty_operations {
 		    unsigned int cmd, unsigned long arg);
 	long (*compat_ioctl)(struct tty_struct *tty,
 			     unsigned int cmd, unsigned long arg);
-	void (*set_termios)(struct tty_struct *tty, struct ktermios * old);
+	void (*set_termios)(struct tty_struct *tty, const struct ktermios *old);
 	void (*throttle)(struct tty_struct * tty);
 	void (*unthrottle)(struct tty_struct * tty);
 	void (*stop)(struct tty_struct *tty);
@@ -396,7 +404,10 @@ struct tty_operations {
 /**
  * struct tty_driver -- driver for TTY devices
  *
+<<<<<<< HEAD
+=======
  * @magic: set to %TTY_DRIVER_MAGIC in __tty_alloc_driver()
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @kref: reference counting. Reaching zero frees all the internals and the
  *	  driver.
  * @cdevs: allocated/registered character /dev devices
@@ -432,7 +443,10 @@ struct tty_operations {
  * @driver_name, @name, @type, @subtype, @init_termios, and @ops.
  */
 struct tty_driver {
+<<<<<<< HEAD
+=======
 	int	magic;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct kref kref;
 	struct cdev **cdevs;
 	struct module	*owner;
@@ -488,9 +502,12 @@ static inline void tty_set_operations(struct tty_driver *driver,
 {
 	driver->ops = op;
 }
+<<<<<<< HEAD
+=======
 
 /* tty driver magic number */
 #define TTY_DRIVER_MAGIC		0x5402
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * DOC: TTY Driver Flags

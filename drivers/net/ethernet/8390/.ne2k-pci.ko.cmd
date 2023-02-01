@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/8390/ne2k-pci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/8390/ne2k-pci.ko drivers/net/ethernet/8390/ne2k-pci.o drivers/net/ethernet/8390/ne2k-pci.mod.o;  true

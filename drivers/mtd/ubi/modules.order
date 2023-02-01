@@ -1,0 +1,2 @@
+drivers/mtd/ubi/ubi.ko
+drivers/mtd/ubi/gluebi.ko

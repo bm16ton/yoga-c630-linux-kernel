@@ -1006,7 +1006,11 @@ int efx_siena_init_struct(struct efx_nic *efx,
 	efx->pci_dev = pci_dev;
 	efx->msg_enable = debug;
 	efx->state = STATE_UNINIT;
+<<<<<<< HEAD
+	strscpy(efx->name, pci_name(pci_dev), sizeof(efx->name));
+=======
 	strlcpy(efx->name, pci_name(pci_dev), sizeof(efx->name));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	efx->net_dev = net_dev;
 	efx->rx_prefix_size = efx->type->rx_prefix_size;

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2-common.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2-common.o @drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2-common.mod 

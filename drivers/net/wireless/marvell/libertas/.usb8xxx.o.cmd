@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/libertas/usb8xxx.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/marvell/libertas/usb8xxx.o @drivers/net/wireless/marvell/libertas/usb8xxx.mod 

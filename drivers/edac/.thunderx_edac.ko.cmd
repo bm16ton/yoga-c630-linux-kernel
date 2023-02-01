@@ -1,0 +1,1 @@
+cmd_drivers/edac/thunderx_edac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/edac/thunderx_edac.ko drivers/edac/thunderx_edac.o drivers/edac/thunderx_edac.mod.o;  true

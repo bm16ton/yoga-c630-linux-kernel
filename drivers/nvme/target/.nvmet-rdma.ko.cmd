@@ -1,0 +1,1 @@
+cmd_drivers/nvme/target/nvmet-rdma.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nvme/target/nvmet-rdma.ko drivers/nvme/target/nvmet-rdma.o drivers/nvme/target/nvmet-rdma.mod.o;  true

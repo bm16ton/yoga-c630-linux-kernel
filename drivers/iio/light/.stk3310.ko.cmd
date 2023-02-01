@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/stk3310.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/stk3310.ko drivers/iio/light/stk3310.o drivers/iio/light/stk3310.mod.o;  true

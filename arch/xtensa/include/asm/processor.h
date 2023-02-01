@@ -205,9 +205,12 @@ struct thread_struct {
 #define start_thread(regs, new_pc, new_sp) \
 	do { \
 		unsigned long syscall = (regs)->syscall; \
+		unsigned long current_aregs[16]; \
+		memcpy(current_aregs, (regs)->areg, sizeof(current_aregs)); \
 		memset((regs), 0, sizeof(*(regs))); \
 		(regs)->pc = (new_pc); \
 		(regs)->ps = USER_PS_VALUE; \
+		memcpy((regs)->areg, current_aregs, sizeof(current_aregs)); \
 		(regs)->areg[1] = (new_sp); \
 		(regs)->areg[0] = 0; \
 		(regs)->wmask = 1; \
@@ -221,9 +224,12 @@ struct thread_struct {
 struct task_struct;
 struct mm_struct;
 
+<<<<<<< HEAD
+=======
 /* Free all resources held by a thread. */
 #define release_thread(thread) do { } while(0)
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern unsigned long __get_wchan(struct task_struct *p);
 
 #define KSTK_EIP(tsk)		(task_pt_regs(tsk)->pc)

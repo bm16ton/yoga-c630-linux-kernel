@@ -429,7 +429,11 @@ static int qcom_swrm_get_alert_slave_dev_num(struct qcom_swrm_ctrl *ctrl)
 
 	ctrl->reg_read(ctrl, SWRM_MCP_SLV_STATUS, &val);
 
+<<<<<<< HEAD
+	for (dev_num = 1; dev_num <= SDW_MAX_DEVICES; dev_num++) {
+=======
 	for (dev_num = 0; dev_num <= SDW_MAX_DEVICES; dev_num++) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		status = (val >> (dev_num * SWRM_MCP_SLV_STATUS_SZ));
 
 		if ((status & SWRM_MCP_SLV_STATUS_MASK) == SDW_SLAVE_ALERT) {
@@ -449,7 +453,11 @@ static void qcom_swrm_get_device_status(struct qcom_swrm_ctrl *ctrl)
 	ctrl->reg_read(ctrl, SWRM_MCP_SLV_STATUS, &val);
 	ctrl->slave_status = val;
 
+<<<<<<< HEAD
+	for (i = 1; i <= SDW_MAX_DEVICES; i++) {
+=======
 	for (i = 0; i <= SDW_MAX_DEVICES; i++) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		u32 s;
 
 		s = (val >> (i * 2));
@@ -489,6 +497,13 @@ static int qcom_swrm_enumerate(struct sdw_bus *bus)
 	char *buf1 = (char *)&val1, *buf2 = (char *)&val2;
 
 	for (i = 1; i <= SDW_MAX_DEVICES; i++) {
+<<<<<<< HEAD
+		/* do not continue if the status is Not Present  */
+		if (!ctrl->status[i])
+			continue;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*SCP_Devid5 - Devid 4*/
 		ctrl->reg_read(ctrl, SWRM_ENUMERATOR_SLAVE_DEV_ID_1(i), &val1);
 

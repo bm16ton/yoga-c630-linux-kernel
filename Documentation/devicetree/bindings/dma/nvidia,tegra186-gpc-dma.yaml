@@ -4,7 +4,11 @@
 $id: http://devicetree.org/schemas/dma/nvidia,tegra186-gpc-dma.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
+<<<<<<< HEAD
+title: NVIDIA Tegra GPC DMA Controller
+=======
 title: NVIDIA Tegra GPC DMA Controller Device Tree Bindings
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 description: |
   The Tegra General Purpose Central (GPC) DMA controller is used for faster

@@ -117,7 +117,11 @@ static struct mt8195_afe_tuner_cfg mt8195_afe_tuner_cfgs[MT8195_AUD_PLL_NUM] = {
 		.upper_bound_reg = AFE_APLL_TUNER_CFG,
 		.upper_bound_shift = 8,
 		.upper_bound_maskbit = 0xff,
+<<<<<<< HEAD
+		.upper_bound_default = 0x3,
+=======
 		.upper_bound_default = 0x2,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[MT8195_AUD_PLL2] = {
 		.id = MT8195_AUD_PLL2,
@@ -135,7 +139,11 @@ static struct mt8195_afe_tuner_cfg mt8195_afe_tuner_cfgs[MT8195_AUD_PLL_NUM] = {
 		.upper_bound_reg = AFE_APLL_TUNER_CFG1,
 		.upper_bound_shift = 8,
 		.upper_bound_maskbit = 0xff,
+<<<<<<< HEAD
+		.upper_bound_default = 0x3,
+=======
 		.upper_bound_default = 0x2,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[MT8195_AUD_PLL3] = {
 		.id = MT8195_AUD_PLL3,
@@ -284,7 +292,11 @@ static int mt8195_afe_enable_apll_tuner(struct mtk_base_afe *afe,
 {
 	struct mt8195_afe_tuner_cfg *cfg = mt8195_afe_found_apll_tuner(id);
 	unsigned long flags;
+<<<<<<< HEAD
+	int ret;
+=======
 	int ret = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!cfg)
 		return -EINVAL;
@@ -308,7 +320,11 @@ static int mt8195_afe_enable_apll_tuner(struct mtk_base_afe *afe,
 
 	spin_unlock_irqrestore(&cfg->ctrl_lock, flags);
 
+<<<<<<< HEAD
+	return 0;
+=======
 	return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int mt8195_afe_disable_apll_tuner(struct mtk_base_afe *afe,
@@ -316,7 +332,11 @@ static int mt8195_afe_disable_apll_tuner(struct mtk_base_afe *afe,
 {
 	struct mt8195_afe_tuner_cfg *cfg = mt8195_afe_found_apll_tuner(id);
 	unsigned long flags;
+<<<<<<< HEAD
+	int ret;
+=======
 	int ret = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!cfg)
 		return -EINVAL;
@@ -338,7 +358,11 @@ static int mt8195_afe_disable_apll_tuner(struct mtk_base_afe *afe,
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	return 0;
+=======
 	return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int mt8195_afe_get_mclk_source_clk_id(int sel)

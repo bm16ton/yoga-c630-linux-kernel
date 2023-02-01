@@ -193,7 +193,11 @@ static int tfa9890_init(struct regmap *regmap)
 {
 	int ret;
 
+<<<<<<< HEAD
+	/* temporarily allow access to hidden registers */
+=======
 	/* unhide keys to allow updating them */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = regmap_write(regmap, TFA989X_HIDE_UNHIDE_KEY, 0x5a6b);
 	if (ret)
 		return ret;
@@ -203,7 +207,11 @@ static int tfa9890_init(struct regmap *regmap)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	/* hide registers again */
+=======
 	/* hide keys again */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = regmap_write(regmap, TFA989X_HIDE_UNHIDE_KEY, 0x0000);
 	if (ret)
 		return ret;

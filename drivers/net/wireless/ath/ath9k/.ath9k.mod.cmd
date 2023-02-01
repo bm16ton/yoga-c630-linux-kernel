@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath9k/ath9k.mod := printf '%s\n'   beacon.o gpio.o init.o main.o recv.o xmit.o link.o antenna.o channel.o mci.o pci.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath9k/"$$0) }' > drivers/net/wireless/ath/ath9k/ath9k.mod

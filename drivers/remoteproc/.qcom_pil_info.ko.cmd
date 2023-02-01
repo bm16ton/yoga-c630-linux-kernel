@@ -1,0 +1,1 @@
+cmd_drivers/remoteproc/qcom_pil_info.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/remoteproc/qcom_pil_info.ko drivers/remoteproc/qcom_pil_info.o drivers/remoteproc/qcom_pil_info.mod.o;  true

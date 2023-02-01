@@ -571,6 +571,21 @@ static const struct dmi_system_id byt_rt5640_quirk_table[] = {
 					BYT_RT5640_MCLK_EN),
 	},
 	{
+		/* Advantech MICA-071 */
+		.matches = {
+			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "Advantech"),
+			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "MICA-071"),
+		},
+		/* OVCD Th = 1500uA to reliable detect head-phones vs -set */
+		.driver_data = (void *)(BYT_RT5640_IN3_MAP |
+					BYT_RT5640_JD_SRC_JD2_IN4N |
+					BYT_RT5640_OVCD_TH_1500UA |
+					BYT_RT5640_OVCD_SF_0P75 |
+					BYT_RT5640_MONO_SPEAKER |
+					BYT_RT5640_DIFF_MIC |
+					BYT_RT5640_MCLK_EN),
+	},
+	{
 		.matches = {
 			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "ARCHOS"),
 			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ARCHOS 80 Cesium"),
@@ -1136,9 +1151,59 @@ static int byt_rt5640_add_codec_device_props(struct device *i2c_dev,
 	}
 
 	ret = device_add_software_node(i2c_dev, to_software_node(fwnode));
+<<<<<<< HEAD
+=======
+
+	fwnode_handle_put(fwnode);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	fwnode_handle_put(fwnode);
 
+	return ret;
+}
+
+/* Some Android devs specify IRQs/GPIOS in a special AMCR0F28 ACPI device */
+static const struct acpi_gpio_params amcr0f28_jd_gpio = { 1, 0, false };
+
+static const struct acpi_gpio_mapping amcr0f28_gpios[] = {
+	{ "rt5640-jd-gpios", &amcr0f28_jd_gpio, 1 },
+	{ }
+};
+
+static int byt_rt5640_get_amcr0f28_settings(struct snd_soc_card *card)
+{
+	struct byt_rt5640_private *priv = snd_soc_card_get_drvdata(card);
+	struct rt5640_set_jack_data *data = &priv->jack_data;
+	struct acpi_device *adev;
+	int ret = 0;
+
+	adev = acpi_dev_get_first_match_dev("AMCR0F28", "1", -1);
+	if (!adev) {
+		dev_err(card->dev, "error cannot find AMCR0F28 adev\n");
+		return -ENOENT;
+	}
+
+	data->codec_irq_override = acpi_dev_gpio_irq_get(adev, 0);
+	if (data->codec_irq_override < 0) {
+		ret = data->codec_irq_override;
+		dev_err(card->dev, "error %d getting codec IRQ\n", ret);
+		goto put_adev;
+	}
+
+	if (BYT_RT5640_JDSRC(byt_rt5640_quirk) == RT5640_JD_SRC_EXT_GPIO) {
+		acpi_dev_add_driver_gpios(adev, amcr0f28_gpios);
+		data->jd_gpio = devm_fwnode_gpiod_get(card->dev, acpi_fwnode_handle(adev),
+						      "rt5640-jd", GPIOD_IN, "rt5640-jd");
+		acpi_dev_remove_driver_gpios(adev);
+
+		if (IS_ERR(data->jd_gpio)) {
+			ret = PTR_ERR(data->jd_gpio);
+			dev_err(card->dev, "error %d getting jd GPIO\n", ret);
+		}
+	}
+
+put_adev:
+	acpi_dev_put(adev);
 	return ret;
 }
 
@@ -1314,10 +1379,10 @@ static int byt_rt5640_init(struct snd_soc_pcm_runtime *runtime)
 	}
 
 	if (BYT_RT5640_JDSRC(byt_rt5640_quirk)) {
-		ret = snd_soc_card_jack_new(card, "Headset",
-					    SND_JACK_HEADSET | SND_JACK_BTN_0,
-					    &priv->jack, rt5640_pins,
-					    ARRAY_SIZE(rt5640_pins));
+		ret = snd_soc_card_jack_new_pins(card, "Headset",
+						 SND_JACK_HEADSET | SND_JACK_BTN_0,
+						 &priv->jack, rt5640_pins,
+						 ARRAY_SIZE(rt5640_pins));
 		if (ret) {
 			dev_err(card->dev, "Jack creation failed %d\n", ret);
 			return ret;
@@ -1335,6 +1400,19 @@ static int byt_rt5640_init(struct snd_soc_pcm_runtime *runtime)
 	}
 
 	if (byt_rt5640_quirk & BYT_RT5640_JD_HP_ELITEP_1000G2) {
+<<<<<<< HEAD
+		ret = snd_soc_card_jack_new_pins(card, "Headset",
+						 SND_JACK_HEADSET,
+						 &priv->jack, rt5640_pins,
+						 ARRAY_SIZE(rt5640_pins));
+		if (ret)
+			return ret;
+
+		ret = snd_soc_card_jack_new_pins(card, "Headset 2",
+						 SND_JACK_HEADSET,
+						 &priv->jack2, rt5640_pins2,
+						 ARRAY_SIZE(rt5640_pins2));
+=======
 		ret = snd_soc_card_jack_new(card, "Headset",
 					    SND_JACK_HEADSET,
 					    &priv->jack, rt5640_pins,
@@ -1346,6 +1424,7 @@ static int byt_rt5640_init(struct snd_soc_pcm_runtime *runtime)
 					    SND_JACK_HEADSET,
 					    &priv->jack2, rt5640_pins2,
 					    ARRAY_SIZE(rt5640_pins2));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret)
 			return ret;
 
@@ -1413,7 +1492,11 @@ static int byt_rt5640_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 	ret = snd_soc_dai_set_fmt(asoc_rtd_to_cpu(rtd, 0),
 				  SND_SOC_DAIFMT_I2S     |
 				  SND_SOC_DAIFMT_NB_NF   |
+<<<<<<< HEAD
+				  SND_SOC_DAIFMT_BP_FP);
+=======
 				  SND_SOC_DAIFMT_CBC_CFC);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		dev_err(rtd->dev, "can't set format to I2S, err %d\n", ret);
 		return ret;
@@ -1636,7 +1719,7 @@ static int snd_byt_rt5640_mc_probe(struct platform_device *pdev)
 		 * with the codec driver/pdata are non-existent
 		 */
 
-		struct acpi_chan_package chan_package;
+		struct acpi_chan_package chan_package = { 0 };
 
 		/* format specified: 2 64-bit integers */
 		struct acpi_buffer format = {sizeof("NN"), "NN"};
@@ -1743,6 +1826,7 @@ static int snd_byt_rt5640_mc_probe(struct platform_device *pdev)
 		 */
 		if (!priv->mclk)
 			byt_rt5640_quirk &= ~BYT_RT5640_MCLK_EN;
+<<<<<<< HEAD
 	}
 
 	if (byt_rt5640_quirk & BYT_RT5640_NO_SPEAKERS) {
@@ -1763,6 +1847,28 @@ static int snd_byt_rt5640_mc_probe(struct platform_device *pdev)
 			lineout_string = " cfg-lineout:2";
 	}
 
+=======
+	}
+
+	if (byt_rt5640_quirk & BYT_RT5640_NO_SPEAKERS) {
+		cfg_spk = 0;
+		spk_type = "none";
+	} else if (byt_rt5640_quirk & BYT_RT5640_MONO_SPEAKER) {
+		cfg_spk = 1;
+		spk_type = "mono";
+	} else {
+		cfg_spk = 2;
+		spk_type = "stereo";
+	}
+
+	if (byt_rt5640_quirk & BYT_RT5640_LINEOUT) {
+		if (byt_rt5640_quirk & BYT_RT5640_LINEOUT_AS_HP2)
+			lineout_string = " cfg-hp2:lineout";
+		else
+			lineout_string = " cfg-lineout:2";
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (byt_rt5640_quirk & BYT_RT5640_HSMIC2_ON_IN1)
 		headset2_string = " cfg-hs2:in1";
 

@@ -1,0 +1,1 @@
+cmd_drivers/leds/rgb/leds-qcom-lpg.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/rgb/leds-qcom-lpg.ko drivers/leds/rgb/leds-qcom-lpg.o drivers/leds/rgb/leds-qcom-lpg.mod.o;  true

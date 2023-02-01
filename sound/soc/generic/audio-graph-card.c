@@ -158,8 +158,10 @@ static int asoc_simple_parse_dai(struct device_node *ep,
 	 *    if he unbinded CPU or Codec.
 	 */
 	ret = snd_soc_get_dai_name(&args, &dlc->dai_name);
-	if (ret < 0)
+	if (ret < 0) {
+		of_node_put(node);
 		return ret;
+	}
 
 	dlc->of_node = node;
 
@@ -415,7 +417,11 @@ static inline bool parse_as_dpcm_link(struct asoc_simple_priv *priv,
 	 * or has convert-xxx property
 	 */
 	if ((of_get_child_count(codec_port) > 1) ||
+<<<<<<< HEAD
+	    asoc_simple_is_convert_required(adata))
+=======
 	    (adata->convert_rate || adata->convert_channels))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return true;
 
 	return false;
@@ -483,8 +489,10 @@ static int __graph_for_each_link(struct asoc_simple_priv *priv,
 			of_node_put(codec_ep);
 			of_node_put(codec_port);
 
-			if (ret < 0)
+			if (ret < 0) {
+				of_node_put(cpu_ep);
 				return ret;
+			}
 
 			codec_port_old = codec_port;
 		}
@@ -578,6 +586,7 @@ int audio_graph_parse_of(struct asoc_simple_priv *priv, struct device *dev)
 	ret = asoc_simple_parse_card_name(card, NULL);
 	if (ret < 0)
 		goto err;
+<<<<<<< HEAD
 
 	snd_soc_card_set_drvdata(card, priv);
 
@@ -587,6 +596,17 @@ int audio_graph_parse_of(struct asoc_simple_priv *priv, struct device *dev)
 	if (ret < 0)
 		goto err;
 
+=======
+
+	snd_soc_card_set_drvdata(card, priv);
+
+	asoc_simple_debug_info(priv);
+
+	ret = devm_snd_soc_register_card(dev, card);
+	if (ret < 0)
+		goto err;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	devm_kfree(dev, li);
 	return 0;
 

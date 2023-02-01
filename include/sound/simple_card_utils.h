@@ -39,6 +39,7 @@ struct asoc_simple_dai {
 struct asoc_simple_data {
 	u32 convert_rate;
 	u32 convert_channels;
+	const char *convert_sample_format;
 };
 
 struct asoc_simple_jack {
@@ -51,7 +52,10 @@ struct prop_nums {
 	int cpus;
 	int codecs;
 	int platforms;
+<<<<<<< HEAD
+=======
 	int c2c;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct asoc_simple_priv {
@@ -64,7 +68,10 @@ struct asoc_simple_priv {
 		struct snd_soc_dai_link_component *platforms;
 		struct asoc_simple_data adata;
 		struct snd_soc_codec_conf *codec_conf;
+<<<<<<< HEAD
+=======
 		struct snd_soc_pcm_stream *c2c_conf;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct prop_nums num;
 		unsigned int mclk_fs;
 	} *dai_props;
@@ -173,12 +180,13 @@ void asoc_simple_canonicalize_platform(struct snd_soc_dai_link_component *platfo
 void asoc_simple_canonicalize_cpu(struct snd_soc_dai_link_component *cpus,
 				  int is_single_links);
 
-int asoc_simple_clean_reference(struct snd_soc_card *card);
+void asoc_simple_clean_reference(struct snd_soc_card *card);
 
 void asoc_simple_convert_fixup(struct asoc_simple_data *data,
 				      struct snd_pcm_hw_params *params);
 void asoc_simple_parse_convert(struct device_node *np, char *prefix,
 			       struct asoc_simple_data *data);
+bool asoc_simple_is_convert_required(const struct asoc_simple_data *data);
 
 int asoc_simple_parse_routing(struct snd_soc_card *card,
 				      char *prefix);

@@ -344,7 +344,12 @@ static void lan966x_ifh_set_timestamp(void *ifh, u64 timestamp)
 		IFH_POS_TIMESTAMP, IFH_LEN * 4, PACK, 0);
 }
 
+<<<<<<< HEAD
+static netdev_tx_t lan966x_port_xmit(struct sk_buff *skb,
+				     struct net_device *dev)
+=======
 static int lan966x_port_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct lan966x_port *port = netdev_priv(dev);
 	struct lan966x *lan966x = port->lan966x;
@@ -466,6 +471,10 @@ static const struct net_device_ops lan966x_port_netdev_ops = {
 	.ndo_set_mac_address		= lan966x_port_set_mac_address,
 	.ndo_get_port_parent_id		= lan966x_port_get_parent_id,
 	.ndo_eth_ioctl			= lan966x_port_ioctl,
+<<<<<<< HEAD
+	.ndo_setup_tc			= lan966x_tc_setup,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 bool lan966x_netdevice_check(const struct net_device *dev)
@@ -738,7 +747,12 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
 		return -EINVAL;
 
 	dev = devm_alloc_etherdev_mqs(lan966x->dev,
+<<<<<<< HEAD
+				      sizeof(struct lan966x_port),
+				      NUM_PRIO_QUEUES, 1);
+=======
 				      sizeof(struct lan966x_port), 8, 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!dev)
 		return -ENOMEM;
 
@@ -754,7 +768,13 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
 	dev->netdev_ops = &lan966x_port_netdev_ops;
 	dev->ethtool_ops = &lan966x_ethtool_ops;
 	dev->features |= NETIF_F_HW_VLAN_CTAG_TX |
+<<<<<<< HEAD
+			 NETIF_F_HW_VLAN_STAG_TX |
+			 NETIF_F_HW_TC;
+	dev->hw_features |= NETIF_F_HW_TC;
+=======
 			 NETIF_F_HW_VLAN_STAG_TX;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev->needed_headroom = IFH_LEN * sizeof(u32);
 
 	eth_hw_addr_gen(dev, lan966x->base_mac, p + 1);
@@ -770,6 +790,10 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
 	port->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
 		MAC_10 | MAC_100 | MAC_1000FD | MAC_2500FD;
 
+<<<<<<< HEAD
+	phy_interface_set_rgmii(port->phylink_config.supported_interfaces);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__set_bit(PHY_INTERFACE_MODE_MII,
 		  port->phylink_config.supported_interfaces);
 	__set_bit(PHY_INTERFACE_MODE_GMII,
@@ -778,6 +802,11 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
 		  port->phylink_config.supported_interfaces);
 	__set_bit(PHY_INTERFACE_MODE_QSGMII,
 		  port->phylink_config.supported_interfaces);
+<<<<<<< HEAD
+	__set_bit(PHY_INTERFACE_MODE_QUSGMII,
+		  port->phylink_config.supported_interfaces);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__set_bit(PHY_INTERFACE_MODE_1000BASEX,
 		  port->phylink_config.supported_interfaces);
 	__set_bit(PHY_INTERFACE_MODE_2500BASEX,
@@ -956,6 +985,11 @@ static void lan966x_init(struct lan966x *lan966x)
 		lan966x, ANA_ANAINTR);
 
 	spin_lock_init(&lan966x->tx_lock);
+<<<<<<< HEAD
+
+	lan966x_taprio_init(lan966x);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int lan966x_ram_init(struct lan966x *lan966x)
@@ -969,7 +1003,12 @@ static int lan966x_reset_switch(struct lan966x *lan966x)
 	int val = 0;
 	int ret;
 
+<<<<<<< HEAD
+	switch_reset = devm_reset_control_get_optional_shared(lan966x->dev,
+							      "switch");
+=======
 	switch_reset = devm_reset_control_get_shared(lan966x->dev, "switch");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(switch_reset))
 		return dev_err_probe(lan966x->dev, PTR_ERR(switch_reset),
 				     "Could not obtain switch reset");
@@ -1164,6 +1203,10 @@ static int lan966x_remove(struct platform_device *pdev)
 {
 	struct lan966x *lan966x = platform_get_drvdata(pdev);
 
+<<<<<<< HEAD
+	lan966x_taprio_deinit(lan966x);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lan966x_fdma_deinit(lan966x);
 	lan966x_cleanup_ports(lan966x);
 

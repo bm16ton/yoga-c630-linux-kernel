@@ -2653,7 +2653,12 @@ err_out:
 
 	if (userfont) {
 		p->userfont = old_userfont;
+<<<<<<< HEAD
+		if (--REFCOUNT(data) == 0)
+			kfree(data - FONT_EXTRA_WORDS * sizeof(int));
+=======
 		REFCOUNT(data)--;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	vc->vc_font.width = old_width;
@@ -2810,7 +2815,11 @@ static u16 *fbcon_screen_pos(const struct vc_data *vc, int offset)
 	int line;
 	
 	if (vc->vc_num != fg_console || !softback_lines)
+<<<<<<< HEAD
+	return (u16 *) (vc->vc_origin + offset);
+=======
 		return (u16 *) (vc->vc_origin + offset);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	line = offset / vc->vc_size_row;
 	if (line >= softback_lines)
 		return (u16 *) (vc->vc_origin + offset -

@@ -1,0 +1,1 @@
+cmd_drivers/iio/potentiometer/mcp4131.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/potentiometer/mcp4131.ko drivers/iio/potentiometer/mcp4131.o drivers/iio/potentiometer/mcp4131.mod.o;  true

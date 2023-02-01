@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/ad5761.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/ad5761.ko drivers/iio/dac/ad5761.o drivers/iio/dac/ad5761.mod.o;  true

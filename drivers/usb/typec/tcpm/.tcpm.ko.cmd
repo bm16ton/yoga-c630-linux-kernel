@@ -1,0 +1,1 @@
+cmd_drivers/usb/typec/tcpm/tcpm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/typec/tcpm/tcpm.ko drivers/usb/typec/tcpm/tcpm.o drivers/usb/typec/tcpm/tcpm.mod.o;  true

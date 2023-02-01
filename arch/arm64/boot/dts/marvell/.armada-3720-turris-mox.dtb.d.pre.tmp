@@ -1,0 +1,10 @@
+armada-3720-turris-mox.o: \
+ arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts \
+ scripts/dtc/include-prefixes/dt-bindings/bus/moxtet.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/input.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/linux-event-codes.h \
+ arch/arm64/boot/dts/marvell/armada-372x.dtsi \
+ arch/arm64/boot/dts/marvell/armada-37xx.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

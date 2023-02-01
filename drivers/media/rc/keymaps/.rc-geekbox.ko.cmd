@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-geekbox.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-geekbox.ko drivers/media/rc/keymaps/rc-geekbox.o drivers/media/rc/keymaps/rc-geekbox.mod.o;  true

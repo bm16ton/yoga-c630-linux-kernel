@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/drivetemp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/drivetemp.ko drivers/hwmon/drivetemp.o drivers/hwmon/drivetemp.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/input/tablet/pegasus_notetaker.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/tablet/pegasus_notetaker.ko drivers/input/tablet/pegasus_notetaker.o drivers/input/tablet/pegasus_notetaker.mod.o;  true

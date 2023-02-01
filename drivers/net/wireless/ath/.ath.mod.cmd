@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath.mod := printf '%s\n'   main.o regd.o hw.o key.o dfs_pattern_detector.o dfs_pri_detector.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/"$$0) }' > drivers/net/wireless/ath/ath.mod

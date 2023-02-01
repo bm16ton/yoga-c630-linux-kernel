@@ -736,10 +736,15 @@ static int aspeed_spi_probe(struct platform_device *pdev)
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	aspi->regs = devm_ioremap_resource(dev, res);
+<<<<<<< HEAD
+	if (IS_ERR(aspi->regs))
+		return PTR_ERR(aspi->regs);
+=======
 	if (IS_ERR(aspi->regs)) {
 		dev_err(dev, "missing AHB register window\n");
 		return PTR_ERR(aspi->regs);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
 	aspi->ahb_base = devm_ioremap_resource(dev, res);
@@ -1165,7 +1170,11 @@ static const struct aspeed_spi_data ast2500_spi_data = {
 static const struct aspeed_spi_data ast2600_fmc_data = {
 	.max_cs	       = 3,
 	.hastype       = false,
+<<<<<<< HEAD
+	.mode_bits     = SPI_RX_QUAD | SPI_TX_QUAD,
+=======
 	.mode_bits     = SPI_RX_QUAD | SPI_RX_QUAD,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.we0	       = 16,
 	.ctl0	       = CE0_CTRL_REG,
 	.timing	       = CE0_TIMING_COMPENSATION_REG,
@@ -1180,7 +1189,11 @@ static const struct aspeed_spi_data ast2600_fmc_data = {
 static const struct aspeed_spi_data ast2600_spi_data = {
 	.max_cs	       = 2,
 	.hastype       = false,
+<<<<<<< HEAD
+	.mode_bits     = SPI_RX_QUAD | SPI_TX_QUAD,
+=======
 	.mode_bits     = SPI_RX_QUAD | SPI_RX_QUAD,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.we0	       = 16,
 	.ctl0	       = CE0_CTRL_REG,
 	.timing	       = CE0_TIMING_COMPENSATION_REG,

@@ -1,0 +1,1 @@
+cmd_sound/pci/oxygen/snd-oxygen-lib.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/oxygen/snd-oxygen-lib.ko sound/pci/oxygen/snd-oxygen-lib.o sound/pci/oxygen/snd-oxygen-lib.mod.o;  true

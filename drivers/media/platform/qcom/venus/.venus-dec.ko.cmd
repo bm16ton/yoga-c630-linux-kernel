@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/qcom/venus/venus-dec.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/platform/qcom/venus/venus-dec.ko drivers/media/platform/qcom/venus/venus-dec.o drivers/media/platform/qcom/venus/venus-dec.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_arch/arm64/xen/built-in.a := rm -f arch/arm64/xen/built-in.a;  printf "arch/arm64/xen/%s " ../../arm/xen/enlighten.o ../../arm/xen/grant-table.o ../../arm/xen/p2m.o ../../arm/xen/mm.o hypercall.o | xargs ar cDPrST arch/arm64/xen/built-in.a

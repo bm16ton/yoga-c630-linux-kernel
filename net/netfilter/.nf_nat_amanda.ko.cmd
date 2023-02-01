@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_nat_amanda.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/nf_nat_amanda.ko net/netfilter/nf_nat_amanda.o net/netfilter/nf_nat_amanda.mod.o;  true

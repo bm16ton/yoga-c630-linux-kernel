@@ -12,7 +12,10 @@
 #include "../include/drv_types.h"
 #include "../include/rtw_br_ext.h"
 #include "../include/usb_osintf.h"
+<<<<<<< HEAD
+=======
 #include "../include/recv_osdep.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifndef csum_ipv6_magic
 #include "../include/net/ip6_checksum.h"

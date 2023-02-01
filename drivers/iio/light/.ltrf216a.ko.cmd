@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/ltrf216a.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/ltrf216a.ko drivers/iio/light/ltrf216a.o drivers/iio/light/ltrf216a.mod.o;  true

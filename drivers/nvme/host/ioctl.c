@@ -20,19 +20,32 @@ static void __user *nvme_to_user_ptr(uintptr_t ptrval)
 	return (void __user *)ptrval;
 }
 
+<<<<<<< HEAD
+static void *nvme_add_user_metadata(struct request *req, void __user *ubuf,
+		unsigned len, u32 seed)
+=======
 static void *nvme_add_user_metadata(struct bio *bio, void __user *ubuf,
 		unsigned len, u32 seed, bool write)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct bio_integrity_payload *bip;
 	int ret = -ENOMEM;
 	void *buf;
+<<<<<<< HEAD
+	struct bio *bio = req->bio;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	buf = kmalloc(len, GFP_KERNEL);
 	if (!buf)
 		goto out;
 
 	ret = -EFAULT;
+<<<<<<< HEAD
+	if ((req_op(req) == REQ_OP_DRV_OUT) && copy_from_user(buf, ubuf, len))
+=======
 	if (write && copy_from_user(buf, ubuf, len))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_free_meta;
 
 	bip = bio_integrity_alloc(bio, GFP_KERNEL, 1);
@@ -45,9 +58,19 @@ static void *nvme_add_user_metadata(struct bio *bio, void __user *ubuf,
 	bip->bip_iter.bi_sector = seed;
 	ret = bio_integrity_add_page(bio, virt_to_page(buf), len,
 			offset_in_page(buf));
+<<<<<<< HEAD
+	if (ret != len) {
+		ret = -ENOMEM;
+		goto out_free_meta;
+	}
+
+	req->cmd_flags |= REQ_INTEGRITY;
+	return buf;
+=======
 	if (ret == len)
 		return buf;
 	ret = -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_free_meta:
 	kfree(buf);
 out:
@@ -65,6 +88,29 @@ static int nvme_finish_user_metadata(struct request *req, void __user *ubuf,
 }
 
 static struct request *nvme_alloc_user_request(struct request_queue *q,
+<<<<<<< HEAD
+		struct nvme_command *cmd, blk_opf_t rq_flags,
+		blk_mq_req_flags_t blk_flags)
+{
+	struct request *req;
+
+	req = blk_mq_alloc_request(q, nvme_req_op(cmd) | rq_flags, blk_flags);
+	if (IS_ERR(req))
+		return req;
+	nvme_init_request(req, cmd);
+	nvme_req(req)->flags |= NVME_REQ_USERCMD;
+	return req;
+}
+
+static int nvme_map_user_request(struct request *req, u64 ubuffer,
+		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
+		u32 meta_seed, void **metap, struct io_uring_cmd *ioucmd,
+		bool vec)
+{
+	struct request_queue *q = req->q;
+	struct nvme_ns *ns = q->queuedata;
+	struct block_device *bdev = ns ? ns->disk->part0 : NULL;
+=======
 		struct nvme_command *cmd, void __user *ubuffer,
 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
 		u32 meta_seed, void **metap, unsigned timeout, bool vec,
@@ -74,10 +120,47 @@ static struct request *nvme_alloc_user_request(struct request_queue *q,
 	struct nvme_ns *ns = q->queuedata;
 	struct block_device *bdev = ns ? ns->disk->part0 : NULL;
 	struct request *req;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bio *bio = NULL;
 	void *meta = NULL;
 	int ret;
 
+<<<<<<< HEAD
+	if (ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED)) {
+		struct iov_iter iter;
+
+		/* fixedbufs is only for non-vectored io */
+		if (WARN_ON_ONCE(vec))
+			return -EINVAL;
+		ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
+				rq_data_dir(req), &iter, ioucmd);
+		if (ret < 0)
+			goto out;
+		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
+	} else {
+		ret = blk_rq_map_user_io(req, NULL, nvme_to_user_ptr(ubuffer),
+				bufflen, GFP_KERNEL, vec, 0, 0,
+				rq_data_dir(req));
+	}
+
+	if (ret)
+		goto out;
+	bio = req->bio;
+	if (bdev)
+		bio_set_dev(bio, bdev);
+
+	if (bdev && meta_buffer && meta_len) {
+		meta = nvme_add_user_metadata(req, meta_buffer, meta_len,
+				meta_seed);
+		if (IS_ERR(meta)) {
+			ret = PTR_ERR(meta);
+			goto out_unmap;
+		}
+		*metap = meta;
+	}
+
+	return ret;
+=======
 	req = blk_mq_alloc_request(q, nvme_req_op(cmd) | rq_flags, blk_flags);
 	if (IS_ERR(req))
 		return req;
@@ -122,17 +205,26 @@ static struct request *nvme_alloc_user_request(struct request_queue *q,
 	}
 
 	return req;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out_unmap:
 	if (bio)
 		blk_rq_unmap_user(bio);
 out:
 	blk_mq_free_request(req);
+<<<<<<< HEAD
+	return ret;
+}
+
+static int nvme_submit_user_cmd(struct request_queue *q,
+		struct nvme_command *cmd, u64 ubuffer,
+=======
 	return ERR_PTR(ret);
 }
 
 static int nvme_submit_user_cmd(struct request_queue *q,
 		struct nvme_command *cmd, void __user *ubuffer,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
 		u32 meta_seed, u64 *result, unsigned timeout, bool vec)
 {
@@ -143,11 +235,26 @@ static int nvme_submit_user_cmd(struct request_queue *q,
 	u32 effects;
 	int ret;
 
+<<<<<<< HEAD
+	req = nvme_alloc_user_request(q, cmd, 0, 0);
+	if (IS_ERR(req))
+		return PTR_ERR(req);
+
+	req->timeout = timeout;
+	if (ubuffer && bufflen) {
+		ret = nvme_map_user_request(req, ubuffer, bufflen, meta_buffer,
+				meta_len, meta_seed, &meta, NULL, vec);
+		if (ret)
+			return ret;
+	}
+
+=======
 	req = nvme_alloc_user_request(q, cmd, ubuffer, bufflen, meta_buffer,
 			meta_len, meta_seed, &meta, timeout, vec, 0, 0);
 	if (IS_ERR(req))
 		return PTR_ERR(req);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bio = req->bio;
 	ctrl = nvme_req(req)->ctrl;
 
@@ -227,7 +334,11 @@ static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
 	c.rw.appmask = cpu_to_le16(io.appmask);
 
 	return nvme_submit_user_cmd(ns->queue, &c,
+<<<<<<< HEAD
+			io.addr, length,
+=======
 			nvme_to_user_ptr(io.addr), length,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			metadata, meta_len, lower_32_bits(io.slba), NULL, 0,
 			false);
 }
@@ -281,7 +392,11 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
 		timeout = msecs_to_jiffies(cmd.timeout_ms);
 
 	status = nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
+<<<<<<< HEAD
+			cmd.addr, cmd.data_len,
+=======
 			nvme_to_user_ptr(cmd.addr), cmd.data_len,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			nvme_to_user_ptr(cmd.metadata), cmd.metadata_len,
 			0, &result, timeout, false);
 
@@ -327,7 +442,11 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
 		timeout = msecs_to_jiffies(cmd.timeout_ms);
 
 	status = nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
+<<<<<<< HEAD
+			cmd.addr, cmd.data_len,
+=======
 			nvme_to_user_ptr(cmd.addr), cmd.data_len,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			nvme_to_user_ptr(cmd.metadata), cmd.metadata_len,
 			0, &cmd.result, timeout, vec);
 
@@ -356,9 +475,21 @@ struct nvme_uring_cmd_pdu {
 		struct bio *bio;
 		struct request *req;
 	};
+<<<<<<< HEAD
+	u32 meta_len;
+	u32 nvme_status;
+	union {
+		struct {
+			void *meta; /* kernel-resident buffer */
+			void __user *meta_buffer;
+		};
+		u64 result;
+	} u;
+=======
 	void *meta; /* kernel-resident buffer */
 	void __user *meta_buffer;
 	u32 meta_len;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
@@ -367,11 +498,18 @@ static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
 	return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
 }
 
+<<<<<<< HEAD
+static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd)
+{
+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+	struct request *req = pdu->req;
+=======
 static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
 {
 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
 	struct request *req = pdu->req;
 	struct bio *bio = req->bio;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int status;
 	u64 result;
 
@@ -382,16 +520,82 @@ static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
 
 	result = le64_to_cpu(nvme_req(req)->result.u64);
 
+<<<<<<< HEAD
+	if (pdu->meta_len)
+		status = nvme_finish_user_metadata(req, pdu->u.meta_buffer,
+					pdu->u.meta, pdu->meta_len, status);
+	if (req->bio)
+		blk_rq_unmap_user(req->bio);
+=======
 	if (pdu->meta)
 		status = nvme_finish_user_metadata(req, pdu->meta_buffer,
 					pdu->meta, pdu->meta_len, status);
 	if (bio)
 		blk_rq_unmap_user(bio);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	blk_mq_free_request(req);
 
 	io_uring_cmd_done(ioucmd, status, result);
 }
 
+<<<<<<< HEAD
+static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
+{
+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+
+	if (pdu->bio)
+		blk_rq_unmap_user(pdu->bio);
+
+	io_uring_cmd_done(ioucmd, pdu->nvme_status, pdu->u.result);
+}
+
+static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+						blk_status_t err)
+{
+	struct io_uring_cmd *ioucmd = req->end_io_data;
+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+	void *cookie = READ_ONCE(ioucmd->cookie);
+
+	req->bio = pdu->bio;
+	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
+		pdu->nvme_status = -EINTR;
+	else
+		pdu->nvme_status = nvme_req(req)->status;
+	pdu->u.result = le64_to_cpu(nvme_req(req)->result.u64);
+
+	/*
+	 * For iopoll, complete it directly.
+	 * Otherwise, move the completion to task work.
+	 */
+	if (cookie != NULL && blk_rq_is_poll(req))
+		nvme_uring_task_cb(ioucmd);
+	else
+		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
+
+	return RQ_END_IO_FREE;
+}
+
+static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
+						     blk_status_t err)
+{
+	struct io_uring_cmd *ioucmd = req->end_io_data;
+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+	void *cookie = READ_ONCE(ioucmd->cookie);
+
+	req->bio = pdu->bio;
+	pdu->req = req;
+
+	/*
+	 * For iopoll, complete it directly.
+	 * Otherwise, move the completion to task work.
+	 */
+	if (cookie != NULL && blk_rq_is_poll(req))
+		nvme_uring_task_meta_cb(ioucmd);
+	else
+		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
+
+	return RQ_END_IO_NONE;
+=======
 static void nvme_uring_cmd_end_io(struct request *req, blk_status_t err)
 {
 	struct io_uring_cmd *ioucmd = req->end_io_data;
@@ -403,6 +607,7 @@ static void nvme_uring_cmd_end_io(struct request *req, blk_status_t err)
 	req->bio = bio;
 	/* this takes care of moving rest of completion-work to task context */
 	io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
@@ -417,6 +622,10 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
 	blk_opf_t rq_flags = 0;
 	blk_mq_req_flags_t blk_flags = 0;
 	void *meta = NULL;
+<<<<<<< HEAD
+	int ret;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!capable(CAP_SYS_ADMIN))
 		return -EACCES;
@@ -452,6 +661,47 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
 		rq_flags = REQ_NOWAIT;
 		blk_flags = BLK_MQ_REQ_NOWAIT;
 	}
+<<<<<<< HEAD
+	if (issue_flags & IO_URING_F_IOPOLL)
+		rq_flags |= REQ_POLLED;
+
+retry:
+	req = nvme_alloc_user_request(q, &c, rq_flags, blk_flags);
+	if (IS_ERR(req))
+		return PTR_ERR(req);
+	req->timeout = d.timeout_ms ? msecs_to_jiffies(d.timeout_ms) : 0;
+
+	if (d.addr && d.data_len) {
+		ret = nvme_map_user_request(req, d.addr,
+			d.data_len, nvme_to_user_ptr(d.metadata),
+			d.metadata_len, 0, &meta, ioucmd, vec);
+		if (ret)
+			return ret;
+	}
+
+	if (issue_flags & IO_URING_F_IOPOLL && rq_flags & REQ_POLLED) {
+		if (unlikely(!req->bio)) {
+			/* we can't poll this, so alloc regular req instead */
+			blk_mq_free_request(req);
+			rq_flags &= ~REQ_POLLED;
+			goto retry;
+		} else {
+			WRITE_ONCE(ioucmd->cookie, req->bio);
+			req->bio->bi_opf |= REQ_POLLED;
+		}
+	}
+	/* to free bio on completion, as req->bio will be null at that time */
+	pdu->bio = req->bio;
+	pdu->meta_len = d.metadata_len;
+	req->end_io_data = ioucmd;
+	if (pdu->meta_len) {
+		pdu->u.meta = meta;
+		pdu->u.meta_buffer = nvme_to_user_ptr(d.metadata);
+		req->end_io = nvme_uring_cmd_end_io_meta;
+	} else {
+		req->end_io = nvme_uring_cmd_end_io;
+	}
+=======
 
 	req = nvme_alloc_user_request(q, &c, nvme_to_user_ptr(d.addr),
 			d.data_len, nvme_to_user_ptr(d.metadata),
@@ -469,6 +719,7 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
 	pdu->meta_buffer = nvme_to_user_ptr(d.metadata);
 	pdu->meta_len = d.metadata_len;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	blk_execute_rq_nowait(req, false);
 	return -EIOCBQUEUED;
 }
@@ -566,9 +817,12 @@ long nvme_ns_chr_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 static int nvme_uring_cmd_checks(unsigned int issue_flags)
 {
+<<<<<<< HEAD
+=======
 	/* IOPOLL not supported yet */
 	if (issue_flags & IO_URING_F_IOPOLL)
 		return -EOPNOTSUPP;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* NVMe passthrough requires big SQE/CQE support */
 	if ((issue_flags & (IO_URING_F_SQE128|IO_URING_F_CQE32)) !=
@@ -611,6 +865,28 @@ int nvme_ns_chr_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
 	return nvme_ns_uring_cmd(ns, ioucmd, issue_flags);
 }
 
+<<<<<<< HEAD
+int nvme_ns_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
+				 struct io_comp_batch *iob,
+				 unsigned int poll_flags)
+{
+	struct bio *bio;
+	int ret = 0;
+	struct nvme_ns *ns;
+	struct request_queue *q;
+
+	rcu_read_lock();
+	bio = READ_ONCE(ioucmd->cookie);
+	ns = container_of(file_inode(ioucmd->file)->i_cdev,
+			struct nvme_ns, cdev);
+	q = ns->queue;
+	if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio && bio->bi_bdev)
+		ret = bio_poll(bio, iob, poll_flags);
+	rcu_read_unlock();
+	return ret;
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_NVME_MULTIPATH
 static int nvme_ns_head_ctrl_ioctl(struct nvme_ns *ns, unsigned int cmd,
 		void __user *argp, struct nvme_ns_head *head, int srcu_idx)
@@ -692,6 +968,34 @@ int nvme_ns_head_chr_uring_cmd(struct io_uring_cmd *ioucmd,
 	srcu_read_unlock(&head->srcu, srcu_idx);
 	return ret;
 }
+<<<<<<< HEAD
+
+int nvme_ns_head_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
+				      struct io_comp_batch *iob,
+				      unsigned int poll_flags)
+{
+	struct cdev *cdev = file_inode(ioucmd->file)->i_cdev;
+	struct nvme_ns_head *head = container_of(cdev, struct nvme_ns_head, cdev);
+	int srcu_idx = srcu_read_lock(&head->srcu);
+	struct nvme_ns *ns = nvme_find_path(head);
+	struct bio *bio;
+	int ret = 0;
+	struct request_queue *q;
+
+	if (ns) {
+		rcu_read_lock();
+		bio = READ_ONCE(ioucmd->cookie);
+		q = ns->queue;
+		if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio
+				&& bio->bi_bdev)
+			ret = bio_poll(bio, iob, poll_flags);
+		rcu_read_unlock();
+	}
+	srcu_read_unlock(&head->srcu, srcu_idx);
+	return ret;
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_NVME_MULTIPATH */
 
 int nvme_dev_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
@@ -699,6 +1003,13 @@ int nvme_dev_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
 	struct nvme_ctrl *ctrl = ioucmd->file->private_data;
 	int ret;
 
+<<<<<<< HEAD
+	/* IOPOLL not supported yet */
+	if (issue_flags & IO_URING_F_IOPOLL)
+		return -EOPNOTSUPP;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = nvme_uring_cmd_checks(issue_flags);
 	if (ret)
 		return ret;

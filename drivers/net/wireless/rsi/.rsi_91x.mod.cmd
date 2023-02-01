@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/rsi/rsi_91x.mod := printf '%s\n'   rsi_91x_main.o rsi_91x_core.o rsi_91x_mac80211.o rsi_91x_mgmt.o rsi_91x_hal.o rsi_91x_ps.o rsi_91x_coex.o rsi_91x_debugfs.o | awk '!x[$$0]++ { print("drivers/net/wireless/rsi/"$$0) }' > drivers/net/wireless/rsi/rsi_91x.mod

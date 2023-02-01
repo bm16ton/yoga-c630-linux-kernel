@@ -1,0 +1,4 @@
+drivers/media/pci/saa7134/saa7134.ko
+drivers/media/pci/saa7134/saa7134-empress.ko
+drivers/media/pci/saa7134/saa7134-alsa.ko
+drivers/media/pci/saa7134/saa7134-dvb.ko

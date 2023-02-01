@@ -1,0 +1,1 @@
+cmd_drivers/staging/media/sunxi/cedrus/sunxi-cedrus.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/media/sunxi/cedrus/sunxi-cedrus.ko drivers/staging/media/sunxi/cedrus/sunxi-cedrus.o drivers/staging/media/sunxi/cedrus/sunxi-cedrus.mod.o;  true

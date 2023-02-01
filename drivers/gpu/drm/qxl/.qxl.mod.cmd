@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/qxl/qxl.mod := printf '%s\n'   qxl_drv.o qxl_kms.o qxl_display.o qxl_ttm.o qxl_object.o qxl_gem.o qxl_cmd.o qxl_image.o qxl_draw.o qxl_debugfs.o qxl_irq.o qxl_dumb.o qxl_ioctl.o qxl_release.o qxl_prime.o | awk '!x[$$0]++ { print("drivers/gpu/drm/qxl/"$$0) }' > drivers/gpu/drm/qxl/qxl.mod

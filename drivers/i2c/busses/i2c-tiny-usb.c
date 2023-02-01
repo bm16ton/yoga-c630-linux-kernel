@@ -32,6 +32,9 @@
    (in practice, due to additional delays in the i2c bitbanging
    code this results in a i2c clock of about 50kHz) */
 static unsigned short delay = 10;
+int intfnum;
+module_param(intfnum, int, 0);
+MODULE_PARM_DESC(intfnum, "bind to interface number ");
 module_param(delay, ushort, 0);
 MODULE_PARM_DESC(delay, "bit delay in microseconds "
 		 "(default is 10us for 100kHz max)");
@@ -220,11 +223,23 @@ static int i2c_gpio_probe(struct usb_interface *interface)
 //	int ifnum = intf->cur_altsetting->desc.bInterfaceNumber;
 	int inf;
 	inf = interface->cur_altsetting->desc.bInterfaceNumber;
+<<<<<<< HEAD
+	if (intfnum) {
+		if(inf == intfnum) {
+			return 0;
+		}
+	}
+	if (inf <= 5 && inf >= 1) {
+		dev_info(&interface->dev, "Ignoring Interface\n");
+		return -ENODEV;
+		}
+=======
 
 	if (inf <= 3 && inf >= 1) {
 		dev_info(&interface->dev, "Ignoring Interface\n");
 		return -ENODEV;
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

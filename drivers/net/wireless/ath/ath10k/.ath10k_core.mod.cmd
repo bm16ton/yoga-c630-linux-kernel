@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath10k/ath10k_core.mod := printf '%s\n'   mac.o debug.o core.o htc.o htt.o htt_rx.o htt_tx.o txrx.o wmi.o wmi-tlv.o bmi.o hw.o p2p.o swap.o spectral.o testmode.o trace.o thermal.o debugfs_sta.o wow.o coredump.o ce.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath10k/"$$0) }' > drivers/net/wireless/ath/ath10k/ath10k_core.mod

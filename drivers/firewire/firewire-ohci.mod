@@ -1,0 +1,1 @@
+drivers/firewire/ohci.o

@@ -160,7 +160,11 @@
 
 #define IMX7_CSI_VIDEO_NAME		"imx-capture"
 /* In bytes, per queue */
+<<<<<<< HEAD
+#define IMX7_CSI_VIDEO_MEM_LIMIT	SZ_512M
+=======
 #define IMX7_CSI_VIDEO_MEM_LIMIT	SZ_64M
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define IMX7_CSI_VIDEO_EOF_TIMEOUT	2000
 
 #define IMX7_CSI_DEF_MBUS_CODE		MEDIA_BUS_FMT_UYVY8_2X8
@@ -521,9 +525,15 @@ static void imx7_csi_configure(struct imx7_csi *csi)
 	cr18 = imx7_csi_reg_read(csi, CSI_CSICR18);
 
 	cr18 &= ~(BIT_CSI_HW_ENABLE | BIT_MIPI_DATA_FORMAT_MASK |
+<<<<<<< HEAD
+		  BIT_DATA_FROM_MIPI | BIT_MIPI_DOUBLE_CMPNT |
+		  BIT_BASEADDR_CHG_ERR_EN | BIT_BASEADDR_SWITCH_SEL |
+		  BIT_BASEADDR_SWITCH_EN | BIT_DEINTERLACE_EN);
+=======
 		  BIT_DATA_FROM_MIPI | BIT_BASEADDR_CHG_ERR_EN |
 		  BIT_BASEADDR_SWITCH_EN | BIT_BASEADDR_SWITCH_SEL |
 		  BIT_DEINTERLACE_EN);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (out_pix->field == V4L2_FIELD_INTERLACED) {
 		cr18 |= BIT_DEINTERLACE_EN;
@@ -1360,7 +1370,11 @@ static int imx7_csi_video_start_streaming(struct vb2_queue *vq,
 
 	mutex_lock(&csi->mdev.graph_mutex);
 
+<<<<<<< HEAD
+	ret = __video_device_pipeline_start(csi->vdev, &csi->pipe);
+=======
 	ret = __media_pipeline_start(&csi->sd.entity, &csi->pipe);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto err_unlock;
 
@@ -1373,7 +1387,11 @@ static int imx7_csi_video_start_streaming(struct vb2_queue *vq,
 	return 0;
 
 err_stop:
+<<<<<<< HEAD
+	__video_device_pipeline_stop(csi->vdev);
+=======
 	__media_pipeline_stop(&csi->sd.entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_unlock:
 	mutex_unlock(&csi->mdev.graph_mutex);
 	dev_err(csi->dev, "pipeline start failed with %d\n", ret);
@@ -1396,7 +1414,11 @@ static void imx7_csi_video_stop_streaming(struct vb2_queue *vq)
 
 	mutex_lock(&csi->mdev.graph_mutex);
 	v4l2_subdev_call(&csi->sd, video, s_stream, 0);
+<<<<<<< HEAD
+	__video_device_pipeline_stop(csi->vdev);
+=======
 	__media_pipeline_stop(&csi->sd.entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&csi->mdev.graph_mutex);
 
 	/* release all active buffers */

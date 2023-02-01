@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/ulp/srpt/ib_srpt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/infiniband/ulp/srpt/ib_srpt.ko drivers/infiniband/ulp/srpt/ib_srpt.o drivers/infiniband/ulp/srpt/ib_srpt.mod.o;  true

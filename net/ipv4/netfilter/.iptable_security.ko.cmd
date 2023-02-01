@@ -1,0 +1,1 @@
+cmd_net/ipv4/netfilter/iptable_security.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/ipv4/netfilter/iptable_security.ko net/ipv4/netfilter/iptable_security.o net/ipv4/netfilter/iptable_security.mod.o;  true

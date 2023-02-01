@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/modules.order := {   cat drivers/net/wireless/marvell/libertas/modules.order;   cat drivers/net/wireless/marvell/libertas_tf/modules.order;   cat drivers/net/wireless/marvell/mwifiex/modules.order;   echo drivers/net/wireless/marvell/mwl8k.ko; :; } > drivers/net/wireless/marvell/modules.order

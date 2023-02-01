@@ -306,7 +306,11 @@ sdw_intel_startup_controller(struct sdw_intel_ctx *ctx)
 
 	/* Check SNDWLCAP.LCOUNT */
 	caps = ioread32(ctx->mmio_base + ctx->shim_base + SDW_SHIM_LCAP);
+<<<<<<< HEAD
+	caps &= SDW_SHIM_LCAP_LCOUNT_MASK;
+=======
 	caps &= GENMASK(2, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Check HW supported vs property value */
 	if (caps < ctx->count) {

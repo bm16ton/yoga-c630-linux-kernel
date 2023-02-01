@@ -1,0 +1,1 @@
+cmd_drivers/leds/leds-is31fl32xx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/leds-is31fl32xx.ko drivers/leds/leds-is31fl32xx.o drivers/leds/leds-is31fl32xx.mod.o;  true

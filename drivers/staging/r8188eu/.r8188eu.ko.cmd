@@ -1,0 +1,1 @@
+cmd_drivers/staging/r8188eu/r8188eu.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/r8188eu/r8188eu.ko drivers/staging/r8188eu/r8188eu.o drivers/staging/r8188eu/r8188eu.mod.o;  true

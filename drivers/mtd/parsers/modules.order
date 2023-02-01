@@ -1,0 +1,4 @@
+drivers/mtd/parsers/cmdlinepart.ko
+drivers/mtd/parsers/ofpart.ko
+drivers/mtd/parsers/afs.ko
+drivers/mtd/parsers/qcomsmempart.ko

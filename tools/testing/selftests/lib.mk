@@ -41,6 +41,13 @@ ifeq (0,$(MAKELEVEL))
 endif
 selfdir = $(realpath $(dir $(filter %/lib.mk,$(MAKEFILE_LIST))))
 top_srcdir = $(selfdir)/../../..
+<<<<<<< HEAD
+
+ifeq ($(KHDR_INCLUDES),)
+KHDR_INCLUDES := -isystem $(top_srcdir)/usr/include
+endif
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # The following are built by lib.mk common compile rules.
 # TEST_CUSTOM_PROGS should be used by tests that require
@@ -118,6 +125,11 @@ endef
 
 clean:
 	$(CLEAN)
+
+# Enables to extend CFLAGS and LDFLAGS from command line, e.g.
+# make USERCFLAGS=-Werror USERLDFLAGS=-static
+CFLAGS += $(USERCFLAGS)
+LDFLAGS += $(USERLDFLAGS)
 
 # When make O= with kselftest target from main level
 # the following aren't defined.

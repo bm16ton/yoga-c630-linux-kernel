@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/mp2888.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/mp2888.ko drivers/hwmon/pmbus/mp2888.o drivers/hwmon/pmbus/mp2888.mod.o;  true

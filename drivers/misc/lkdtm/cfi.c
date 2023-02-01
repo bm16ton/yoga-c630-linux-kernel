@@ -20,6 +20,13 @@ static noinline int lkdtm_increment_int(int *counter)
 
 	return *counter;
 }
+
+/* Don't allow the compiler to inline the calls. */
+static noinline void lkdtm_indirect_call(void (*func)(int *))
+{
+	func(&called_count);
+}
+
 /*
  * This tries to call an indirect function with a mismatched prototype.
  */
@@ -29,16 +36,56 @@ static void lkdtm_CFI_FORWARD_PROTO(void)
 	 * Matches lkdtm_increment_void()'s prototype, but not
 	 * lkdtm_increment_int()'s prototype.
 	 */
-	void (*func)(int *);
-
 	pr_info("Calling matched prototype ...\n");
-	func = lkdtm_increment_void;
-	func(&called_count);
+	lkdtm_indirect_call(lkdtm_increment_void);
 
 	pr_info("Calling mismatched prototype ...\n");
-	func = (void *)lkdtm_increment_int;
-	func(&called_count);
+	lkdtm_indirect_call((void *)lkdtm_increment_int);
 
+	pr_err("FAIL: survived mismatched prototype function call!\n");
+	pr_expected_config(CONFIG_CFI_CLANG);
+}
+
+/*
+ * This can stay local to LKDTM, as there should not be a production reason
+ * to disable PAC && SCS.
+ */
+#ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
+# ifdef CONFIG_ARM64_BTI_KERNEL
+#  define __no_pac             "branch-protection=bti"
+# else
+#  ifdef CONFIG_CC_HAS_BRANCH_PROT_PAC_RET
+#   define __no_pac            "branch-protection=none"
+#  else
+#   define __no_pac            "sign-return-address=none"
+#  endif
+# endif
+# define __no_ret_protection   __noscs __attribute__((__target__(__no_pac)))
+#else
+# define __no_ret_protection   __noscs
+#endif
+
+#define no_pac_addr(addr)      \
+	((__force __typeof__(addr))((uintptr_t)(addr) | PAGE_OFFSET))
+
+<<<<<<< HEAD
+/* The ultimate ROP gadget. */
+static noinline __no_ret_protection
+void set_return_addr_unchecked(unsigned long *expected, unsigned long *addr)
+{
+	/* Use of volatile is to make sure final write isn't seen as a dead store. */
+	unsigned long * volatile *ret_addr = (unsigned long **)__builtin_frame_address(0) + 1;
+
+	/* Make sure we've found the right place on the stack before writing it. */
+	if (no_pac_addr(*ret_addr) == expected)
+		*ret_addr = (addr);
+	else
+		/* Check architecture, stack layout, or compiler behavior... */
+		pr_warn("Eek: return address mismatch! %px != %px\n",
+			*ret_addr, addr);
+}
+
+=======
 	pr_err("FAIL: survived mismatched prototype function call!\n");
 	pr_expected_config(CONFIG_CFI_CLANG);
 }
@@ -77,6 +124,7 @@ void set_return_addr_unchecked(unsigned long *expected, unsigned long *addr)
 			*ret_addr, addr);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static noinline
 void set_return_addr(unsigned long *expected, unsigned long *addr)
 {

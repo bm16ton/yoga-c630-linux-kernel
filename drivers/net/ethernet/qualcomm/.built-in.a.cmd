@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qualcomm/built-in.a := rm -f drivers/net/ethernet/qualcomm/built-in.a;  printf "drivers/net/ethernet/qualcomm/%s " emac/built-in.a | xargs ar cDPrST drivers/net/ethernet/qualcomm/built-in.a

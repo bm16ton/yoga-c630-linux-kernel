@@ -1,0 +1,1 @@
+cmd_drivers/regulator/rpi-panel-attiny-regulator.mod := printf '%s\n'   rpi-panel-attiny-regulator.o | awk '!x[$$0]++ { print("drivers/regulator/"$$0) }' > drivers/regulator/rpi-panel-attiny-regulator.mod

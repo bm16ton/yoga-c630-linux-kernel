@@ -1,0 +1,1 @@
+cmd_net/tipc/tipc.mod := printf '%s\n'   addr.o bcast.o bearer.o core.o link.o discover.o msg.o name_distr.o subscr.o monitor.o name_table.o net.o netlink.o netlink_compat.o node.o socket.o eth_media.o topsrv.o group.o trace.o udp_media.o ib_media.o sysctl.o crypto.o | awk '!x[$$0]++ { print("net/tipc/"$$0) }' > net/tipc/tipc.mod

@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/vl6180.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/vl6180.ko drivers/iio/light/vl6180.o drivers/iio/light/vl6180.mod.o;  true

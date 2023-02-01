@@ -478,6 +478,13 @@ static const struct of_device_id mtk_vcodec_match[] = {
 		.compatible = "mediatek,mt8195-vcodec-dec",
 		.data = &mtk_lat_sig_core_pdata,
 	},
+<<<<<<< HEAD
+	{
+		.compatible = "mediatek,mt8188-vcodec-dec",
+		.data = &mtk_lat_sig_core_pdata,
+	},
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{},
 };
 

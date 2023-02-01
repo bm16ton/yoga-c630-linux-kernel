@@ -347,9 +347,12 @@ static int imx_dsp_rproc_stop(struct rproc *rproc)
 	struct device *dev = rproc->dev.parent;
 	int ret = 0;
 
+<<<<<<< HEAD
+=======
 	/* Make sure work is finished */
 	flush_work(&priv->rproc_work);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (rproc->state == RPROC_CRASHED) {
 		priv->flags &= ~REMOTE_IS_READY;
 		return 0;
@@ -432,9 +435,24 @@ static void imx_dsp_rproc_vq_work(struct work_struct *work)
 {
 	struct imx_dsp_rproc *priv = container_of(work, struct imx_dsp_rproc,
 						  rproc_work);
+<<<<<<< HEAD
+	struct rproc *rproc = priv->rproc;
+
+	mutex_lock(&rproc->lock);
+
+	if (rproc->state != RPROC_RUNNING)
+		goto unlock_mutex;
 
 	rproc_vq_interrupt(priv->rproc, 0);
 	rproc_vq_interrupt(priv->rproc, 1);
+
+unlock_mutex:
+	mutex_unlock(&rproc->lock);
+=======
+
+	rproc_vq_interrupt(priv->rproc, 0);
+	rproc_vq_interrupt(priv->rproc, 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -599,7 +617,11 @@ static int imx_dsp_rproc_add_carveout(struct imx_dsp_rproc *priv)
 		}
 
 		/* Register memory region */
+<<<<<<< HEAD
+		mem = rproc_mem_entry_init(dev, (void __force *)cpu_addr, (dma_addr_t)att->sa,
+=======
 		mem = rproc_mem_entry_init(dev, cpu_addr, (dma_addr_t)att->sa,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					   att->size, da, NULL, NULL, "dsp_mem");
 
 		if (mem)
@@ -635,7 +657,11 @@ static int imx_dsp_rproc_add_carveout(struct imx_dsp_rproc *priv)
 		}
 
 		/* Register memory region */
+<<<<<<< HEAD
+		mem = rproc_mem_entry_init(dev, (void __force *)cpu_addr, (dma_addr_t)rmem->base,
+=======
 		mem = rproc_mem_entry_init(dev, cpu_addr, (dma_addr_t)rmem->base,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					   rmem->size, da, NULL, NULL, it.node->name);
 
 		if (mem)

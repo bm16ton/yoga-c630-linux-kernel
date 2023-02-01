@@ -202,6 +202,16 @@ void blkcg_set_ioprio(struct bio *bio)
 		bio->bi_ioprio = prio;
 }
 
+<<<<<<< HEAD
+void blk_ioprio_exit(struct gendisk *disk)
+{
+	blkcg_deactivate_policy(disk->queue, &ioprio_policy);
+}
+
+int blk_ioprio_init(struct gendisk *disk)
+{
+	return blkcg_activate_policy(disk->queue, &ioprio_policy);
+=======
 void blk_ioprio_exit(struct request_queue *q)
 {
 	blkcg_deactivate_policy(q, &ioprio_policy);
@@ -210,6 +220,7 @@ void blk_ioprio_exit(struct request_queue *q)
 int blk_ioprio_init(struct request_queue *q)
 {
 	return blkcg_activate_policy(q, &ioprio_policy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __init ioprio_init(void)

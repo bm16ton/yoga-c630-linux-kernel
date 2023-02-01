@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/chelsio/cxgb4vf/cxgb4vf.mod := printf '%s\n'   cxgb4vf_main.o t4vf_hw.o sge.o | awk '!x[$$0]++ { print("drivers/net/ethernet/chelsio/cxgb4vf/"$$0) }' > drivers/net/ethernet/chelsio/cxgb4vf/cxgb4vf.mod

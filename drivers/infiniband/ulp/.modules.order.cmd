@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/ulp/modules.order := {   cat drivers/infiniband/ulp/ipoib/modules.order;   cat drivers/infiniband/ulp/srp/modules.order;   cat drivers/infiniband/ulp/srpt/modules.order;   cat drivers/infiniband/ulp/iser/modules.order;   cat drivers/infiniband/ulp/isert/modules.order; :; } > drivers/infiniband/ulp/modules.order

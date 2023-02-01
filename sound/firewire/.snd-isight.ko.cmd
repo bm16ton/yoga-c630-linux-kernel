@@ -1,0 +1,1 @@
+cmd_sound/firewire/snd-isight.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/snd-isight.ko sound/firewire/snd-isight.o sound/firewire/snd-isight.mod.o;  true

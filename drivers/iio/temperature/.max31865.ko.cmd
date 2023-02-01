@@ -1,0 +1,1 @@
+cmd_drivers/iio/temperature/max31865.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/temperature/max31865.ko drivers/iio/temperature/max31865.o drivers/iio/temperature/max31865.mod.o;  true

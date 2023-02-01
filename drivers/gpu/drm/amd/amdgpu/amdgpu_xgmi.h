@@ -43,6 +43,10 @@ struct amdgpu_hive_info {
 	} pstate;
 
 	struct amdgpu_reset_domain *reset_domain;
+<<<<<<< HEAD
+	uint32_t device_remove_count;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct amdgpu_pcs_ras_field {

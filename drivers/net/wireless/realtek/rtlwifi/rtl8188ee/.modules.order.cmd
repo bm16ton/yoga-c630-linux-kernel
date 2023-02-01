@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8188ee/modules.order := {   echo drivers/net/wireless/realtek/rtlwifi/rtl8188ee/rtl8188ee.ko; :; } > drivers/net/wireless/realtek/rtlwifi/rtl8188ee/modules.order

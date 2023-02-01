@@ -137,6 +137,8 @@ void HalSetBrateCfg(struct adapter *adapt, u8 *brates, u16 *rate_cfg)
 		}
 	}
 }
+<<<<<<< HEAD
+=======
 
 static void one_out_pipe(struct adapter *adapter)
 {
@@ -310,3 +312,4 @@ clear_evt:
 exit:
 	return ret;
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

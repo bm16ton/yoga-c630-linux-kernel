@@ -605,6 +605,17 @@ again:
 			set_bit(FSCACHE_COOKIE_DO_PREP_TO_WRITE, &cookie->flags);
 			queue = true;
 		}
+<<<<<<< HEAD
+		/*
+		 * We could race with cookie_lru which may set LRU_DISCARD bit
+		 * but has yet to run the cookie state machine.  If this happens
+		 * and another thread tries to use the cookie, clear LRU_DISCARD
+		 * so we don't end up withdrawing the cookie while in use.
+		 */
+		if (test_and_clear_bit(FSCACHE_COOKIE_DO_LRU_DISCARD, &cookie->flags))
+			fscache_see_cookie(cookie, fscache_cookie_see_lru_discard_clear);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 
 	case FSCACHE_COOKIE_STATE_FAILED:
@@ -693,9 +704,15 @@ static void fscache_cookie_state_machine(struct fscache_cookie *cookie)
 {
 	enum fscache_cookie_state state;
 	bool wake = false;
+<<<<<<< HEAD
 
 	_enter("c=%x", cookie->debug_id);
 
+=======
+
+	_enter("c=%x", cookie->debug_id);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 again:
 	spin_lock(&cookie->lock);
 again_locked:

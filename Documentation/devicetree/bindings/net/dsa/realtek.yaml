@@ -189,7 +189,10 @@ examples:
                             };
                             port@5 {
                                     reg = <5>;
+<<<<<<< HEAD
+=======
                                     label = "cpu";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
                                     ethernet = <&gmac0>;
                                     phy-mode = "rgmii";
                                     fixed-link {
@@ -277,7 +280,10 @@ examples:
                             };
                             port@6 {
                                     reg = <6>;
+<<<<<<< HEAD
+=======
                                     label = "cpu";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
                                     ethernet = <&fec1>;
                                     phy-mode = "rgmii";
                                     tx-internal-delay-ps = <2000>;

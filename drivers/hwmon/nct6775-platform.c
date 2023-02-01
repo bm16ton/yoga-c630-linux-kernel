@@ -355,7 +355,11 @@ static void nct6791_enable_io_mapping(struct nct6775_sio_data *sio_data)
 	}
 }
 
+<<<<<<< HEAD
+static int nct6775_suspend(struct device *dev)
+=======
 static int __maybe_unused nct6775_suspend(struct device *dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int err;
 	u16 tmp;
@@ -386,7 +390,11 @@ out:
 	return err;
 }
 
+<<<<<<< HEAD
+static int nct6775_resume(struct device *dev)
+=======
 static int __maybe_unused nct6775_resume(struct device *dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct nct6775_data *data = dev_get_drvdata(dev);
 	struct nct6775_sio_data *sio_data = dev_get_platdata(dev);
@@ -467,7 +475,11 @@ abort:
 	return err;
 }
 
+<<<<<<< HEAD
+static DEFINE_SIMPLE_DEV_PM_OPS(nct6775_dev_pm_ops, nct6775_suspend, nct6775_resume);
+=======
 static SIMPLE_DEV_PM_OPS(nct6775_dev_pm_ops, nct6775_suspend, nct6775_resume);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void
 nct6775_check_fan_inputs(struct nct6775_data *data, struct nct6775_sio_data *sio_data)
@@ -934,7 +946,11 @@ static int nct6775_platform_probe(struct platform_device *pdev)
 static struct platform_driver nct6775_driver = {
 	.driver = {
 		.name	= DRVNAME,
+<<<<<<< HEAD
+		.pm	= pm_sleep_ptr(&nct6775_dev_pm_ops),
+=======
 		.pm	= &nct6775_dev_pm_ops,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	.probe		= nct6775_platform_probe,
 };
@@ -1043,7 +1059,13 @@ static struct platform_device *pdev[2];
 
 static const char * const asus_wmi_boards[] = {
 	"PRO H410T",
+<<<<<<< HEAD
+	"ProArt B550-CREATOR",
 	"ProArt X570-CREATOR WIFI",
+	"ProArt Z490-CREATOR 10G",
+=======
+	"ProArt X570-CREATOR WIFI",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	"Pro B550M-C",
 	"Pro WS X570-ACE",
 	"PRIME B360-PLUS",
@@ -1055,8 +1077,15 @@ static const char * const asus_wmi_boards[] = {
 	"PRIME X570-P",
 	"PRIME X570-PRO",
 	"ROG CROSSHAIR VIII DARK HERO",
+<<<<<<< HEAD
+	"ROG CROSSHAIR VIII EXTREME",
 	"ROG CROSSHAIR VIII FORMULA",
 	"ROG CROSSHAIR VIII HERO",
+	"ROG CROSSHAIR VIII HERO (WI-FI)",
+=======
+	"ROG CROSSHAIR VIII FORMULA",
+	"ROG CROSSHAIR VIII HERO",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	"ROG CROSSHAIR VIII IMPACT",
 	"ROG STRIX B550-A GAMING",
 	"ROG STRIX B550-E GAMING",
@@ -1080,8 +1109,16 @@ static const char * const asus_wmi_boards[] = {
 	"ROG STRIX Z490-G GAMING (WI-FI)",
 	"ROG STRIX Z490-H GAMING",
 	"ROG STRIX Z490-I GAMING",
+<<<<<<< HEAD
+	"TUF GAMING B550M-E",
+	"TUF GAMING B550M-E (WI-FI)",
 	"TUF GAMING B550M-PLUS",
 	"TUF GAMING B550M-PLUS (WI-FI)",
+	"TUF GAMING B550M-PLUS WIFI II",
+=======
+	"TUF GAMING B550M-PLUS",
+	"TUF GAMING B550M-PLUS (WI-FI)",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	"TUF GAMING B550-PLUS",
 	"TUF GAMING B550-PLUS WIFI II",
 	"TUF GAMING B550-PRO",

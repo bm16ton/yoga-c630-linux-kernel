@@ -42,6 +42,28 @@ static struct net_device *felix_classify_db(struct dsa_db db)
 	}
 }
 
+<<<<<<< HEAD
+static int felix_cpu_port_for_master(struct dsa_switch *ds,
+				     struct net_device *master)
+{
+	struct ocelot *ocelot = ds->priv;
+	struct dsa_port *cpu_dp;
+	int lag;
+
+	if (netif_is_lag_master(master)) {
+		mutex_lock(&ocelot->fwd_domain_lock);
+		lag = ocelot_bond_get_id(ocelot, master);
+		mutex_unlock(&ocelot->fwd_domain_lock);
+
+		return lag;
+	}
+
+	cpu_dp = master->dsa_ptr;
+	return cpu_dp->index;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Set up VCAP ES0 rules for pushing a tag_8021q VLAN towards the CPU such that
  * the tagger can perform RX source port identification.
  */
@@ -269,10 +291,17 @@ static int felix_trap_get_cpu_port(struct dsa_switch *ds,
 {
 	struct dsa_port *dp;
 	int first_port;
+<<<<<<< HEAD
 
 	if (WARN_ON(!trap->ingress_port_mask))
 		return -1;
 
+=======
+
+	if (WARN_ON(!trap->ingress_port_mask))
+		return -1;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	first_port = __ffs(trap->ingress_port_mask);
 	dp = dsa_to_port(ds, first_port);
 
@@ -396,10 +425,17 @@ static int felix_tag_npi_setup(struct dsa_switch *ds)
 			dev_err(ds->dev, "Multiple NPI ports not supported\n");
 			return -EINVAL;
 		}
+<<<<<<< HEAD
 
 		first_cpu_dp = dp->cpu_dp;
 	}
 
+=======
+
+		first_cpu_dp = dp->cpu_dp;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!first_cpu_dp)
 		return -EINVAL;
 
@@ -416,6 +452,217 @@ static void felix_tag_npi_teardown(struct dsa_switch *ds)
 }
 
 static unsigned long felix_tag_npi_get_host_fwd_mask(struct dsa_switch *ds)
+<<<<<<< HEAD
+{
+	struct ocelot *ocelot = ds->priv;
+
+	return BIT(ocelot->num_phys_ports);
+}
+
+static int felix_tag_npi_change_master(struct dsa_switch *ds, int port,
+				       struct net_device *master,
+				       struct netlink_ext_ack *extack)
+{
+	struct dsa_port *dp = dsa_to_port(ds, port), *other_dp;
+	struct ocelot *ocelot = ds->priv;
+
+	if (netif_is_lag_master(master)) {
+		NL_SET_ERR_MSG_MOD(extack,
+				   "LAG DSA master only supported using ocelot-8021q");
+		return -EOPNOTSUPP;
+	}
+
+	/* Changing the NPI port breaks user ports still assigned to the old
+	 * one, so only allow it while they're down, and don't allow them to
+	 * come back up until they're all changed to the new one.
+	 */
+	dsa_switch_for_each_user_port(other_dp, ds) {
+		struct net_device *slave = other_dp->slave;
+
+		if (other_dp != dp && (slave->flags & IFF_UP) &&
+		    dsa_port_to_master(other_dp) != master) {
+			NL_SET_ERR_MSG_MOD(extack,
+					   "Cannot change while old master still has users");
+			return -EOPNOTSUPP;
+		}
+	}
+
+	felix_npi_port_deinit(ocelot, ocelot->npi);
+	felix_npi_port_init(ocelot, felix_cpu_port_for_master(ds, master));
+
+	return 0;
+}
+
+/* Alternatively to using the NPI functionality, that same hardware MAC
+ * connected internally to the enetc or fman DSA master can be configured to
+ * use the software-defined tag_8021q frame format. As far as the hardware is
+ * concerned, it thinks it is a "dumb switch" - the queues of the CPU port
+ * module are now disconnected from it, but can still be accessed through
+ * register-based MMIO.
+ */
+static const struct felix_tag_proto_ops felix_tag_npi_proto_ops = {
+	.setup			= felix_tag_npi_setup,
+	.teardown		= felix_tag_npi_teardown,
+	.get_host_fwd_mask	= felix_tag_npi_get_host_fwd_mask,
+	.change_master		= felix_tag_npi_change_master,
+};
+
+static int felix_tag_8021q_setup(struct dsa_switch *ds)
+{
+	struct ocelot *ocelot = ds->priv;
+	struct dsa_port *dp;
+	int err;
+
+	err = dsa_tag_8021q_register(ds, htons(ETH_P_8021AD));
+	if (err)
+		return err;
+
+	dsa_switch_for_each_cpu_port(dp, ds)
+		ocelot_port_setup_dsa_8021q_cpu(ocelot, dp->index);
+
+	dsa_switch_for_each_user_port(dp, ds)
+		ocelot_port_assign_dsa_8021q_cpu(ocelot, dp->index,
+						 dp->cpu_dp->index);
+
+	dsa_switch_for_each_available_port(dp, ds)
+		/* This overwrites ocelot_init():
+		 * Do not forward BPDU frames to the CPU port module,
+		 * for 2 reasons:
+		 * - When these packets are injected from the tag_8021q
+		 *   CPU port, we want them to go out, not loop back
+		 *   into the system.
+		 * - STP traffic ingressing on a user port should go to
+		 *   the tag_8021q CPU port, not to the hardware CPU
+		 *   port module.
+		 */
+		ocelot_write_gix(ocelot,
+				 ANA_PORT_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA(0),
+				 ANA_PORT_CPU_FWD_BPDU_CFG, dp->index);
+
+	/* The ownership of the CPU port module's queues might have just been
+	 * transferred to the tag_8021q tagger from the NPI-based tagger.
+	 * So there might still be all sorts of crap in the queues. On the
+	 * other hand, the MMIO-based matching of PTP frames is very brittle,
+	 * so we need to be careful that there are no extra frames to be
+	 * dequeued over MMIO, since we would never know to discard them.
+	 */
+	ocelot_drain_cpu_queue(ocelot, 0);
+
+	return 0;
+}
+
+static void felix_tag_8021q_teardown(struct dsa_switch *ds)
+{
+	struct ocelot *ocelot = ds->priv;
+	struct dsa_port *dp;
+
+	dsa_switch_for_each_available_port(dp, ds)
+		/* Restore the logic from ocelot_init:
+		 * do not forward BPDU frames to the front ports.
+		 */
+		ocelot_write_gix(ocelot,
+				 ANA_PORT_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA(0xffff),
+				 ANA_PORT_CPU_FWD_BPDU_CFG,
+				 dp->index);
+
+	dsa_switch_for_each_user_port(dp, ds)
+		ocelot_port_unassign_dsa_8021q_cpu(ocelot, dp->index);
+
+	dsa_switch_for_each_cpu_port(dp, ds)
+		ocelot_port_teardown_dsa_8021q_cpu(ocelot, dp->index);
+
+	dsa_tag_8021q_unregister(ds);
+}
+
+static unsigned long felix_tag_8021q_get_host_fwd_mask(struct dsa_switch *ds)
+{
+	return dsa_cpu_ports(ds);
+}
+
+static int felix_tag_8021q_change_master(struct dsa_switch *ds, int port,
+					 struct net_device *master,
+					 struct netlink_ext_ack *extack)
+{
+	int cpu = felix_cpu_port_for_master(ds, master);
+	struct ocelot *ocelot = ds->priv;
+
+	ocelot_port_unassign_dsa_8021q_cpu(ocelot, port);
+	ocelot_port_assign_dsa_8021q_cpu(ocelot, port, cpu);
+
+	return felix_update_trapping_destinations(ds, true);
+}
+
+static const struct felix_tag_proto_ops felix_tag_8021q_proto_ops = {
+	.setup			= felix_tag_8021q_setup,
+	.teardown		= felix_tag_8021q_teardown,
+	.get_host_fwd_mask	= felix_tag_8021q_get_host_fwd_mask,
+	.change_master		= felix_tag_8021q_change_master,
+};
+
+static void felix_set_host_flood(struct dsa_switch *ds, unsigned long mask,
+				 bool uc, bool mc, bool bc)
+{
+	struct ocelot *ocelot = ds->priv;
+	unsigned long val;
+
+	val = uc ? mask : 0;
+	ocelot_rmw_rix(ocelot, val, mask, ANA_PGID_PGID, PGID_UC);
+
+	val = mc ? mask : 0;
+	ocelot_rmw_rix(ocelot, val, mask, ANA_PGID_PGID, PGID_MC);
+	ocelot_rmw_rix(ocelot, val, mask, ANA_PGID_PGID, PGID_MCIPV4);
+	ocelot_rmw_rix(ocelot, val, mask, ANA_PGID_PGID, PGID_MCIPV6);
+
+	val = bc ? mask : 0;
+	ocelot_rmw_rix(ocelot, val, mask, ANA_PGID_PGID, PGID_BC);
+}
+
+static void
+felix_migrate_host_flood(struct dsa_switch *ds,
+			 const struct felix_tag_proto_ops *proto_ops,
+			 const struct felix_tag_proto_ops *old_proto_ops)
+{
+	struct ocelot *ocelot = ds->priv;
+	struct felix *felix = ocelot_to_felix(ocelot);
+	unsigned long mask;
+
+	if (old_proto_ops) {
+		mask = old_proto_ops->get_host_fwd_mask(ds);
+		felix_set_host_flood(ds, mask, false, false, false);
+	}
+
+	mask = proto_ops->get_host_fwd_mask(ds);
+	felix_set_host_flood(ds, mask, !!felix->host_flood_uc_mask,
+			     !!felix->host_flood_mc_mask, true);
+}
+
+static int felix_migrate_mdbs(struct dsa_switch *ds,
+			      const struct felix_tag_proto_ops *proto_ops,
+			      const struct felix_tag_proto_ops *old_proto_ops)
+{
+	struct ocelot *ocelot = ds->priv;
+	unsigned long from, to;
+
+	if (!old_proto_ops)
+		return 0;
+
+	from = old_proto_ops->get_host_fwd_mask(ds);
+	to = proto_ops->get_host_fwd_mask(ds);
+
+	return ocelot_migrate_mdbs(ocelot, from, to);
+}
+
+/* Configure the shared hardware resources for a transition between
+ * @old_proto_ops and @proto_ops.
+ * Manual migration is needed because as far as DSA is concerned, no change of
+ * the CPU port is taking place here, just of the tagging protocol.
+ */
+static int
+felix_tag_proto_setup_shared(struct dsa_switch *ds,
+			     const struct felix_tag_proto_ops *proto_ops,
+			     const struct felix_tag_proto_ops *old_proto_ops)
+{
+=======
 {
 	struct ocelot *ocelot = ds->priv;
 
@@ -570,6 +817,7 @@ felix_tag_proto_setup_shared(struct dsa_switch *ds,
 			     const struct felix_tag_proto_ops *proto_ops,
 			     const struct felix_tag_proto_ops *old_proto_ops)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool using_tag_8021q = (proto_ops == &felix_tag_8021q_proto_ops);
 	int err;
 
@@ -612,11 +860,19 @@ static int felix_change_tag_protocol(struct dsa_switch *ds,
 
 	if (proto_ops == old_proto_ops)
 		return 0;
+<<<<<<< HEAD
 
 	err = proto_ops->setup(ds);
 	if (err)
 		goto setup_failed;
 
+=======
+
+	err = proto_ops->setup(ds);
+	if (err)
+		goto setup_failed;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = felix_tag_proto_setup_shared(ds, proto_ops, old_proto_ops);
 	if (err)
 		goto setup_shared_failed;
@@ -667,6 +923,19 @@ static void felix_port_set_host_flood(struct dsa_switch *ds, int port,
 			     !!felix->host_flood_mc_mask, true);
 }
 
+<<<<<<< HEAD
+static int felix_port_change_master(struct dsa_switch *ds, int port,
+				    struct net_device *master,
+				    struct netlink_ext_ack *extack)
+{
+	struct ocelot *ocelot = ds->priv;
+	struct felix *felix = ocelot_to_felix(ocelot);
+
+	return felix->tag_proto_ops->change_master(ds, port, master, extack);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int felix_set_ageing_time(struct dsa_switch *ds,
 				 unsigned int ageing_time)
 {
@@ -720,6 +989,11 @@ static int felix_fdb_add(struct dsa_switch *ds, int port,
 static int felix_fdb_del(struct dsa_switch *ds, int port,
 			 const unsigned char *addr, u16 vid,
 			 struct dsa_db db)
+<<<<<<< HEAD
+{
+	struct net_device *bridge_dev = felix_classify_db(db);
+	struct dsa_port *dp = dsa_to_port(ds, port);
+=======
 {
 	struct net_device *bridge_dev = felix_classify_db(db);
 	struct dsa_port *dp = dsa_to_port(ds, port);
@@ -756,11 +1030,48 @@ static int felix_lag_fdb_del(struct dsa_switch *ds, struct dsa_lag lag,
 			     struct dsa_db db)
 {
 	struct net_device *bridge_dev = felix_classify_db(db);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ocelot *ocelot = ds->priv;
 
 	if (IS_ERR(bridge_dev))
 		return PTR_ERR(bridge_dev);
 
+<<<<<<< HEAD
+	if (dsa_port_is_cpu(dp) && !bridge_dev &&
+	    dsa_fdb_present_in_other_db(ds, port, addr, vid, db))
+		return 0;
+
+	if (dsa_port_is_cpu(dp))
+		port = PGID_CPU;
+
+	return ocelot_fdb_del(ocelot, port, addr, vid, bridge_dev);
+}
+
+static int felix_lag_fdb_add(struct dsa_switch *ds, struct dsa_lag lag,
+			     const unsigned char *addr, u16 vid,
+			     struct dsa_db db)
+{
+	struct net_device *bridge_dev = felix_classify_db(db);
+	struct ocelot *ocelot = ds->priv;
+
+	if (IS_ERR(bridge_dev))
+		return PTR_ERR(bridge_dev);
+
+	return ocelot_lag_fdb_add(ocelot, lag.dev, addr, vid, bridge_dev);
+}
+
+static int felix_lag_fdb_del(struct dsa_switch *ds, struct dsa_lag lag,
+			     const unsigned char *addr, u16 vid,
+			     struct dsa_db db)
+{
+	struct net_device *bridge_dev = felix_classify_db(db);
+	struct ocelot *ocelot = ds->priv;
+
+	if (IS_ERR(bridge_dev))
+		return PTR_ERR(bridge_dev);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ocelot_lag_fdb_del(ocelot, lag.dev, addr, vid, bridge_dev);
 }
 
@@ -790,6 +1101,7 @@ static int felix_mdb_del(struct dsa_switch *ds, int port,
 {
 	struct net_device *bridge_dev = felix_classify_db(db);
 	struct ocelot *ocelot = ds->priv;
+<<<<<<< HEAD
 
 	if (IS_ERR(bridge_dev))
 		return PTR_ERR(bridge_dev);
@@ -801,6 +1113,19 @@ static int felix_mdb_del(struct dsa_switch *ds, int port,
 	if (port == ocelot->npi)
 		port = ocelot->num_phys_ports;
 
+=======
+
+	if (IS_ERR(bridge_dev))
+		return PTR_ERR(bridge_dev);
+
+	if (dsa_is_cpu_port(ds, port) && !bridge_dev &&
+	    dsa_mdb_present_in_other_db(ds, port, mdb, db))
+		return 0;
+
+	if (port == ocelot->npi)
+		port = ocelot->num_phys_ports;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ocelot_port_mdb_del(ocelot, port, mdb, bridge_dev);
 }
 
@@ -855,11 +1180,29 @@ static void felix_bridge_leave(struct dsa_switch *ds, int port,
 
 static int felix_lag_join(struct dsa_switch *ds, int port,
 			  struct dsa_lag lag,
+<<<<<<< HEAD
+			  struct netdev_lag_upper_info *info,
+			  struct netlink_ext_ack *extack)
+=======
 			  struct netdev_lag_upper_info *info)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ocelot *ocelot = ds->priv;
+	int err;
 
+	err = ocelot_port_lag_join(ocelot, port, lag.dev, info, extack);
+	if (err)
+		return err;
+
+<<<<<<< HEAD
+	/* Update the logical LAG port that serves as tag_8021q CPU port */
+	if (!dsa_is_cpu_port(ds, port))
+		return 0;
+
+	return felix_port_change_master(ds, port, lag.dev, extack);
+=======
 	return ocelot_port_lag_join(ocelot, port, lag.dev, info);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int felix_lag_leave(struct dsa_switch *ds, int port,
@@ -869,7 +1212,11 @@ static int felix_lag_leave(struct dsa_switch *ds, int port,
 
 	ocelot_port_lag_leave(ocelot, port, lag.dev);
 
-	return 0;
+	/* Update the logical LAG port that serves as tag_8021q CPU port */
+	if (!dsa_is_cpu_port(ds, port))
+		return 0;
+
+	return felix_port_change_master(ds, port, lag.dev, NULL);
 }
 
 static int felix_lag_change(struct dsa_switch *ds, int port)
@@ -972,10 +1319,17 @@ static struct phylink_pcs *felix_phylink_mac_select_pcs(struct dsa_switch *ds,
 	struct ocelot *ocelot = ds->priv;
 	struct felix *felix = ocelot_to_felix(ocelot);
 	struct phylink_pcs *pcs = NULL;
+<<<<<<< HEAD
 
 	if (felix->pcs && felix->pcs[port])
 		pcs = felix->pcs[port];
 
+=======
+
+	if (felix->pcs && felix->pcs[port])
+		pcs = felix->pcs[port];
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return pcs;
 }
 
@@ -998,6 +1352,7 @@ static void felix_phylink_mac_link_up(struct dsa_switch *ds, int port,
 {
 	struct ocelot *ocelot = ds->priv;
 	struct felix *felix = ocelot_to_felix(ocelot);
+<<<<<<< HEAD
 
 	ocelot_phylink_mac_link_up(ocelot, port, phydev, link_an_mode,
 				   interface, speed, duplex, tx_pause, rx_pause,
@@ -1005,6 +1360,33 @@ static void felix_phylink_mac_link_up(struct dsa_switch *ds, int port,
 
 	if (felix->info->port_sched_speed_set)
 		felix->info->port_sched_speed_set(ocelot, port, speed);
+}
+
+static int felix_port_enable(struct dsa_switch *ds, int port,
+			     struct phy_device *phydev)
+{
+	struct dsa_port *dp = dsa_to_port(ds, port);
+	struct ocelot *ocelot = ds->priv;
+
+	if (!dsa_port_is_user(dp))
+		return 0;
+
+	if (ocelot->npi >= 0) {
+		struct net_device *master = dsa_port_to_master(dp);
+
+		if (felix_cpu_port_for_master(ds, master) != ocelot->npi) {
+			dev_err(ds->dev, "Multiple masters are not allowed\n");
+			return -EINVAL;
+		}
+	}
+=======
+
+	ocelot_phylink_mac_link_up(ocelot, port, phydev, link_an_mode,
+				   interface, speed, duplex, tx_pause, rx_pause,
+				   FELIX_MAC_QUIRKS);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	return 0;
 }
 
 static void felix_port_qos_map_init(struct ocelot *ocelot, int port)
@@ -1026,6 +1408,55 @@ static void felix_port_qos_map_init(struct ocelot *ocelot, int port)
 			      ANA_PORT_PCP_DEI_MAP,
 			      port, i);
 	}
+}
+
+static void felix_get_stats64(struct dsa_switch *ds, int port,
+			      struct rtnl_link_stats64 *stats)
+{
+	struct ocelot *ocelot = ds->priv;
+
+	ocelot_port_get_stats64(ocelot, port, stats);
+}
+
+static void felix_get_pause_stats(struct dsa_switch *ds, int port,
+				  struct ethtool_pause_stats *pause_stats)
+{
+	struct ocelot *ocelot = ds->priv;
+
+	ocelot_port_get_pause_stats(ocelot, port, pause_stats);
+}
+
+static void felix_get_rmon_stats(struct dsa_switch *ds, int port,
+				 struct ethtool_rmon_stats *rmon_stats,
+				 const struct ethtool_rmon_hist_range **ranges)
+{
+	struct ocelot *ocelot = ds->priv;
+
+	ocelot_port_get_rmon_stats(ocelot, port, rmon_stats, ranges);
+}
+
+static void felix_get_eth_ctrl_stats(struct dsa_switch *ds, int port,
+				     struct ethtool_eth_ctrl_stats *ctrl_stats)
+{
+	struct ocelot *ocelot = ds->priv;
+
+	ocelot_port_get_eth_ctrl_stats(ocelot, port, ctrl_stats);
+}
+
+static void felix_get_eth_mac_stats(struct dsa_switch *ds, int port,
+				    struct ethtool_eth_mac_stats *mac_stats)
+{
+	struct ocelot *ocelot = ds->priv;
+
+	ocelot_port_get_eth_mac_stats(ocelot, port, mac_stats);
+}
+
+static void felix_get_eth_phy_stats(struct dsa_switch *ds, int port,
+				    struct ethtool_eth_phy_stats *phy_stats)
+{
+	struct ocelot *ocelot = ds->priv;
+
+	ocelot_port_get_eth_phy_stats(ocelot, port, phy_stats);
 }
 
 static void felix_get_strings(struct dsa_switch *ds, int port,
@@ -1144,11 +1575,55 @@ static int felix_parse_dt(struct felix *felix, phy_interface_t *port_phy_modes)
 	return err;
 }
 
+static struct regmap *felix_request_regmap_by_name(struct felix *felix,
+						   const char *resource_name)
+{
+	struct ocelot *ocelot = &felix->ocelot;
+	struct resource res;
+	int i;
+
+	for (i = 0; i < felix->info->num_resources; i++) {
+		if (strcmp(resource_name, felix->info->resources[i].name))
+			continue;
+
+		memcpy(&res, &felix->info->resources[i], sizeof(res));
+		res.start += felix->switch_base;
+		res.end += felix->switch_base;
+
+		return ocelot_regmap_init(ocelot, &res);
+	}
+
+	return ERR_PTR(-ENOENT);
+}
+
+static struct regmap *felix_request_regmap(struct felix *felix,
+					   enum ocelot_target target)
+{
+	const char *resource_name = felix->info->resource_names[target];
+
+	/* If the driver didn't provide a resource name for the target,
+	 * the resource is optional.
+	 */
+	if (!resource_name)
+		return NULL;
+
+	return felix_request_regmap_by_name(felix, resource_name);
+}
+
+static struct regmap *felix_request_port_regmap(struct felix *felix, int port)
+{
+	char resource_name[32];
+
+	sprintf(resource_name, "port%d", port);
+
+	return felix_request_regmap_by_name(felix, resource_name);
+}
+
 static int felix_init_structs(struct felix *felix, int num_phys_ports)
 {
 	struct ocelot *ocelot = &felix->ocelot;
 	phy_interface_t *port_phy_modes;
-	struct resource res;
+	struct regmap *target;
 	int port, i, err;
 
 	ocelot->num_phys_ports = num_phys_ports;
@@ -1182,6 +1657,9 @@ static int felix_init_structs(struct felix *felix, int num_phys_ports)
 	}
 
 	for (i = 0; i < TARGET_MAX; i++) {
+<<<<<<< HEAD
+		target = felix_request_regmap(felix, i);
+=======
 		struct regmap *target;
 
 		if (!felix->info->target_io_res[i].name)
@@ -1193,9 +1671,11 @@ static int felix_init_structs(struct felix *felix, int num_phys_ports)
 		res.end += felix->switch_base;
 
 		target = felix->info->init_regmap(ocelot, &res);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (IS_ERR(target)) {
 			dev_err(ocelot->dev,
-				"Failed to map device memory space\n");
+				"Failed to map device memory space: %pe\n",
+				target);
 			kfree(port_phy_modes);
 			return PTR_ERR(target);
 		}
@@ -1212,7 +1692,6 @@ static int felix_init_structs(struct felix *felix, int num_phys_ports)
 
 	for (port = 0; port < num_phys_ports; port++) {
 		struct ocelot_port *ocelot_port;
-		struct regmap *target;
 
 		ocelot_port = devm_kzalloc(ocelot->dev,
 					   sizeof(struct ocelot_port),
@@ -1224,16 +1703,20 @@ static int felix_init_structs(struct felix *felix, int num_phys_ports)
 			return -ENOMEM;
 		}
 
+<<<<<<< HEAD
+		target = felix_request_port_regmap(felix, port);
+=======
 		memcpy(&res, &felix->info->port_io_res[port], sizeof(res));
 		res.flags = IORESOURCE_MEM;
 		res.start += felix->switch_base;
 		res.end += felix->switch_base;
 
 		target = felix->info->init_regmap(ocelot, &res);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (IS_ERR(target)) {
 			dev_err(ocelot->dev,
-				"Failed to map memory space for port %d\n",
-				port);
+				"Failed to map memory space for port %d: %pe\n",
+				port, target);
 			kfree(port_phy_modes);
 			return PTR_ERR(target);
 		}
@@ -1842,6 +2325,12 @@ const struct dsa_switch_ops felix_switch_ops = {
 	.setup				= felix_setup,
 	.teardown			= felix_teardown,
 	.set_ageing_time		= felix_set_ageing_time,
+	.get_stats64			= felix_get_stats64,
+	.get_pause_stats		= felix_get_pause_stats,
+	.get_rmon_stats			= felix_get_rmon_stats,
+	.get_eth_ctrl_stats		= felix_get_eth_ctrl_stats,
+	.get_eth_mac_stats		= felix_get_eth_mac_stats,
+	.get_eth_phy_stats		= felix_get_eth_phy_stats,
 	.get_strings			= felix_get_strings,
 	.get_ethtool_stats		= felix_get_ethtool_stats,
 	.get_sset_count			= felix_get_sset_count,
@@ -1851,6 +2340,10 @@ const struct dsa_switch_ops felix_switch_ops = {
 	.phylink_mac_select_pcs		= felix_phylink_mac_select_pcs,
 	.phylink_mac_link_down		= felix_phylink_mac_link_down,
 	.phylink_mac_link_up		= felix_phylink_mac_link_up,
+<<<<<<< HEAD
+	.port_enable			= felix_port_enable,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.port_fast_age			= felix_port_fast_age,
 	.port_fdb_dump			= felix_fdb_dump,
 	.port_fdb_add			= felix_fdb_add,
@@ -1906,6 +2399,10 @@ const struct dsa_switch_ops felix_switch_ops = {
 	.port_add_dscp_prio		= felix_port_add_dscp_prio,
 	.port_del_dscp_prio		= felix_port_del_dscp_prio,
 	.port_set_host_flood		= felix_port_set_host_flood,
+<<<<<<< HEAD
+	.port_change_master		= felix_port_change_master,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct net_device *felix_port_to_netdev(struct ocelot *ocelot, int port)

@@ -278,7 +278,23 @@ void hv_ringbuffer_cleanup(struct hv_ring_buffer_info *ring_info)
 	kfree(ring_info->pkt_buffer);
 	ring_info->pkt_buffer = NULL;
 	ring_info->pkt_buffer_size = 0;
+<<<<<<< HEAD
 }
+
+/*
+ * Check if the ring buffer spinlock is available to take or not; used on
+ * atomic contexts, like panic path (see the Hyper-V framebuffer driver).
+ */
+
+bool hv_ringbuffer_spinlock_busy(struct vmbus_channel *channel)
+{
+	struct hv_ring_buffer_info *rinfo = &channel->outbound;
+
+	return spin_is_locked(&rinfo->ring_lock);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+}
+EXPORT_SYMBOL_GPL(hv_ringbuffer_spinlock_busy);
 
 /* Write to the ring buffer. */
 int hv_ringbuffer_write(struct vmbus_channel *channel,
@@ -483,6 +499,7 @@ struct vmpacket_descriptor *hv_pkt_iter_first(struct vmbus_channel *channel)
 	bytes_avail = min(rbi->pkt_buffer_size, bytes_avail);
 
 	desc = (struct vmpacket_descriptor *)(hv_get_ring_buffer(rbi) + rbi->priv_read_index);
+<<<<<<< HEAD
 
 	/*
 	 * Ensure the compiler does not use references to incoming Hyper-V values (which
@@ -510,6 +527,35 @@ struct vmpacket_descriptor *hv_pkt_iter_first(struct vmbus_channel *channel)
 	memcpy(desc_copy, desc, pkt_len);
 
 	/*
+=======
+
+	/*
+	 * Ensure the compiler does not use references to incoming Hyper-V values (which
+	 * could change at any moment) when reading local variables later in the code
+	 */
+	pkt_len = READ_ONCE(desc->len8) << 3;
+	pkt_offset = READ_ONCE(desc->offset8) << 3;
+
+	/*
+	 * If pkt_len is invalid, set it to the smaller of hv_pkt_iter_avail() and
+	 * rbi->pkt_buffer_size
+	 */
+	if (pkt_len < sizeof(struct vmpacket_descriptor) || pkt_len > bytes_avail)
+		pkt_len = bytes_avail;
+
+	/*
+	 * If pkt_offset is invalid, arbitrarily set it to
+	 * the size of vmpacket_descriptor
+	 */
+	if (pkt_offset < sizeof(struct vmpacket_descriptor) || pkt_offset > pkt_len)
+		pkt_offset = sizeof(struct vmpacket_descriptor);
+
+	/* Copy the Hyper-V packet out of the ring buffer */
+	desc_copy = (struct vmpacket_descriptor *)rbi->pkt_buffer;
+	memcpy(desc_copy, desc, pkt_len);
+
+	/*
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * Hyper-V could still change len8 and offset8 after the earlier read.
 	 * Ensure that desc_copy has legal values for len8 and offset8 that
 	 * are consistent with the copy we just made

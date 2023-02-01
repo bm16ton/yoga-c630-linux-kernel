@@ -1,0 +1,1 @@
+cmd_drivers/soundwire/soundwire-bus.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/soundwire/soundwire-bus.ko drivers/soundwire/soundwire-bus.o drivers/soundwire/soundwire-bus.mod.o;  true

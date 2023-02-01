@@ -1,0 +1,1 @@
+cmd_drivers/net/can/spi/hi311x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/can/spi/hi311x.ko drivers/net/can/spi/hi311x.o drivers/net/can/spi/hi311x.mod.o;  true

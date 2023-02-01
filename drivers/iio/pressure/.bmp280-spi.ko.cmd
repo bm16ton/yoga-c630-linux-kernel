@@ -1,0 +1,1 @@
+cmd_drivers/iio/pressure/bmp280-spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/pressure/bmp280-spi.ko drivers/iio/pressure/bmp280-spi.o drivers/iio/pressure/bmp280-spi.mod.o;  true

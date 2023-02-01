@@ -27,6 +27,23 @@ void efx_mae_mport_mport(struct efx_nic *efx, u32 mport_id, u32 *out);
 
 int efx_mae_lookup_mport(struct efx_nic *efx, u32 selector, u32 *id);
 
+<<<<<<< HEAD
+#define MAE_NUM_FIELDS	(MAE_FIELD_ENC_VNET_ID + 1)
+
+struct mae_caps {
+	u32 match_field_count;
+	u32 action_prios;
+	u8 action_rule_fields[MAE_NUM_FIELDS];
+};
+
+int efx_mae_get_caps(struct efx_nic *efx, struct mae_caps *caps);
+
+int efx_mae_match_check_caps(struct efx_nic *efx,
+			     const struct efx_tc_match_fields *mask,
+			     struct netlink_ext_ack *extack);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int efx_mae_alloc_action_set(struct efx_nic *efx, struct efx_tc_action_set *act);
 int efx_mae_free_action_set(struct efx_nic *efx, u32 fw_id);
 

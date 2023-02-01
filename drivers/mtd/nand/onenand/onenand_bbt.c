@@ -61,7 +61,11 @@ static int create_bbt(struct mtd_info *mtd, uint8_t *buf, struct nand_bbt_descr 
 	int startblock;
 	loff_t from;
 	size_t readlen;
+<<<<<<< HEAD
+	struct mtd_oob_ops ops = { };
+=======
 	struct mtd_oob_ops ops;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int rgn;
 
 	printk(KERN_INFO "Scanning device for bad blocks\n");

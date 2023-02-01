@@ -37,10 +37,17 @@ static int acp5x_i2s_set_fmt(struct snd_soc_dai *cpu_dai,
 	}
 	mode = fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK;
 	switch (mode) {
+<<<<<<< HEAD
+	case SND_SOC_DAIFMT_BP_FP:
+		adata->master_mode = I2S_MASTER_MODE_ENABLE;
+		break;
+	case SND_SOC_DAIFMT_BC_FC:
+=======
 	case SND_SOC_DAIFMT_CBC_CFC:
 		adata->master_mode = I2S_MASTER_MODE_ENABLE;
 		break;
 	case SND_SOC_DAIFMT_CBP_CFP:
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adata->master_mode = I2S_MASTER_MODE_DISABLE;
 		break;
 	}
@@ -345,6 +352,10 @@ static const struct snd_soc_dai_ops acp5x_i2s_dai_ops = {
 
 static const struct snd_soc_component_driver acp5x_dai_component = {
 	.name = "acp5x-i2s",
+<<<<<<< HEAD
+	.legacy_dai_naming = 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct snd_soc_dai_driver acp5x_i2s_dai = {

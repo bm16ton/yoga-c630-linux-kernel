@@ -7,7 +7,11 @@
 #include <linux/debugfs.h>
 #include <linux/delay.h>
 #include <linux/device.h>
+<<<<<<< HEAD
+#include <linux/gpio/consumer.h>
+=======
 #include <linux/gpio.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -415,7 +419,10 @@
 
 #define WSA883X_NUM_REGISTERS           (WSA883X_EMEM_63 + 1)
 #define WSA883X_MAX_REGISTER            (WSA883X_NUM_REGISTERS - 1)
+<<<<<<< HEAD
+=======
 #define WSA883X_PROBE_TIMEOUT 1000
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define WSA883X_VERSION_1_0 0
 #define WSA883X_VERSION_1_1 1
@@ -1393,7 +1400,11 @@ static int wsa883x_probe(struct sdw_slave *pdev,
 	}
 
 	wsa883x->sd_n = devm_gpiod_get_optional(&pdev->dev, "powerdown",
+<<<<<<< HEAD
+						GPIOD_FLAGS_BIT_NONEXCLUSIVE | GPIOD_OUT_HIGH);
+=======
 						GPIOD_FLAGS_BIT_NONEXCLUSIVE);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(wsa883x->sd_n)) {
 		dev_err(&pdev->dev, "Shutdown Control GPIO not found\n");
 		ret = PTR_ERR(wsa883x->sd_n);
@@ -1409,9 +1420,16 @@ static int wsa883x_probe(struct sdw_slave *pdev,
 	wsa883x->sconfig.type = SDW_STREAM_PDM;
 
 	pdev->prop.sink_ports = GENMASK(WSA883X_MAX_SWR_PORTS, 0);
+<<<<<<< HEAD
+	pdev->prop.simple_clk_stop_capable = true;
+	pdev->prop.sink_dpn_prop = wsa_sink_dpn_prop;
+	pdev->prop.scp_int1_mask = SDW_SCP_INT1_BUS_CLASH | SDW_SCP_INT1_PARITY;
+	gpiod_direction_output(wsa883x->sd_n, 0);
+=======
 	pdev->prop.sink_dpn_prop = wsa_sink_dpn_prop;
 	pdev->prop.scp_int1_mask = SDW_SCP_INT1_BUS_CLASH | SDW_SCP_INT1_PARITY;
 	gpiod_direction_output(wsa883x->sd_n, 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	wsa883x->regmap = devm_regmap_init_sdw(pdev, &wsa883x_regmap_config);
 	if (IS_ERR(wsa883x->regmap)) {
@@ -1440,19 +1458,29 @@ err:
 static int __maybe_unused wsa883x_runtime_suspend(struct device *dev)
 {
 	struct regmap *regmap = dev_get_regmap(dev, NULL);
+<<<<<<< HEAD
+=======
 	struct wsa883x_priv *wsa883x = dev_get_drvdata(dev);
 
 	gpiod_direction_output(wsa883x->sd_n, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	regcache_cache_only(regmap, true);
 	regcache_mark_dirty(regmap);
 
+<<<<<<< HEAD
+=======
 	regulator_disable(wsa883x->vdd);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
 static int __maybe_unused wsa883x_runtime_resume(struct device *dev)
 {
+<<<<<<< HEAD
+	struct regmap *regmap = dev_get_regmap(dev, NULL);
+
+=======
 	struct sdw_slave *slave = dev_to_sdw_dev(dev);
 	struct regmap *regmap = dev_get_regmap(dev, NULL);
 	struct wsa883x_priv *wsa883x = dev_get_drvdata(dev);
@@ -1477,6 +1505,7 @@ static int __maybe_unused wsa883x_runtime_resume(struct device *dev)
 	}
 
 	usleep_range(20000, 20010);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	regcache_cache_only(regmap, false);
 	regcache_sync(regmap);
 

@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-aggregator.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-aggregator.ko drivers/gpio/gpio-aggregator.o drivers/gpio/gpio-aggregator.mod.o;  true

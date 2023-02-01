@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/da280.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/da280.ko drivers/iio/accel/da280.o drivers/iio/accel/da280.mod.o;  true

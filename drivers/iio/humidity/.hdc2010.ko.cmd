@@ -1,0 +1,1 @@
+cmd_drivers/iio/humidity/hdc2010.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/humidity/hdc2010.ko drivers/iio/humidity/hdc2010.o drivers/iio/humidity/hdc2010.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/ad5624r_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/ad5624r_spi.ko drivers/iio/dac/ad5624r_spi.o drivers/iio/dac/ad5624r_spi.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipset/ip_set_bitmap_ipmac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/ipset/ip_set_bitmap_ipmac.ko net/netfilter/ipset/ip_set_bitmap_ipmac.o net/netfilter/ipset/ip_set_bitmap_ipmac.mod.o;  true

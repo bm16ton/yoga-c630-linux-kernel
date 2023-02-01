@@ -1298,6 +1298,7 @@ static inline uint32_t A6XX_CP_MRQ_MRB_STAT_REM(uint32_t val)
 #define REG_A6XX_RBBM_VBIF_GX_RESET_STATUS			0x00000215
 
 static inline uint32_t REG_A6XX_RBBM_PERFCTR_CP(uint32_t i0) { return 0x00000400 + 0x2*i0; }
+<<<<<<< HEAD
 
 static inline uint32_t REG_A6XX_RBBM_PERFCTR_RBBM(uint32_t i0) { return 0x0000041c + 0x2*i0; }
 
@@ -1327,6 +1328,37 @@ static inline uint32_t REG_A6XX_RBBM_PERFCTR_VSC(uint32_t i0) { return 0x000004e
 
 static inline uint32_t REG_A6XX_RBBM_PERFCTR_LRZ(uint32_t i0) { return 0x000004ea + 0x2*i0; }
 
+=======
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_RBBM(uint32_t i0) { return 0x0000041c + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_PC(uint32_t i0) { return 0x00000424 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_VFD(uint32_t i0) { return 0x00000434 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_HLSQ(uint32_t i0) { return 0x00000444 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_VPC(uint32_t i0) { return 0x00000450 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_CCU(uint32_t i0) { return 0x0000045c + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_TSE(uint32_t i0) { return 0x00000466 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_RAS(uint32_t i0) { return 0x0000046e + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_UCHE(uint32_t i0) { return 0x00000476 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_TP(uint32_t i0) { return 0x0000048e + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_SP(uint32_t i0) { return 0x000004a6 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_RB(uint32_t i0) { return 0x000004d6 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_VSC(uint32_t i0) { return 0x000004e6 + 0x2*i0; }
+
+static inline uint32_t REG_A6XX_RBBM_PERFCTR_LRZ(uint32_t i0) { return 0x000004ea + 0x2*i0; }
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline uint32_t REG_A6XX_RBBM_PERFCTR_CMP(uint32_t i0) { return 0x000004f2 + 0x2*i0; }
 
 #define REG_A6XX_RBBM_PERFCTR_CNTL				0x00000500
@@ -1412,6 +1444,10 @@ static inline uint32_t REG_A6XX_RBBM_PERFCTR_RBBM_SEL(uint32_t i0) { return 0x00
 #define REG_A6XX_RBBM_VBIF_CLIENT_QOS_CNTL			0x00000010
 
 #define REG_A6XX_RBBM_GBIF_CLIENT_QOS_CNTL			0x00000011
+
+#define REG_A6XX_RBBM_GBIF_HALT					0x00000016
+
+#define REG_A6XX_RBBM_GBIF_HALT_ACK				0x00000017
 
 #define REG_A6XX_RBBM_WAIT_FOR_GPU_IDLE_CMD			0x0000001c
 #define A6XX_RBBM_WAIT_FOR_GPU_IDLE_CMD_WAIT_GPU_IDLE		0x00000001

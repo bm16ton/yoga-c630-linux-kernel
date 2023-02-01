@@ -1,0 +1,5 @@
+crypto/async_tx/async_tx.ko
+crypto/async_tx/async_memcpy.ko
+crypto/async_tx/async_xor.ko
+crypto/async_tx/async_pq.ko
+crypto/async_tx/async_raid6_recov.ko

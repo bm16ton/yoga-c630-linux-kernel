@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ivtv/modules.order := {   echo drivers/media/pci/ivtv/ivtv.ko;   echo drivers/media/pci/ivtv/ivtv-alsa.ko;   echo drivers/media/pci/ivtv/ivtvfb.ko; :; } > drivers/media/pci/ivtv/modules.order

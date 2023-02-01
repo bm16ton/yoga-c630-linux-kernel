@@ -115,6 +115,10 @@ static struct dev_pm_domain pm_domain = {
 static void mock_gt_probe(struct drm_i915_private *i915)
 {
 	i915->gt[0] = &i915->gt0;
+<<<<<<< HEAD
+	i915->gt[0]->name = "Mock GT";
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 struct drm_i915_private *mock_gem_device(void)
@@ -172,14 +176,18 @@ struct drm_i915_private *mock_gem_device(void)
 	/* Using the global GTT may ask questions about KMS users, so prepare */
 	drm_mode_config_init(&i915->drm);
 
+<<<<<<< HEAD
+	RUNTIME_INFO(i915)->graphics.ip.ver = -1;
+=======
 	mkwrite_device_info(i915)->graphics.ver = -1;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	mkwrite_device_info(i915)->page_sizes =
+	RUNTIME_INFO(i915)->page_sizes =
 		I915_GTT_PAGE_SIZE_4K |
 		I915_GTT_PAGE_SIZE_64K |
 		I915_GTT_PAGE_SIZE_2M;
 
-	mkwrite_device_info(i915)->memory_regions = REGION_SMEM;
+	RUNTIME_INFO(i915)->memory_regions = REGION_SMEM;
 	intel_memory_regions_hw_probe(i915);
 
 	spin_lock_init(&i915->gpu_error.lock);
@@ -209,7 +217,11 @@ struct drm_i915_private *mock_gem_device(void)
 	mock_init_ggtt(to_gt(i915));
 	to_gt(i915)->vm = i915_vm_get(&to_gt(i915)->ggtt->vm);
 
+<<<<<<< HEAD
+	RUNTIME_INFO(i915)->platform_engine_mask = BIT(0);
+=======
 	mkwrite_device_info(i915)->platform_engine_mask = BIT(0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	to_gt(i915)->info.engine_mask = BIT(0);
 
 	to_gt(i915)->engine[RCS0] = mock_engine(i915, "mock", RCS0);

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-odroid.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-odroid.ko drivers/media/rc/keymaps/rc-odroid.o drivers/media/rc/keymaps/rc-odroid.mod.o;  true

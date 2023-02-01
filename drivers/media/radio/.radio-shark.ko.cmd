@@ -1,0 +1,1 @@
+cmd_drivers/media/radio/radio-shark.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/radio/radio-shark.ko drivers/media/radio/radio-shark.o drivers/media/radio/radio-shark.mod.o;  true

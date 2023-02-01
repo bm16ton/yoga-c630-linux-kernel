@@ -1,0 +1,63 @@
+From: Helmut Grohne <helmut@subdivi.de>
+Subject: make pkg-config substitutable
+Date: Tue, 30 Aug 2016 16:59:36 +0200
+
+--- a/Makefile
++++ b/Makefile
+@@ -25,6 +25,8 @@ UDEV_RULE_DIR?=/lib/udev/rules.d/
+ PUBKEY_DIR?=pubkeys
+ RUNTIME_PUBKEY_DIR?=/etc/wireless-regdb/pubkeys
+ 
++PKG_CONFIG ?= pkg-config
++
+ CFLAGS += -O2 -fpic
+ CFLAGS += -std=gnu99 -Wall -Werror -pedantic
+ CFLAGS += -Wall -g
+@@ -39,8 +41,8 @@ all: all_noverify verify
+ all_noverify: $(LIBREG) crda intersect regdbdump db2rd optimize
+ 
+ ifeq ($(USE_OPENSSL),1)
+-CFLAGS += -DUSE_OPENSSL -DPUBKEY_DIR=\"$(RUNTIME_PUBKEY_DIR)\" `pkg-config --cflags openssl`
+-LIBREGLDLIBS += `pkg-config --libs openssl`
++CFLAGS += -DUSE_OPENSSL -DPUBKEY_DIR=\"$(RUNTIME_PUBKEY_DIR)\" `$(PKG_CONFIG) --cflags openssl`
++LIBREGLDLIBS += `$(PKG_CONFIG) --libs openssl`
+ 
+ ifeq ($(RUNTIME_PUBKEY_ONLY),1)
+ CFLAGS += -DRUNTIME_PUBKEY_ONLY
+@@ -59,19 +61,19 @@ endif
+ MKDIR ?= mkdir -p
+ INSTALL ?= install
+ 
+-NL1FOUND := $(shell pkg-config --atleast-version=1 libnl-1 && echo Y)
+-NL2FOUND := $(shell pkg-config --atleast-version=2 libnl-2.0 && echo Y)
+-NL3FOUND := $(shell pkg-config --atleast-version=3 libnl-3.0 && echo Y)
+-NL32FOUND := $(shell pkg-config --atleast-version=3 libnl-3.2 && echo Y)
++NL1FOUND := $(shell $(PKG_CONFIG) --atleast-version=1 libnl-1 && echo Y)
++NL2FOUND := $(shell $(PKG_CONFIG) --atleast-version=2 libnl-2.0 && echo Y)
++NL3FOUND := $(shell $(PKG_CONFIG) --atleast-version=3 libnl-3.0 && echo Y)
++NL32FOUND := $(shell $(PKG_CONFIG) --atleast-version=3 libnl-3.2 && echo Y)
+ 
+ ifeq ($(NL32FOUND),Y)
+ CFLAGS += -DCONFIG_LIBNL30
+-NLLIBS += $(shell pkg-config --libs libnl-genl-3.2)
++NLLIBS += $(shell $(PKG_CONFIG) --libs libnl-genl-3.2)
+ NLLIBNAME = libnl-3.2
+ else
+ 	ifeq ($(NL3FOUND),Y)
+ 	CFLAGS += -DCONFIG_LIBNL30
+-	NLLIBS += $(shell pkg-config --libs libnl-genl-3.0)
++	NLLIBS += $(shell $(PKG_CONFIG) --libs libnl-genl-3.0)
+ 	NLLIBNAME = libnl-3.0
+ 	else
+ 		ifeq ($(NL2FOUND),Y)
+@@ -90,8 +92,8 @@ ifeq ($(NLLIBNAME),)
+ $(error Cannot find development files for any supported version of libnl)
+ endif
+ 
+-NLLIBS += `pkg-config --libs $(NLLIBNAME)`
+-CFLAGS += `pkg-config --cflags $(NLLIBNAME)`
++NLLIBS += `$(PKG_CONFIG) --libs $(NLLIBNAME)`
++CFLAGS += `$(PKG_CONFIG) --cflags $(NLLIBNAME)`
+ 
+ ifeq ($(V),1)
+ Q=

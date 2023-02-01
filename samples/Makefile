@@ -35,3 +35,7 @@ subdir-$(CONFIG_SAMPLE_WATCH_QUEUE)	+= watch_queue
 obj-$(CONFIG_DEBUG_KMEMLEAK_TEST)	+= kmemleak/
 obj-$(CONFIG_SAMPLE_CORESIGHT_SYSCFG)	+= coresight/
 obj-$(CONFIG_SAMPLE_FPROBE)		+= fprobe/
+<<<<<<< HEAD
+obj-$(CONFIG_SAMPLES_RUST)		+= rust/
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

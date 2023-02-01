@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/max16601.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/max16601.ko drivers/hwmon/pmbus/max16601.o drivers/hwmon/pmbus/max16601.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/qla2xxx/qla2xxx.mod := printf '%s\n'   qla_os.o qla_init.o qla_mbx.o qla_iocb.o qla_isr.o qla_gs.o qla_dbg.o qla_sup.o qla_attr.o qla_mid.o qla_dfs.o qla_bsg.o qla_nx.o qla_mr.o qla_nx2.o qla_target.o qla_tmpl.o qla_nvme.o qla_edif.o | awk '!x[$$0]++ { print("drivers/scsi/qla2xxx/"$$0) }' > drivers/scsi/qla2xxx/qla2xxx.mod

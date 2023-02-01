@@ -25,6 +25,10 @@ properties:
       - qcom,sm8350-dp
 
   reg:
+<<<<<<< HEAD
+    minItems: 4
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     items:
       - description: ahb register block
       - description: aux register block
@@ -71,6 +75,30 @@ properties:
   operating-points-v2:
     maxItems: 1
 
+<<<<<<< HEAD
+  opp-table: true
+
+  power-domains:
+    maxItems: 1
+
+  aux-bus:
+    $ref: /schemas/display/dp-aux-bus.yaml#
+
+  data-lanes:
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    minItems: 1
+    maxItems: 4
+    items:
+      maximum: 3
+
+  "#sound-dai-cells":
+    const: 0
+
+  vdda-0p9-supply:
+    deprecated: true
+  vdda-1p2-supply:
+    deprecated: true
+=======
   power-domains:
     maxItems: 1
 
@@ -79,6 +107,7 @@ properties:
 
   vdda-0p9-supply: true
   vdda-1p2-supply: true
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
@@ -99,10 +128,40 @@ required:
   - clock-names
   - phys
   - phy-names
+<<<<<<< HEAD
+  - power-domains
+  - ports
+
+allOf:
+  # AUX BUS does not exist on DP controllers
+  # Audio output also is present only on DP output
+  # p1 regions is present on DP, but not on eDP
+  - if:
+      properties:
+        compatible:
+          contains:
+            enum:
+              - qcom,sc7280-edp
+              - qcom,sc8180x-edp
+    then:
+      properties:
+        "#sound-dai-cells": false
+        reg:
+          maxItems: 4
+    else:
+      properties:
+        aux-bus: false
+        reg:
+          minItems: 5
+      required:
+        - "#sound-dai-cells"
+
+=======
   - "#sound-dai-cells"
   - power-domains
   - ports
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 additionalProperties: false
 
 examples:
@@ -141,9 +200,12 @@ examples:
 
         power-domains = <&rpmhpd SC7180_CX>;
 
+<<<<<<< HEAD
+=======
         vdda-0p9-supply = <&vdda_usb_ss_dp_core>;
         vdda-1p2-supply = <&vdda_usb_ss_dp_1p2>;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         ports {
             #address-cells = <1>;
             #size-cells = <0>;

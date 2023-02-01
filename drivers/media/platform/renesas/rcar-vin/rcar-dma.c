@@ -1244,8 +1244,11 @@ static int rvin_mc_validate_format(struct rvin_dev *vin, struct v4l2_subdev *sd,
 
 static int rvin_set_stream(struct rvin_dev *vin, int on)
 {
+<<<<<<< HEAD
+=======
 	struct media_pipeline *pipe;
 	struct media_device *mdev;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct v4l2_subdev *sd;
 	struct media_pad *pad;
 	int ret;
@@ -1265,7 +1268,11 @@ static int rvin_set_stream(struct rvin_dev *vin, int on)
 	sd = media_entity_to_v4l2_subdev(pad->entity);
 
 	if (!on) {
+<<<<<<< HEAD
+		video_device_pipeline_stop(&vin->vdev);
+=======
 		media_pipeline_stop(&vin->vdev.entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return v4l2_subdev_call(sd, video, s_stream, 0);
 	}
 
@@ -1273,6 +1280,9 @@ static int rvin_set_stream(struct rvin_dev *vin, int on)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	ret = video_device_pipeline_alloc_start(&vin->vdev);
+=======
 	/*
 	 * The graph lock needs to be taken to protect concurrent
 	 * starts of multiple VIN instances as they might share
@@ -1284,6 +1294,7 @@ static int rvin_set_stream(struct rvin_dev *vin, int on)
 	pipe = sd->entity.pipe ? sd->entity.pipe : &vin->vdev.pipe;
 	ret = __media_pipeline_start(&vin->vdev.entity, pipe);
 	mutex_unlock(&mdev->graph_mutex);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -1291,7 +1302,11 @@ static int rvin_set_stream(struct rvin_dev *vin, int on)
 	if (ret == -ENOIOCTLCMD)
 		ret = 0;
 	if (ret)
+<<<<<<< HEAD
+		video_device_pipeline_stop(&vin->vdev);
+=======
 		media_pipeline_stop(&vin->vdev.entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }

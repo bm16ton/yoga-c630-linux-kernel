@@ -1,0 +1,1 @@
+cmd_drivers/char/ipmi/ipmi_poweroff.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/char/ipmi/ipmi_poweroff.ko drivers/char/ipmi/ipmi_poweroff.o drivers/char/ipmi/ipmi_poweroff.mod.o;  true

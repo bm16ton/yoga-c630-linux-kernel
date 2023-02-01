@@ -47,7 +47,11 @@ configure_stack(void)
 	if (CHECK_FAIL(system("tc qdisc add dev lo clsact")))
 		return false;
 	sprintf(tc_cmd, "%s %s %s %s", "tc filter add dev lo ingress bpf",
+<<<<<<< HEAD
+		       "direct-action object-file ./test_sk_assign.bpf.o",
+=======
 		       "direct-action object-file ./test_sk_assign.o",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		       "section tc",
 		       (env.verbosity < VERBOSE_VERY) ? " 2>/dev/null" : "verbose");
 	if (CHECK(system(tc_cmd), "BPF load failed;",

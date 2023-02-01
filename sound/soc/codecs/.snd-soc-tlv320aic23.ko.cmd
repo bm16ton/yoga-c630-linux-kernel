@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/snd-soc-tlv320aic23.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/codecs/snd-soc-tlv320aic23.ko sound/soc/codecs/snd-soc-tlv320aic23.o sound/soc/codecs/snd-soc-tlv320aic23.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/be2iscsi/be2iscsi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/be2iscsi/be2iscsi.ko drivers/scsi/be2iscsi/be2iscsi.o drivers/scsi/be2iscsi/be2iscsi.mod.o;  true

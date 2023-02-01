@@ -1,0 +1,1 @@
+cmd_drivers/crypto/qcom-rng.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/crypto/qcom-rng.ko drivers/crypto/qcom-rng.o drivers/crypto/qcom-rng.mod.o;  true

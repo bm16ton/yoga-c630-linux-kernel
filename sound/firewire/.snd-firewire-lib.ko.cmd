@@ -1,0 +1,1 @@
+cmd_sound/firewire/snd-firewire-lib.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/snd-firewire-lib.ko sound/firewire/snd-firewire-lib.o sound/firewire/snd-firewire-lib.mod.o;  true

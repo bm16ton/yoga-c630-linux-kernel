@@ -1,0 +1,1 @@
+cmd_drivers/char/ipmi/ipmi_si.mod := printf '%s\n'   ipmi_si_intf.o ipmi_kcs_sm.o ipmi_smic_sm.o ipmi_bt_sm.o ipmi_si_hotmod.o ipmi_si_hardcode.o ipmi_si_platform.o ipmi_si_port_io.o ipmi_si_mem_io.o ipmi_si_pci.o | awk '!x[$$0]++ { print("drivers/char/ipmi/"$$0) }' > drivers/char/ipmi/ipmi_si.mod

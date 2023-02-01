@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/hw/hns/hns-roce-hw-v2.mod := printf '%s\n'   hns_roce_hw_v2.o hns_roce_main.o hns_roce_cmd.o hns_roce_pd.o hns_roce_ah.o hns_roce_hem.o hns_roce_mr.o hns_roce_qp.o hns_roce_cq.o hns_roce_alloc.o hns_roce_db.o hns_roce_srq.o hns_roce_restrack.o | awk '!x[$$0]++ { print("drivers/infiniband/hw/hns/"$$0) }' > drivers/infiniband/hw/hns/hns-roce-hw-v2.mod

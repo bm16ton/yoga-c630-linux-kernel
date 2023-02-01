@@ -1,0 +1,1 @@
+cmd_/Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/ft232h-intf.mod := printf '%s\n'   ft232h-intf.o | awk '!x[$$0]++ { print("/Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/"$$0) }' > /Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/ft232h-intf.mod

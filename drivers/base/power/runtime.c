@@ -484,7 +484,21 @@ static int rpm_idle(struct device *dev, int rpmflags)
 
 	dev->power.idle_notification = true;
 
+<<<<<<< HEAD
+	if (dev->power.irq_safe)
+		spin_unlock(&dev->power.lock);
+	else
+		spin_unlock_irq(&dev->power.lock);
+
+	retval = callback(dev);
+
+	if (dev->power.irq_safe)
+		spin_lock(&dev->power.lock);
+	else
+		spin_lock_irq(&dev->power.lock);
+=======
 	retval = __rpm_callback(callback, dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev->power.idle_notification = false;
 	wake_up_all(&dev->power.wait_queue);
@@ -792,10 +806,13 @@ static int rpm_resume(struct device *dev, int rpmflags)
 		DEFINE_WAIT(wait);
 
 		if (rpmflags & (RPM_ASYNC | RPM_NOWAIT)) {
-			if (dev->power.runtime_status == RPM_SUSPENDING)
+			if (dev->power.runtime_status == RPM_SUSPENDING) {
 				dev->power.deferred_resume = true;
-			else
+				if (rpmflags & RPM_NOWAIT)
+					retval = -EINPROGRESS;
+			} else {
 				retval = -EINPROGRESS;
+			}
 			goto out;
 		}
 
@@ -1488,12 +1505,21 @@ void pm_runtime_enable(struct device *dev)
 
 	dev->power.last_status = RPM_INVALID;
 	dev->power.accounting_timestamp = ktime_get_mono_fast_ns();
+<<<<<<< HEAD
 
 	if (dev->power.runtime_status == RPM_SUSPENDED &&
 	    !dev->power.ignore_children &&
 	    atomic_read(&dev->power.child_count) > 0)
 		dev_warn(dev, "Enabling runtime PM for inactive device with active children\n");
 
+=======
+
+	if (dev->power.runtime_status == RPM_SUSPENDED &&
+	    !dev->power.ignore_children &&
+	    atomic_read(&dev->power.child_count) > 0)
+		dev_warn(dev, "Enabling runtime PM for inactive device with active children\n");
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	spin_unlock_irqrestore(&dev->power.lock, flags);
 }

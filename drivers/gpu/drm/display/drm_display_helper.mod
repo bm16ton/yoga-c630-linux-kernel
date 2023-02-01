@@ -1,0 +1,9 @@
+drivers/gpu/drm/display/drm_display_helper_mod.o
+drivers/gpu/drm/display/drm_dp_dual_mode_helper.o
+drivers/gpu/drm/display/drm_dp_helper.o
+drivers/gpu/drm/display/drm_dp_mst_topology.o
+drivers/gpu/drm/display/drm_dsc_helper.o
+drivers/gpu/drm/display/drm_hdmi_helper.o
+drivers/gpu/drm/display/drm_scdc_helper.o
+drivers/gpu/drm/display/drm_dp_aux_dev.o
+drivers/gpu/drm/display/drm_dp_cec.o

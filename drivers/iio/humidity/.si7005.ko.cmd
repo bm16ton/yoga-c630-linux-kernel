@@ -1,0 +1,1 @@
+cmd_drivers/iio/humidity/si7005.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/humidity/si7005.ko drivers/iio/humidity/si7005.o drivers/iio/humidity/si7005.mod.o;  true

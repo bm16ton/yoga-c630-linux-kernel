@@ -1,0 +1,1 @@
+cmd_sound/firewire/oxfw/snd-oxfw.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/oxfw/snd-oxfw.ko sound/firewire/oxfw/snd-oxfw.o sound/firewire/oxfw/snd-oxfw.mod.o;  true

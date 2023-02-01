@@ -1,0 +1,1 @@
+cmd_drivers/input/keyboard/tegra-kbc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/keyboard/tegra-kbc.ko drivers/input/keyboard/tegra-kbc.o drivers/input/keyboard/tegra-kbc.mod.o;  true

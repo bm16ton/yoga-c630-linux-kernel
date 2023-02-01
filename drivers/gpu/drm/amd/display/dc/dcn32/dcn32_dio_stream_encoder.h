@@ -71,7 +71,13 @@
 	SRI(DP_MSE_RATE_UPDATE, DP, id), \
 	SRI(DP_PIXEL_FORMAT, DP, id), \
 	SRI(DP_SEC_CNTL, DP, id), \
+<<<<<<< HEAD
+	SRI(DP_SEC_CNTL1, DP, id), \
 	SRI(DP_SEC_CNTL2, DP, id), \
+	SRI(DP_SEC_CNTL5, DP, id), \
+=======
+	SRI(DP_SEC_CNTL2, DP, id), \
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SRI(DP_SEC_CNTL6, DP, id), \
 	SRI(DP_STEER_FIFO, DP, id), \
 	SRI(DP_VID_M, DP, id), \
@@ -93,7 +99,11 @@
 	SRI(DIG_FIFO_CTRL0, DIG, id)
 
 
+<<<<<<< HEAD
+#define SE_COMMON_MASK_SH_LIST_DCN32(mask_sh)\
+=======
 #define SE_COMMON_MASK_SH_LIST_DCN32_BASE(mask_sh)\
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SE_SF(DP0_DP_PIXEL_FORMAT, DP_PIXEL_ENCODING, mask_sh),\
 	SE_SF(DP0_DP_PIXEL_FORMAT, DP_COMPONENT_DEPTH, mask_sh),\
 	SE_SF(DP0_DP_PIXEL_FORMAT, DP_PIXEL_PER_CYCLE_PROCESSING_MODE, mask_sh),\
@@ -106,6 +116,10 @@
 	SE_SF(DIG0_HDMI_VBI_PACKET_CONTROL, HDMI_GC_CONT, mask_sh),\
 	SE_SF(DIG0_HDMI_VBI_PACKET_CONTROL, HDMI_GC_SEND, mask_sh),\
 	SE_SF(DIG0_HDMI_VBI_PACKET_CONTROL, HDMI_NULL_SEND, mask_sh),\
+<<<<<<< HEAD
+	SE_SF(DIG0_HDMI_VBI_PACKET_CONTROL, HDMI_ACP_SEND, mask_sh),\
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	SE_SF(DIG0_HDMI_INFOFRAME_CONTROL0, HDMI_AUDIO_INFO_SEND, mask_sh),\
 	SE_SF(DIG0_HDMI_INFOFRAME_CONTROL1, HDMI_AUDIO_INFO_LINE, mask_sh),\
 	SE_SF(DIG0_HDMI_GC, HDMI_GC_AVMUTE, mask_sh),\
@@ -244,6 +258,8 @@
 	SE_SF(DIG0_DIG_FIFO_CTRL0, DIG_FIFO_RESET_DONE, mask_sh),\
 	SE_SF(DIG0_DIG_FIFO_CTRL0, DIG_FIFO_OUTPUT_PIXEL_MODE, mask_sh)
 
+<<<<<<< HEAD
+=======
 #if defined(CONFIG_DRM_AMD_DC_HDCP)
 #define SE_COMMON_MASK_SH_LIST_DCN32(mask_sh)\
 	SE_COMMON_MASK_SH_LIST_DCN32_BASE(mask_sh),\
@@ -253,6 +269,7 @@
 	SE_COMMON_MASK_SH_LIST_DCN32_BASE(mask_sh)
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void dcn32_dio_stream_encoder_construct(
 	struct dcn10_stream_encoder *enc1,
 	struct dc_context *ctx,

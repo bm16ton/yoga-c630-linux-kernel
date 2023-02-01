@@ -1,0 +1,1 @@
+cmd_net/bridge/netfilter/nft_meta_bridge.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/bridge/netfilter/nft_meta_bridge.ko net/bridge/netfilter/nft_meta_bridge.o net/bridge/netfilter/nft_meta_bridge.mod.o;  true

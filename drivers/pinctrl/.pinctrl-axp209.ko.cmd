@@ -1,0 +1,1 @@
+cmd_drivers/pinctrl/pinctrl-axp209.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/pinctrl/pinctrl-axp209.ko drivers/pinctrl/pinctrl-axp209.o drivers/pinctrl/pinctrl-axp209.mod.o;  true

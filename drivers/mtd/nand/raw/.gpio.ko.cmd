@@ -1,0 +1,1 @@
+cmd_drivers/mtd/nand/raw/gpio.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/nand/raw/gpio.ko drivers/mtd/nand/raw/gpio.o drivers/mtd/nand/raw/gpio.mod.o;  true

@@ -26,6 +26,14 @@
 顺便说下，中文文档也需要遵守内核编码风格，风格中中文和英文的主要不同就是中文
 的字符标点占用两个英文字符宽度， 所以，当英文要求不要超过每行100个字符时，
 中文就不要超过50个字符。另外，也要注意'-'，'=' 等符号与相关标题的对齐。在将
+<<<<<<< HEAD
+补丁提交到社区之前，一定要进行必要的 ``checkpatch.pl`` 检查和编译测试。
+
+与Linux 内核社区一起工作
+------------------------
+
+与内核开发社区进行协作并将工作推向上游的基本指南。
+=======
 补丁提交到社区之前，一定要进行必要的checkpatch.pl检查和编译测试。
 
 许可证文档
@@ -41,15 +49,80 @@
 
 下面的手册是为内核用户编写的——即那些试图让它在给定系统上以最佳方式工作的
 用户。
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+
+   process/development-process
+   process/submitting-patches
+   行为准则 <process/code-of-conduct>
+   maintainer/index
+   完整开发流程文档 <process/index>
+
+内部API文档
+-----------
+
+开发人员使用的内核内部交互接口手册。
+
+.. toctree::
+   :maxdepth: 1
+
+   core-api/index
+   driver-api/index
+   内核中的锁 <locking/index>
+
+TODOList:
+
+* subsystem-apis
+
+开发工具和流程
+--------------
+
+为所有内核开发人员提供有用信息的各种其他手册。
+
+.. toctree::
+   :maxdepth: 1
+
+   process/license-rules
+   doc-guide/index
+   dev-tools/index
+   dev-tools/testing-overview
+   kernel-hacking/index
+
+TODOList:
+
+* trace/index
+* fault-injection/index
+* livepatch/index
+
+面向用户的文档
+--------------
+
+下列手册针对
+希望内核在给定系统上以最佳方式工作的*用户*，
+和查找内核用户空间API信息的程序开发人员。
+
+.. toctree::
+   :maxdepth: 1
 
    admin-guide/index
+<<<<<<< HEAD
+   admin-guide/reporting-issues.rst
+
+TODOList:
+
+* 内核构建系统 <kbuild/index>
+* 用户空间工具 <tools/index>
+* userspace-api/index
+
+也可参考独立于内核文档的 `Linux 手册页 <https://www.kernel.org/doc/man-pages/>`_ 。
+=======
 
 TODOList:
 
 * kbuild/index
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 固件相关文档
 ------------
@@ -65,6 +138,10 @@ TODOList:
 
 * firmware-guide/index
 
+<<<<<<< HEAD
+体系结构文档
+------------
+=======
 应用程序开发人员文档
 --------------------
 
@@ -196,8 +273,25 @@ TODOList:
 
 * staging/index
 * watch_queue
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-目录和表格
+.. toctree::
+   :maxdepth: 2
+
+   arch
+
+其他文档
+--------
+
+有几份未排序的文档似乎不适合放在文档的其他部分，或者可能需要进行一些调整和/或
+转换为reStructureText格式，也有可能太旧。
+
+TODOList:
+
+* staging/index
+
+
+索引和表格
 ----------
 
 * :ref:`genindex`

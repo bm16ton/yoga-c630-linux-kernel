@@ -1,0 +1,4 @@
+drivers/gnss/gnss.ko
+drivers/gnss/gnss-serial.ko
+drivers/gnss/gnss-sirf.ko
+drivers/gnss/gnss-ubx.ko

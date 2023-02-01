@@ -153,6 +153,12 @@ enum pm_ioctl_id {
 	/* Runtime feature configuration */
 	IOCTL_SET_FEATURE_CONFIG = 26,
 	IOCTL_GET_FEATURE_CONFIG = 27,
+<<<<<<< HEAD
+	/* Dynamic SD/GEM configuration */
+	IOCTL_SET_SD_CONFIG = 30,
+	IOCTL_SET_GEM_CONFIG = 31,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum pm_query_id {
@@ -399,6 +405,33 @@ enum pm_feature_config_id {
 	PM_FEATURE_EXTWDT_VALUE = 4,
 };
 
+<<<<<<< HEAD
+/**
+ * enum pm_sd_config_type - PM SD configuration.
+ * @SD_CONFIG_EMMC_SEL: To set SD_EMMC_SEL in CTRL_REG_SD and SD_SLOTTYPE
+ * @SD_CONFIG_BASECLK: To set SD_BASECLK in SD_CONFIG_REG1
+ * @SD_CONFIG_8BIT: To set SD_8BIT in SD_CONFIG_REG2
+ * @SD_CONFIG_FIXED: To set fixed config registers
+ */
+enum pm_sd_config_type {
+	SD_CONFIG_EMMC_SEL = 1,
+	SD_CONFIG_BASECLK = 2,
+	SD_CONFIG_8BIT = 3,
+	SD_CONFIG_FIXED = 4,
+};
+
+/**
+ * enum pm_gem_config_type - PM GEM configuration.
+ * @GEM_CONFIG_SGMII_MODE: To set GEM_SGMII_MODE in GEM_CLK_CTRL register
+ * @GEM_CONFIG_FIXED: To set fixed config registers
+ */
+enum pm_gem_config_type {
+	GEM_CONFIG_SGMII_MODE = 1,
+	GEM_CONFIG_FIXED = 2,
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * struct zynqmp_pm_query_data - PM query data
  * @qid:	query ID
@@ -475,6 +508,12 @@ int zynqmp_pm_is_function_supported(const u32 api_id, const u32 id);
 int zynqmp_pm_set_feature_config(enum pm_feature_config_id id, u32 value);
 int zynqmp_pm_get_feature_config(enum pm_feature_config_id id, u32 *payload);
 int zynqmp_pm_register_sgi(u32 sgi_num, u32 reset);
+<<<<<<< HEAD
+int zynqmp_pm_set_sd_config(u32 node, enum pm_sd_config_type config, u32 value);
+int zynqmp_pm_set_gem_config(u32 node, enum pm_gem_config_type config,
+			     u32 value);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline int zynqmp_pm_get_api_version(u32 *version)
 {
@@ -745,6 +784,24 @@ static inline int zynqmp_pm_register_sgi(u32 sgi_num, u32 reset)
 {
 	return -ENODEV;
 }
+<<<<<<< HEAD
+
+static inline int zynqmp_pm_set_sd_config(u32 node,
+					  enum pm_sd_config_type config,
+					  u32 value)
+{
+	return -ENODEV;
+}
+
+static inline int zynqmp_pm_set_gem_config(u32 node,
+					   enum pm_gem_config_type config,
+					   u32 value)
+{
+	return -ENODEV;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #endif /* __FIRMWARE_ZYNQMP_H__ */

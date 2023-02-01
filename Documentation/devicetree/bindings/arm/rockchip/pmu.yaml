@@ -21,10 +21,18 @@ select:
         enum:
           - rockchip,px30-pmu
           - rockchip,rk3066-pmu
+<<<<<<< HEAD
+          - rockchip,rk3128-pmu
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - rockchip,rk3288-pmu
           - rockchip,rk3368-pmu
           - rockchip,rk3399-pmu
           - rockchip,rk3568-pmu
+<<<<<<< HEAD
+          - rockchip,rk3588-pmu
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   required:
     - compatible
@@ -35,10 +43,18 @@ properties:
       - enum:
           - rockchip,px30-pmu
           - rockchip,rk3066-pmu
+<<<<<<< HEAD
+          - rockchip,rk3128-pmu
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - rockchip,rk3288-pmu
           - rockchip,rk3368-pmu
           - rockchip,rk3399-pmu
           - rockchip,rk3568-pmu
+<<<<<<< HEAD
+          - rockchip,rk3588-pmu
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - const: syscon
       - const: simple-mfd
 

@@ -29,6 +29,10 @@
 #include <linux/uts.h>
 #include <linux/utsname.h>
 #include <linux/ctype.h>
+<<<<<<< HEAD
+#include <generated/utsversion.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <generated/utsrelease.h>
 
 #define _SETUP

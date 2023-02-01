@@ -176,9 +176,12 @@ struct thread_struct {
 
 struct task_struct;
 
+<<<<<<< HEAD
+=======
 /* Free all resources held by a thread. */
 #define release_thread(thread) do { } while (0)
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum idle_boot_override {IDLE_NO_OVERRIDE = 0, IDLE_HALT, IDLE_NOMWAIT, IDLE_POLL};
 
 extern unsigned long		boot_option_idle_override;
@@ -194,7 +197,11 @@ static inline void flush_thread(void)
 unsigned long __get_wchan(struct task_struct *p);
 
 #define __KSTK_TOS(tsk) ((unsigned long)task_stack_page(tsk) + \
+<<<<<<< HEAD
+			 THREAD_SIZE - sizeof(struct pt_regs))
+=======
 			 THREAD_SIZE - 32 - sizeof(struct pt_regs))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define task_pt_regs(tsk) ((struct pt_regs *)__KSTK_TOS(tsk))
 #define KSTK_EIP(tsk) (task_pt_regs(tsk)->csr_era)
 #define KSTK_ESP(tsk) (task_pt_regs(tsk)->regs[3])

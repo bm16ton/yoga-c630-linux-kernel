@@ -21,6 +21,20 @@
 #define sof_ops(sdev) \
 	((sdev)->pdata->desc->ops)
 
+static inline int sof_ops_init(struct snd_sof_dev *sdev)
+{
+	if (sdev->pdata->desc->ops_init)
+		return sdev->pdata->desc->ops_init(sdev);
+
+	return 0;
+}
+
+static inline void sof_ops_free(struct snd_sof_dev *sdev)
+{
+	if (sdev->pdata->desc->ops_free)
+		sdev->pdata->desc->ops_free(sdev);
+}
+
 /* Mandatory operations are verified during probing */
 
 /* init */
@@ -334,6 +348,17 @@ static inline u64 snd_sof_dsp_read64(struct snd_sof_dev *sdev, u32 bar,
 static inline int snd_sof_dsp_block_read(struct snd_sof_dev *sdev,
 					 enum snd_sof_fw_blk_type blk_type,
 					 u32 offset, void *dest, size_t bytes)
+<<<<<<< HEAD
+{
+	return sof_ops(sdev)->block_read(sdev, blk_type, offset, dest, bytes);
+}
+
+static inline int snd_sof_dsp_block_write(struct snd_sof_dev *sdev,
+					  enum snd_sof_fw_blk_type blk_type,
+					  u32 offset, void *src, size_t bytes)
+{
+	return sof_ops(sdev)->block_write(sdev, blk_type, offset, src, bytes);
+=======
 {
 	return sof_ops(sdev)->block_read(sdev, blk_type, offset, dest, bytes);
 }
@@ -358,15 +383,24 @@ static inline void snd_sof_dsp_mailbox_write(struct snd_sof_dev *sdev,
 {
 	if (sof_ops(sdev)->mailbox_write)
 		sof_ops(sdev)->mailbox_write(sdev, offset, src, bytes);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
-/* ipc */
-static inline int snd_sof_dsp_send_msg(struct snd_sof_dev *sdev,
-				       struct snd_sof_ipc_msg *msg)
+/* mailbox IO */
+static inline void snd_sof_dsp_mailbox_read(struct snd_sof_dev *sdev,
+					    u32 offset, void *dest, size_t bytes)
 {
-	return sof_ops(sdev)->send_msg(sdev, msg);
+	if (sof_ops(sdev)->mailbox_read)
+		sof_ops(sdev)->mailbox_read(sdev, offset, dest, bytes);
 }
 
+<<<<<<< HEAD
+static inline void snd_sof_dsp_mailbox_write(struct snd_sof_dev *sdev,
+					     u32 offset, void *src, size_t bytes)
+{
+	if (sof_ops(sdev)->mailbox_write)
+		sof_ops(sdev)->mailbox_write(sdev, offset, src, bytes);
+=======
 /* host DMA trace */
 static inline int snd_sof_dma_trace_init(struct snd_sof_dev *sdev,
 					 struct sof_ipc_dma_trace_params_ext *dtrace_params)
@@ -375,22 +409,14 @@ static inline int snd_sof_dma_trace_init(struct snd_sof_dev *sdev,
 		return sof_ops(sdev)->trace_init(sdev, dtrace_params);
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
-static inline int snd_sof_dma_trace_release(struct snd_sof_dev *sdev)
+/* ipc */
+static inline int snd_sof_dsp_send_msg(struct snd_sof_dev *sdev,
+				       struct snd_sof_ipc_msg *msg)
 {
-	if (sof_ops(sdev)->trace_release)
-		return sof_ops(sdev)->trace_release(sdev);
-
-	return 0;
-}
-
-static inline int snd_sof_dma_trace_trigger(struct snd_sof_dev *sdev, int cmd)
-{
-	if (sof_ops(sdev)->trace_trigger)
-		return sof_ops(sdev)->trace_trigger(sdev, cmd);
-
-	return 0;
+	return sof_ops(sdev)->send_msg(sdev, msg);
 }
 
 /* host PCM ops */

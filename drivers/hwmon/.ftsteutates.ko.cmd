@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/ftsteutates.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/ftsteutates.ko drivers/hwmon/ftsteutates.o drivers/hwmon/ftsteutates.mod.o;  true

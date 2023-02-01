@@ -1,0 +1,1 @@
+cmd_drivers/gnss/modules.order := {   echo drivers/gnss/gnss.ko;   echo drivers/gnss/gnss-serial.ko;   echo drivers/gnss/gnss-sirf.ko;   echo drivers/gnss/gnss-ubx.ko; :; } > drivers/gnss/modules.order

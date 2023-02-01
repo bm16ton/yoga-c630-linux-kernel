@@ -15,7 +15,11 @@
 
 #include <asm/sections.h>
 
+<<<<<<< HEAD
+#define KSYM_NAME_LEN 512
+=======
 #define KSYM_NAME_LEN 128
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define KSYM_SYMBOL_LEN (sizeof("%s+%#lx/%#lx [%s %s]") + \
 			(KSYM_NAME_LEN - 1) + \
 			2*(BITS_PER_LONG*3/10) + (MODULE_NAME_LEN - 1) + \

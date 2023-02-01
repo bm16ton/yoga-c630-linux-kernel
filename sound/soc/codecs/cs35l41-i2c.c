@@ -56,13 +56,20 @@ static int cs35l41_i2c_probe(struct i2c_client *client)
 	return cs35l41_probe(cs35l41, hw_cfg);
 }
 
+<<<<<<< HEAD
+static void cs35l41_i2c_remove(struct i2c_client *client)
+=======
 static int cs35l41_i2c_remove(struct i2c_client *client)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct cs35l41_private *cs35l41 = i2c_get_clientdata(client);
 
 	cs35l41_remove(cs35l41);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_OF

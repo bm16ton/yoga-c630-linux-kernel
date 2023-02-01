@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/armmmci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/armmmci.ko drivers/mmc/host/armmmci.o drivers/mmc/host/armmmci.mod.o;  true

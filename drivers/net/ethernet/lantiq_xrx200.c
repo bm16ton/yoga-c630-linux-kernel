@@ -620,8 +620,12 @@ static int xrx200_probe(struct platform_device *pdev)
 			 PMAC_HD_CTL);
 
 	/* setup NAPI */
+<<<<<<< HEAD
+	netif_napi_add(net_dev, &priv->chan_rx.napi, xrx200_poll_rx);
+=======
 	netif_napi_add(net_dev, &priv->chan_rx.napi, xrx200_poll_rx,
 		       NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	netif_napi_add_tx(net_dev, &priv->chan_tx.napi,
 			  xrx200_tx_housekeeping);
 

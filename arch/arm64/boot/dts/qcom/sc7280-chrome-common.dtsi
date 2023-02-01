@@ -83,6 +83,8 @@
 	};
 };
 
+<<<<<<< HEAD
+=======
 /* Modem setup is different on Chrome setups than typical Qualcomm setup */
 &remoteproc_mpss {
 	status = "okay";
@@ -94,6 +96,7 @@
 			"qcom/sc7280-herobrine/modem/qdsp6sw.mbn";
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &remoteproc_wpss {
 	status = "okay";
 	firmware-name = "ath11k/WCN6750/hw1.0/wpss.mdt";

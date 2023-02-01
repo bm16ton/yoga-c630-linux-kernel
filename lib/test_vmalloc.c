@@ -80,7 +80,11 @@ static int random_size_align_alloc_test(void)
 	int i;
 
 	for (i = 0; i < test_loop_count; i++) {
+<<<<<<< HEAD
+		rnd = get_random_u8();
+=======
 		rnd = prandom_u32();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * Maximum 1024 pages, if PAGE_SIZE is 4096.
@@ -151,9 +155,13 @@ static int random_size_alloc_test(void)
 	int i;
 
 	for (i = 0; i < test_loop_count; i++) {
+<<<<<<< HEAD
+		n = prandom_u32_max(100) + 1;
+=======
 		n = prandom_u32();
 		n = (n % 100) + 1;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		p = vmalloc(n * PAGE_SIZE);
 
 		if (!p)
@@ -293,16 +301,24 @@ pcpu_alloc_test(void)
 		return -1;
 
 	for (i = 0; i < 35000; i++) {
+<<<<<<< HEAD
+		size = prandom_u32_max(PAGE_SIZE / 4) + 1;
+=======
 		unsigned int r;
 
 		r = prandom_u32();
 		size = (r % (PAGE_SIZE / 4)) + 1;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * Maximum PAGE_SIZE
 		 */
+<<<<<<< HEAD
+		align = 1 << (prandom_u32_max(11) + 1);
+=======
 		r = prandom_u32();
 		align = 1 << ((r % 11) + 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		pcpu[i] = __alloc_percpu(size, align);
 		if (!pcpu[i])
@@ -393,14 +409,20 @@ static struct test_driver {
 
 static void shuffle_array(int *arr, int n)
 {
+<<<<<<< HEAD
+	int i, j;
+
+	for (i = n - 1; i > 0; i--)  {
+=======
 	unsigned int rnd;
 	int i, j;
 
 	for (i = n - 1; i > 0; i--)  {
 		rnd = prandom_u32();
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Cut the range. */
-		j = rnd % i;
+		j = prandom_u32_max(i);
 
 		/* Swap indexes. */
 		swap(arr[i], arr[j]);

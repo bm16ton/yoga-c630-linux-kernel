@@ -1,0 +1,17 @@
+drivers/iio/gyro/adis16080.ko
+drivers/iio/gyro/adis16130.ko
+drivers/iio/gyro/adis16136.ko
+drivers/iio/gyro/adis16260.ko
+drivers/iio/gyro/adxrs290.ko
+drivers/iio/gyro/adxrs450.ko
+drivers/iio/gyro/bmg160_core.ko
+drivers/iio/gyro/bmg160_i2c.ko
+drivers/iio/gyro/bmg160_spi.ko
+drivers/iio/gyro/fxas21002c_core.ko
+drivers/iio/gyro/fxas21002c_i2c.ko
+drivers/iio/gyro/fxas21002c_spi.ko
+drivers/iio/gyro/mpu3050.ko
+drivers/iio/gyro/itg3200.ko
+drivers/iio/gyro/st_gyro.ko
+drivers/iio/gyro/st_gyro_i2c.ko
+drivers/iio/gyro/st_gyro_spi.ko

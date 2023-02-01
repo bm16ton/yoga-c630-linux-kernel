@@ -1,0 +1,14 @@
+drivers/net/wireguard/main.o
+drivers/net/wireguard/noise.o
+drivers/net/wireguard/device.o
+drivers/net/wireguard/peer.o
+drivers/net/wireguard/timers.o
+drivers/net/wireguard/queueing.o
+drivers/net/wireguard/send.o
+drivers/net/wireguard/receive.o
+drivers/net/wireguard/socket.o
+drivers/net/wireguard/peerlookup.o
+drivers/net/wireguard/allowedips.o
+drivers/net/wireguard/ratelimiter.o
+drivers/net/wireguard/cookie.o
+drivers/net/wireguard/netlink.o

@@ -1,0 +1,1 @@
+cmd_drivers/platform/chrome/cros_usbpd_logger.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/platform/chrome/cros_usbpd_logger.ko drivers/platform/chrome/cros_usbpd_logger.o drivers/platform/chrome/cros_usbpd_logger.mod.o;  true

@@ -1,0 +1,16 @@
+sm8450-sony-xperia-nagara-pdx223.o: \
+ arch/arm64/boot/dts/qcom/sm8450-sony-xperia-nagara-pdx223.dts \
+ scripts/dtc/include-prefixes/dt-bindings/regulator/qcom,rpmh-regulator.h \
+ arch/arm64/boot/dts/qcom/sm8450.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/qcom,gcc-sm8450.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/qcom,rpmh.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/qcom,sm8450-camcc.h \
+ scripts/dtc/include-prefixes/dt-bindings/dma/qcom-gpi.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/mailbox/qcom-ipcc.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/qcom-rpmpd.h \
+ scripts/dtc/include-prefixes/dt-bindings/interconnect/qcom,sm8450.h \
+ scripts/dtc/include-prefixes/dt-bindings/soc/qcom,rpmh-rsc.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h

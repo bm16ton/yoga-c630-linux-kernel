@@ -380,6 +380,7 @@ static int xlnx_formatter_pcm_open(struct snd_soc_component *component,
 	runtime->private_data = stream_data;
 
 	/* Resize the period bytes as divisible by 64 */
+<<<<<<< HEAD
 	err = snd_pcm_hw_constraint_step(runtime, 0,
 					 SNDRV_PCM_HW_PARAM_PERIOD_BYTES,
 					 XLNX_AUD_ALIGN_BYTES);
@@ -395,6 +396,23 @@ static int xlnx_formatter_pcm_open(struct snd_soc_component *component,
 					 XLNX_AUD_ALIGN_BYTES);
 	if (err) {
 		dev_err(component->dev,
+=======
+	err = snd_pcm_hw_constraint_step(runtime, 0,
+					 SNDRV_PCM_HW_PARAM_PERIOD_BYTES,
+					 XLNX_AUD_ALIGN_BYTES);
+	if (err) {
+		dev_err(component->dev,
+			"Unable to set constraint on period bytes\n");
+		return err;
+	}
+
+	/* Resize the buffer bytes as divisible by 64 */
+	err = snd_pcm_hw_constraint_step(runtime, 0,
+					 SNDRV_PCM_HW_PARAM_BUFFER_BYTES,
+					 XLNX_AUD_ALIGN_BYTES);
+	if (err) {
+		dev_err(component->dev,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			"Unable to set constraint on buffer bytes\n");
 		return err;
 	}
@@ -575,6 +593,16 @@ static int xlnx_formatter_pcm_new(struct snd_soc_component *component,
 }
 
 static const struct snd_soc_component_driver xlnx_asoc_component = {
+<<<<<<< HEAD
+	.name			= DRV_NAME,
+	.set_sysclk		= xlnx_formatter_set_sysclk,
+	.open			= xlnx_formatter_pcm_open,
+	.close			= xlnx_formatter_pcm_close,
+	.hw_params		= xlnx_formatter_pcm_hw_params,
+	.trigger		= xlnx_formatter_pcm_trigger,
+	.pointer		= xlnx_formatter_pcm_pointer,
+	.pcm_construct		= xlnx_formatter_pcm_new,
+=======
 	.name		= DRV_NAME,
 	.set_sysclk	= xlnx_formatter_set_sysclk,
 	.open		= xlnx_formatter_pcm_open,
@@ -583,6 +611,7 @@ static const struct snd_soc_component_driver xlnx_asoc_component = {
 	.trigger	= xlnx_formatter_pcm_trigger,
 	.pointer	= xlnx_formatter_pcm_pointer,
 	.pcm_construct	= xlnx_formatter_pcm_new,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int xlnx_formatter_pcm_probe(struct platform_device *pdev)
@@ -703,7 +732,7 @@ static int xlnx_formatter_pcm_remove(struct platform_device *pdev)
 		dev_err(&pdev->dev, "audio formatter reset failed\n");
 
 	clk_disable_unprepare(adata->axi_clk);
-	return ret;
+	return 0;
 }
 
 static const struct of_device_id xlnx_formatter_pcm_of_match[] = {

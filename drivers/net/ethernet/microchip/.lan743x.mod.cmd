@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/microchip/lan743x.mod := printf '%s\n'   lan743x_main.o lan743x_ethtool.o lan743x_ptp.o | awk '!x[$$0]++ { print("drivers/net/ethernet/microchip/"$$0) }' > drivers/net/ethernet/microchip/lan743x.mod

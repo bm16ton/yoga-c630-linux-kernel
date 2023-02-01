@@ -1,0 +1,1 @@
+cmd_sound/pci/hda/snd-hda-codec-si3054.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/hda/snd-hda-codec-si3054.ko sound/pci/hda/snd-hda-codec-si3054.o sound/pci/hda/snd-hda-codec-si3054.mod.o;  true

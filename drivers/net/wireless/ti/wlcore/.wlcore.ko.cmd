@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ti/wlcore/wlcore.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/ti/wlcore/wlcore.ko drivers/net/wireless/ti/wlcore/wlcore.o drivers/net/wireless/ti/wlcore/wlcore.mod.o;  true

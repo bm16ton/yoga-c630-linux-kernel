@@ -1,0 +1,1 @@
+cmd_drivers/bcma/bcma.mod := printf '%s\n'   main.o scan.o core.o sprom.o driver_chipcommon.o driver_chipcommon_pmu.o driver_chipcommon_b.o driver_pci.o driver_pcie2.o host_pci.o | awk '!x[$$0]++ { print("drivers/bcma/"$$0) }' > drivers/bcma/bcma.mod

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/csiostor/csiostor.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/csiostor/csiostor.ko drivers/scsi/csiostor/csiostor.o drivers/scsi/csiostor/csiostor.mod.o;  true

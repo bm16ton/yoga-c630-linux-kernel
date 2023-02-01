@@ -217,10 +217,16 @@ static ssize_t sof_ipc_flood_dfs_write(struct file *file, const char __user *buf
 			ipc_count = MAX_IPC_FLOOD_COUNT;
 	}
 
+<<<<<<< HEAD
+	ret = pm_runtime_resume_and_get(dev);
+	if (ret < 0 && ret != -EACCES) {
+		dev_err_ratelimited(dev, "debugfs write failed to resume %d\n", ret);
+=======
 	ret = pm_runtime_get_sync(dev);
 	if (ret < 0 && ret != -EACCES) {
 		dev_err_ratelimited(dev, "debugfs write failed to resume %d\n", ret);
 		pm_runtime_put_noidle(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out;
 	}
 

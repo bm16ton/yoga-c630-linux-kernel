@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/dp83tc811.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/dp83tc811.ko drivers/net/phy/dp83tc811.o drivers/net/phy/dp83tc811.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/crypto/inside-secure/crypto_safexcel.mod := printf '%s\n'   safexcel.o safexcel_ring.o safexcel_cipher.o safexcel_hash.o | awk '!x[$$0]++ { print("drivers/crypto/inside-secure/"$$0) }' > drivers/crypto/inside-secure/crypto_safexcel.mod

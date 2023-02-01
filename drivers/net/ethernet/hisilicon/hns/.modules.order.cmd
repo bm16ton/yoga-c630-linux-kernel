@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns/modules.order := {   echo drivers/net/ethernet/hisilicon/hns/hnae.ko;   echo drivers/net/ethernet/hisilicon/hns/hns_dsaf.ko;   echo drivers/net/ethernet/hisilicon/hns/hns_enet_drv.ko; :; } > drivers/net/ethernet/hisilicon/hns/modules.order

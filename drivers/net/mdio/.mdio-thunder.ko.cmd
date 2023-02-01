@@ -1,0 +1,1 @@
+cmd_drivers/net/mdio/mdio-thunder.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/mdio/mdio-thunder.ko drivers/net/mdio/mdio-thunder.o drivers/net/mdio/mdio-thunder.mod.o;  true

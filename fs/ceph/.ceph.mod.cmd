@@ -1,0 +1,1 @@
+cmd_fs/ceph/ceph.mod := printf '%s\n'   super.o inode.o dir.o file.o locks.o addr.o ioctl.o export.o caps.o snap.o xattr.o quota.o io.o mds_client.o mdsmap.o strings.o ceph_frag.o debugfs.o util.o metric.o cache.o acl.o | awk '!x[$$0]++ { print("fs/ceph/"$$0) }' > fs/ceph/ceph.mod

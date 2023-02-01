@@ -1,0 +1,1 @@
+cmd_drivers/message/fusion/mptsas.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/message/fusion/mptsas.ko drivers/message/fusion/mptsas.o drivers/message/fusion/mptsas.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/mmc/core/built-in.a := rm -f drivers/mmc/core/built-in.a;  printf "drivers/mmc/core/%s " core.o bus.o host.o mmc.o mmc_ops.o sd.o sd_ops.o sdio.o sdio_ops.o sdio_bus.o sdio_cis.o sdio_io.o sdio_irq.o slot-gpio.o regulator.o pwrseq.o debugfs.o crypto.o pwrseq_simple.o pwrseq_emmc.o block.o queue.o | xargs ar cDPrST drivers/mmc/core/built-in.a

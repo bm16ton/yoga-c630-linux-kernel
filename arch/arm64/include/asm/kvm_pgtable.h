@@ -13,12 +13,33 @@
 
 #define KVM_PGTABLE_MAX_LEVELS		4U
 
+<<<<<<< HEAD
+/*
+ * The largest supported block sizes for KVM (no 52-bit PA support):
+ *  - 4K (level 1):	1GB
+ *  - 16K (level 2):	32MB
+ *  - 64K (level 2):	512MB
+ */
+#ifdef CONFIG_ARM64_4K_PAGES
+#define KVM_PGTABLE_MIN_BLOCK_LEVEL	1U
+#else
+#define KVM_PGTABLE_MIN_BLOCK_LEVEL	2U
+#endif
+
+static inline u64 kvm_get_parange(u64 mmfr0)
+{
+	u64 parange = cpuid_feature_extract_unsigned_field(mmfr0,
+				ID_AA64MMFR0_EL1_PARANGE_SHIFT);
+	if (parange > ID_AA64MMFR0_EL1_PARANGE_MAX)
+		parange = ID_AA64MMFR0_EL1_PARANGE_MAX;
+=======
 static inline u64 kvm_get_parange(u64 mmfr0)
 {
 	u64 parange = cpuid_feature_extract_unsigned_field(mmfr0,
 				ID_AA64MMFR0_PARANGE_SHIFT);
 	if (parange > ID_AA64MMFR0_PARANGE_MAX)
 		parange = ID_AA64MMFR0_PARANGE_MAX;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return parange;
 }
@@ -58,11 +79,15 @@ static inline u64 kvm_granule_size(u32 level)
 
 static inline bool kvm_level_supports_block_mapping(u32 level)
 {
+<<<<<<< HEAD
+	return level >= KVM_PGTABLE_MIN_BLOCK_LEVEL;
+=======
 	/*
 	 * Reject invalid block mappings and don't bother with 4TB mappings for
 	 * 52-bit PAs.
 	 */
 	return !(level == 0 || (PAGE_SIZE != SZ_4K && level == 1));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/panfrost/panfrost.mod := printf '%s\n'   panfrost_drv.o panfrost_device.o panfrost_devfreq.o panfrost_gem.o panfrost_gem_shrinker.o panfrost_gpu.o panfrost_job.o panfrost_mmu.o panfrost_perfcnt.o panfrost_dump.o | awk '!x[$$0]++ { print("drivers/gpu/drm/panfrost/"$$0) }' > drivers/gpu/drm/panfrost/panfrost.mod

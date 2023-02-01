@@ -1,0 +1,1 @@
+cmd_drivers/message/fusion/mptctl.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/message/fusion/mptctl.ko drivers/message/fusion/mptctl.o drivers/message/fusion/mptctl.mod.o;  true

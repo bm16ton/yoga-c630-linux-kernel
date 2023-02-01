@@ -1,0 +1,1 @@
+cmd_drivers/leds/trigger/ledtrig-camera.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/trigger/ledtrig-camera.ko drivers/leds/trigger/ledtrig-camera.o drivers/leds/trigger/ledtrig-camera.mod.o;  true

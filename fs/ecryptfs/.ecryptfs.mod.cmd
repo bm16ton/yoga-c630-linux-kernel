@@ -1,0 +1,1 @@
+cmd_fs/ecryptfs/ecryptfs.mod := printf '%s\n'   dentry.o file.o inode.o main.o super.o mmap.o read_write.o crypto.o keystore.o kthread.o debug.o messaging.o miscdev.o | awk '!x[$$0]++ { print("fs/ecryptfs/"$$0) }' > fs/ecryptfs/ecryptfs.mod

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-total-media-in-hand-02.mod := printf '%s\n'   rc-total-media-in-hand-02.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-total-media-in-hand-02.mod

@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/function/usb_f_uac2.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/function/usb_f_uac2.ko drivers/usb/gadget/function/usb_f_uac2.o drivers/usb/gadget/function/usb_f_uac2.mod.o;  true

@@ -1,0 +1,3 @@
+drivers/iio/imu/st_lsm6dsx/st_lsm6dsx.ko
+drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_i2c.ko
+drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_spi.ko

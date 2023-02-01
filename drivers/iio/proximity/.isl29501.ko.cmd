@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/isl29501.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/isl29501.ko drivers/iio/proximity/isl29501.o drivers/iio/proximity/isl29501.mod.o;  true

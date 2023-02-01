@@ -151,9 +151,9 @@ static DEFINE_IDA(hwmon_ida);
  * between hwmon and thermal_sys modules.
  */
 #ifdef CONFIG_THERMAL_OF
-static int hwmon_thermal_get_temp(void *data, int *temp)
+static int hwmon_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 {
-	struct hwmon_thermal_data *tdata = data;
+	struct hwmon_thermal_data *tdata = tz->devdata;
 	struct hwmon_device *hwdev = to_hwmon_device(tdata->dev);
 	int ret;
 	long t;
@@ -168,9 +168,15 @@ static int hwmon_thermal_get_temp(void *data, int *temp)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int hwmon_thermal_set_trips(struct thermal_zone_device *tz, int low, int high)
+{
+	struct hwmon_thermal_data *tdata = tz->devdata;
+=======
 static int hwmon_thermal_set_trips(void *data, int low, int high)
 {
 	struct hwmon_thermal_data *tdata = data;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct hwmon_device *hwdev = to_hwmon_device(tdata->dev);
 	const struct hwmon_chip_info *chip = hwdev->chip;
 	const struct hwmon_channel_info **info = chip->info;
@@ -203,7 +209,11 @@ static int hwmon_thermal_set_trips(void *data, int low, int high)
 	return 0;
 }
 
+<<<<<<< HEAD
+static const struct thermal_zone_device_ops hwmon_thermal_ops = {
+=======
 static const struct thermal_zone_of_device_ops hwmon_thermal_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_temp = hwmon_thermal_get_temp,
 	.set_trips = hwmon_thermal_set_trips,
 };
@@ -227,8 +237,13 @@ static int hwmon_thermal_add_sensor(struct device *dev, int index)
 	tdata->dev = dev;
 	tdata->index = index;
 
+<<<<<<< HEAD
+	tzd = devm_thermal_of_zone_register(dev, index, tdata,
+					    &hwmon_thermal_ops);
+=======
 	tzd = devm_thermal_zone_of_sensor_register(dev, index, tdata,
 						   &hwmon_thermal_ops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(tzd)) {
 		if (PTR_ERR(tzd) != -ENODEV)
 			return PTR_ERR(tzd);

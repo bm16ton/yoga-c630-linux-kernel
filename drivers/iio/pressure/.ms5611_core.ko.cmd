@@ -1,0 +1,1 @@
+cmd_drivers/iio/pressure/ms5611_core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/pressure/ms5611_core.ko drivers/iio/pressure/ms5611_core.o drivers/iio/pressure/ms5611_core.mod.o;  true

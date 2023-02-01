@@ -636,7 +636,7 @@ xfs_ialloc_ag_alloc(
 	/* randomly do sparse inode allocations */
 	if (xfs_has_sparseinodes(tp->t_mountp) &&
 	    igeo->ialloc_min_blks < igeo->ialloc_blks)
-		do_sparse = prandom_u32() & 1;
+		do_sparse = prandom_u32_max(2);
 #endif
 
 	/*
@@ -805,7 +805,11 @@ sparse_alloc:
 	 * number from being easily guessable.
 	 */
 	error = xfs_ialloc_inode_init(args.mp, tp, NULL, newlen, pag->pag_agno,
+<<<<<<< HEAD
+			args.agbno, args.len, get_random_u32());
+=======
 			args.agbno, args.len, prandom_u32());
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (error)
 		return error;

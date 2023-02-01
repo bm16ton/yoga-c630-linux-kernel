@@ -995,6 +995,7 @@ bool drm_helper_hpd_irq_event(struct drm_device *dev)
 				drm_connector_get(connector);
 				first_changed_connector = connector;
 			}
+<<<<<<< HEAD
 
 			changed++;
 		}
@@ -1012,6 +1013,124 @@ bool drm_helper_hpd_irq_event(struct drm_device *dev)
 
 	return changed;
 }
+EXPORT_SYMBOL(drm_helper_hpd_irq_event);
+
+/**
+ * drm_crtc_helper_mode_valid_fixed - Validates a display mode
+ * @crtc: the crtc
+ * @mode: the mode to validate
+ * @fixed_mode: the display hardware's mode
+ *
+ * Returns:
+ * MODE_OK on success, or another mode-status code otherwise.
+ */
+enum drm_mode_status drm_crtc_helper_mode_valid_fixed(struct drm_crtc *crtc,
+						      const struct drm_display_mode *mode,
+						      const struct drm_display_mode *fixed_mode)
+{
+	if (mode->hdisplay != fixed_mode->hdisplay && mode->vdisplay != fixed_mode->vdisplay)
+		return MODE_ONE_SIZE;
+	else if (mode->hdisplay != fixed_mode->hdisplay)
+		return MODE_ONE_WIDTH;
+	else if (mode->vdisplay != fixed_mode->vdisplay)
+		return MODE_ONE_HEIGHT;
+
+	return MODE_OK;
+}
+EXPORT_SYMBOL(drm_crtc_helper_mode_valid_fixed);
+
+/**
+ * drm_connector_helper_get_modes_from_ddc - Updates the connector's EDID
+ *                                           property from the connector's
+ *                                           DDC channel
+ * @connector: The connector
+ *
+ * Returns:
+ * The number of detected display modes.
+ *
+ * Uses a connector's DDC channel to retrieve EDID data and update the
+ * connector's EDID property and display modes. Drivers can use this
+ * function to implement struct &drm_connector_helper_funcs.get_modes
+ * for connectors with a DDC channel.
+ */
+int drm_connector_helper_get_modes_from_ddc(struct drm_connector *connector)
+{
+	struct edid *edid;
+	int count = 0;
+
+	if (!connector->ddc)
+		return 0;
+
+	edid = drm_get_edid(connector, connector->ddc);
+
+	// clears property if EDID is NULL
+	drm_connector_update_edid_property(connector, edid);
+
+	if (edid) {
+		count = drm_add_edid_modes(connector, edid);
+		kfree(edid);
+=======
+
+			changed++;
+		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	}
+
+<<<<<<< HEAD
+	return count;
+}
+EXPORT_SYMBOL(drm_connector_helper_get_modes_from_ddc);
+
+/**
+ * drm_connector_helper_get_modes_fixed - Duplicates a display mode for a connector
+ * @connector: the connector
+ * @fixed_mode: the display hardware's mode
+ *
+ * This function duplicates a display modes for a connector. Drivers for hardware
+ * that only supports a single fixed mode can use this function in their connector's
+ * get_modes helper.
+ *
+ * Returns:
+ * The number of created modes.
+ */
+int drm_connector_helper_get_modes_fixed(struct drm_connector *connector,
+					 const struct drm_display_mode *fixed_mode)
+{
+	struct drm_device *dev = connector->dev;
+	struct drm_display_mode *mode;
+
+	mode = drm_mode_duplicate(dev, fixed_mode);
+	if (!mode) {
+		drm_err(dev, "Failed to duplicate mode " DRM_MODE_FMT "\n",
+			DRM_MODE_ARG(fixed_mode));
+		return 0;
+	}
+=======
+	if (changed == 1)
+		drm_kms_helper_connector_hotplug_event(first_changed_connector);
+	else if (changed > 0)
+		drm_kms_helper_hotplug_event(dev);
+
+	if (first_changed_connector)
+		drm_connector_put(first_changed_connector);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	if (mode->name[0] == '\0')
+		drm_mode_set_name(mode);
+
+	mode->type |= DRM_MODE_TYPE_PREFERRED;
+	drm_mode_probed_add(connector, mode);
+
+	if (mode->width_mm)
+		connector->display_info.width_mm = mode->width_mm;
+	if (mode->height_mm)
+		connector->display_info.height_mm = mode->height_mm;
+
+	return 1;
+}
+<<<<<<< HEAD
+EXPORT_SYMBOL(drm_connector_helper_get_modes_fixed);
+=======
 EXPORT_SYMBOL(drm_helper_hpd_irq_event);
 
 /**
@@ -1049,6 +1168,7 @@ int drm_connector_helper_get_modes_from_ddc(struct drm_connector *connector)
 	return count;
 }
 EXPORT_SYMBOL(drm_connector_helper_get_modes_from_ddc);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * drm_connector_helper_get_modes - Read EDID and update connector.

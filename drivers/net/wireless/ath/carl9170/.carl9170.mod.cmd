@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/carl9170/carl9170.mod := printf '%s\n'   main.o usb.o cmd.o mac.o phy.o led.o fw.o tx.o rx.o debug.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/carl9170/"$$0) }' > drivers/net/wireless/ath/carl9170/carl9170.mod

@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipvs/ip_vs.mod := printf '%s\n'   ip_vs_conn.o ip_vs_core.o ip_vs_ctl.o ip_vs_sched.o ip_vs_xmit.o ip_vs_app.o ip_vs_sync.o ip_vs_est.o ip_vs_proto.o ip_vs_pe.o ip_vs_proto_tcp.o ip_vs_proto_udp.o ip_vs_proto_ah_esp.o ip_vs_proto_sctp.o ip_vs_nfct.o | awk '!x[$$0]++ { print("net/netfilter/ipvs/"$$0) }' > net/netfilter/ipvs/ip_vs.mod

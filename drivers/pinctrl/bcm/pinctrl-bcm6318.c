@@ -27,12 +27,15 @@
 #define BCM6318_PAD_REG		0x54
 #define  BCM6328_PAD_MASK	GENMASK(3, 0)
 
+<<<<<<< HEAD
+=======
 struct bcm6318_pingroup {
 	const char *name;
 	const unsigned * const pins;
 	const unsigned num_pins;
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct bcm6318_function {
 	const char *name;
 	const char * const *groups;
@@ -146,6 +149,59 @@ static unsigned gpio47_pins[] = { 47 };
 static unsigned gpio48_pins[] = { 48 };
 static unsigned gpio49_pins[] = { 49 };
 
+<<<<<<< HEAD
+static struct pingroup bcm6318_groups[] = {
+	BCM_PIN_GROUP(gpio0),
+	BCM_PIN_GROUP(gpio1),
+	BCM_PIN_GROUP(gpio2),
+	BCM_PIN_GROUP(gpio3),
+	BCM_PIN_GROUP(gpio4),
+	BCM_PIN_GROUP(gpio5),
+	BCM_PIN_GROUP(gpio6),
+	BCM_PIN_GROUP(gpio7),
+	BCM_PIN_GROUP(gpio8),
+	BCM_PIN_GROUP(gpio9),
+	BCM_PIN_GROUP(gpio10),
+	BCM_PIN_GROUP(gpio11),
+	BCM_PIN_GROUP(gpio12),
+	BCM_PIN_GROUP(gpio13),
+	BCM_PIN_GROUP(gpio14),
+	BCM_PIN_GROUP(gpio15),
+	BCM_PIN_GROUP(gpio16),
+	BCM_PIN_GROUP(gpio17),
+	BCM_PIN_GROUP(gpio18),
+	BCM_PIN_GROUP(gpio19),
+	BCM_PIN_GROUP(gpio20),
+	BCM_PIN_GROUP(gpio21),
+	BCM_PIN_GROUP(gpio22),
+	BCM_PIN_GROUP(gpio23),
+	BCM_PIN_GROUP(gpio24),
+	BCM_PIN_GROUP(gpio25),
+	BCM_PIN_GROUP(gpio26),
+	BCM_PIN_GROUP(gpio27),
+	BCM_PIN_GROUP(gpio28),
+	BCM_PIN_GROUP(gpio29),
+	BCM_PIN_GROUP(gpio30),
+	BCM_PIN_GROUP(gpio31),
+	BCM_PIN_GROUP(gpio32),
+	BCM_PIN_GROUP(gpio33),
+	BCM_PIN_GROUP(gpio34),
+	BCM_PIN_GROUP(gpio35),
+	BCM_PIN_GROUP(gpio36),
+	BCM_PIN_GROUP(gpio37),
+	BCM_PIN_GROUP(gpio38),
+	BCM_PIN_GROUP(gpio39),
+	BCM_PIN_GROUP(gpio40),
+	BCM_PIN_GROUP(gpio41),
+	BCM_PIN_GROUP(gpio42),
+	BCM_PIN_GROUP(gpio43),
+	BCM_PIN_GROUP(gpio44),
+	BCM_PIN_GROUP(gpio45),
+	BCM_PIN_GROUP(gpio46),
+	BCM_PIN_GROUP(gpio47),
+	BCM_PIN_GROUP(gpio48),
+	BCM_PIN_GROUP(gpio49),
+=======
 #define BCM6318_GROUP(n)					\
 	{							\
 		.name = #n,					\
@@ -204,6 +260,7 @@ static struct bcm6318_pingroup bcm6318_groups[] = {
 	BCM6318_GROUP(gpio47),
 	BCM6318_GROUP(gpio48),
 	BCM6318_GROUP(gpio49),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* GPIO_MODE */
@@ -368,10 +425,17 @@ static const char *bcm6318_pinctrl_get_group_name(struct pinctrl_dev *pctldev,
 
 static int bcm6318_pinctrl_get_group_pins(struct pinctrl_dev *pctldev,
 					  unsigned group, const unsigned **pins,
+<<<<<<< HEAD
+					  unsigned *npins)
+{
+	*pins = bcm6318_groups[group].pins;
+	*npins = bcm6318_groups[group].npins;
+=======
 					  unsigned *num_pins)
 {
 	*pins = bcm6318_groups[group].pins;
 	*num_pins = bcm6318_groups[group].num_pins;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -424,7 +488,11 @@ static int bcm6318_pinctrl_set_mux(struct pinctrl_dev *pctldev,
 				   unsigned selector, unsigned group)
 {
 	struct bcm63xx_pinctrl *pc = pinctrl_dev_get_drvdata(pctldev);
+<<<<<<< HEAD
+	const struct pingroup *pg = &bcm6318_groups[group];
+=======
 	const struct bcm6318_pingroup *pg = &bcm6318_groups[group];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct bcm6318_function *f = &bcm6318_funcs[selector];
 
 	bcm6318_rmw_mux(pc, pg->pins[0], f->mode_val, f->mux_val);

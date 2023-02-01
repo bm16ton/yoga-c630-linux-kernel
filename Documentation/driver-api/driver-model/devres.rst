@@ -279,6 +279,7 @@ GPIO
   devm_gpio_request_one()
 
 I2C
+  devm_i2c_add_adapter()
   devm_i2c_new_dummy_device()
 
 IIO
@@ -301,6 +302,7 @@ IO region
   devm_release_region()
   devm_release_resource()
   devm_request_mem_region()
+  devm_request_free_mem_region()
   devm_request_region()
   devm_request_resource()
 
@@ -334,7 +336,7 @@ IRQ
   devm_irq_alloc_descs_from()
   devm_irq_alloc_generic_chip()
   devm_irq_setup_generic_chip()
-  devm_irq_sim_init()
+  devm_irq_domain_create_sim()
 
 LED
   devm_led_classdev_register()
@@ -392,7 +394,9 @@ PHY
 PINCTRL
   devm_pinctrl_get()
   devm_pinctrl_put()
+  devm_pinctrl_get_select()
   devm_pinctrl_register()
+  devm_pinctrl_register_and_init()
   devm_pinctrl_unregister()
 
 POWER
@@ -401,14 +405,28 @@ POWER
 
 PWM
   devm_pwm_get()
+<<<<<<< HEAD
+=======
   devm_of_pwm_get()
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   devm_fwnode_pwm_get()
 
 REGULATOR
+  devm_regulator_bulk_register_supply_alias()
   devm_regulator_bulk_get()
+  devm_regulator_bulk_get_enable()
+  devm_regulator_bulk_put()
   devm_regulator_get()
+  devm_regulator_get_enable()
+  devm_regulator_get_enable_optional()
+  devm_regulator_get_exclusive()
+  devm_regulator_get_optional()
+  devm_regulator_irq_helper()
   devm_regulator_put()
   devm_regulator_register()
+  devm_regulator_register_notifier()
+  devm_regulator_register_supply_alias()
+  devm_regulator_unregister_notifier()
 
 RESET
   devm_reset_control_get()
@@ -427,6 +445,8 @@ SLAVE DMA ENGINE
   devm_acpi_dma_controller_register()
 
 SPI
+  devm_spi_alloc_master()
+  devm_spi_alloc_slave()
   devm_spi_register_master()
 
 WATCHDOG

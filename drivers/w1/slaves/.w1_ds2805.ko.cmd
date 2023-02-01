@@ -1,0 +1,1 @@
+cmd_drivers/w1/slaves/w1_ds2805.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/w1/slaves/w1_ds2805.ko drivers/w1/slaves/w1_ds2805.o drivers/w1/slaves/w1_ds2805.mod.o;  true

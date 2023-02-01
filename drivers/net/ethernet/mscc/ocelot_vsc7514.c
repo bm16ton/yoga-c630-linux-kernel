@@ -6,6 +6,7 @@
  */
 #include <linux/dsa/ocelot.h>
 #include <linux/interrupt.h>
+#include <linux/iopoll.h>
 #include <linux/module.h>
 #include <linux/of_net.h>
 #include <linux/netdevice.h>
@@ -24,6 +25,12 @@
 
 #define VSC7514_VCAP_POLICER_BASE			128
 #define VSC7514_VCAP_POLICER_MAX			191
+<<<<<<< HEAD
+
+#define MEM_INIT_SLEEP_US				1000
+#define MEM_INIT_TIMEOUT_US				100000
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const u32 *ocelot_regmap[TARGET_MAX] = {
 	[ANA] = vsc7514_ana_regmap,
@@ -97,6 +104,9 @@ static const struct reg_field ocelot_regfields[REGFIELD_MAX] = {
 };
 
 static const struct ocelot_stat_layout ocelot_stats_layout[OCELOT_NUM_STATS] = {
+<<<<<<< HEAD
+	OCELOT_COMMON_STATS,
+=======
 	[OCELOT_STAT_RX_OCTETS] = {
 		.name = "rx_octets",
 		.reg = SYS_COUNT_RX_OCTETS,
@@ -469,6 +479,7 @@ static const struct ocelot_stat_layout ocelot_stats_layout[OCELOT_NUM_STATS] = {
 		.name = "drop_green_prio_7",
 		.reg = SYS_COUNT_DROP_GREEN_PRIO_7,
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void ocelot_pll5_init(struct ocelot *ocelot)
@@ -562,27 +573,43 @@ static const struct of_device_id mscc_ocelot_match[] = {
 };
 MODULE_DEVICE_TABLE(of, mscc_ocelot_match);
 
+static int ocelot_mem_init_status(struct ocelot *ocelot)
+{
+	unsigned int val;
+	int err;
+
+	err = regmap_field_read(ocelot->regfields[SYS_RESET_CFG_MEM_INIT],
+				&val);
+
+	return err ?: val;
+}
+
 static int ocelot_reset(struct ocelot *ocelot)
 {
-	int retries = 100;
+	int err;
 	u32 val;
 
-	regmap_field_write(ocelot->regfields[SYS_RESET_CFG_MEM_INIT], 1);
-	regmap_field_write(ocelot->regfields[SYS_RESET_CFG_MEM_ENA], 1);
+	err = regmap_field_write(ocelot->regfields[SYS_RESET_CFG_MEM_INIT], 1);
+	if (err)
+		return err;
 
-	do {
-		msleep(1);
-		regmap_field_read(ocelot->regfields[SYS_RESET_CFG_MEM_INIT],
-				  &val);
-	} while (val && --retries);
+	err = regmap_field_write(ocelot->regfields[SYS_RESET_CFG_MEM_ENA], 1);
+	if (err)
+		return err;
 
-	if (!retries)
-		return -ETIMEDOUT;
+	/* MEM_INIT is a self-clearing bit. Wait for it to be cleared (should be
+	 * 100us) before enabling the switch core.
+	 */
+	err = readx_poll_timeout(ocelot_mem_init_status, ocelot, val, !val,
+				 MEM_INIT_SLEEP_US, MEM_INIT_TIMEOUT_US);
+	if (err)
+		return err;
 
-	regmap_field_write(ocelot->regfields[SYS_RESET_CFG_MEM_ENA], 1);
-	regmap_field_write(ocelot->regfields[SYS_RESET_CFG_CORE_ENA], 1);
+	err = regmap_field_write(ocelot->regfields[SYS_RESET_CFG_MEM_ENA], 1);
+	if (err)
+		return err;
 
-	return 0;
+	return regmap_field_write(ocelot->regfields[SYS_RESET_CFG_CORE_ENA], 1);
 }
 
 /* Watermark encode

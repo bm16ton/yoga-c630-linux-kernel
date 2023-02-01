@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-cherry.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-cherry.ko drivers/hid/hid-cherry.o drivers/hid/hid-cherry.mod.o;  true

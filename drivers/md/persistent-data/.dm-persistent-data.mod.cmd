@@ -1,0 +1,1 @@
+cmd_drivers/md/persistent-data/dm-persistent-data.mod := printf '%s\n'   dm-array.o dm-bitset.o dm-block-manager.o dm-space-map-common.o dm-space-map-disk.o dm-space-map-metadata.o dm-transaction-manager.o dm-btree.o dm-btree-remove.o dm-btree-spine.o | awk '!x[$$0]++ { print("drivers/md/persistent-data/"$$0) }' > drivers/md/persistent-data/dm-persistent-data.mod

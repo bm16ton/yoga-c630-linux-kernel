@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/marvell/cafe_ccic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/platform/marvell/cafe_ccic.ko drivers/media/platform/marvell/cafe_ccic.o drivers/media/platform/marvell/cafe_ccic.mod.o;  true

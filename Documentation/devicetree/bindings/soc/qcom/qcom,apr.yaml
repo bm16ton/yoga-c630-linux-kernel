@@ -20,6 +20,12 @@ properties:
       - qcom,apr-v2
       - qcom,gpr
 
+<<<<<<< HEAD
+  power-domains:
+    maxItems: 1
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   qcom,apr-domain:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2, 3, 4, 5, 6, 7]
@@ -52,6 +58,29 @@ properties:
         2 = Audio DSP Domain
         3 = Application Processor Domain
 
+<<<<<<< HEAD
+  qcom,glink-channels:
+    $ref: /schemas/types.yaml#/definitions/string-array
+    description: Channel name used for the communication
+    items:
+      - const: apr_audio_svc
+
+  qcom,intents:
+    $ref: /schemas/types.yaml#/definitions/uint32-array
+    description:
+      List of (size, amount) pairs describing what intents should be
+      preallocated for this virtual channel. This can be used to tweak the
+      default intents available for the channel to meet expectations of the
+      remote.
+
+  qcom,smd-channels:
+    $ref: /schemas/types.yaml#/definitions/string-array
+    description: Channel name used for the communication
+    items:
+      - const: apr_audio_svc
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#address-cells':
     const: 1
 
@@ -97,6 +126,29 @@ patternProperties:
             3 = AMDB Service.
             4 = Voice processing manager.
 
+<<<<<<< HEAD
+      clock-controller:
+        $ref: /schemas/sound/qcom,q6dsp-lpass-clocks.yaml#
+        description: Qualcomm DSP LPASS clock controller
+        unevaluatedProperties: false
+
+      dais:
+        type: object
+        oneOf:
+          - $ref: /schemas/sound/qcom,q6apm-dai.yaml#
+          - $ref: /schemas/sound/qcom,q6dsp-lpass-ports.yaml#
+          - $ref: /schemas/sound/qcom,q6asm-dais.yaml#
+        unevaluatedProperties: false
+        description: Qualcomm DSP audio ports
+
+      routing:
+        type: object
+        $ref: /schemas/sound/qcom,q6adm-routing.yaml#
+        unevaluatedProperties: false
+        description: Qualcomm DSP LPASS audio routing
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       qcom,protection-domain:
         $ref: /schemas/types.yaml#/definitions/string-array
         description: protection domain service name and path for apr service
@@ -107,6 +159,46 @@ patternProperties:
           "tms/servreg", "msm/modem/wlan_pd".
           "tms/servreg", "msm/slpi/sensor_pd".
 
+<<<<<<< HEAD
+    allOf:
+      - if:
+          properties:
+            compatible:
+              enum:
+                - qcom,q6afe
+        then:
+          properties:
+            dais:
+              properties:
+                compatible:
+                  const: qcom,q6afe-dais
+
+      - if:
+          properties:
+            compatible:
+              enum:
+                - qcom,q6apm
+        then:
+          properties:
+            dais:
+              properties:
+                compatible:
+                  enum:
+                    - qcom,q6apm-dais
+                    - qcom,q6apm-lpass-dais
+
+      - if:
+          properties:
+            compatible:
+              enum:
+                - qcom,q6asm
+        then:
+          properties:
+            dais:
+              properties:
+                compatible:
+                  const: qcom,q6asm-dais
+=======
       '#address-cells':
         const: 1
 
@@ -118,6 +210,7 @@ patternProperties:
         type: object
         description:
           Service based devices like clock controllers or digital audio interfaces.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     additionalProperties: false
 
@@ -125,6 +218,33 @@ required:
   - compatible
   - qcom,domain
 
+<<<<<<< HEAD
+allOf:
+  - if:
+      properties:
+        compatible:
+          enum:
+            - qcom,gpr
+    then:
+      properties:
+        power-domains: false
+
+  - if:
+      required:
+        - qcom,glink-channels
+    then:
+      properties:
+        qcom,smd-channels: false
+
+  - if:
+      required:
+        - qcom,smd-channels
+    then:
+      properties:
+        qcom,glink-channels: false
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 additionalProperties: false
 
 examples:

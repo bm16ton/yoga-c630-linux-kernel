@@ -99,7 +99,15 @@ static int msm_hdmi_get_phy(struct hdmi *hdmi)
 	of_node_put(phy_node);
 
 	if (!phy_pdev) {
+<<<<<<< HEAD
 		DRM_DEV_ERROR(&pdev->dev, "phy driver is not ready\n");
+		return -EPROBE_DEFER;
+	}
+	if (!hdmi->phy) {
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		DRM_DEV_ERROR(&pdev->dev, "phy driver is not ready\n");
+		put_device(&phy_pdev->dev);
 		return -EPROBE_DEFER;
 	}
 	if (!hdmi->phy) {
@@ -252,7 +260,11 @@ static struct hdmi *msm_hdmi_init(struct platform_device *pdev)
 	if (hdmi->hpd_gpiod)
 		gpiod_set_consumer_name(hdmi->hpd_gpiod, "HDMI_HPD");
 
+<<<<<<< HEAD
+	devm_pm_runtime_enable(&pdev->dev);
+=======
 	pm_runtime_enable(&pdev->dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hdmi->workq = alloc_ordered_workqueue("msm_hdmi", 0);
 
@@ -300,6 +312,11 @@ int msm_hdmi_modeset_init(struct hdmi *hdmi,
 	struct platform_device *pdev = hdmi->pdev;
 	int ret;
 
+	if (priv->num_bridges == ARRAY_SIZE(priv->bridges)) {
+		DRM_DEV_ERROR(dev->dev, "too many bridges\n");
+		return -ENOSPC;
+	}
+
 	hdmi->dev = dev;
 	hdmi->encoder = encoder;
 
@@ -339,7 +356,11 @@ int msm_hdmi_modeset_init(struct hdmi *hdmi,
 		goto fail;
 	}
 
+<<<<<<< HEAD
+	ret = devm_request_irq(dev->dev, hdmi->irq,
+=======
 	ret = devm_request_irq(&pdev->dev, hdmi->irq,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			msm_hdmi_irq, IRQF_TRIGGER_HIGH,
 			"hdmi_isr", hdmi);
 	if (ret < 0) {

@@ -526,6 +526,40 @@ void rtl8188e_ReadEFuse(struct adapter *Adapter, u16 _size_byte, u8 *pbuf)
 	Hal_EfuseReadEFuse88E(Adapter, 0, _size_byte, pbuf);
 }
 
+<<<<<<< HEAD
+static void dump_chip_info(struct adapter *adapter, struct HAL_VERSION chip_vers)
+{
+	struct net_device *netdev = adapter->pnetdev;
+	char *cut = NULL;
+	char buf[25];
+
+	switch (chip_vers.CUTVersion) {
+	case A_CUT_VERSION:
+		cut = "A_CUT";
+		break;
+	case B_CUT_VERSION:
+		cut = "B_CUT";
+		break;
+	case C_CUT_VERSION:
+		cut = "C_CUT";
+		break;
+	case D_CUT_VERSION:
+		cut = "D_CUT";
+		break;
+	case E_CUT_VERSION:
+		cut = "E_CUT";
+		break;
+	default:
+		snprintf(buf, sizeof(buf), "UNKNOWN_CUT(%d)", chip_vers.CUTVersion);
+		cut = buf;
+		break;
+	}
+
+	netdev_dbg(netdev, "Chip Version Info: CHIP_8188E_%s_%s_%s_1T1R_RomVer(%d)\n",
+		   IS_NORMAL_CHIP(chip_vers) ? "Normal_Chip" : "Test_Chip",
+		   IS_CHIP_VENDOR_TSMC(chip_vers) ? "TSMC" : "UMC",
+		   cut, 0);
+=======
 static void dump_chip_info(struct HAL_VERSION chip_vers)
 {
 	uint cnt = 0;
@@ -563,6 +597,7 @@ static void dump_chip_info(struct HAL_VERSION chip_vers)
 	cnt += sprintf((buf + cnt), "RomVer(%d)\n", 0);
 
 	pr_info("%s", buf);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void rtl8188e_read_chip_version(struct adapter *padapter)
@@ -581,7 +616,11 @@ void rtl8188e_read_chip_version(struct adapter *padapter)
 	ChipVersion.VendorType = ((value32 & VENDOR_ID) ? CHIP_VENDOR_UMC : CHIP_VENDOR_TSMC);
 	ChipVersion.CUTVersion = (value32 & CHIP_VER_RTL_MASK) >> CHIP_VER_RTL_SHIFT; /*  IC version (CUT) */
 
+<<<<<<< HEAD
+	dump_chip_info(padapter, ChipVersion);
+=======
 	dump_chip_info(ChipVersion);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pHalData->VersionID = ChipVersion;
 }
@@ -688,6 +727,10 @@ Hal_EfuseParseIDCode88E(
 	)
 {
 	struct eeprom_priv *pEEPROM = &padapter->eeprompriv;
+<<<<<<< HEAD
+	struct net_device *netdev = padapter->pnetdev;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16			EEPROMId;
 
 	/*  Check 0x8129 again for making sure autoload status!! */
@@ -699,7 +742,11 @@ Hal_EfuseParseIDCode88E(
 		pEEPROM->bautoload_fail_flag = false;
 	}
 
+<<<<<<< HEAD
+	netdev_dbg(netdev, "EEPROM ID = 0x%04x\n", EEPROMId);
+=======
 	pr_info("EEPROM ID = 0x%04x\n", EEPROMId);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void Hal_ReadPowerValueFromPROM_8188E(struct txpowerinfo24g *pwrInfo24G, u8 *PROMContent, bool AutoLoadFail)

@@ -1,0 +1,1 @@
+cmd_drivers/i2c/busses/i2c-simtec.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/busses/i2c-simtec.ko drivers/i2c/busses/i2c-simtec.o drivers/i2c/busses/i2c-simtec.mod.o;  true

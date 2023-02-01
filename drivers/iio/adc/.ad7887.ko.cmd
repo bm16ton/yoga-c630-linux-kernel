@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/ad7887.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/ad7887.ko drivers/iio/adc/ad7887.o drivers/iio/adc/ad7887.mod.o;  true

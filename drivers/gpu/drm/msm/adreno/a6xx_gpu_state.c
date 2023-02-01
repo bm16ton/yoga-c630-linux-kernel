@@ -91,7 +91,7 @@ struct a6xx_state_memobj {
 static void *state_kcalloc(struct a6xx_gpu_state *a6xx_state, int nr, size_t objsize)
 {
 	struct a6xx_state_memobj *obj =
-		kzalloc((nr * objsize) + sizeof(*obj), GFP_KERNEL);
+		kvzalloc((nr * objsize) + sizeof(*obj), GFP_KERNEL);
 
 	if (!obj)
 		return NULL;
@@ -813,6 +813,12 @@ static struct msm_gpu_state_bo *a6xx_snapshot_gmu_bo(
 {
 	struct msm_gpu_state_bo *snapshot;
 
+<<<<<<< HEAD
+	if (!bo->size)
+		return NULL;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snapshot = state_kcalloc(a6xx_state, 1, sizeof(*snapshot));
 	if (!snapshot)
 		return NULL;
@@ -1015,12 +1021,21 @@ struct msm_gpu_state *a6xx_gpu_state_get(struct msm_gpu *gpu)
 	}
 
 	a6xx_get_registers(gpu, a6xx_state, dumper);
+<<<<<<< HEAD
 
 	if (dumper) {
 		a6xx_get_shaders(gpu, a6xx_state, dumper);
 		a6xx_get_clusters(gpu, a6xx_state, dumper);
 		a6xx_get_dbgahb_clusters(gpu, a6xx_state, dumper);
 
+=======
+
+	if (dumper) {
+		a6xx_get_shaders(gpu, a6xx_state, dumper);
+		a6xx_get_clusters(gpu, a6xx_state, dumper);
+		a6xx_get_dbgahb_clusters(gpu, a6xx_state, dumper);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		msm_gem_kernel_put(dumper->bo, gpu->aspace);
 	}
 
@@ -1046,8 +1061,18 @@ static void a6xx_gpu_state_destroy(struct kref *kref)
 	if (a6xx_state->gmu_hfi)
 		kvfree(a6xx_state->gmu_hfi->data);
 
+<<<<<<< HEAD
+	if (a6xx_state->gmu_debug)
+		kvfree(a6xx_state->gmu_debug->data);
+
+	list_for_each_entry_safe(obj, tmp, &a6xx_state->objs, node) {
+		list_del(&obj->node);
+		kvfree(obj);
+	}
+=======
 	list_for_each_entry_safe(obj, tmp, &a6xx_state->objs, node)
 		kfree(obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	adreno_gpu_state_destroy(state);
 	kfree(a6xx_state);

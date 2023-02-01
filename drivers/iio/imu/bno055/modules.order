@@ -1,0 +1,3 @@
+drivers/iio/imu/bno055/bno055.ko
+drivers/iio/imu/bno055/bno055_ser.ko
+drivers/iio/imu/bno055/bno055_i2c.ko

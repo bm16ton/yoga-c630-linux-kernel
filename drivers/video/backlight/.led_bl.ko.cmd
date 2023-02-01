@@ -1,0 +1,1 @@
+cmd_drivers/video/backlight/led_bl.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/backlight/led_bl.ko drivers/video/backlight/led_bl.o drivers/video/backlight/led_bl.mod.o;  true

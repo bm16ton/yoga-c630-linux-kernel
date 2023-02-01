@@ -1,0 +1,1 @@
+cmd_drivers/media/mmc/siano/smssdio.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/mmc/siano/smssdio.ko drivers/media/mmc/siano/smssdio.o drivers/media/mmc/siano/smssdio.mod.o;  true

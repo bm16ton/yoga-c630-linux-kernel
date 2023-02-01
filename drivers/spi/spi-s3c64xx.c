@@ -390,8 +390,13 @@ static int s3c64xx_spi_unprepare_transfer(struct spi_master *spi)
 	if (sdd->rx_dma.ch && sdd->tx_dma.ch) {
 		dma_release_channel(sdd->rx_dma.ch);
 		dma_release_channel(sdd->tx_dma.ch);
+<<<<<<< HEAD
+		sdd->rx_dma.ch = NULL;
+		sdd->tx_dma.ch = NULL;
+=======
 		sdd->rx_dma.ch = 0;
 		sdd->tx_dma.ch = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;

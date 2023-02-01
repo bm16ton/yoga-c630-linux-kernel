@@ -1,0 +1,1 @@
+cmd_drivers/ata/acard-ahci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/ata/acard-ahci.ko drivers/ata/acard-ahci.o drivers/ata/acard-ahci.mod.o;  true

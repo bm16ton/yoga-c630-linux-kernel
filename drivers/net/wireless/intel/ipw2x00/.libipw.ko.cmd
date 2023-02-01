@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/ipw2x00/libipw.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/intel/ipw2x00/libipw.ko drivers/net/wireless/intel/ipw2x00/libipw.o drivers/net/wireless/intel/ipw2x00/libipw.mod.o;  true

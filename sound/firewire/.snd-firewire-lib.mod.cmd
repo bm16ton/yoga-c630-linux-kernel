@@ -1,0 +1,1 @@
+cmd_sound/firewire/snd-firewire-lib.mod := printf '%s\n'   lib.o iso-resources.o packets-buffer.o fcp.o cmp.o amdtp-stream.o amdtp-am824.o | awk '!x[$$0]++ { print("sound/firewire/"$$0) }' > sound/firewire/snd-firewire-lib.mod

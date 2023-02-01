@@ -1,0 +1,1 @@
+cmd_security/selinux/built-in.a := rm -f security/selinux/built-in.a;  printf "security/selinux/%s " avc.o hooks.o selinuxfs.o netlink.o nlmsgtab.o netif.o netnode.o netport.o status.o ss/ebitmap.o ss/hashtab.o ss/symtab.o ss/sidtab.o ss/avtab.o ss/policydb.o ss/services.o ss/conditional.o ss/mls.o ss/context.o xfrm.o netlabel.o | xargs ar cDPrST security/selinux/built-in.a

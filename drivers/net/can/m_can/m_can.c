@@ -1022,6 +1022,7 @@ static int m_can_echo_tx_event(struct net_device *dev)
 
 		/* retrieve get index */
 		fgi = FIELD_GET(TXEFS_EFGI_MASK, m_can_read(cdev, M_CAN_TXEFS));
+<<<<<<< HEAD
 
 		/* get message marker, timestamp */
 		err = m_can_txe_fifo_read(cdev, fgi, 4, &txe);
@@ -1030,6 +1031,16 @@ static int m_can_echo_tx_event(struct net_device *dev)
 			return err;
 		}
 
+=======
+
+		/* get message marker, timestamp */
+		err = m_can_txe_fifo_read(cdev, fgi, 4, &txe);
+		if (err) {
+			netdev_err(dev, "TXE FIFO read returned %d\n", err);
+			return err;
+		}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		msg_mark = FIELD_GET(TX_EVENT_MM_MASK, txe);
 		timestamp = FIELD_GET(TX_EVENT_TXTS_MASK, txe) << 16;
 
@@ -1233,10 +1244,17 @@ static int m_can_set_bittiming(struct net_device *dev)
  * - setup bittiming
  * - configure timestamp generation
  */
-static void m_can_chip_config(struct net_device *dev)
+static int m_can_chip_config(struct net_device *dev)
 {
 	struct m_can_classdev *cdev = netdev_priv(dev);
 	u32 cccr, test;
+	int err;
+
+	err = m_can_init_ram(cdev);
+	if (err) {
+		dev_err(cdev->dev, "Message RAM configuration failed\n");
+		return err;
+	}
 
 	m_can_config_endisable(cdev, true);
 
@@ -1360,18 +1378,25 @@ static void m_can_chip_config(struct net_device *dev)
 
 	if (cdev->ops->init)
 		cdev->ops->init(cdev);
+
+	return 0;
 }
 
-static void m_can_start(struct net_device *dev)
+static int m_can_start(struct net_device *dev)
 {
 	struct m_can_classdev *cdev = netdev_priv(dev);
+	int ret;
 
 	/* basic m_can configuration */
-	m_can_chip_config(dev);
+	ret = m_can_chip_config(dev);
+	if (ret)
+		return ret;
 
 	cdev->can.state = CAN_STATE_ERROR_ACTIVE;
 
 	m_can_enable_all_interrupts(cdev);
+
+	return 0;
 }
 
 static int m_can_set_mode(struct net_device *dev, enum can_mode mode)
@@ -1467,8 +1492,12 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
 	}
 
 	if (!cdev->is_peripheral)
+<<<<<<< HEAD
+		netif_napi_add(dev, &cdev->napi, m_can_poll);
+=======
 		netif_napi_add(dev, &cdev->napi,
 			       m_can_poll, NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Shared properties of all M_CAN versions */
 	cdev->version = m_can_version;
@@ -1800,7 +1829,13 @@ static int m_can_open(struct net_device *dev)
 	}
 
 	/* start the m_can controller */
+<<<<<<< HEAD
+	err = m_can_start(dev);
+	if (err)
+		goto exit_irq_fail;
+=======
 	m_can_start(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!cdev->is_peripheral)
 		napi_enable(&cdev->napi);
@@ -2059,9 +2094,13 @@ int m_can_class_resume(struct device *dev)
 		ret = m_can_clk_start(cdev);
 		if (ret)
 			return ret;
+		ret  = m_can_start(ndev);
+		if (ret) {
+			m_can_clk_stop(cdev);
 
-		m_can_init_ram(cdev);
-		m_can_start(ndev);
+			return ret;
+		}
+
 		netif_device_attach(ndev);
 		netif_start_queue(ndev);
 	}

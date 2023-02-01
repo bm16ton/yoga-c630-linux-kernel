@@ -1,0 +1,6 @@
+drivers/nvdimm/libnvdimm.ko
+drivers/nvdimm/nd_pmem.ko
+drivers/nvdimm/nd_btt.ko
+drivers/nvdimm/of_pmem.ko
+drivers/nvdimm/virtio_pmem.ko
+drivers/nvdimm/nd_virtio.ko

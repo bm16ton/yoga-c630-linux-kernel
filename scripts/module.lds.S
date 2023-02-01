@@ -33,6 +33,10 @@ SECTIONS {
 
 	__patchable_function_entries : { *(__patchable_function_entries) }
 
+#ifdef CONFIG_ARCH_USES_CFI_TRAPS
+	__kcfi_traps 		: { KEEP(*(.kcfi_traps)) }
+#endif
+
 #ifdef CONFIG_LTO_CLANG
 	/*
 	 * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
@@ -53,6 +57,8 @@ SECTIONS {
 		*(.rodata .rodata.[0-9a-zA-Z_]*)
 		*(.rodata..L*)
 	}
+<<<<<<< HEAD
+=======
 
 	/*
 	 * With CONFIG_CFI_CLANG, we assume __cfi_check is at the beginning
@@ -62,6 +68,7 @@ SECTIONS {
 		*(.text.__cfi_check)
 		*(.text .text.[0-9a-zA-Z_]* .text..L.cfi*)
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 }
 

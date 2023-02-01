@@ -1,0 +1,66 @@
+!<thin>
+//                                              484       `
+dmi_scan.o/
+dmi-sysfs.o/
+dmi-id.o/
+qcom_scm.o/
+qcom_scm-smc.o/
+qcom_scm-legacy.o/
+sysfb.o/
+meson/meson_sm.o/
+efi/efi-bgrt.o/
+efi/efi.o/
+efi/vars.o/
+efi/reboot.o/
+efi/memattr.o/
+efi/tpm.o/
+efi/memmap.o/
+efi/capsule.o/
+efi/fdtparams.o/
+efi/esrt.o/
+efi/efi-pstore.o/
+efi/cper.o/
+efi/runtime-wrappers.o/
+efi/mokvar-table.o/
+efi/sysfb_efi.o/
+efi/efi-init.o/
+efi/arm-runtime.o/
+efi/earlycon.o/
+efi/cper-arm.o/
+psci/psci.o/
+smccc/smccc.o/
+smccc/kvm_guest.o/
+smccc/soc_id.o/
+xilinx/zynqmp.o/
+/0              0           0     0     644     29368     `
+/12             0           0     0     644     22776     `
+/25             0           0     0     644     11120     `
+/35             0           0     0     644     51480     `
+/47             0           0     0     644     4744      `
+/63             0           0     0     644     4960      `
+/82             0           0     0     644     5080      `
+/91             0           0     0     644     11584     `
+/109            0           0     0     644     3632      `
+/125            0           0     0     644     31536     `
+/136            0           0     0     644     11928     `
+/148            0           0     0     644     4224      `
+/162            0           0     0     644     6080      `
+/177            0           0     0     644     4888      `
+/188            0           0     0     644     6632      `
+/202            0           0     0     644     7240      `
+/217            0           0     0     644     3704      `
+/234            0           0     0     644     13560     `
+/246            0           0     0     644     8864      `
+/264            0           0     0     644     28192     `
+/276            0           0     0     644     27848     `
+/300            0           0     0     644     7160      `
+/320            0           0     0     644     24872     `
+/337            0           0     0     644     6512      `
+/353            0           0     0     644     6472      `
+/372            0           0     0     644     7696      `
+/388            0           0     0     644     11696     `
+/404            0           0     0     644     23072     `
+/417            0           0     0     644     5856      `
+/432            0           0     0     644     4568      `
+/451            0           0     0     644     6560      `
+/467            0           0     0     644     59224     `

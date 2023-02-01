@@ -1,0 +1,27 @@
+Source: wireless-regdb
+Section: net
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Seth Forshee <seth@forshee.me>
+Build-Depends: debhelper-compat (= 12),
+ openssl,
+ python3,
+ python3-m2crypto,
+ quilt
+Rules-Requires-Root: no
+Standards-Version: 4.5.0
+Homepage: https://wireless.wiki.kernel.org/en/developers/regulatory/wireless-regdb
+
+Package: wireless-regdb
+Architecture: all
+Multi-Arch: foreign
+Depends: ${misc:Depends}
+Suggests: crda
+Description: wireless regulatory database
+ This package contains the wireless regulatory database used by the Central
+ Regulatory Database Agent (CRDA) to configure wireless devices to operate
+ within the radio spectrum allowed in the local jurisdiction.
+ .
+ This regulatory information is provided with no warranty either expressed or
+ implied. Only Linux drivers which use cfg80211 framework can make use of the
+ regulatory database and CRDA.

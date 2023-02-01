@@ -1,0 +1,1 @@
+sound/firewire/isight.o

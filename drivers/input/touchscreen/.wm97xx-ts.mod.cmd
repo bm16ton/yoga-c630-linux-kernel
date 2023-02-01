@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/wm97xx-ts.mod := printf '%s\n'   wm97xx-core.o wm9705.o wm9712.o wm9713.o | awk '!x[$$0]++ { print("drivers/input/touchscreen/"$$0) }' > drivers/input/touchscreen/wm97xx-ts.mod

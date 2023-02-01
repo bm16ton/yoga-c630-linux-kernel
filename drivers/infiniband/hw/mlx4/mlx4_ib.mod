@@ -1,0 +1,12 @@
+drivers/infiniband/hw/mlx4/ah.o
+drivers/infiniband/hw/mlx4/cq.o
+drivers/infiniband/hw/mlx4/doorbell.o
+drivers/infiniband/hw/mlx4/mad.o
+drivers/infiniband/hw/mlx4/main.o
+drivers/infiniband/hw/mlx4/mr.o
+drivers/infiniband/hw/mlx4/qp.o
+drivers/infiniband/hw/mlx4/srq.o
+drivers/infiniband/hw/mlx4/mcg.o
+drivers/infiniband/hw/mlx4/cm.o
+drivers/infiniband/hw/mlx4/alias_GUID.o
+drivers/infiniband/hw/mlx4/sysfs.o

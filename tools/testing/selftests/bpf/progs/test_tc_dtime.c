@@ -15,7 +15,10 @@
 #include <linux/udp.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_endian.h>
+<<<<<<< HEAD
+=======
 #include <sys/socket.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* veth_src --- veth_src_fwd --- veth_det_fwd --- veth_dst
  *           |                                 |

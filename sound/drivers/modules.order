@@ -1,0 +1,9 @@
+sound/drivers/snd-aloop.ko
+sound/drivers/snd-serial-u16550.ko
+sound/drivers/snd-serial-generic.ko
+sound/drivers/snd-mts64.ko
+sound/drivers/snd-portman2x4.ko
+sound/drivers/opl3/snd-opl3-lib.ko
+sound/drivers/opl3/snd-opl3-synth.ko
+sound/drivers/mpu401/snd-mpu401-uart.ko
+sound/drivers/mpu401/snd-mpu401.ko

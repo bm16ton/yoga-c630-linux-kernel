@@ -58,7 +58,11 @@ config ARCH_USE_GNU_PROPERTY
 config BINFMT_ELF_FDPIC
 	bool "Kernel support for FDPIC ELF binaries"
 	default y if !BINFMT_ELF
+<<<<<<< HEAD
+	depends on ARM || ((M68K || SUPERH || XTENSA) && !MMU)
+=======
 	depends on ARM || ((M68K || SUPERH) && !MMU)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select ELFCORE
 	help
 	  ELF FDPIC binaries are based on ELF, but allow the individual load
@@ -142,6 +146,8 @@ config BINFMT_ZFLAT
 	help
 	  Support FLAT format compressed binaries
 
+<<<<<<< HEAD
+=======
 config HAVE_AOUT
        def_bool n
 
@@ -175,6 +181,7 @@ config OSF4_COMPAT
 	  with v4 shared libraries freely available from Compaq. If you're
 	  going to use shared libraries from Tru64 version 5.0 or later, say N.
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config BINFMT_MISC
 	tristate "Kernel support for MISC binaries"
 	help

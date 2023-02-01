@@ -169,14 +169,6 @@ config USB_LD
 	  To compile this driver as a module, choose M here: the
 	  module will be called ldusb.
 
-config USB_GOTEMP
-	tristate "USB GO TEMP temp sensor"
-	help
-	  driver for gotemp usb temp sensor.
-
-	  To compile this driver as a module, choose M here: the
-	  module will be called gotemp.
-	  
 config USB_TRANCEVIBRATOR
 	tristate "PlayStation 2 Trance Vibrator driver support"
 	help

@@ -123,6 +123,7 @@ gt-y += \
 	gt/intel_ring.o \
 	gt/intel_ring_submission.o \
 	gt/intel_rps.o \
+	gt/intel_sa_media.o \
 	gt/intel_sseu.o \
 	gt/intel_sseu_debugfs.o \
 	gt/intel_timeline.o \
@@ -257,7 +258,12 @@ i915-y += \
 	display/intel_vga.o \
 	display/i9xx_plane.o \
 	display/skl_scaler.o \
+<<<<<<< HEAD
+	display/skl_universal_plane.o \
+	display/skl_watermark.o
+=======
 	display/skl_universal_plane.o
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 i915-$(CONFIG_ACPI) += \
 	display/intel_acpi.o \
 	display/intel_opregion.o
@@ -280,6 +286,10 @@ i915-y += \
 	display/intel_ddi.o \
 	display/intel_ddi_buf_trans.o \
 	display/intel_display_trace.o \
+<<<<<<< HEAD
+	display/intel_dkl_phy.o \
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	display/intel_dp.o \
 	display/intel_dp_aux.o \
 	display/intel_dp_aux_backlight.o \

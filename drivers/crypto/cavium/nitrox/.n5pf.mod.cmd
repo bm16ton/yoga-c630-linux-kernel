@@ -1,0 +1,1 @@
+cmd_drivers/crypto/cavium/nitrox/n5pf.mod := printf '%s\n'   nitrox_main.o nitrox_isr.o nitrox_lib.o nitrox_hal.o nitrox_reqmgr.o nitrox_algs.o nitrox_mbx.o nitrox_skcipher.o nitrox_aead.o nitrox_sriov.o nitrox_debugfs.o | awk '!x[$$0]++ { print("drivers/crypto/cavium/nitrox/"$$0) }' > drivers/crypto/cavium/nitrox/n5pf.mod

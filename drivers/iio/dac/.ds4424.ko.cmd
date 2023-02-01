@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/ds4424.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/ds4424.ko drivers/iio/dac/ds4424.o drivers/iio/dac/ds4424.mod.o;  true

@@ -502,6 +502,10 @@ static int litex_mmc_irq_init(struct platform_device *pdev,
 
 use_polling:
 	host->mmc->caps |= MMC_CAP_NEEDS_POLL;
+<<<<<<< HEAD
+	host->irq = 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

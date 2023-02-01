@@ -18,14 +18,22 @@
 
 struct bio;
 struct cgroup_subsys_state;
+<<<<<<< HEAD
+struct gendisk;
+=======
 struct request_queue;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define FC_APPID_LEN              129
 
 #ifdef CONFIG_BLK_CGROUP
 extern struct cgroup_subsys_state * const blkcg_root_css;
 
+<<<<<<< HEAD
+void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay);
+=======
 void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void blkcg_maybe_throttle_current(void);
 bool blk_cgroup_congested(void);
 void blkcg_pin_online(struct cgroup_subsys_state *blkcg_css);
@@ -39,7 +47,10 @@ struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio);
 
 static inline void blkcg_maybe_throttle_current(void) { }
 static inline bool blk_cgroup_congested(void) { return false; }
+<<<<<<< HEAD
+=======
 static inline void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay) { }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
 {
 	return NULL;

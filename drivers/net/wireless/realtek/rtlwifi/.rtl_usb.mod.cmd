@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl_usb.mod := printf '%s\n'   usb.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtlwifi/"$$0) }' > drivers/net/wireless/realtek/rtlwifi/rtl_usb.mod

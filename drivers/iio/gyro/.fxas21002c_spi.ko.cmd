@@ -1,0 +1,1 @@
+cmd_drivers/iio/gyro/fxas21002c_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/gyro/fxas21002c_spi.ko drivers/iio/gyro/fxas21002c_spi.o drivers/iio/gyro/fxas21002c_spi.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/dynapro.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/dynapro.ko drivers/input/touchscreen/dynapro.o drivers/input/touchscreen/dynapro.mod.o;  true

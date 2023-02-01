@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/built-in.a := rm -f drivers/media/usb/built-in.a;  printf "drivers/media/usb/%s " b2c2/built-in.a dvb-usb/built-in.a dvb-usb-v2/built-in.a s2255/built-in.a siano/built-in.a ttusb-budget/built-in.a ttusb-dec/built-in.a | xargs ar cDPrST drivers/media/usb/built-in.a

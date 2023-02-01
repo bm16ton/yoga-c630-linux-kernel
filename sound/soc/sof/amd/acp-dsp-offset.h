@@ -46,6 +46,33 @@
 #define ACPAXI2AXI_ATU_BASE_ADDR_GRP_8		0xC3C
 #define ACPAXI2AXI_ATU_CTRL			0xC40
 #define ACP_SOFT_RESET				0x1000
+<<<<<<< HEAD
+#define ACP_CONTROL				0x1004
+
+#define ACP3X_I2S_PIN_CONFIG			0x1400
+#define ACP6X_I2S_PIN_CONFIG			0x1440
+
+/* Registers offsets from ACP_PGFSM block */
+#define ACP3X_PGFSM_BASE			0x141C
+#define ACP6X_PGFSM_BASE                        0x1024
+#define PGFSM_CONTROL_OFFSET			0x0
+#define PGFSM_STATUS_OFFSET			0x4
+#define ACP3X_CLKMUX_SEL			0x1424
+#define ACP6X_CLKMUX_SEL			0x102C
+
+/* Registers from ACP_INTR block */
+#define ACP3X_EXT_INTR_STAT			0x1808
+#define ACP6X_EXT_INTR_STAT                     0x1A0C
+
+#define ACP3X_DSP_SW_INTR_BASE			0x1814
+#define ACP6X_DSP_SW_INTR_BASE                  0x1808
+#define DSP_SW_INTR_CNTL_OFFSET			0x0
+#define DSP_SW_INTR_STAT_OFFSET			0x4
+#define DSP_SW_INTR_TRIG_OFFSET			0x8
+#define ACP_ERROR_STATUS			0x18C4
+#define ACP3X_AXI2DAGB_SEM_0			0x1880
+#define ACP6X_AXI2DAGB_SEM_0			0x1874
+=======
 
 #define ACP_I2S_PIN_CONFIG			0x1400
 
@@ -62,6 +89,7 @@
 #define ACP_SW_INTR_TRIG                        0x181C
 #define ACP_ERROR_STATUS			0x18C4
 #define ACP_AXI2DAGB_SEM_0			0x1880
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Registers from ACP_SHA block */
 #define ACP_SHA_DSP_FW_QUALIFIER		0x1C70
@@ -75,5 +103,9 @@
 #define ACP_SHA_PSP_ACK                         0x1C74
 
 #define ACP_SCRATCH_REG_0			0x10000
+<<<<<<< HEAD
+#define ACP6X_DSP_FUSION_RUNSTALL		0x0644
+=======
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

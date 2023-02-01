@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/hisilicon/kirin/kirin-drm.mod := printf '%s\n'   kirin_drm_drv.o kirin_drm_ade.o | awk '!x[$$0]++ { print("drivers/gpu/drm/hisilicon/kirin/"$$0) }' > drivers/gpu/drm/hisilicon/kirin/kirin-drm.mod

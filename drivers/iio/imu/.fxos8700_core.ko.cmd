@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/fxos8700_core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/fxos8700_core.ko drivers/iio/imu/fxos8700_core.o drivers/iio/imu/fxos8700_core.mod.o;  true

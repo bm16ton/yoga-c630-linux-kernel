@@ -16,7 +16,10 @@ CONFIG_MACH_HUSKY=y
 CONFIG_UNUSED_BOARD_FILES=y
 CONFIG_CMDLINE="console=ttyS0,115200n8 console=tty1 noinitrd root=/dev/mtdblock2 rootfstype=jffs2   debug"
 CONFIG_FPE_NWFPE=y
+<<<<<<< HEAD
+=======
 CONFIG_BINFMT_AOUT=m
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 CONFIG_MODULES=y
 CONFIG_MODULE_UNLOAD=y
 CONFIG_MODULE_FORCE_UNLOAD=y

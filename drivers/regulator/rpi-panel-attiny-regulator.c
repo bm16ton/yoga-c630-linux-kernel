@@ -148,6 +148,7 @@ static int attiny_lcd_power_is_enabled(struct regulator_dev *rdev)
 	int ret, i;
 
 	mutex_lock(&state->lock);
+<<<<<<< HEAD
 
 	for (i = 0; i < 10; i++) {
 		ret = regmap_read(rdev->regmap, REG_PORTC, &data);
@@ -156,6 +157,16 @@ static int attiny_lcd_power_is_enabled(struct regulator_dev *rdev)
 		usleep_range(10000, 12000);
 	}
 
+=======
+
+	for (i = 0; i < 10; i++) {
+		ret = regmap_read(rdev->regmap, REG_PORTC, &data);
+		if (!ret)
+			break;
+		usleep_range(10000, 12000);
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&state->lock);
 
 	if (ret < 0)
@@ -191,6 +202,7 @@ static int attiny_update_status(struct backlight_device *bl)
 	int ret, i;
 
 	mutex_lock(&state->lock);
+<<<<<<< HEAD
 
 	for (i = 0; i < 10; i++) {
 		ret = regmap_write(regmap, REG_PWM, brightness);
@@ -200,6 +212,17 @@ static int attiny_update_status(struct backlight_device *bl)
 
 	mutex_unlock(&state->lock);
 
+=======
+
+	for (i = 0; i < 10; i++) {
+		ret = regmap_write(regmap, REG_PWM, brightness);
+		if (!ret)
+			break;
+	}
+
+	mutex_unlock(&state->lock);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -373,6 +396,8 @@ static int attiny_i2c_probe(struct i2c_client *i2c,
 		goto error;
 	}
 
+<<<<<<< HEAD
+=======
 	return 0;
 
 error:
@@ -387,7 +412,20 @@ static int attiny_i2c_remove(struct i2c_client *client)
 
 	mutex_destroy(&state->lock);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
+
+error:
+	mutex_destroy(&state->lock);
+
+	return ret;
+}
+
+static void attiny_i2c_remove(struct i2c_client *client)
+{
+	struct attiny_lcd *state = i2c_get_clientdata(client);
+
+	mutex_destroy(&state->lock);
 }
 
 static const struct of_device_id attiny_dt_ids[] = {

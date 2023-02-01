@@ -32,7 +32,11 @@ properties:
       - description: Display byte clock
       - description: Display byte interface clock
       - description: Display pixel clock
+<<<<<<< HEAD
+      - description: Display core clock
+=======
       - description: Display escape clock
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - description: Display AHB clock
       - description: Display AXI clock
 
@@ -66,13 +70,19 @@ properties:
       2 DSI links.
 
   assigned-clocks:
+<<<<<<< HEAD
+=======
     minItems: 2
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     maxItems: 2
     description: |
       Parents of "byte" and "pixel" for the given platform.
 
   assigned-clock-parents:
+<<<<<<< HEAD
+=======
     minItems: 2
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     maxItems: 2
     description: |
       The Byte clock and Pixel clock PLL outputs provided by a DSI PHY block.
@@ -136,8 +146,11 @@ required:
   - phy-names
   - assigned-clocks
   - assigned-clock-parents
+<<<<<<< HEAD
+=======
   - power-domains
   - operating-points-v2
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - ports
 
 additionalProperties: false

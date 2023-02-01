@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-roccat-lua.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-roccat-lua.ko drivers/hid/hid-roccat-lua.o drivers/hid/hid-roccat-lua.mod.o;  true

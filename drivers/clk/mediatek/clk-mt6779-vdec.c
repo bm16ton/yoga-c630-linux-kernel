@@ -39,11 +39,21 @@ static const struct mtk_gate vdec_clks[] = {
 	GATE_VDEC1_I(CLK_VDEC_LARB1, "vdec_larb1_cken", "vdec_sel", 0),
 };
 
-static const struct of_device_id of_match_clk_mt6779_vdec[] = {
-	{ .compatible = "mediatek,mt6779-vdecsys", },
-	{}
+static const struct mtk_clk_desc vdec_desc = {
+	.clks = vdec_clks,
+	.num_clks = ARRAY_SIZE(vdec_clks),
 };
 
+<<<<<<< HEAD
+static const struct of_device_id of_match_clk_mt6779_vdec[] = {
+	{
+		.compatible = "mediatek,mt6779-vdecsys",
+		.data = &vdec_desc,
+	}, {
+		/* sentinel */
+	}
+};
+=======
 static int clk_mt6779_vdec_probe(struct platform_device *pdev)
 {
 	struct clk_hw_onecell_data *clk_data;
@@ -56,9 +66,11 @@ static int clk_mt6779_vdec_probe(struct platform_device *pdev)
 
 	return of_clk_add_hw_provider(node, of_clk_hw_onecell_get, clk_data);
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct platform_driver clk_mt6779_vdec_drv = {
-	.probe = clk_mt6779_vdec_probe,
+	.probe = mtk_clk_simple_probe,
+	.remove = mtk_clk_simple_remove,
 	.driver = {
 		.name = "clk-mt6779-vdec",
 		.of_match_table = of_match_clk_mt6779_vdec,

@@ -187,6 +187,17 @@ static inline u32 read_cpucfg(u32 reg)
 #define  CPUCFG16_L3_DINCL		BIT(16)
 
 #define LOONGARCH_CPUCFG17		0x11
+<<<<<<< HEAD
+#define LOONGARCH_CPUCFG18		0x12
+#define LOONGARCH_CPUCFG19		0x13
+#define LOONGARCH_CPUCFG20		0x14
+#define  CPUCFG_CACHE_WAYS_M		GENMASK(15, 0)
+#define  CPUCFG_CACHE_SETS_M		GENMASK(23, 16)
+#define  CPUCFG_CACHE_LSIZE_M		GENMASK(30, 24)
+#define  CPUCFG_CACHE_WAYS	 	0
+#define  CPUCFG_CACHE_SETS		16
+#define  CPUCFG_CACHE_LSIZE		24
+=======
 #define  CPUCFG17_L1I_WAYS_M		GENMASK(15, 0)
 #define  CPUCFG17_L1I_SETS_M		GENMASK(23, 16)
 #define  CPUCFG17_L1I_SIZE_M		GENMASK(30, 24)
@@ -217,6 +228,7 @@ static inline u32 read_cpucfg(u32 reg)
 #define  CPUCFG20_L3_WAYS		0
 #define  CPUCFG20_L3_SETS		16
 #define  CPUCFG20_L3_SIZE		24
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define LOONGARCH_CPUCFG48		0x30
 #define  CPUCFG48_MCSR_LCK		BIT(0)

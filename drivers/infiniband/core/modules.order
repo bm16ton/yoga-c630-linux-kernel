@@ -1,0 +1,7 @@
+drivers/infiniband/core/ib_core.ko
+drivers/infiniband/core/ib_cm.ko
+drivers/infiniband/core/iw_cm.ko
+drivers/infiniband/core/rdma_cm.ko
+drivers/infiniband/core/ib_umad.ko
+drivers/infiniband/core/ib_uverbs.ko
+drivers/infiniband/core/rdma_ucm.ko

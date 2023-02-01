@@ -1,0 +1,1 @@
+cmd_drivers/nfc/microread/microread.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nfc/microread/microread.ko drivers/nfc/microread/microread.o drivers/nfc/microread/microread.mod.o;  true

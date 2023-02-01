@@ -17,7 +17,13 @@ struct ptp {
 	void __iomem *reg_base;
 	u64 (*read_ptp_tstmp)(struct ptp *ptp);
 	spinlock_t ptp_lock; /* lock */
+<<<<<<< HEAD
+	struct hrtimer hrtimer;
+	ktime_t last_ts;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 clock_rate;
+	u32 clock_period;
 };
 
 struct ptp *ptp_get(void);

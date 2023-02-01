@@ -24,6 +24,12 @@
 struct kvm_vfio_group {
 	struct list_head node;
 	struct file *file;
+<<<<<<< HEAD
+#ifdef CONFIG_SPAPR_TCE_IOMMU
+	struct iommu_group *iommu_group;
+#endif
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct kvm_vfio {
@@ -46,6 +52,7 @@ static void kvm_vfio_file_set_kvm(struct file *file, struct kvm *kvm)
 }
 
 static bool kvm_vfio_file_enforced_coherent(struct file *file)
+<<<<<<< HEAD
 {
 	bool (*fn)(struct file *file);
 	bool ret;
@@ -61,6 +68,36 @@ static bool kvm_vfio_file_enforced_coherent(struct file *file)
 	return ret;
 }
 
+static bool kvm_vfio_file_is_group(struct file *file)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+{
+	bool (*fn)(struct file *file);
+	bool ret;
+
+<<<<<<< HEAD
+	fn = symbol_get(vfio_file_is_group);
+=======
+	fn = symbol_get(vfio_file_enforced_coherent);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	if (!fn)
+		return false;
+
+	ret = fn(file);
+
+<<<<<<< HEAD
+	symbol_put(vfio_file_is_group);
+=======
+	symbol_put(vfio_file_enforced_coherent);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	return ret;
+}
+
+<<<<<<< HEAD
+#ifdef CONFIG_SPAPR_TCE_IOMMU
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
 {
 	struct iommu_group *(*fn)(struct file *file);
@@ -77,6 +114,17 @@ static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
 	return ret;
 }
 
+<<<<<<< HEAD
+static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
+					     struct kvm_vfio_group *kvg)
+{
+	if (WARN_ON_ONCE(!kvg->iommu_group))
+		return;
+
+	kvm_spapr_tce_release_iommu_group(kvm, kvg->iommu_group);
+	iommu_group_put(kvg->iommu_group);
+	kvg->iommu_group = NULL;
+=======
 #ifdef CONFIG_SPAPR_TCE_IOMMU
 static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
 					     struct kvm_vfio_group *kvg)
@@ -87,6 +135,7 @@ static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
 		return;
 
 	kvm_spapr_tce_release_iommu_group(kvm, grp);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 #endif
 
@@ -136,7 +185,11 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
 		return -EBADF;
 
 	/* Ensure the FD is a vfio group FD.*/
+<<<<<<< HEAD
+	if (!kvm_vfio_file_is_group(filp)) {
+=======
 	if (!kvm_vfio_file_iommu_group(filp)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -EINVAL;
 		goto err_fput;
 	}
@@ -223,6 +276,34 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
 	struct kvm_vfio_group *kvg;
 	struct fd f;
 	int ret;
+<<<<<<< HEAD
+
+	if (copy_from_user(&param, arg, sizeof(struct kvm_vfio_spapr_tce)))
+		return -EFAULT;
+
+	f = fdget(param.groupfd);
+	if (!f.file)
+		return -EBADF;
+
+	ret = -ENOENT;
+
+	mutex_lock(&kv->lock);
+
+	list_for_each_entry(kvg, &kv->group_list, node) {
+		if (kvg->file != f.file)
+			continue;
+
+		if (!kvg->iommu_group) {
+			kvg->iommu_group = kvm_vfio_file_iommu_group(kvg->file);
+			if (WARN_ON_ONCE(!kvg->iommu_group)) {
+				ret = -EIO;
+				goto err_fdput;
+			}
+		}
+
+		ret = kvm_spapr_tce_attach_iommu_group(dev->kvm, param.tablefd,
+						       kvg->iommu_group);
+=======
 
 	if (copy_from_user(&param, arg, sizeof(struct kvm_vfio_spapr_tce)))
 		return -EFAULT;
@@ -249,6 +330,7 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
 
 		ret = kvm_spapr_tce_attach_iommu_group(dev->kvm, param.tablefd,
 						       grp);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 

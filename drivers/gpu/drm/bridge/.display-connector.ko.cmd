@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/bridge/display-connector.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/bridge/display-connector.ko drivers/gpu/drm/bridge/display-connector.o drivers/gpu/drm/bridge/display-connector.mod.o;  true

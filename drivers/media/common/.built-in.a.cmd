@@ -1,0 +1,1 @@
+cmd_drivers/media/common/built-in.a := rm -f drivers/media/common/built-in.a;  printf "drivers/media/common/%s " b2c2/built-in.a siano/built-in.a v4l2-tpg/built-in.a videobuf2/built-in.a | xargs ar cDPrST drivers/media/common/built-in.a

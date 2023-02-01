@@ -1,0 +1,1 @@
+cmd_arch/arm64/crypto/aes-ce-blk.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o arch/arm64/crypto/aes-ce-blk.ko arch/arm64/crypto/aes-ce-blk.o arch/arm64/crypto/aes-ce-blk.mod.o;  true

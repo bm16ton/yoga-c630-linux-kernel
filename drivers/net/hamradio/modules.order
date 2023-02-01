@@ -1,0 +1,8 @@
+drivers/net/hamradio/mkiss.ko
+drivers/net/hamradio/6pack.ko
+drivers/net/hamradio/yam.ko
+drivers/net/hamradio/bpqether.ko
+drivers/net/hamradio/baycom_ser_fdx.ko
+drivers/net/hamradio/hdlcdrv.ko
+drivers/net/hamradio/baycom_ser_hdx.ko
+drivers/net/hamradio/baycom_par.ko

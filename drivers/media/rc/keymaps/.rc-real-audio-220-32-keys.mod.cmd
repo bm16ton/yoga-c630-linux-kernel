@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-real-audio-220-32-keys.mod := printf '%s\n'   rc-real-audio-220-32-keys.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-real-audio-220-32-keys.mod

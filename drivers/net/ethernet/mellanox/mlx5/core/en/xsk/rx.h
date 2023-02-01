@@ -5,12 +5,14 @@
 #define __MLX5_EN_XSK_RX_H__
 
 #include "en.h"
-#include <net/xdp_sock_drv.h>
 
 #define MLX5E_MTT_PTAG_MASK 0xfffffffffffffff8ULL
 
 /* RX data path */
 
+int mlx5e_xsk_alloc_rx_mpwqe(struct mlx5e_rq *rq, u16 ix);
+int mlx5e_xsk_alloc_rx_wqes_batched(struct mlx5e_rq *rq, u16 ix, int wqe_bulk);
+int mlx5e_xsk_alloc_rx_wqes(struct mlx5e_rq *rq, u16 ix, int wqe_bulk);
 struct sk_buff *mlx5e_xsk_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq,
 						    struct mlx5e_mpw_info *wi,
 						    u16 cqe_bcnt,
@@ -20,6 +22,8 @@ struct sk_buff *mlx5e_xsk_skb_from_cqe_linear(struct mlx5e_rq *rq,
 					      struct mlx5e_wqe_frag_info *wi,
 					      u32 cqe_bcnt);
 
+<<<<<<< HEAD
+=======
 static inline int mlx5e_xsk_page_alloc_pool(struct mlx5e_rq *rq,
 					    struct mlx5e_dma_info *dma_info)
 {
@@ -62,4 +66,5 @@ static inline bool mlx5e_xsk_update_rx_wakeup(struct mlx5e_rq *rq, bool alloc_er
 	return false;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __MLX5_EN_XSK_RX_H__ */

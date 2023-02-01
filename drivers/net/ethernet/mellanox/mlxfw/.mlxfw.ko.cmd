@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/mellanox/mlxfw/mlxfw.ko drivers/net/ethernet/mellanox/mlxfw/mlxfw.o drivers/net/ethernet/mellanox/mlxfw/mlxfw.mod.o;  true

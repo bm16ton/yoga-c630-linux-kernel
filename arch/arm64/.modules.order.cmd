@@ -1,0 +1,1 @@
+cmd_arch/arm64/modules.order := {   cat arch/arm64/kernel/modules.order;   cat arch/arm64/mm/modules.order;   cat arch/arm64/net/modules.order;   cat arch/arm64/xen/modules.order;   cat arch/arm64/crypto/modules.order; :; } > arch/arm64/modules.order

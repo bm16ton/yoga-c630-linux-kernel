@@ -1,0 +1,1 @@
+cmd_drivers/usb/serial/cypress_m8.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/serial/cypress_m8.ko drivers/usb/serial/cypress_m8.o drivers/usb/serial/cypress_m8.mod.o;  true

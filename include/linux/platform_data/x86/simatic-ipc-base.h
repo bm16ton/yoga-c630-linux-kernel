@@ -19,6 +19,10 @@
 #define SIMATIC_IPC_DEVICE_427E 2
 #define SIMATIC_IPC_DEVICE_127E 3
 #define SIMATIC_IPC_DEVICE_227E 4
+<<<<<<< HEAD
+#define SIMATIC_IPC_DEVICE_227G 5
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct simatic_ipc_platform {
 	u8	devmode;

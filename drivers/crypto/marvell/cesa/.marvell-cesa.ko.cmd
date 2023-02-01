@@ -1,0 +1,1 @@
+cmd_drivers/crypto/marvell/cesa/marvell-cesa.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/crypto/marvell/cesa/marvell-cesa.ko drivers/crypto/marvell/cesa/marvell-cesa.o drivers/crypto/marvell/cesa/marvell-cesa.mod.o;  true

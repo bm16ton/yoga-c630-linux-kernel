@@ -1,0 +1,1 @@
+cmd_drivers/usb/atm/xusbatm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/atm/xusbatm.ko drivers/usb/atm/xusbatm.o drivers/usb/atm/xusbatm.mod.o;  true

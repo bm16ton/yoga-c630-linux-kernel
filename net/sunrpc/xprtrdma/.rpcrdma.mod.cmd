@@ -1,0 +1,1 @@
+cmd_net/sunrpc/xprtrdma/rpcrdma.mod := printf '%s\n'   transport.o rpc_rdma.o verbs.o frwr_ops.o svc_rdma.o svc_rdma_backchannel.o svc_rdma_transport.o svc_rdma_sendto.o svc_rdma_recvfrom.o svc_rdma_rw.o svc_rdma_pcl.o module.o backchannel.o | awk '!x[$$0]++ { print("net/sunrpc/xprtrdma/"$$0) }' > net/sunrpc/xprtrdma/rpcrdma.mod

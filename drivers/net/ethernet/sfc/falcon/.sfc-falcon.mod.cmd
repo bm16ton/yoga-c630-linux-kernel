@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/sfc/falcon/sfc-falcon.mod := printf '%s\n'   efx.o nic.o farch.o falcon.o tx.o rx.o selftest.o ethtool.o qt202x_phy.o mdio_10g.o tenxpress.o txc43128_phy.o falcon_boards.o mtd.o | awk '!x[$$0]++ { print("drivers/net/ethernet/sfc/falcon/"$$0) }' > drivers/net/ethernet/sfc/falcon/sfc-falcon.mod

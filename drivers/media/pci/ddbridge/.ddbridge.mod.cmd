@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ddbridge/ddbridge.mod := printf '%s\n'   ddbridge-main.o ddbridge-core.o ddbridge-ci.o ddbridge-hw.o ddbridge-i2c.o ddbridge-max.o ddbridge-mci.o ddbridge-sx8.o | awk '!x[$$0]++ { print("drivers/media/pci/ddbridge/"$$0) }' > drivers/media/pci/ddbridge/ddbridge.mod

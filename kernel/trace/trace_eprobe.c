@@ -27,6 +27,12 @@ struct trace_eprobe {
 	/* tracepoint event */
 	const char *event_name;
 
+<<<<<<< HEAD
+	/* filter string for the tracepoint */
+	char *filter_str;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct trace_event_call *event;
 
 	struct dyn_event	devent;
@@ -49,6 +55,10 @@ static void trace_event_probe_cleanup(struct trace_eprobe *ep)
 	kfree(ep->event_system);
 	if (ep->event)
 		trace_event_put_ref(ep->event);
+<<<<<<< HEAD
+	kfree(ep->filter_str);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(ep);
 }
 
@@ -563,6 +573,12 @@ static void eprobe_trigger_func(struct event_trigger_data *data,
 	if (unlikely(!rec))
 		return;
 
+<<<<<<< HEAD
+	if (unlikely(!rec))
+		return;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__eprobe_trace_func(edata, rec);
 }
 
@@ -617,14 +633,25 @@ static struct event_trigger_data *
 new_eprobe_trigger(struct trace_eprobe *ep, struct trace_event_file *file)
 {
 	struct event_trigger_data *trigger;
+<<<<<<< HEAD
+	struct event_filter *filter = NULL;
 	struct eprobe_data *edata;
+	int ret;
+=======
+	struct eprobe_data *edata;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	edata = kzalloc(sizeof(*edata), GFP_KERNEL);
 	trigger = kzalloc(sizeof(*trigger), GFP_KERNEL);
 	if (!trigger || !edata) {
+<<<<<<< HEAD
+		ret = -ENOMEM;
+		goto error;
+=======
 		kfree(edata);
 		kfree(trigger);
 		return ERR_PTR(-ENOMEM);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	trigger->flags = EVENT_TRIGGER_FL_PROBE;
@@ -639,13 +666,32 @@ new_eprobe_trigger(struct trace_eprobe *ep, struct trace_event_file *file)
 	trigger->cmd_ops = &event_trigger_cmd;
 
 	INIT_LIST_HEAD(&trigger->list);
+<<<<<<< HEAD
+
+	if (ep->filter_str) {
+		ret = create_event_filter(file->tr, ep->event,
+					ep->filter_str, false, &filter);
+		if (ret)
+			goto error;
+	}
+	RCU_INIT_POINTER(trigger->filter, filter);
+=======
 	RCU_INIT_POINTER(trigger->filter, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	edata->file = file;
 	edata->ep = ep;
 	trigger->private_data = edata;
 
 	return trigger;
+<<<<<<< HEAD
+error:
+	free_event_filter(filter);
+	kfree(edata);
+	kfree(trigger);
+	return ERR_PTR(ret);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int enable_eprobe(struct trace_eprobe *ep,
@@ -679,6 +725,10 @@ static int disable_eprobe(struct trace_eprobe *ep,
 {
 	struct event_trigger_data *trigger = NULL, *iter;
 	struct trace_event_file *file;
+<<<<<<< HEAD
+	struct event_filter *filter;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct eprobe_data *edata;
 
 	file = find_event_file(tr, ep->event_system, ep->event_name);
@@ -705,6 +755,13 @@ static int disable_eprobe(struct trace_eprobe *ep,
 	/* Make sure nothing is using the edata or trigger */
 	tracepoint_synchronize_unregister();
 
+<<<<<<< HEAD
+	filter = rcu_access_pointer(trigger->filter);
+
+	if (filter)
+		free_event_filter(filter);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(edata);
 	kfree(trigger);
 
@@ -880,12 +937,70 @@ static int trace_eprobe_tp_update_arg(struct trace_eprobe *ep, const char *argv[
 	return ret;
 }
 
+<<<<<<< HEAD
+static int trace_eprobe_parse_filter(struct trace_eprobe *ep, int argc, const char *argv[])
+{
+	struct event_filter *dummy = NULL;
+	int i, ret, len = 0;
+	char *p;
+
+	if (argc == 0) {
+		trace_probe_log_err(0, NO_EP_FILTER);
+		return -EINVAL;
+	}
+
+	/* Recover the filter string */
+	for (i = 0; i < argc; i++)
+		len += strlen(argv[i]) + 1;
+
+	ep->filter_str = kzalloc(len, GFP_KERNEL);
+	if (!ep->filter_str)
+		return -ENOMEM;
+
+	p = ep->filter_str;
+	for (i = 0; i < argc; i++) {
+		ret = snprintf(p, len, "%s ", argv[i]);
+		if (ret < 0)
+			goto error;
+		if (ret > len) {
+			ret = -E2BIG;
+			goto error;
+		}
+		p += ret;
+		len -= ret;
+	}
+	p[-1] = '\0';
+
+	/*
+	 * Ensure the filter string can be parsed correctly. Note, this
+	 * filter string is for the original event, not for the eprobe.
+	 */
+	ret = create_event_filter(top_trace_array(), ep->event, ep->filter_str,
+				  true, &dummy);
+	free_event_filter(dummy);
+	if (ret)
+		goto error;
+
+	return 0;
+error:
+	kfree(ep->filter_str);
+	ep->filter_str = NULL;
+	return ret;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int __trace_eprobe_create(int argc, const char *argv[])
 {
 	/*
 	 * Argument syntax:
+<<<<<<< HEAD
+	 *      e[:[GRP/][ENAME]] SYSTEM.EVENT [FETCHARGS] [if FILTER]
+	 * Fetch args (no space):
+=======
 	 *      e[:[GRP/][ENAME]] SYSTEM.EVENT [FETCHARGS]
 	 * Fetch args:
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *  <name>=$<field>[:TYPE]
 	 */
 	const char *event = NULL, *group = EPROBE_EVENT_SYSTEM;
@@ -895,8 +1010,13 @@ static int __trace_eprobe_create(int argc, const char *argv[])
 	char buf1[MAX_EVENT_NAME_LEN];
 	char buf2[MAX_EVENT_NAME_LEN];
 	char gbuf[MAX_EVENT_NAME_LEN];
+<<<<<<< HEAD
+	int ret = 0, filter_idx = 0;
+	int i, filter_cnt;
+=======
 	int ret = 0;
 	int i;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (argc < 2 || argv[0][0] != 'e')
 		return -ECANCELED;
@@ -925,6 +1045,18 @@ static int __trace_eprobe_create(int argc, const char *argv[])
 		event = buf1;
 	}
 
+<<<<<<< HEAD
+	for (i = 2; i < argc; i++) {
+		if (!strcmp(argv[i], "if")) {
+			filter_idx = i + 1;
+			filter_cnt = argc - filter_idx;
+			argc = i;
+			break;
+		}
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&event_mutex);
 	event_call = find_and_get_event(sys_name, sys_event);
 	ep = alloc_event_probe(group, event, event_call, argc - 2);
@@ -940,6 +1072,17 @@ static int __trace_eprobe_create(int argc, const char *argv[])
 		goto error;
 	}
 
+<<<<<<< HEAD
+	if (filter_idx) {
+		trace_probe_log_set_index(filter_idx);
+		ret = trace_eprobe_parse_filter(ep, filter_cnt, argv + filter_idx);
+		if (ret)
+			goto parse_error;
+	} else
+		ep->filter_str = NULL;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	argc -= 2; argv += 2;
 	/* parse arguments */
 	for (i = 0; i < argc && i < MAX_TRACE_ARGS; i++) {

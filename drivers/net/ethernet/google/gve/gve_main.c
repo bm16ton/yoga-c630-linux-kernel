@@ -526,8 +526,12 @@ static void gve_add_napi(struct gve_priv *priv, int ntfy_idx,
 {
 	struct gve_notify_block *block = &priv->ntfy_blocks[ntfy_idx];
 
+<<<<<<< HEAD
+	netif_napi_add(priv->dev, &block->napi, gve_poll);
+=======
 	netif_napi_add(priv->dev, &block->napi, gve_poll,
 		       NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void gve_remove_napi(struct gve_priv *priv, int ntfy_idx)

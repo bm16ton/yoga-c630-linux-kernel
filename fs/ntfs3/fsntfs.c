@@ -1849,9 +1849,16 @@ int ntfs_security_init(struct ntfs_sb_info *sbi)
 		goto out;
 	}
 
+<<<<<<< HEAD
+	root_sdh = resident_data_ex(attr, sizeof(struct INDEX_ROOT));
+	if (root_sdh->type != ATTR_ZERO ||
+	    root_sdh->rule != NTFS_COLLATION_TYPE_SECURITY_HASH ||
+	    offsetof(struct INDEX_ROOT, ihdr) + root_sdh->ihdr.used > attr->res.data_size) {
+=======
 	root_sdh = resident_data(attr);
 	if (root_sdh->type != ATTR_ZERO ||
 	    root_sdh->rule != NTFS_COLLATION_TYPE_SECURITY_HASH) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = -EINVAL;
 		goto out;
 	}
@@ -1867,9 +1874,16 @@ int ntfs_security_init(struct ntfs_sb_info *sbi)
 		goto out;
 	}
 
+<<<<<<< HEAD
+	root_sii = resident_data_ex(attr, sizeof(struct INDEX_ROOT));
+	if (root_sii->type != ATTR_ZERO ||
+	    root_sii->rule != NTFS_COLLATION_TYPE_UINT ||
+	    offsetof(struct INDEX_ROOT, ihdr) + root_sii->ihdr.used > attr->res.data_size) {
+=======
 	root_sii = resident_data(attr);
 	if (root_sii->type != ATTR_ZERO ||
 	    root_sii->rule != NTFS_COLLATION_TYPE_UINT) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = -EINVAL;
 		goto out;
 	}

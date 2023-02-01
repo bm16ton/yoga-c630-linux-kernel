@@ -925,7 +925,11 @@ mt7915_mcu_sta_amsdu_tlv(struct mt7915_dev *dev, struct sk_buff *skb,
 	    vif->type != NL80211_IFTYPE_AP)
 		return;
 
+<<<<<<< HEAD
+	if (!sta->deflink.agg.max_amsdu_len)
+=======
 	if (!sta->max_amsdu_len)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    return;
 
 	tlv = mt76_connac_mcu_add_tlv(skb, STA_REC_HW_AMSDU, sizeof(*amsdu));
@@ -934,7 +938,11 @@ mt7915_mcu_sta_amsdu_tlv(struct mt7915_dev *dev, struct sk_buff *skb,
 	amsdu->amsdu_en = true;
 	msta->wcid.amsdu = true;
 
+<<<<<<< HEAD
+	switch (sta->deflink.agg.max_amsdu_len) {
+=======
 	switch (sta->max_amsdu_len) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case IEEE80211_MAX_MPDU_LEN_VHT_11454:
 		if (!is_mt7915(&dev->mt76)) {
 			amsdu->max_mpdu_size =
@@ -1304,7 +1312,11 @@ int mt7915_mcu_set_fixed_rate_ctrl(struct mt7915_dev *dev,
 			ra->phy = *phy;
 		break;
 	case RATE_PARAM_MMPS_UPDATE:
+<<<<<<< HEAD
+		ra->mmps_mode = mt7915_mcu_get_mmps_mode(sta->deflink.smps_mode);
+=======
 		ra->mmps_mode = mt7915_mcu_get_mmps_mode(sta->smps_mode);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	default:
 		break;
@@ -1461,7 +1473,11 @@ mt7915_mcu_sta_rate_ctrl_tlv(struct sk_buff *skb, struct mt7915_dev *dev,
 	ra->channel = chandef->chan->hw_value;
 	ra->bw = sta->deflink.bandwidth;
 	ra->phy.bw = sta->deflink.bandwidth;
+<<<<<<< HEAD
+	ra->mmps_mode = mt7915_mcu_get_mmps_mode(sta->deflink.smps_mode);
+=======
 	ra->mmps_mode = mt7915_mcu_get_mmps_mode(sta->smps_mode);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (supp_rate) {
 		supp_rate &= mask->control[band].legacy;

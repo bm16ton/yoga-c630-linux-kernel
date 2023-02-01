@@ -1025,8 +1025,11 @@ static int a5psw_remove(struct platform_device *pdev)
 	clk_disable_unprepare(a5psw->hclk);
 	clk_disable_unprepare(a5psw->clk);
 
+<<<<<<< HEAD
+=======
 	platform_set_drvdata(pdev, NULL);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

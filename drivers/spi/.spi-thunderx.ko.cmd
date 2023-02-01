@@ -1,0 +1,1 @@
+cmd_drivers/spi/spi-thunderx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/spi/spi-thunderx.ko drivers/spi/spi-thunderx.o drivers/spi/spi-thunderx.mod.o;  true

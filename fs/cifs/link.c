@@ -38,29 +38,28 @@ static int
 symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
 {
 	int rc;
-	struct crypto_shash *md5 = NULL;
-	struct sdesc *sdescmd5 = NULL;
+	struct shash_desc *md5 = NULL;
 
-	rc = cifs_alloc_hash("md5", &md5, &sdescmd5);
+	rc = cifs_alloc_hash("md5", &md5);
 	if (rc)
 		goto symlink_hash_err;
 
-	rc = crypto_shash_init(&sdescmd5->shash);
+	rc = crypto_shash_init(md5);
 	if (rc) {
 		cifs_dbg(VFS, "%s: Could not init md5 shash\n", __func__);
 		goto symlink_hash_err;
 	}
-	rc = crypto_shash_update(&sdescmd5->shash, link_str, link_len);
+	rc = crypto_shash_update(md5, link_str, link_len);
 	if (rc) {
 		cifs_dbg(VFS, "%s: Could not update with link_str\n", __func__);
 		goto symlink_hash_err;
 	}
-	rc = crypto_shash_final(&sdescmd5->shash, md5_hash);
+	rc = crypto_shash_final(md5, md5_hash);
 	if (rc)
 		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
 
 symlink_hash_err:
-	cifs_free_hash(&md5, &sdescmd5);
+	cifs_free_hash(&md5);
 	return rc;
 }
 
@@ -202,40 +201,6 @@ out:
 	return rc;
 }
 
-static int
-query_mf_symlink(const unsigned int xid, struct cifs_tcon *tcon,
-		 struct cifs_sb_info *cifs_sb, const unsigned char *path,
-		 char **symlinkinfo)
-{
-	int rc;
-	u8 *buf = NULL;
-	unsigned int link_len = 0;
-	unsigned int bytes_read = 0;
-
-	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
-	if (!buf)
-		return -ENOMEM;
-
-	if (tcon->ses->server->ops->query_mf_symlink)
-		rc = tcon->ses->server->ops->query_mf_symlink(xid, tcon,
-					      cifs_sb, path, buf, &bytes_read);
-	else
-		rc = -ENOSYS;
-
-	if (rc)
-		goto out;
-
-	if (bytes_read == 0) { /* not a symlink */
-		rc = -EINVAL;
-		goto out;
-	}
-
-	rc = parse_mf_symlink(buf, bytes_read, &link_len, symlinkinfo);
-out:
-	kfree(buf);
-	return rc;
-}
-
 int
 check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
 		 struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
@@ -245,6 +210,7 @@ check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
 	u8 *buf = NULL;
 	unsigned int link_len = 0;
 	unsigned int bytes_read = 0;
+	char *symlink = NULL;
 
 	if (!couldbe_mf_symlink(fattr))
 		/* it's not a symlink */
@@ -266,7 +232,7 @@ check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
 	if (bytes_read == 0) /* not a symlink */
 		goto out;
 
-	rc = parse_mf_symlink(buf, bytes_read, &link_len, NULL);
+	rc = parse_mf_symlink(buf, bytes_read, &link_len, &symlink);
 	if (rc == -EINVAL) {
 		/* it's not a symlink */
 		rc = 0;
@@ -281,6 +247,7 @@ check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
 	fattr->cf_mode &= ~S_IFMT;
 	fattr->cf_mode |= S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
 	fattr->cf_dtype = DT_LNK;
+	fattr->cf_symlink_target = symlink;
 out:
 	kfree(buf);
 	return rc;
@@ -461,6 +428,7 @@ smb3_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
 	oparms.disposition = FILE_CREATE;
 	oparms.fid = &fid;
 	oparms.reconnect = false;
+	oparms.mode = 0644;
 
 	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL,
 		       NULL, NULL);
@@ -600,6 +568,8 @@ cifs_hl_exit:
 	return rc;
 }
 
+<<<<<<< HEAD
+=======
 const char *
 cifs_get_link(struct dentry *direntry, struct inode *inode,
 	      struct delayed_call *done)
@@ -669,6 +639,7 @@ cifs_get_link(struct dentry *direntry, struct inode *inode,
 	return target_path;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int
 cifs_symlink(struct user_namespace *mnt_userns, struct inode *inode,
 	     struct dentry *direntry, const char *symname)

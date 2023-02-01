@@ -2,11 +2,45 @@
 /*
  * Clang Control Flow Integrity (CFI) support.
  *
+<<<<<<< HEAD
+ * Copyright (C) 2022 Google LLC
+=======
  * Copyright (C) 2021 Google LLC
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #ifndef _LINUX_CFI_H
 #define _LINUX_CFI_H
 
+<<<<<<< HEAD
+#include <linux/bug.h>
+#include <linux/module.h>
+
+#ifdef CONFIG_CFI_CLANG
+enum bug_trap_type report_cfi_failure(struct pt_regs *regs, unsigned long addr,
+				      unsigned long *target, u32 type);
+
+static inline enum bug_trap_type report_cfi_failure_noaddr(struct pt_regs *regs,
+							   unsigned long addr)
+{
+	return report_cfi_failure(regs, addr, NULL, 0);
+}
+
+#ifdef CONFIG_ARCH_USES_CFI_TRAPS
+bool is_cfi_trap(unsigned long addr);
+#endif
+#endif /* CONFIG_CFI_CLANG */
+
+#ifdef CONFIG_MODULES
+#ifdef CONFIG_ARCH_USES_CFI_TRAPS
+void module_cfi_finalize(const Elf_Ehdr *hdr, const Elf_Shdr *sechdrs,
+			 struct module *mod);
+#else
+static inline void module_cfi_finalize(const Elf_Ehdr *hdr,
+				       const Elf_Shdr *sechdrs,
+				       struct module *mod) {}
+#endif /* CONFIG_ARCH_USES_CFI_TRAPS */
+#endif /* CONFIG_MODULES */
+=======
 #ifdef CONFIG_CFI_CLANG
 typedef void (*cfi_check_fn)(uint64_t id, void *ptr, void *diag);
 
@@ -46,5 +80,6 @@ static inline void cfi_module_remove(struct module *mod, unsigned long base_addr
 #ifndef __CFI_ADDRESSABLE
 #define __CFI_ADDRESSABLE(fn, __attr)
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _LINUX_CFI_H */

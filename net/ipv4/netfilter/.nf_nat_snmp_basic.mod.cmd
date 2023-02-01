@@ -1,0 +1,1 @@
+cmd_net/ipv4/netfilter/nf_nat_snmp_basic.mod := printf '%s\n'   nf_nat_snmp_basic.asn1.o nf_nat_snmp_basic_main.o | awk '!x[$$0]++ { print("net/ipv4/netfilter/"$$0) }' > net/ipv4/netfilter/nf_nat_snmp_basic.mod

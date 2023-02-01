@@ -1,0 +1,1 @@
+cmd_drivers/firewire/modules.order := {   echo drivers/firewire/firewire-core.ko;   echo drivers/firewire/firewire-ohci.ko;   echo drivers/firewire/firewire-sbp2.ko;   echo drivers/firewire/firewire-net.ko;   echo drivers/firewire/nosy.ko; :; } > drivers/firewire/modules.order

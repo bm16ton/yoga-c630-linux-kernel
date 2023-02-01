@@ -1,0 +1,1 @@
+cmd_fs/nfs/blocklayout/blocklayoutdriver.mod := printf '%s\n'   blocklayout.o dev.o extent_tree.o rpc_pipefs.o | awk '!x[$$0]++ { print("fs/nfs/blocklayout/"$$0) }' > fs/nfs/blocklayout/blocklayoutdriver.mod

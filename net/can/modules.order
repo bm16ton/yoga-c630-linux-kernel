@@ -1,0 +1,6 @@
+net/can/can.ko
+net/can/can-raw.ko
+net/can/can-bcm.ko
+net/can/can-gw.ko
+net/can/j1939/can-j1939.ko
+net/can/can-isotp.ko

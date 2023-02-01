@@ -248,6 +248,10 @@ struct bpf_func_state {
 	 */
 	u32 async_entry_cnt;
 	bool in_callback_fn;
+<<<<<<< HEAD
+	struct tnum callback_ret_range;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool in_async_callback_fn;
 
 	/* The following fields should be last. See copy_func_state() */
@@ -592,6 +596,11 @@ int check_kfunc_mem_size_reg(struct bpf_verifier_env *env, struct bpf_reg_state 
 			     u32 regno);
 int check_mem_reg(struct bpf_verifier_env *env, struct bpf_reg_state *reg,
 		   u32 regno, u32 mem_size);
+bool is_dynptr_reg_valid_init(struct bpf_verifier_env *env,
+			      struct bpf_reg_state *reg);
+bool is_dynptr_type_expected(struct bpf_verifier_env *env,
+			     struct bpf_reg_state *reg,
+			     enum bpf_arg_type arg_type);
 
 /* this lives here instead of in bpf.h because it needs to dereference tgt_prog */
 static inline u64 bpf_trampoline_compute_key(const struct bpf_prog *tgt_prog,
@@ -619,6 +628,11 @@ int bpf_check_attach_target(struct bpf_verifier_log *log,
 			    struct bpf_attach_target_info *tgt_info);
 void bpf_free_kfunc_btf_tab(struct bpf_kfunc_btf_tab *tab);
 
+<<<<<<< HEAD
+int mark_chain_precision(struct bpf_verifier_env *env, int regno);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define BPF_BASE_TYPE_MASK	GENMASK(BPF_BASE_TYPE_BITS - 1, 0)
 
 /* extract base type from bpf_{arg, return, reg}_type. */
@@ -634,7 +648,11 @@ static inline u32 type_flag(u32 type)
 }
 
 /* only use after check_attach_btf_id() */
+<<<<<<< HEAD
+static inline enum bpf_prog_type resolve_prog_type(const struct bpf_prog *prog)
+=======
 static inline enum bpf_prog_type resolve_prog_type(struct bpf_prog *prog)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return prog->type == BPF_PROG_TYPE_EXT ?
 		prog->aux->dst_prog->type : prog->type;

@@ -18,7 +18,11 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_drv.h>
 #include <drm/drm_fb_helper.h>
+<<<<<<< HEAD
+#include <drm/drm_gem_dma_helper.h>
+=======
 #include <drm/drm_gem_cma_helper.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_print.h>
 
 #include "logicvc_crtc.h"
@@ -29,9 +33,15 @@
 #include "logicvc_of.h"
 #include "logicvc_regs.h"
 
+<<<<<<< HEAD
+DEFINE_DRM_GEM_DMA_FOPS(logicvc_drm_fops);
+
+static int logicvc_drm_gem_dma_dumb_create(struct drm_file *file_priv,
+=======
 DEFINE_DRM_GEM_CMA_FOPS(logicvc_drm_fops);
 
 static int logicvc_drm_gem_cma_dumb_create(struct drm_file *file_priv,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					   struct drm_device *drm_dev,
 					   struct drm_mode_create_dumb *args)
 {
@@ -40,7 +50,11 @@ static int logicvc_drm_gem_cma_dumb_create(struct drm_file *file_priv,
 	/* Stride is always fixed to its configuration value. */
 	args->pitch = logicvc->config.row_stride * DIV_ROUND_UP(args->bpp, 8);
 
+<<<<<<< HEAD
+	return drm_gem_dma_dumb_create_internal(file_priv, drm_dev, args);
+=======
 	return drm_gem_cma_dumb_create_internal(file_priv, drm_dev, args);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct drm_driver logicvc_drm_driver = {
@@ -54,7 +68,11 @@ static struct drm_driver logicvc_drm_driver = {
 	.major				= 1,
 	.minor				= 0,
 
+<<<<<<< HEAD
+	DRM_GEM_DMA_DRIVER_OPS_VMAP_WITH_DUMB_CREATE(logicvc_drm_gem_dma_dumb_create),
+=======
 	DRM_GEM_CMA_DRIVER_OPS_VMAP_WITH_DUMB_CREATE(logicvc_drm_gem_cma_dumb_create),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct regmap_config logicvc_drm_regmap_config = {

@@ -1,0 +1,1 @@
+cmd_drivers/input/keyboard/qt2160.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/keyboard/qt2160.ko drivers/input/keyboard/qt2160.o drivers/input/keyboard/qt2160.mod.o;  true

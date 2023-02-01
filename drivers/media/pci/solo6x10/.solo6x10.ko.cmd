@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/solo6x10/solo6x10.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/solo6x10/solo6x10.ko drivers/media/pci/solo6x10/solo6x10.o drivers/media/pci/solo6x10/solo6x10.mod.o;  true

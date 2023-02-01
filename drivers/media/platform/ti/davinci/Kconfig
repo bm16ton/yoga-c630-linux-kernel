@@ -32,6 +32,8 @@ config VIDEO_DAVINCI_VPIF_CAPTURE
 	  To compile this driver as a module, choose M here. There will
 	  be two modules called vpif.ko and vpif_capture.ko
 
+<<<<<<< HEAD
+=======
 config VIDEO_DM6446_CCDC
 	tristate "TI DM6446 CCDC video capture driver"
 	depends on V4L_PLATFORM_DRIVERS
@@ -81,6 +83,7 @@ config VIDEO_DM365_ISIF
 	   To compile this driver as a module, choose M here. There will
 	   be three modules called vpfe_capture.ko, vpss.ko and isif.ko
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config VIDEO_DAVINCI_VPBE_DISPLAY
 	tristate "TI DaVinci VPBE V4L2-Display driver"
 	depends on V4L_PLATFORM_DRIVERS

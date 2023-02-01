@@ -1,0 +1,1 @@
+cmd_drivers/scsi/qedi/qedi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/qedi/qedi.ko drivers/scsi/qedi/qedi.o drivers/scsi/qedi/qedi.mod.o;  true

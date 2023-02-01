@@ -112,9 +112,17 @@ static int check_fpr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 	return errors;
 }
 
+<<<<<<< HEAD
+#define SVE_Z_SHARED_BYTES (128 / 8)
+
+static uint8_t z_zero[__SVE_ZREG_SIZE(SVE_VQ_MAX)];
+uint8_t z_in[SVE_NUM_ZREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
+uint8_t z_out[SVE_NUM_ZREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
+=======
 static uint8_t z_zero[__SVE_ZREG_SIZE(SVE_VQ_MAX)];
 uint8_t z_in[SVE_NUM_PREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
 uint8_t z_out[SVE_NUM_PREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void setup_z(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 		    uint64_t svcr)
@@ -133,6 +141,41 @@ static int check_z(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 	if (!sve_vl)
 		return 0;
 
+<<<<<<< HEAD
+	for (i = 0; i < SVE_NUM_ZREGS; i++) {
+		uint8_t *in = &z_in[reg_size * i];
+		uint8_t *out = &z_out[reg_size * i];
+
+		if (svcr & SVCR_SM_MASK) {
+			/*
+			 * In streaming mode the whole register should
+			 * be cleared by the transition out of
+			 * streaming mode.
+			 */
+			if (memcmp(z_zero, out, reg_size) != 0) {
+				ksft_print_msg("%s SVE VL %d Z%d non-zero\n",
+					       cfg->name, sve_vl, i);
+				errors++;
+			}
+		} else {
+			/*
+			 * For standard SVE the low 128 bits should be
+			 * preserved and any additional bits cleared.
+			 */
+			if (memcmp(in, out, SVE_Z_SHARED_BYTES) != 0) {
+				ksft_print_msg("%s SVE VL %d Z%d low 128 bits changed\n",
+					       cfg->name, sve_vl, i);
+				errors++;
+			}
+
+			if (reg_size > SVE_Z_SHARED_BYTES &&
+			    (memcmp(z_zero, out + SVE_Z_SHARED_BYTES,
+				    reg_size - SVE_Z_SHARED_BYTES) != 0)) {
+				ksft_print_msg("%s SVE VL %d Z%d high bits non-zero\n",
+					       cfg->name, sve_vl, i);
+				errors++;
+			}
+=======
 	/*
 	 * After a syscall the low 128 bits of the Z registers should
 	 * be preserved and the rest be zeroed or preserved, except if
@@ -149,6 +192,7 @@ static int check_z(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 			ksft_print_msg("%s SVE VL %d Z%d low 128 bits changed\n",
 				       cfg->name, sve_vl, i);
 			errors++;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -176,9 +220,15 @@ static int check_p(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 	if (!sve_vl)
 		return 0;
 
+<<<<<<< HEAD
+	/* After a syscall the P registers should be zeroed */
+	for (i = 0; i < SVE_NUM_PREGS * reg_size; i++)
+		if (p_out[i])
+=======
 	/* After a syscall the P registers should be preserved or zeroed */
 	for (i = 0; i < SVE_NUM_PREGS * reg_size; i++)
 		if (p_out[i] && (p_in[i] != p_out[i]))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			errors++;
 	if (errors)
 		ksft_print_msg("%s SVE VL %d predicate registers non-zero\n",
@@ -226,9 +276,15 @@ static int check_ffr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
 	    !(getauxval(AT_HWCAP2) & HWCAP2_SME_FA64))
 		return 0;
 
+<<<<<<< HEAD
+	/* After a syscall FFR should be zeroed */
+	for (i = 0; i < reg_size; i++)
+		if (ffr_out[i])
+=======
 	/* After a syscall the P registers should be preserved or zeroed */
 	for (i = 0; i < reg_size; i++)
 		if (ffr_out[i] && (ffr_in[i] != ffr_out[i]))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			errors++;
 	if (errors)
 		ksft_print_msg("%s SVE VL %d FFR non-zero\n",

@@ -122,7 +122,11 @@ volumes, calling::
 to tell fscache that a volume has been withdrawn.  This waits for all
 outstanding accesses on the volume to complete before returning.
 
+<<<<<<< HEAD
+When the cache is completely withdrawn, fscache should be notified by
+=======
 When the the cache is completely withdrawn, fscache should be notified by
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 calling::
 
 	void fscache_relinquish_cache(struct fscache_cache *cache);

@@ -1,0 +1,14 @@
+net/6lowpan/6lowpan.ko
+net/6lowpan/nhc_dest.ko
+net/6lowpan/nhc_fragment.ko
+net/6lowpan/nhc_hop.ko
+net/6lowpan/nhc_ipv6.ko
+net/6lowpan/nhc_mobility.ko
+net/6lowpan/nhc_routing.ko
+net/6lowpan/nhc_udp.ko
+net/6lowpan/nhc_ghc_ext_hop.ko
+net/6lowpan/nhc_ghc_udp.ko
+net/6lowpan/nhc_ghc_icmpv6.ko
+net/6lowpan/nhc_ghc_ext_dest.ko
+net/6lowpan/nhc_ghc_ext_frag.ko
+net/6lowpan/nhc_ghc_ext_route.ko

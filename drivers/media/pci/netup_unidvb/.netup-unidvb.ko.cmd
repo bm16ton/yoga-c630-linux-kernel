@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/netup_unidvb/netup-unidvb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/netup_unidvb/netup-unidvb.ko drivers/media/pci/netup_unidvb/netup-unidvb.o drivers/media/pci/netup_unidvb/netup-unidvb.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_fs/cachefiles/cachefiles.mod := printf '%s\n'   cache.o daemon.o interface.o io.o key.o main.o namei.o security.o volume.o xattr.o | awk '!x[$$0]++ { print("fs/cachefiles/"$$0) }' > fs/cachefiles/cachefiles.mod

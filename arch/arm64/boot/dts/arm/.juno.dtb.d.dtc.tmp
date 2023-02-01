@@ -1,0 +1,1 @@
+arch/arm64/boot/dts/arm/juno.dtb: arch/arm64/boot/dts/arm/.juno.dtb.dts.tmp

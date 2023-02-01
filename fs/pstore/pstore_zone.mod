@@ -1,0 +1,1 @@
+fs/pstore/zone.o

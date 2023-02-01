@@ -190,6 +190,13 @@
 #define CTRLDESCL0_1_WIDTH(n)		((n) & 0xffff)
 #define CTRLDESCL0_1_WIDTH_MASK		GENMASK(15, 0)
 
+<<<<<<< HEAD
+#define CTRLDESCL0_3_P_SIZE(n)		(((n) << 20) & CTRLDESCL0_3_P_SIZE_MASK)
+#define CTRLDESCL0_3_P_SIZE_MASK	GENMASK(22, 20)
+#define CTRLDESCL0_3_T_SIZE(n)		(((n) << 16) & CTRLDESCL0_3_T_SIZE_MASK)
+#define CTRLDESCL0_3_T_SIZE_MASK	GENMASK(17, 16)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define CTRLDESCL0_3_PITCH(n)		((n) & 0xffff)
 #define CTRLDESCL0_3_PITCH_MASK		GENMASK(15, 0)
 
@@ -248,6 +255,10 @@
 
 #define PANIC0_THRES_LOW_MASK		GENMASK(24, 16)
 #define PANIC0_THRES_HIGH_MASK		GENMASK(8, 0)
+<<<<<<< HEAD
+#define PANIC0_THRES_MAX		511
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define LCDIF_MIN_XRES			120
 #define LCDIF_MIN_YRES			120

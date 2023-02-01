@@ -306,7 +306,11 @@ static struct clk_rcg2 disp_cc_mdss_pclk0_clk_src = {
 		.name = "disp_cc_mdss_pclk0_clk_src",
 		.parent_data = disp_cc_parent_data_5,
 		.num_parents = ARRAY_SIZE(disp_cc_parent_data_5),
+<<<<<<< HEAD
+		.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE | CLK_OPS_PARENT_ENABLE,
+=======
 		.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.ops = &clk_pixel_ops,
 	},
 };
@@ -385,7 +389,11 @@ static struct clk_branch disp_cc_mdss_byte0_clk = {
 				&disp_cc_mdss_byte0_clk_src.clkr.hw,
 			},
 			.num_parents = 1,
+<<<<<<< HEAD
+			.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE | CLK_OPS_PARENT_ENABLE,
+=======
 			.flags = CLK_SET_RATE_PARENT | CLK_GET_RATE_NOCACHE,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			.ops = &clk_branch2_ops,
 		},
 	},

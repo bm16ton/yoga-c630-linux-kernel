@@ -1,0 +1,8 @@
+drivers/rtc/rtc-armada38x.ko
+drivers/rtc/rtc-cros-ec.ko
+drivers/rtc/rtc-meson-vrtc.ko
+drivers/rtc/rtc-mv.ko
+drivers/rtc/rtc-pcf2127.ko
+drivers/rtc/rtc-pm8xxx.ko
+drivers/rtc/rtc-rk808.ko
+drivers/rtc/rtc-rv8803.ko

@@ -114,6 +114,8 @@ struct msm_gem_object {
 	 */
 	struct list_head node;
 
+<<<<<<< HEAD
+=======
 	/**
 	 * An object is either:
 	 *  inactive - on priv->inactive_dontneed or priv->inactive_willneed
@@ -125,6 +127,7 @@ struct msm_gem_object {
 	 */
 	struct list_head mm_list;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct page **pages;
 	struct sg_table *sgt;
 	void *vaddr;
@@ -138,7 +141,10 @@ struct msm_gem_object {
 
 	char name[32]; /* Identifier to print for the debugfs files */
 
+<<<<<<< HEAD
+=======
 	int active_count;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int pin_count;
 };
 #define to_msm_bo(x) container_of(x, struct msm_gem_object, base)
@@ -159,8 +165,8 @@ int msm_gem_get_and_pin_iova(struct drm_gem_object *obj,
 		struct msm_gem_address_space *aspace, uint64_t *iova);
 void msm_gem_unpin_iova(struct drm_gem_object *obj,
 		struct msm_gem_address_space *aspace);
-struct page **msm_gem_get_pages(struct drm_gem_object *obj);
-void msm_gem_put_pages(struct drm_gem_object *obj);
+struct page **msm_gem_pin_pages(struct drm_gem_object *obj);
+void msm_gem_unpin_pages(struct drm_gem_object *obj);
 int msm_gem_dumb_create(struct drm_file *file, struct drm_device *dev,
 		struct drm_mode_create_dumb *args);
 int msm_gem_dumb_map_offset(struct drm_file *file, struct drm_device *dev,
@@ -171,8 +177,12 @@ void *msm_gem_get_vaddr_active(struct drm_gem_object *obj);
 void msm_gem_put_vaddr_locked(struct drm_gem_object *obj);
 void msm_gem_put_vaddr(struct drm_gem_object *obj);
 int msm_gem_madvise(struct drm_gem_object *obj, unsigned madv);
+<<<<<<< HEAD
+bool msm_gem_active(struct drm_gem_object *obj);
+=======
 void msm_gem_active_get(struct drm_gem_object *obj, struct msm_gpu *gpu);
 void msm_gem_active_put(struct drm_gem_object *obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int msm_gem_cpu_prep(struct drm_gem_object *obj, uint32_t op, ktime_t *timeout);
 int msm_gem_cpu_fini(struct drm_gem_object *obj);
 int msm_gem_new_handle(struct drm_device *dev, struct drm_file *file,
@@ -208,12 +218,6 @@ msm_gem_lock(struct drm_gem_object *obj)
 	dma_resv_lock(obj->resv, NULL);
 }
 
-static inline bool __must_check
-msm_gem_trylock(struct drm_gem_object *obj)
-{
-	return dma_resv_trylock(obj->resv);
-}
-
 static inline int
 msm_gem_lock_interruptible(struct drm_gem_object *obj)
 {
@@ -226,8 +230,8 @@ msm_gem_unlock(struct drm_gem_object *obj)
 	dma_resv_unlock(obj->resv);
 }
 
-static inline bool
-msm_gem_is_locked(struct drm_gem_object *obj)
+static inline void
+msm_gem_assert_locked(struct drm_gem_object *obj)
 {
 	/*
 	 * Destroying the object is a special case.. msm_gem_free_object()
@@ -241,13 +245,25 @@ msm_gem_is_locked(struct drm_gem_object *obj)
 	 * Unfortunately lockdep is not aware of this detail.  So when the
 	 * refcount drops to zero, we pretend it is already locked.
 	 */
+<<<<<<< HEAD
+	lockdep_assert_once(
+		(kref_read(&obj->refcount) == 0) ||
+		(lockdep_is_held(&obj->resv->lock.base) != LOCK_STATE_NOT_HELD)
+	);
+=======
 	return dma_resv_is_locked(obj->resv) || (kref_read(&obj->refcount) == 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
-static inline bool is_active(struct msm_gem_object *msm_obj)
+/* imported/exported objects are not purgeable: */
+static inline bool is_unpurgeable(struct msm_gem_object *msm_obj)
 {
+<<<<<<< HEAD
+	return msm_obj->base.import_attach || msm_obj->pin_count;
+=======
 	GEM_WARN_ON(!msm_gem_is_locked(&msm_obj->base));
 	return msm_obj->active_count;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* imported/exported objects are not purgeable: */
@@ -264,6 +280,12 @@ static inline bool is_purgeable(struct msm_gem_object *msm_obj)
 
 static inline bool is_vunmapable(struct msm_gem_object *msm_obj)
 {
+<<<<<<< HEAD
+	msm_gem_assert_locked(&msm_obj->base);
+	return (msm_obj->vmap_count == 0) && msm_obj->vaddr;
+}
+
+=======
 	GEM_WARN_ON(!msm_gem_is_locked(&msm_obj->base));
 	return (msm_obj->vmap_count == 0) && msm_obj->vaddr;
 }
@@ -301,11 +323,14 @@ static inline void mark_unpurgeable(struct msm_gem_object *msm_obj)
 	msm_obj->dontneed = false;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline bool is_unevictable(struct msm_gem_object *msm_obj)
 {
 	return is_unpurgeable(msm_obj) || msm_obj->vaddr;
 }
 
+<<<<<<< HEAD
+=======
 static inline void mark_evictable(struct msm_gem_object *msm_obj)
 {
 	struct msm_drm_private *priv = msm_obj->base.dev->dev_private;
@@ -339,6 +364,7 @@ static inline void mark_unevictable(struct msm_gem_object *msm_obj)
 	msm_obj->evictable = false;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void msm_gem_purge(struct drm_gem_object *obj);
 void msm_gem_evict(struct drm_gem_object *obj);
 void msm_gem_vunmap(struct drm_gem_object *obj);
@@ -390,9 +416,14 @@ struct msm_gem_submit {
 /* make sure these don't conflict w/ MSM_SUBMIT_BO_x */
 #define BO_VALID	0x8000	/* is current addr in cmdstream correct/valid? */
 #define BO_LOCKED	0x4000	/* obj lock is held */
+<<<<<<< HEAD
+#define BO_OBJ_PINNED	0x2000	/* obj (pages) is pinned and on active list */
+#define BO_VMA_PINNED	0x1000	/* vma (virtual address) is pinned */
+=======
 #define BO_ACTIVE	0x2000	/* active refcnt is held */
 #define BO_OBJ_PINNED	0x1000	/* obj (pages) is pinned and on active list */
 #define BO_VMA_PINNED	0x0800	/* vma (virtual address) is pinned */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		uint32_t flags;
 		union {
 			struct msm_gem_object *obj;

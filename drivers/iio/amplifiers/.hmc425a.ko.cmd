@@ -1,0 +1,1 @@
+cmd_drivers/iio/amplifiers/hmc425a.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/amplifiers/hmc425a.ko drivers/iio/amplifiers/hmc425a.o drivers/iio/amplifiers/hmc425a.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/hisi_sas/modules.order := {   echo drivers/scsi/hisi_sas/hisi_sas_main.ko;   echo drivers/scsi/hisi_sas/hisi_sas_v1_hw.ko;   echo drivers/scsi/hisi_sas/hisi_sas_v2_hw.ko;   echo drivers/scsi/hisi_sas/hisi_sas_v3_hw.ko; :; } > drivers/scsi/hisi_sas/modules.order

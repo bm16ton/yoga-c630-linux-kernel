@@ -127,6 +127,75 @@ struct venc_h264_vsi {
 	struct venc_h264_vpu_buf work_bufs[VENC_H264_VPU_WORK_BUF_MAX];
 };
 
+<<<<<<< HEAD
+/**
+ * struct venc_h264_vpu_config_ext - Structure for h264 encoder configuration
+ *                                   AP-W/R : AP is writer/reader on this item
+ *                                   VPU-W/R: VPU is write/reader on this item
+ * @input_fourcc: input fourcc
+ * @bitrate: target bitrate (in bps)
+ * @pic_w: picture width. Picture size is visible stream resolution, in pixels,
+ *         to be used for display purposes; must be smaller or equal to buffer
+ *         size.
+ * @pic_h: picture height
+ * @buf_w: buffer width. Buffer size is stream resolution in pixels aligned to
+ *         hardware requirements.
+ * @buf_h: buffer height
+ * @gop_size: group of picture size (idr frame)
+ * @intra_period: intra frame period
+ * @framerate: frame rate in fps
+ * @profile: as specified in standard
+ * @level: as specified in standard
+ * @wfd: WFD mode 1:on, 0:off
+ * @max_qp: max quant parameter
+ * @min_qp: min quant parameter
+ * @reserved: reserved configs
+ */
+struct venc_h264_vpu_config_ext {
+	u32 input_fourcc;
+	u32 bitrate;
+	u32 pic_w;
+	u32 pic_h;
+	u32 buf_w;
+	u32 buf_h;
+	u32 gop_size;
+	u32 intra_period;
+	u32 framerate;
+	u32 profile;
+	u32 level;
+	u32 wfd;
+	u32 max_qp;
+	u32 min_qp;
+	u32 reserved[8];
+};
+
+/**
+ * struct venc_h264_vpu_buf_34 - Structure for 34-bit buffer information
+ *                               AP-W/R : AP is writer/reader on this item
+ *                               VPU-W/R: VPU is write/reader on this item
+ * @iova: 34-bit IO virtual address
+ * @vpua: VPU side memory addr which is used by RC_CODE
+ * @size: buffer size (in bytes)
+ */
+struct venc_h264_vpu_buf_34 {
+	u64 iova;
+	u32 vpua;
+	u32 size;
+};
+
+/**
+ * struct venc_h264_vsi_34 - Structure for VPU driver control and info share
+ *                           Used for 34-bit iova sharing
+ * @config: h264 encoder configuration
+ * @work_bufs: working buffer information in VPU side
+ */
+struct venc_h264_vsi_34 {
+	struct venc_h264_vpu_config_ext config;
+	struct venc_h264_vpu_buf_34 work_bufs[VENC_H264_VPU_WORK_BUF_MAX];
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * struct venc_h264_inst - h264 encoder AP driver instance
  * @hw_base: h264 encoder hardware register base
@@ -140,6 +209,11 @@ struct venc_h264_vsi {
  * @vpu_inst: VPU instance to exchange information between AP and VPU
  * @vsi: driver structure allocated by VPU side and shared to AP side for
  *	 control and info share
+<<<<<<< HEAD
+ * @vsi_34: driver structure allocated by VPU side and shared to AP side for
+ *	 control and info share, used for 34-bit iova sharing.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @ctx: context for v4l2 layer integration
  */
 struct venc_h264_inst {
@@ -152,6 +226,10 @@ struct venc_h264_inst {
 	unsigned int prepend_hdr;
 	struct venc_vpu_inst vpu_inst;
 	struct venc_h264_vsi *vsi;
+<<<<<<< HEAD
+	struct venc_h264_vsi_34 *vsi_34;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mtk_vcodec_ctx *ctx;
 };
 
@@ -244,6 +322,23 @@ static void h264_enc_free_work_buf(struct venc_h264_inst *inst)
 	mtk_vcodec_debug_leave(inst);
 }
 
+<<<<<<< HEAD
+static int h264_enc_alloc_work_buf(struct venc_h264_inst *inst, bool is_34bit)
+{
+	struct venc_h264_vpu_buf *wb = NULL;
+	struct venc_h264_vpu_buf_34 *wb_34 = NULL;
+	int i;
+	u32 vpua, wb_size;
+	int ret = 0;
+
+	mtk_vcodec_debug_enter(inst);
+
+	if (is_34bit)
+		wb_34 = inst->vsi_34->work_bufs;
+	else
+		wb = inst->vsi->work_bufs;
+
+=======
 static int h264_enc_alloc_work_buf(struct venc_h264_inst *inst)
 {
 	int i;
@@ -252,6 +347,7 @@ static int h264_enc_alloc_work_buf(struct venc_h264_inst *inst)
 
 	mtk_vcodec_debug_enter(inst);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < VENC_H264_VPU_WORK_BUF_MAX; i++) {
 		/*
 		 * This 'wb' structure is set by VPU side and shared to AP for
@@ -269,13 +365,30 @@ static int h264_enc_alloc_work_buf(struct venc_h264_inst *inst)
 		 * address and do some memcpy access to move to bitstream buffer
 		 * assigned by v4l2 layer.
 		 */
+<<<<<<< HEAD
+		if (is_34bit) {
+			inst->work_bufs[i].size = wb_34[i].size;
+			vpua = wb_34[i].vpua;
+			wb_size = wb_34[i].size;
+		} else {
+			inst->work_bufs[i].size = wb[i].size;
+			vpua = wb[i].vpua;
+			wb_size = wb[i].size;
+		}
+
+=======
 		inst->work_bufs[i].size = wb[i].size;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (i == VENC_H264_VPU_WORK_BUF_SKIP_FRAME) {
 			struct mtk_vcodec_fw *handler;
 
 			handler = inst->vpu_inst.ctx->dev->fw_handler;
 			inst->work_bufs[i].va =
+<<<<<<< HEAD
+				mtk_vcodec_fw_map_dm_addr(handler, vpua);
+=======
 				mtk_vcodec_fw_map_dm_addr(handler, wb[i].vpua);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			inst->work_bufs[i].dma_addr = 0;
 		} else {
 			ret = mtk_vcodec_mem_alloc(inst->ctx,
@@ -297,12 +410,23 @@ static int h264_enc_alloc_work_buf(struct venc_h264_inst *inst)
 
 				handler = inst->vpu_inst.ctx->dev->fw_handler;
 				tmp_va = mtk_vcodec_fw_map_dm_addr(handler,
+<<<<<<< HEAD
+								   vpua);
+				memcpy(inst->work_bufs[i].va, tmp_va, wb_size);
+			}
+		}
+		if (is_34bit)
+			wb_34[i].iova = inst->work_bufs[i].dma_addr;
+		else
+			wb[i].iova = inst->work_bufs[i].dma_addr;
+=======
 								   wb[i].vpua);
 				memcpy(inst->work_bufs[i].va, tmp_va,
 				       wb[i].size);
 			}
 		}
 		wb[i].iova = inst->work_bufs[i].dma_addr;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		mtk_vcodec_debug(inst,
 				 "work_buf[%d] va=0x%p iova=%pad size=%zu",
@@ -342,6 +466,17 @@ static unsigned int h264_enc_wait_venc_done(struct venc_h264_inst *inst)
 	return irq_status;
 }
 
+<<<<<<< HEAD
+static int h264_frame_type(unsigned int frm_cnt, unsigned int gop_size,
+			   unsigned int intra_period)
+{
+	if ((gop_size != 0 && (frm_cnt % gop_size) == 0) ||
+	    (frm_cnt == 0 && gop_size == 0)) {
+		/* IDR frame */
+		return VENC_H264_IDR_FRM;
+	} else if ((intra_period != 0 && (frm_cnt % intra_period) == 0) ||
+		   (frm_cnt == 0 && intra_period == 0)) {
+=======
 static int h264_frame_type(struct venc_h264_inst *inst)
 {
 	if ((inst->vsi->config.gop_size != 0 &&
@@ -352,12 +487,17 @@ static int h264_frame_type(struct venc_h264_inst *inst)
 	} else if ((inst->vsi->config.intra_period != 0 &&
 		    (inst->frm_cnt % inst->vsi->config.intra_period) == 0) ||
 		   (inst->frm_cnt == 0 && inst->vsi->config.intra_period == 0)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* I frame */
 		return VENC_H264_I_FRM;
 	} else {
 		return VENC_H264_P_FRM;  /* Note: B frames are not supported */
 	}
 }
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int h264_encode_sps(struct venc_h264_inst *inst,
 			   struct mtk_vcodec_mem *bs_buf,
 			   unsigned int *bs_size)
@@ -438,6 +578,34 @@ static int h264_encode_frame(struct venc_h264_inst *inst,
 			     unsigned int *bs_size)
 {
 	int ret = 0;
+<<<<<<< HEAD
+	unsigned int gop_size;
+	unsigned int intra_period;
+	unsigned int irq_status;
+	struct venc_frame_info frame_info;
+	struct mtk_vcodec_ctx *ctx = inst->ctx;
+
+	mtk_vcodec_debug_enter(inst);
+	mtk_vcodec_debug(inst, "frm_cnt = %d\n ", inst->frm_cnt);
+
+	if (MTK_ENC_IOVA_IS_34BIT(ctx)) {
+		gop_size = inst->vsi_34->config.gop_size;
+		intra_period = inst->vsi_34->config.intra_period;
+	} else {
+		gop_size = inst->vsi->config.gop_size;
+		intra_period = inst->vsi->config.intra_period;
+	}
+	frame_info.frm_count = inst->frm_cnt;
+	frame_info.skip_frm_count = inst->skip_frm_cnt;
+	frame_info.frm_type = h264_frame_type(inst->frm_cnt, gop_size,
+					      intra_period);
+	mtk_vcodec_debug(inst, "frm_count = %d,skip_frm_count =%d,frm_type=%d.\n",
+			 frame_info.frm_count, frame_info.skip_frm_count,
+			 frame_info.frm_type);
+
+	ret = vpu_enc_encode(&inst->vpu_inst, H264_BS_MODE_FRAME,
+			     frm_buf, bs_buf, &frame_info);
+=======
 	unsigned int irq_status;
 	struct venc_frame_info frame_info;
 
@@ -450,6 +618,7 @@ static int h264_encode_frame(struct venc_h264_inst *inst,
 			 frame_info.frm_count, frame_info.skip_frm_count,
 			 frame_info.frm_type);
 	ret = vpu_enc_encode(&inst->vpu_inst, H264_BS_MODE_FRAME, frm_buf, bs_buf, &frame_info);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
@@ -517,7 +686,14 @@ static int h264_enc_init(struct mtk_vcodec_ctx *ctx)
 
 	ret = vpu_enc_init(&inst->vpu_inst);
 
+<<<<<<< HEAD
+	if (MTK_ENC_IOVA_IS_34BIT(ctx))
+		inst->vsi_34 = (struct venc_h264_vsi_34 *)inst->vpu_inst.vsi;
+	else
+		inst->vsi = (struct venc_h264_vsi *)inst->vpu_inst.vsi;
+=======
 	inst->vsi = (struct venc_h264_vsi *)inst->vpu_inst.vsi;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mtk_vcodec_debug_leave(inst);
 
@@ -624,17 +800,69 @@ encode_err:
 	return ret;
 }
 
+<<<<<<< HEAD
+static void h264_enc_set_vsi_configs(struct venc_h264_inst *inst,
+				     struct venc_enc_param *enc_prm)
+{
+	inst->vsi->config.input_fourcc = enc_prm->input_yuv_fmt;
+	inst->vsi->config.bitrate = enc_prm->bitrate;
+	inst->vsi->config.pic_w = enc_prm->width;
+	inst->vsi->config.pic_h = enc_prm->height;
+	inst->vsi->config.buf_w = enc_prm->buf_width;
+	inst->vsi->config.buf_h = enc_prm->buf_height;
+	inst->vsi->config.gop_size = enc_prm->gop_size;
+	inst->vsi->config.framerate = enc_prm->frm_rate;
+	inst->vsi->config.intra_period = enc_prm->intra_period;
+	inst->vsi->config.profile =
+		h264_get_profile(inst, enc_prm->h264_profile);
+	inst->vsi->config.level =
+		h264_get_level(inst, enc_prm->h264_level);
+	inst->vsi->config.wfd = 0;
+}
+
+static void h264_enc_set_vsi_34_configs(struct venc_h264_inst *inst,
+					struct venc_enc_param *enc_prm)
+{
+	inst->vsi_34->config.input_fourcc = enc_prm->input_yuv_fmt;
+	inst->vsi_34->config.bitrate = enc_prm->bitrate;
+	inst->vsi_34->config.pic_w = enc_prm->width;
+	inst->vsi_34->config.pic_h = enc_prm->height;
+	inst->vsi_34->config.buf_w = enc_prm->buf_width;
+	inst->vsi_34->config.buf_h = enc_prm->buf_height;
+	inst->vsi_34->config.gop_size = enc_prm->gop_size;
+	inst->vsi_34->config.framerate = enc_prm->frm_rate;
+	inst->vsi_34->config.intra_period = enc_prm->intra_period;
+	inst->vsi_34->config.profile =
+		h264_get_profile(inst, enc_prm->h264_profile);
+	inst->vsi_34->config.level =
+		h264_get_level(inst, enc_prm->h264_level);
+	inst->vsi_34->config.wfd = 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int h264_enc_set_param(void *handle,
 			      enum venc_set_param_type type,
 			      struct venc_enc_param *enc_prm)
 {
 	int ret = 0;
 	struct venc_h264_inst *inst = (struct venc_h264_inst *)handle;
+<<<<<<< HEAD
+	struct mtk_vcodec_ctx *ctx = inst->ctx;
+	const bool is_34bit = MTK_ENC_IOVA_IS_34BIT(ctx);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mtk_vcodec_debug(inst, "->type=%d", type);
 
 	switch (type) {
 	case VENC_SET_PARAM_ENC:
+<<<<<<< HEAD
+		if (is_34bit)
+			h264_enc_set_vsi_34_configs(inst, enc_prm);
+		else
+			h264_enc_set_vsi_configs(inst, enc_prm);
+=======
 		inst->vsi->config.input_fourcc = enc_prm->input_yuv_fmt;
 		inst->vsi->config.bitrate = enc_prm->bitrate;
 		inst->vsi->config.pic_w = enc_prm->width;
@@ -649,6 +877,7 @@ static int h264_enc_set_param(void *handle,
 		inst->vsi->config.level =
 			h264_get_level(inst, enc_prm->h264_level);
 		inst->vsi->config.wfd = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = vpu_enc_set_param(&inst->vpu_inst, type, enc_prm);
 		if (ret)
 			break;
@@ -656,7 +885,11 @@ static int h264_enc_set_param(void *handle,
 			h264_enc_free_work_buf(inst);
 			inst->work_buf_allocated = false;
 		}
+<<<<<<< HEAD
+		ret = h264_enc_alloc_work_buf(inst, is_34bit);
+=======
 		ret = h264_enc_alloc_work_buf(inst);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret)
 			break;
 		inst->work_buf_allocated = true;

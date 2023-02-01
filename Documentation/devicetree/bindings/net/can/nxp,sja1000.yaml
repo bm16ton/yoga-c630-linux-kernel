@@ -30,8 +30,15 @@ properties:
   clocks:
     maxItems: 1
 
+<<<<<<< HEAD
+  power-domains:
+    maxItems: 1
+
+  reg-io-width:
+=======
   reg-io-width:
     $ref: /schemas/types.yaml#/definitions/uint32
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     description: I/O register width (in bytes) implemented by this device
     default: 1
     enum: [ 1, 2, 4 ]
@@ -105,6 +112,10 @@ allOf:
     then:
       required:
         - clocks
+<<<<<<< HEAD
+        - power-domains
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 unevaluatedProperties: false
 
@@ -129,4 +140,8 @@ examples:
         reg-io-width = <4>;
         interrupts = <GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>;
         clocks = <&sysctrl R9A06G032_HCLK_CAN0>;
+<<<<<<< HEAD
+        power-domains = <&sysctrl>;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     };

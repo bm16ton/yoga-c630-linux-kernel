@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-xgene-sb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-xgene-sb.ko drivers/gpio/gpio-xgene-sb.o drivers/gpio/gpio-xgene-sb.mod.o;  true

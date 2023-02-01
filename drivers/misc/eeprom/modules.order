@@ -1,0 +1,7 @@
+drivers/misc/eeprom/at24.ko
+drivers/misc/eeprom/at25.ko
+drivers/misc/eeprom/eeprom.ko
+drivers/misc/eeprom/max6875.ko
+drivers/misc/eeprom/eeprom_93cx6.ko
+drivers/misc/eeprom/eeprom_93xx46.ko
+drivers/misc/eeprom/ee1004.ko

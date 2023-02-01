@@ -70,6 +70,10 @@ bool fprop_new_period(struct fprop_global *p, int periods)
 	 */
 	if (events <= 1)
 		return false;
+<<<<<<< HEAD
+	preempt_disable_nested();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	write_seqcount_begin(&p->sequence);
 	if (periods < 64)
 		events -= events >> periods;
@@ -77,6 +81,10 @@ bool fprop_new_period(struct fprop_global *p, int periods)
 	percpu_counter_add(&p->events, -events);
 	p->period += periods;
 	write_seqcount_end(&p->sequence);
+<<<<<<< HEAD
+	preempt_enable_nested();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return true;
 }

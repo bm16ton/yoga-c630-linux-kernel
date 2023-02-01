@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/ad7293.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/ad7293.ko drivers/iio/dac/ad7293.o drivers/iio/dac/ad7293.mod.o;  true

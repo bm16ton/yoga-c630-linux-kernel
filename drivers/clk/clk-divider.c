@@ -386,6 +386,19 @@ long divider_round_rate_parent(struct clk_hw *hw, struct clk_hw *parent,
 			       const struct clk_div_table *table,
 			       u8 width, unsigned long flags)
 {
+<<<<<<< HEAD
+	struct clk_rate_request req;
+	int ret;
+
+	clk_hw_init_rate_request(hw, &req, rate);
+	req.best_parent_rate = *prate;
+	req.best_parent_hw = parent;
+
+	ret = divider_determine_rate(hw, &req, table, width, flags);
+	if (ret)
+		return ret;
+
+=======
 	struct clk_rate_request req = {
 		.rate = rate,
 		.best_parent_rate = *prate,
@@ -397,6 +410,7 @@ long divider_round_rate_parent(struct clk_hw *hw, struct clk_hw *parent,
 	if (ret)
 		return ret;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*prate = req.best_parent_rate;
 
 	return req.rate;
@@ -408,12 +422,21 @@ long divider_ro_round_rate_parent(struct clk_hw *hw, struct clk_hw *parent,
 				  const struct clk_div_table *table, u8 width,
 				  unsigned long flags, unsigned int val)
 {
+<<<<<<< HEAD
+	struct clk_rate_request req;
+	int ret;
+
+	clk_hw_init_rate_request(hw, &req, rate);
+	req.best_parent_rate = *prate;
+	req.best_parent_hw = parent;
+=======
 	struct clk_rate_request req = {
 		.rate = rate,
 		.best_parent_rate = *prate,
 		.best_parent_hw = parent,
 	};
 	int ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = divider_ro_determine_rate(hw, &req, table, width, flags, val);
 	if (ret)

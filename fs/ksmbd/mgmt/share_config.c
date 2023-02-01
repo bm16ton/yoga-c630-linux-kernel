@@ -16,6 +16,10 @@
 #include "user_config.h"
 #include "user_session.h"
 #include "../transport_ipc.h"
+<<<<<<< HEAD
+#include "../misc.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define SHARE_HASH_BITS		3
 static DEFINE_HASHTABLE(shares_table, SHARE_HASH_BITS);
@@ -26,7 +30,11 @@ struct ksmbd_veto_pattern {
 	struct list_head	list;
 };
 
+<<<<<<< HEAD
+static unsigned int share_name_hash(const char *name)
+=======
 static unsigned int share_name_hash(char *name)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return jhash(name, strlen(name), 0);
 }
@@ -72,7 +80,11 @@ __get_share_config(struct ksmbd_share_config *share)
 	return share;
 }
 
+<<<<<<< HEAD
+static struct ksmbd_share_config *__share_lookup(const char *name)
+=======
 static struct ksmbd_share_config *__share_lookup(char *name)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ksmbd_share_config *share;
 	unsigned int key = share_name_hash(name);
@@ -119,7 +131,12 @@ static int parse_veto_list(struct ksmbd_share_config *share,
 	return 0;
 }
 
+<<<<<<< HEAD
+static struct ksmbd_share_config *share_config_request(struct unicode_map *um,
+						       const char *name)
+=======
 static struct ksmbd_share_config *share_config_request(char *name)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ksmbd_share_config_response *resp;
 	struct ksmbd_share_config *share = NULL;
@@ -133,6 +150,22 @@ static struct ksmbd_share_config *share_config_request(char *name)
 	if (resp->flags == KSMBD_SHARE_FLAG_INVALID)
 		goto out;
 
+<<<<<<< HEAD
+	if (*resp->share_name) {
+		char *cf_resp_name;
+		bool equal;
+
+		cf_resp_name = ksmbd_casefold_sharename(um, resp->share_name);
+		if (IS_ERR(cf_resp_name))
+			goto out;
+		equal = !strcmp(cf_resp_name, name);
+		kfree(cf_resp_name);
+		if (!equal)
+			goto out;
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	share = kzalloc(sizeof(struct ksmbd_share_config), GFP_KERNEL);
 	if (!share)
 		goto out;
@@ -190,6 +223,13 @@ out:
 	return share;
 }
 
+<<<<<<< HEAD
+struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
+						  const char *name)
+{
+	struct ksmbd_share_config *share;
+
+=======
 static void strtolower(char *share_name)
 {
 	while (*share_name) {
@@ -204,6 +244,7 @@ struct ksmbd_share_config *ksmbd_share_config_get(char *name)
 
 	strtolower(name);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	down_read(&shares_table_lock);
 	share = __share_lookup(name);
 	if (share)
@@ -212,7 +253,11 @@ struct ksmbd_share_config *ksmbd_share_config_get(char *name)
 
 	if (share)
 		return share;
+<<<<<<< HEAD
+	return share_config_request(um, name);
+=======
 	return share_config_request(name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,

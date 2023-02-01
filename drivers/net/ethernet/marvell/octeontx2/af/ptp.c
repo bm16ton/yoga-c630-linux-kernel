@@ -9,6 +9,8 @@
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/pci.h>
+#include <linux/hrtimer.h>
+#include <linux/ktime.h>
 
 #include "ptp.h"
 #include "mbox.h"
@@ -50,6 +52,33 @@
 #define PTP_CLOCK_COMP				0xF18ULL
 #define PTP_TIMESTAMP				0xF20ULL
 #define PTP_CLOCK_SEC				0xFD0ULL
+<<<<<<< HEAD
+#define PTP_SEC_ROLLOVER			0xFD8ULL
+
+#define CYCLE_MULT				1000
+
+static struct ptp *first_ptp_block;
+static const struct pci_device_id ptp_id_table[];
+
+static bool is_ptp_dev_cnf10kb(struct ptp *ptp)
+{
+	return (ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B_PTP) ? true : false;
+}
+
+static bool is_ptp_dev_cn10k(struct ptp *ptp)
+{
+	return (ptp->pdev->device == PCI_DEVID_CN10K_PTP) ? true : false;
+}
+
+static bool cn10k_ptp_errata(struct ptp *ptp)
+{
+	if (ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_A_PTP ||
+	    ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_A_PTP)
+		return true;
+	return false;
+}
+
+=======
 
 #define CYCLE_MULT				1000
 
@@ -64,6 +93,7 @@ static bool cn10k_ptp_errata(struct ptp *ptp)
 	return false;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool is_ptp_tsfmt_sec_nsec(struct ptp *ptp)
 {
 	if (ptp->pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_A_PTP ||
@@ -71,6 +101,63 @@ static bool is_ptp_tsfmt_sec_nsec(struct ptp *ptp)
 		return true;
 	return false;
 }
+<<<<<<< HEAD
+
+static enum hrtimer_restart ptp_reset_thresh(struct hrtimer *hrtimer)
+{
+	struct ptp *ptp = container_of(hrtimer, struct ptp, hrtimer);
+	ktime_t curr_ts = ktime_get();
+	ktime_t delta_ns, period_ns;
+	u64 ptp_clock_hi;
+
+	/* calculate the elapsed time since last restart */
+	delta_ns = ktime_to_ns(ktime_sub(curr_ts, ptp->last_ts));
+
+	/* if the ptp clock value has crossed 0.5 seconds,
+	 * its too late to update pps threshold value, so
+	 * update threshold after 1 second.
+	 */
+	ptp_clock_hi = readq(ptp->reg_base + PTP_CLOCK_HI);
+	if (ptp_clock_hi > 500000000) {
+		period_ns = ktime_set(0, (NSEC_PER_SEC + 100 - ptp_clock_hi));
+	} else {
+		writeq(500000000, ptp->reg_base + PTP_PPS_THRESH_HI);
+		period_ns = ktime_set(0, (NSEC_PER_SEC + 100 - delta_ns));
+	}
+
+	hrtimer_forward_now(hrtimer, period_ns);
+	ptp->last_ts = curr_ts;
+
+	return HRTIMER_RESTART;
+}
+
+static void ptp_hrtimer_start(struct ptp *ptp, ktime_t start_ns)
+{
+	ktime_t period_ns;
+
+	period_ns = ktime_set(0, (NSEC_PER_SEC + 100 - start_ns));
+	hrtimer_start(&ptp->hrtimer, period_ns, HRTIMER_MODE_REL);
+	ptp->last_ts = ktime_get();
+}
+
+static u64 read_ptp_tstmp_sec_nsec(struct ptp *ptp)
+{
+	u64 sec, sec1, nsec;
+	unsigned long flags;
+
+	spin_lock_irqsave(&ptp->ptp_lock, flags);
+	sec = readq(ptp->reg_base + PTP_CLOCK_SEC) & 0xFFFFFFFFUL;
+	nsec = readq(ptp->reg_base + PTP_CLOCK_HI);
+	sec1 = readq(ptp->reg_base + PTP_CLOCK_SEC) & 0xFFFFFFFFUL;
+	/* check nsec rollover */
+	if (sec1 > sec) {
+		nsec = readq(ptp->reg_base + PTP_CLOCK_HI);
+		sec = sec1;
+	}
+	spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+
+	return sec * NSEC_PER_SEC + nsec;
+=======
 
 static u64 read_ptp_tstmp_sec_nsec(struct ptp *ptp)
 {
@@ -146,12 +233,75 @@ calc_adj_comp:
 	comp -= adj;
 
 	return comp;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+}
+
+static u64 read_ptp_tstmp_nsec(struct ptp *ptp)
+{
+<<<<<<< HEAD
+	return readq(ptp->reg_base + PTP_CLOCK_HI);
+}
+
+static u64 ptp_calc_adjusted_comp(u64 ptp_clock_freq)
+{
+	u64 comp, adj = 0, cycles_per_sec, ns_drift = 0;
+	u32 ptp_clock_nsec, cycle_time;
+	int cycle;
+
+	/* Errata:
+	 * Issue #1: At the time of 1 sec rollover of the nano-second counter,
+	 * the nano-second counter is set to 0. However, it should be set to
+	 * (existing counter_value - 10^9).
+	 *
+	 * Issue #2: The nano-second counter rolls over at 0x3B9A_C9FF.
+	 * It should roll over at 0x3B9A_CA00.
+	 */
+
+	/* calculate ptp_clock_comp value */
+	comp = ((u64)1000000000ULL << 32) / ptp_clock_freq;
+	/* use CYCLE_MULT to avoid accuracy loss due to integer arithmetic */
+	cycle_time = NSEC_PER_SEC * CYCLE_MULT / ptp_clock_freq;
+	/* cycles per sec */
+	cycles_per_sec = ptp_clock_freq;
+
+	/* check whether ptp nanosecond counter rolls over early */
+	cycle = cycles_per_sec - 1;
+	ptp_clock_nsec = (cycle * comp) >> 32;
+	while (ptp_clock_nsec < NSEC_PER_SEC) {
+		if (ptp_clock_nsec == 0x3B9AC9FF)
+			goto calc_adj_comp;
+		cycle++;
+		ptp_clock_nsec = (cycle * comp) >> 32;
+	}
+	/* compute nanoseconds lost per second when nsec counter rolls over */
+	ns_drift = ptp_clock_nsec - NSEC_PER_SEC;
+	/* calculate ptp_clock_comp adjustment */
+	if (ns_drift > 0) {
+		adj = comp * ns_drift;
+		adj = adj / 1000000000ULL;
+	}
+	/* speed up the ptp clock to account for nanoseconds lost */
+	comp += adj;
+	return comp;
+
+calc_adj_comp:
+	/* slow down the ptp clock to not rollover early */
+	adj = comp * cycle_time;
+	adj = adj / 1000000000ULL;
+	adj = adj / CYCLE_MULT;
+	comp -= adj;
+
+	return comp;
 }
 
 struct ptp *ptp_get(void)
 {
 	struct ptp *ptp = first_ptp_block;
 
+=======
+	struct ptp *ptp = first_ptp_block;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Check PTP block is present in hardware */
 	if (!pci_dev_present(ptp_id_table))
 		return ERR_PTR(-ENODEV);
@@ -246,6 +396,13 @@ void ptp_start(struct ptp *ptp, u64 sclk, u32 ext_clk_freq, u32 extts)
 	/* sclk is in MHz */
 	ptp->clock_rate = sclk * 1000000;
 
+<<<<<<< HEAD
+	/* Program the seconds rollover value to 1 second */
+	if (is_ptp_dev_cnf10kb(ptp))
+		writeq(0x3b9aca00, ptp->reg_base + PTP_SEC_ROLLOVER);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Enable PTP clock */
 	clock_cfg = readq(ptp->reg_base + PTP_CLOCK_CFG);
 
@@ -270,6 +427,21 @@ void ptp_start(struct ptp *ptp, u64 sclk, u32 ext_clk_freq, u32 extts)
 	/* Set 50% duty cycle for 1Hz output */
 	writeq(0x1dcd650000000000, ptp->reg_base + PTP_PPS_HI_INCR);
 	writeq(0x1dcd650000000000, ptp->reg_base + PTP_PPS_LO_INCR);
+<<<<<<< HEAD
+	if (cn10k_ptp_errata(ptp)) {
+		/* The ptp_clock_hi rollsover to zero once clock cycle before it
+		 * reaches one second boundary. so, program the pps_lo_incr in
+		 * such a way that the pps threshold value comparison at one
+		 * second boundary will succeed and pps edge changes. After each
+		 * one second boundary, the hrtimer handler will be invoked and
+		 * reprograms the pps threshold value.
+		 */
+		ptp->clock_period = NSEC_PER_SEC / ptp->clock_rate;
+		writeq((0x1dcd6500ULL - ptp->clock_period) << 32,
+		       ptp->reg_base + PTP_PPS_LO_INCR);
+	}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (cn10k_ptp_errata(ptp))
 		clock_comp = ptp_calc_adjusted_comp(ptp->clock_rate);
@@ -282,14 +454,47 @@ void ptp_start(struct ptp *ptp, u64 sclk, u32 ext_clk_freq, u32 extts)
 
 static int ptp_get_tstmp(struct ptp *ptp, u64 *clk)
 {
+<<<<<<< HEAD
+	u64 timestamp;
+
+	if (is_ptp_dev_cn10k(ptp)) {
+		timestamp = readq(ptp->reg_base + PTP_TIMESTAMP);
+		*clk = (timestamp >> 32) * NSEC_PER_SEC + (timestamp & 0xFFFFFFFF);
+	} else {
+		*clk = readq(ptp->reg_base + PTP_TIMESTAMP);
+	}
+=======
 	*clk = readq(ptp->reg_base + PTP_TIMESTAMP);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
 static int ptp_set_thresh(struct ptp *ptp, u64 thresh)
 {
+<<<<<<< HEAD
+	if (!cn10k_ptp_errata(ptp))
+		writeq(thresh, ptp->reg_base + PTP_PPS_THRESH_HI);
+
+	return 0;
+}
+
+static int ptp_extts_on(struct ptp *ptp, int on)
+{
+	u64 ptp_clock_hi;
+
+	if (cn10k_ptp_errata(ptp)) {
+		if (on) {
+			ptp_clock_hi = readq(ptp->reg_base + PTP_CLOCK_HI);
+			ptp_hrtimer_start(ptp, (ktime_t)ptp_clock_hi);
+		} else {
+			if (hrtimer_active(&ptp->hrtimer))
+				hrtimer_cancel(&ptp->hrtimer);
+		}
+	}
+=======
 	writeq(thresh, ptp->reg_base + PTP_PPS_THRESH_HI);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -328,6 +533,14 @@ static int ptp_probe(struct pci_dev *pdev,
 		ptp->read_ptp_tstmp = &read_ptp_tstmp_sec_nsec;
 	else
 		ptp->read_ptp_tstmp = &read_ptp_tstmp_nsec;
+<<<<<<< HEAD
+
+	if (cn10k_ptp_errata(ptp)) {
+		hrtimer_init(&ptp->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+		ptp->hrtimer.function = ptp_reset_thresh;
+	}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 
@@ -352,6 +565,9 @@ static void ptp_remove(struct pci_dev *pdev)
 {
 	struct ptp *ptp = pci_get_drvdata(pdev);
 	u64 clock_cfg;
+
+	if (cn10k_ptp_errata(ptp) && hrtimer_active(&ptp->hrtimer))
+		hrtimer_cancel(&ptp->hrtimer);
 
 	if (IS_ERR_OR_NULL(ptp))
 		return;
@@ -420,6 +636,12 @@ int rvu_mbox_handler_ptp_op(struct rvu *rvu, struct ptp_req *req,
 	case PTP_OP_SET_THRESH:
 		err = ptp_set_thresh(rvu->ptp, req->thresh);
 		break;
+<<<<<<< HEAD
+	case PTP_OP_EXTTS_ON:
+		err = ptp_extts_on(rvu->ptp, req->extts_on);
+		break;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		err = -EINVAL;
 		break;

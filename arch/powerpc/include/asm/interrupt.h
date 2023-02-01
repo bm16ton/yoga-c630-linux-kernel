@@ -74,6 +74,20 @@
 #include <asm/kprobes.h>
 #include <asm/runlatch.h>
 
+<<<<<<< HEAD
+#ifdef CONFIG_PPC64
+/*
+ * WARN/BUG is handled with a program interrupt so minimise checks here to
+ * avoid recursion and maximise the chance of getting the first oops handled.
+ */
+#define INT_SOFT_MASK_BUG_ON(regs, cond)				\
+do {									\
+	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG) &&		\
+	    (user_mode(regs) || (TRAP(regs) != INTERRUPT_PROGRAM)))	\
+		BUG_ON(cond);						\
+} while (0)
+#endif
+
 #ifdef CONFIG_PPC_BOOK3S_64
 extern char __end_soft_masked[];
 bool search_kernel_soft_mask_table(unsigned long addr);
@@ -113,6 +127,47 @@ static inline void srr_regs_clobbered(void)
 }
 #endif
 
+=======
+#ifdef CONFIG_PPC_BOOK3S_64
+extern char __end_soft_masked[];
+bool search_kernel_soft_mask_table(unsigned long addr);
+unsigned long search_kernel_restart_table(unsigned long addr);
+
+DECLARE_STATIC_KEY_FALSE(interrupt_exit_not_reentrant);
+
+static inline bool is_implicit_soft_masked(struct pt_regs *regs)
+{
+	if (regs->msr & MSR_PR)
+		return false;
+
+	if (regs->nip >= (unsigned long)__end_soft_masked)
+		return false;
+
+	return search_kernel_soft_mask_table(regs->nip);
+}
+
+static inline void srr_regs_clobbered(void)
+{
+	local_paca->srr_valid = 0;
+	local_paca->hsrr_valid = 0;
+}
+#else
+static inline unsigned long search_kernel_restart_table(unsigned long addr)
+{
+	return 0;
+}
+
+static inline bool is_implicit_soft_masked(struct pt_regs *regs)
+{
+	return false;
+}
+
+static inline void srr_regs_clobbered(void)
+{
+}
+#endif
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void nap_adjust_return(struct pt_regs *regs)
 {
 #ifdef CONFIG_PPC_970_NAP
@@ -170,8 +225,12 @@ static inline void interrupt_enter_prepare(struct pt_regs *regs)
 	 * context.
 	 */
 	if (!(local_paca->irq_happened & PACA_IRQ_HARD_DIS)) {
+<<<<<<< HEAD
+		INT_SOFT_MASK_BUG_ON(regs, !(regs->msr & MSR_EE));
+=======
 		if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG))
 			BUG_ON(!(regs->msr & MSR_EE));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		__hard_irq_enable();
 	} else {
 		__hard_RI_enable();
@@ -194,6 +253,17 @@ static inline void interrupt_enter_prepare(struct pt_regs *regs)
 		 * CT_WARN_ON comes here via program_check_exception,
 		 * so avoid recursion.
 		 */
+<<<<<<< HEAD
+		if (TRAP(regs) != INTERRUPT_PROGRAM)
+			CT_WARN_ON(ct_state() != CONTEXT_KERNEL &&
+				   ct_state() != CONTEXT_IDLE);
+		INT_SOFT_MASK_BUG_ON(regs, is_implicit_soft_masked(regs));
+		INT_SOFT_MASK_BUG_ON(regs, arch_irq_disabled_regs(regs) &&
+					   search_kernel_restart_table(regs->nip));
+	}
+	INT_SOFT_MASK_BUG_ON(regs, !arch_irq_disabled_regs(regs) &&
+				   !(regs->msr & MSR_EE));
+=======
 		if (TRAP(regs) != INTERRUPT_PROGRAM) {
 			CT_WARN_ON(ct_state() != CONTEXT_KERNEL &&
 				   ct_state() != CONTEXT_IDLE);
@@ -208,6 +278,7 @@ static inline void interrupt_enter_prepare(struct pt_regs *regs)
 	}
 	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG))
 		BUG_ON(!arch_irq_disabled_regs(regs) && !(regs->msr & MSR_EE));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 	booke_restore_dbcr0();
@@ -282,7 +353,11 @@ static inline bool nmi_disables_ftrace(struct pt_regs *regs)
 		if (TRAP(regs) == INTERRUPT_PERFMON)
 		       return false;
 	}
+<<<<<<< HEAD
+	if (IS_ENABLED(CONFIG_PPC_BOOK3E_64)) {
+=======
 	if (IS_ENABLED(CONFIG_PPC_BOOK3E)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (TRAP(regs) == INTERRUPT_PERFMON)
 			return false;
 	}
@@ -356,6 +431,7 @@ static inline void interrupt_nmi_exit_prepare(struct pt_regs *regs, struct inter
 {
 	if (mfmsr() & MSR_DR) {
 		// nmi_exit if relocations are on
+<<<<<<< HEAD
 		nmi_exit();
 	} else if (IS_ENABLED(CONFIG_PPC_BOOK3S_64) &&
 		   firmware_has_feature(FW_FEATURE_LPAR) &&
@@ -365,6 +441,17 @@ static inline void interrupt_nmi_exit_prepare(struct pt_regs *regs, struct inter
 		// no nmi_exit for KASAN in real mode
 	} else {
 		nmi_exit();
+=======
+		nmi_exit();
+	} else if (IS_ENABLED(CONFIG_PPC_BOOK3S_64) &&
+		   firmware_has_feature(FW_FEATURE_LPAR) &&
+		   !radix_enabled()) {
+		// no nmi_exit for a pseries hash guest taking a real mode exception
+	} else if (IS_ENABLED(CONFIG_KASAN)) {
+		// no nmi_exit for KASAN in real mode
+	} else {
+		nmi_exit();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/*
@@ -595,6 +682,10 @@ ____##func(struct pt_regs *regs)
 /* kernel/traps.c */
 DECLARE_INTERRUPT_HANDLER_NMI(system_reset_exception);
 #ifdef CONFIG_PPC_BOOK3S_64
+<<<<<<< HEAD
+DECLARE_INTERRUPT_HANDLER_RAW(machine_check_early_boot);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 DECLARE_INTERRUPT_HANDLER_ASYNC(machine_check_exception_async);
 #endif
 DECLARE_INTERRUPT_HANDLER_NMI(machine_check_exception);
@@ -666,8 +757,12 @@ static inline void interrupt_cond_local_irq_enable(struct pt_regs *regs)
 		local_irq_enable();
 }
 
+<<<<<<< HEAD
+long system_call_exception(struct pt_regs *regs, unsigned long r0);
+=======
 long system_call_exception(long r3, long r4, long r5, long r6, long r7, long r8,
 			   unsigned long r0, struct pt_regs *regs);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 notrace unsigned long syscall_exit_prepare(unsigned long r3, struct pt_regs *regs, long scv);
 notrace unsigned long interrupt_exit_user_prepare(struct pt_regs *regs);
 notrace unsigned long interrupt_exit_kernel_prepare(struct pt_regs *regs);

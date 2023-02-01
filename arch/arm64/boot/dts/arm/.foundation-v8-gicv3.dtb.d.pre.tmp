@@ -1,0 +1,6 @@
+foundation-v8-gicv3.o: arch/arm64/boot/dts/arm/foundation-v8-gicv3.dts \
+ arch/arm64/boot/dts/arm/foundation-v8.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ arch/arm64/boot/dts/arm/foundation-v8-gicv3.dtsi \
+ arch/arm64/boot/dts/arm/foundation-v8-spin-table.dtsi

@@ -1,0 +1,1 @@
+cmd_drivers/extcon/extcon-qcom-spmi-misc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/extcon/extcon-qcom-spmi-misc.ko drivers/extcon/extcon-qcom-spmi-misc.o drivers/extcon/extcon-qcom-spmi-misc.mod.o;  true

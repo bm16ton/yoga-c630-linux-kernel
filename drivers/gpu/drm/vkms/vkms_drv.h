@@ -23,6 +23,12 @@
 
 #define NUM_OVERLAY_PLANES 8
 
+<<<<<<< HEAD
+struct vkms_frame_info {
+	struct drm_framebuffer *fb;
+	struct drm_rect src, dst;
+	struct iosys_map map[DRM_FORMAT_MAX_PLANES];
+=======
 struct vkms_writeback_job {
 	struct iosys_map map[DRM_FORMAT_MAX_PLANES];
 	struct iosys_map data[DRM_FORMAT_MAX_PLANES];
@@ -32,19 +38,46 @@ struct vkms_composer {
 	struct drm_framebuffer fb;
 	struct drm_rect src, dst;
 	struct iosys_map map[4];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int offset;
 	unsigned int pitch;
 	unsigned int cpp;
 };
 
+struct pixel_argb_u16 {
+	u16 a, r, g, b;
+};
+
+struct line_buffer {
+	size_t n_pixels;
+	struct pixel_argb_u16 *pixels;
+};
+
+struct vkms_writeback_job {
+	struct iosys_map data[DRM_FORMAT_MAX_PLANES];
+	struct vkms_frame_info wb_frame_info;
+	void (*wb_write)(struct vkms_frame_info *frame_info,
+			 const struct line_buffer *buffer, int y);
+};
+
 /**
  * vkms_plane_state - Driver specific plane state
  * @base: base plane state
- * @composer: data required for composing computation
+ * @frame_info: data required for composing computation
  */
 struct vkms_plane_state {
 	struct drm_shadow_plane_state base;
+<<<<<<< HEAD
+	struct vkms_frame_info *frame_info;
+	void (*plane_read)(struct line_buffer *buffer,
+			   const struct vkms_frame_info *frame_info, int y);
+};
+
+struct vkms_plane {
+	struct drm_plane base;
+=======
 	struct vkms_composer *composer;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct vkms_plane {

@@ -1,0 +1,1 @@
+cmd_drivers/cpufreq/cpufreq_conservative.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/cpufreq/cpufreq_conservative.ko drivers/cpufreq/cpufreq_conservative.o drivers/cpufreq/cpufreq_conservative.mod.o;  true

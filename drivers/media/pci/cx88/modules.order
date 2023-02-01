@@ -1,0 +1,7 @@
+drivers/media/pci/cx88/cx88xx.ko
+drivers/media/pci/cx88/cx8800.ko
+drivers/media/pci/cx88/cx8802.ko
+drivers/media/pci/cx88/cx88-alsa.ko
+drivers/media/pci/cx88/cx88-blackbird.ko
+drivers/media/pci/cx88/cx88-dvb.ko
+drivers/media/pci/cx88/cx88-vp3054-i2c.ko

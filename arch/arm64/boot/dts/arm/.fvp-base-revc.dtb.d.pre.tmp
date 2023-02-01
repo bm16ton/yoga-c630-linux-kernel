@@ -1,0 +1,5 @@
+fvp-base-revc.o: arch/arm64/boot/dts/arm/fvp-base-revc.dts \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ arch/arm64/boot/dts/arm/rtsm_ve-motherboard.dtsi \
+ arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi

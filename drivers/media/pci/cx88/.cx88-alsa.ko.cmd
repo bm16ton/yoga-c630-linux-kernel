@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/cx88/cx88-alsa.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/cx88/cx88-alsa.ko drivers/media/pci/cx88/cx88-alsa.o drivers/media/pci/cx88/cx88-alsa.mod.o;  true

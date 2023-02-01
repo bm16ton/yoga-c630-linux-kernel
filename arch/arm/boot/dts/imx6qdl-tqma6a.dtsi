@@ -36,6 +36,21 @@
 		compatible = "st,24c64", "atmel,24c64";
 		reg = <0x50>;
 		pagesize = <32>;
+		vcc-supply = <&reg_3p3v>;
+	};
+};
+
+&iomuxc {
+	/*
+	 * This pinmuxing is required for the ERR006687 workaround. Board
+	 * DTS files that enable the FEC controller with
+	 * fsl,err006687-workaround-present must include this group.
+	 */
+	pinctrl_enet_fix: enetfixgrp {
+		fsl,pins = <
+			/* ENET ping patch */
+			MX6QDL_PAD_GPIO_6__ENET_IRQ 0x000b1
+		>;
 	};
 };
 

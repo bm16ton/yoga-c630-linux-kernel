@@ -1,0 +1,1 @@
+cmd_drivers/memstick/core/memstick.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/memstick/core/memstick.ko drivers/memstick/core/memstick.o drivers/memstick/core/memstick.mod.o;  true

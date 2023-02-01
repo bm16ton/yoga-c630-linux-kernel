@@ -1,0 +1,1 @@
+cmd_drivers/iio/temperature/mlx90632.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/temperature/mlx90632.ko drivers/iio/temperature/mlx90632.o drivers/iio/temperature/mlx90632.mod.o;  true

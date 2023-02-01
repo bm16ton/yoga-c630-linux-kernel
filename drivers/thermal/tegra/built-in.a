@@ -1,0 +1,11 @@
+!<thin>
+//                                              72        `
+soctherm.o/
+soctherm-fuse.o/
+tegra132-soctherm.o/
+tegra210-soctherm.o/
+
+/0              0           0     0     644     39032     `
+/12             0           0     0     644     2824      `
+/29             0           0     0     644     3680      `
+/50             0           0     0     644     3792      `

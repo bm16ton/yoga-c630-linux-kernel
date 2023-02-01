@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/thunder/thunder_xcv.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/cavium/thunder/thunder_xcv.ko drivers/net/ethernet/cavium/thunder/thunder_xcv.o drivers/net/ethernet/cavium/thunder/thunder_xcv.mod.o;  true

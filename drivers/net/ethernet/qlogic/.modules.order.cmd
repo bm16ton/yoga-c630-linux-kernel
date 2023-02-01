@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qlogic/modules.order := {   echo drivers/net/ethernet/qlogic/qla3xxx.ko;   cat drivers/net/ethernet/qlogic/qlcnic/modules.order;   cat drivers/net/ethernet/qlogic/netxen/modules.order;   cat drivers/net/ethernet/qlogic/qed/modules.order;   cat drivers/net/ethernet/qlogic/qede/modules.order; :; } > drivers/net/ethernet/qlogic/modules.order

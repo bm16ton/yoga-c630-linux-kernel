@@ -774,7 +774,7 @@ disable_regs:
 	return ret;
 }
 
-static int tas6424_i2c_remove(struct i2c_client *client)
+static void tas6424_i2c_remove(struct i2c_client *client)
 {
 	struct device *dev = &client->dev;
 	struct tas6424_data *tas6424 = dev_get_drvdata(dev);
@@ -790,8 +790,11 @@ static int tas6424_i2c_remove(struct i2c_client *client)
 				     tas6424->supplies);
 	if (ret < 0)
 		dev_err(dev, "unable to disable supplies: %d\n", ret);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tas6424_i2c_ids[] = {

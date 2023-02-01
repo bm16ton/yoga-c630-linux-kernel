@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/marvell/skge.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/marvell/skge.ko drivers/net/ethernet/marvell/skge.o drivers/net/ethernet/marvell/skge.mod.o;  true

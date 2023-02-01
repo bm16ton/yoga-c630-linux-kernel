@@ -1,0 +1,3 @@
+drivers/nfc/s3fwrn5/s3fwrn5.ko
+drivers/nfc/s3fwrn5/s3fwrn5_i2c.ko
+drivers/nfc/s3fwrn5/s3fwrn82_uart.ko

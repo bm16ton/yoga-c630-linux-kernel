@@ -1,0 +1,1 @@
+cmd_drivers/mtd/devices/mchp23k256.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/devices/mchp23k256.ko drivers/mtd/devices/mchp23k256.o drivers/mtd/devices/mchp23k256.mod.o;  true

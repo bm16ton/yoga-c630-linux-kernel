@@ -1,0 +1,1 @@
+cmd_drivers/iio/potentiometer/ds1803.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/potentiometer/ds1803.ko drivers/iio/potentiometer/ds1803.o drivers/iio/potentiometer/ds1803.mod.o;  true

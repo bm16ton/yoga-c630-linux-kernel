@@ -841,8 +841,11 @@ static int ov2680_set_fmt(struct v4l2_subdev *sd,
 	if (!ov2680_info)
 		return -EINVAL;
 
+<<<<<<< HEAD
+=======
 	mutex_lock(&dev->input_lock);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	res = v4l2_find_nearest_size(ov2680_res_preview,
 				     ARRAY_SIZE(ov2680_res_preview), width,
 				     height, fmt->width, fmt->height);
@@ -855,20 +858,47 @@ static int ov2680_set_fmt(struct v4l2_subdev *sd,
 	fmt->code = MEDIA_BUS_FMT_SBGGR10_1X10;
 	if (format->which == V4L2_SUBDEV_FORMAT_TRY) {
 		sd_state->pads->try_fmt = *fmt;
+<<<<<<< HEAD
+=======
 		mutex_unlock(&dev->input_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 
 	dev_dbg(&client->dev, "%s: %dx%d\n",
 		__func__, fmt->width, fmt->height);
 
+<<<<<<< HEAD
+	mutex_lock(&dev->input_lock);
+
+	/* s_power has not been called yet for std v4l2 clients (camorama) */
+	power_up(sd);
+	ret = ov2680_write_reg_array(client, dev->res->regs);
+	if (ret) {
+=======
 	/* s_power has not been called yet for std v4l2 clients (camorama) */
 	power_up(sd);
 	ret = ov2680_write_reg_array(client, dev->res->regs);
 	if (ret)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(&client->dev,
 			"ov2680 write resolution register err: %d\n", ret);
+		goto err;
+	}
 
+	vts = dev->res->lines_per_frame;
+
+	/* If necessary increase the VTS to match exposure + MARGIN */
+	if (dev->exposure > vts - OV2680_INTEGRATION_TIME_MARGIN)
+		vts = dev->exposure + OV2680_INTEGRATION_TIME_MARGIN;
+
+<<<<<<< HEAD
+	ret = ov2680_write_reg(client, 2, OV2680_TIMING_VTS_H, vts);
+	if (ret) {
+		dev_err(&client->dev, "ov2680 write vts err: %d\n", ret);
+		goto err;
+	}
+=======
 	vts = dev->res->lines_per_frame;
 
 	/* If necessary increase the VTS to match exposure + MARGIN */
@@ -878,6 +908,7 @@ static int ov2680_set_fmt(struct v4l2_subdev *sd,
 	ret = ov2680_write_reg(client, 2, OV2680_TIMING_VTS_H, vts);
 	if (ret)
 		dev_err(&client->dev, "ov2680 write vts err: %d\n", ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = ov2680_get_intg_factor(client, ov2680_info, res);
 	if (ret) {
@@ -894,11 +925,15 @@ static int ov2680_set_fmt(struct v4l2_subdev *sd,
 	if (v_flag)
 		ov2680_v_flip(sd, v_flag);
 
+<<<<<<< HEAD
+	dev->res = res;
+=======
 	/*
 	 * ret = startup(sd);
 	 * if (ret)
 	 * dev_err(&client->dev, "ov2680 startup err\n");
 	 */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err:
 	mutex_unlock(&dev->input_lock);
 	return ret;
@@ -1065,6 +1100,7 @@ static int ov2680_enum_frame_size(struct v4l2_subdev *sd,
 	int index = fse->index;
 
 	if (index >= N_RES_PREVIEW)
+<<<<<<< HEAD
 		return -EINVAL;
 
 	fse->min_width = ov2680_res_preview[index].width;
@@ -1087,6 +1123,30 @@ static int ov2680_enum_frame_interval(struct v4l2_subdev *sd,
 	    fie->which > V4L2_SUBDEV_FORMAT_ACTIVE)
 		return -EINVAL;
 
+=======
+		return -EINVAL;
+
+	fse->min_width = ov2680_res_preview[index].width;
+	fse->min_height = ov2680_res_preview[index].height;
+	fse->max_width = ov2680_res_preview[index].width;
+	fse->max_height = ov2680_res_preview[index].height;
+
+	return 0;
+}
+
+static int ov2680_enum_frame_interval(struct v4l2_subdev *sd,
+				      struct v4l2_subdev_state *sd_state,
+				      struct v4l2_subdev_frame_interval_enum *fie)
+{
+	struct v4l2_fract fract;
+
+	if (fie->index >= N_RES_PREVIEW ||
+	    fie->width > ov2680_res_preview[0].width ||
+	    fie->height > ov2680_res_preview[0].height ||
+	    fie->which > V4L2_SUBDEV_FORMAT_ACTIVE)
+		return -EINVAL;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fract.denominator = ov2680_res_preview[fie->index].fps;
 	fract.numerator = 1;
 
@@ -1135,7 +1195,7 @@ static const struct v4l2_subdev_ops ov2680_ops = {
 	.sensor = &ov2680_sensor_ops,
 };
 
-static int ov2680_remove(struct i2c_client *client)
+static void ov2680_remove(struct i2c_client *client)
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct ov2680_device *dev = to_ov2680_sensor(sd);
@@ -1148,8 +1208,6 @@ static int ov2680_remove(struct i2c_client *client)
 	media_entity_cleanup(&dev->sd.entity);
 	v4l2_ctrl_handler_free(&dev->ctrl_handler);
 	kfree(dev);
-
-	return 0;
 }
 
 static int ov2680_probe(struct i2c_client *client)

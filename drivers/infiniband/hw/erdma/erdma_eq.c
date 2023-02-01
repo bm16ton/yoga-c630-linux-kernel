@@ -4,12 +4,15 @@
 /*          Kai Shen <kaishen@linux.alibaba.com> */
 /* Copyright (c) 2020-2022, Alibaba Group. */
 
+<<<<<<< HEAD
+=======
 #include <linux/errno.h>
 #include <linux/pci.h>
 #include <linux/types.h>
 
 #include "erdma.h"
 #include "erdma_hw.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "erdma_verbs.h"
 
 #define MAX_POLL_CHUNK_SIZE 16
@@ -229,9 +232,13 @@ static int create_eq_cmd(struct erdma_dev *dev, u32 eqn, struct erdma_eq *eq)
 	req.db_dma_addr_l = lower_32_bits(db_info_dma_addr);
 	req.db_dma_addr_h = upper_32_bits(db_info_dma_addr);
 
+<<<<<<< HEAD
+	return erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
+=======
 	return erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req,
 				   sizeof(struct erdma_cmdq_create_eq_req),
 				   NULL, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int erdma_ceq_init_one(struct erdma_dev *dev, u16 ceqn)
@@ -281,8 +288,12 @@ static void erdma_ceq_uninit_one(struct erdma_dev *dev, u16 ceqn)
 	req.qtype = ERDMA_EQ_TYPE_CEQ;
 	req.vector_idx = ceqn + 1;
 
+<<<<<<< HEAD
+	err = erdma_post_cmd_wait(&dev->cmdq, &req, sizeof(req), NULL, NULL);
+=======
 	err = erdma_post_cmd_wait(&dev->cmdq, (u64 *)&req, sizeof(req), NULL,
 				  NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return;
 

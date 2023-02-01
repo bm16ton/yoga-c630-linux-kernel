@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/thunder/thunder_bgx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/cavium/thunder/thunder_bgx.ko drivers/net/ethernet/cavium/thunder/thunder_bgx.o drivers/net/ethernet/cavium/thunder/thunder_bgx.mod.o;  true

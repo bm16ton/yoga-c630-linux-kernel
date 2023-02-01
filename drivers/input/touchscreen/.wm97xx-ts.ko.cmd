@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/wm97xx-ts.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/wm97xx-ts.ko drivers/input/touchscreen/wm97xx-ts.o drivers/input/touchscreen/wm97xx-ts.mod.o;  true

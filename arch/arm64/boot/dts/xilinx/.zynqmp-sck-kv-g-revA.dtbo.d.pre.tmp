@@ -1,0 +1,6 @@
+zynqmp-sck-kv-g-revA.o: \
+ arch/arm64/boot/dts/xilinx/zynqmp-sck-kv-g-revA.dts \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/net/ti-dp83867.h \
+ scripts/dtc/include-prefixes/dt-bindings/phy/phy.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/pinctrl-zynqmp.h

@@ -1205,6 +1205,20 @@ static const struct snd_soc_dapm_widget q6asm_dapm_widgets[] = {
 };
 
 static const struct snd_soc_component_driver q6asm_fe_dai_component = {
+<<<<<<< HEAD
+	.name			= DRV_NAME,
+	.open			= q6asm_dai_open,
+	.hw_params		= q6asm_dai_hw_params,
+	.close			= q6asm_dai_close,
+	.prepare		= q6asm_dai_prepare,
+	.trigger		= q6asm_dai_trigger,
+	.pointer		= q6asm_dai_pointer,
+	.pcm_construct		= q6asm_dai_pcm_new,
+	.compress_ops		= &q6asm_dai_compress_ops,
+	.dapm_widgets		= q6asm_dapm_widgets,
+	.num_dapm_widgets	= ARRAY_SIZE(q6asm_dapm_widgets),
+	.legacy_dai_naming	= 1,
+=======
 	.name		= DRV_NAME,
 	.open		= q6asm_dai_open,
 	.hw_params	= q6asm_dai_hw_params,
@@ -1216,6 +1230,7 @@ static const struct snd_soc_component_driver q6asm_fe_dai_component = {
 	.compress_ops	= &q6asm_dai_compress_ops,
 	.dapm_widgets	= q6asm_dapm_widgets,
 	.num_dapm_widgets = ARRAY_SIZE(q6asm_dapm_widgets),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct snd_soc_dai_driver q6asm_fe_dais_template[] = {

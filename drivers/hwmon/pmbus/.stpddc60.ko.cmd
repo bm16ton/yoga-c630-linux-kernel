@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/stpddc60.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/stpddc60.ko drivers/hwmon/pmbus/stpddc60.o drivers/hwmon/pmbus/stpddc60.mod.o;  true

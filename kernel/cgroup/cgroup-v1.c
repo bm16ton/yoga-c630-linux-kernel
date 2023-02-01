@@ -59,8 +59,12 @@ int cgroup_attach_task_all(struct task_struct *from, struct task_struct *tsk)
 	int retval = 0;
 
 	mutex_lock(&cgroup_mutex);
+<<<<<<< HEAD
+	cgroup_attach_lock(true);
+=======
 	cpus_read_lock();
 	percpu_down_write(&cgroup_threadgroup_rwsem);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for_each_root(root) {
 		struct cgroup *from_cgrp;
 
@@ -72,8 +76,12 @@ int cgroup_attach_task_all(struct task_struct *from, struct task_struct *tsk)
 		if (retval)
 			break;
 	}
+<<<<<<< HEAD
+	cgroup_attach_unlock(true);
+=======
 	percpu_up_write(&cgroup_threadgroup_rwsem);
 	cpus_read_unlock();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&cgroup_mutex);
 
 	return retval;

@@ -83,6 +83,72 @@ static int acpi_prepare_root_resources(struct acpi_pci_root_info *ci)
 }
 
 /*
+<<<<<<< HEAD
+ * Create a PCI config space window
+ *  - reserve mem region
+ *  - alloc struct pci_config_window with space for all mappings
+ *  - ioremap the config space
+ */
+static struct pci_config_window *arch_pci_ecam_create(struct device *dev,
+		struct resource *cfgres, struct resource *busr, const struct pci_ecam_ops *ops)
+{
+	int bsz, bus_range, err;
+	struct resource *conflict;
+	struct pci_config_window *cfg;
+
+	if (busr->start > busr->end)
+		return ERR_PTR(-EINVAL);
+
+	cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
+	if (!cfg)
+		return ERR_PTR(-ENOMEM);
+
+	cfg->parent = dev;
+	cfg->ops = ops;
+	cfg->busr.start = busr->start;
+	cfg->busr.end = busr->end;
+	cfg->busr.flags = IORESOURCE_BUS;
+	bus_range = resource_size(cfgres) >> ops->bus_shift;
+
+	bsz = 1 << ops->bus_shift;
+
+	cfg->res.start = cfgres->start;
+	cfg->res.end = cfgres->end;
+	cfg->res.flags = IORESOURCE_MEM | IORESOURCE_BUSY;
+	cfg->res.name = "PCI ECAM";
+
+	conflict = request_resource_conflict(&iomem_resource, &cfg->res);
+	if (conflict) {
+		err = -EBUSY;
+		dev_err(dev, "can't claim ECAM area %pR: address conflict with %s %pR\n",
+			&cfg->res, conflict->name, conflict);
+		goto err_exit;
+	}
+
+	cfg->win = pci_remap_cfgspace(cfgres->start, bus_range * bsz);
+	if (!cfg->win)
+		goto err_exit_iomap;
+
+	if (ops->init) {
+		err = ops->init(cfg);
+		if (err)
+			goto err_exit;
+	}
+	dev_info(dev, "ECAM at %pR for %pR\n", &cfg->res, &cfg->busr);
+
+	return cfg;
+
+err_exit_iomap:
+	err = -ENOMEM;
+	dev_err(dev, "ECAM ioremap failed\n");
+err_exit:
+	pci_ecam_free(cfg);
+	return ERR_PTR(err);
+}
+
+/*
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Lookup the bus range for the domain in MCFG, and set up config space
  * mapping.
  */
@@ -106,11 +172,24 @@ pci_acpi_setup_ecam_mapping(struct acpi_pci_root *root)
 
 	bus_shift = ecam_ops->bus_shift ? : 20;
 
+<<<<<<< HEAD
+	if (bus_shift == 20)
+		cfg = pci_ecam_create(dev, &cfgres, bus_res, ecam_ops);
+	else {
+		cfgres.start = root->mcfg_addr + (bus_res->start << bus_shift);
+		cfgres.end = cfgres.start + (resource_size(bus_res) << bus_shift) - 1;
+		cfgres.end |= BIT(28) + (((PCI_CFG_SPACE_EXP_SIZE - 1) & 0xf00) << 16);
+		cfgres.flags = IORESOURCE_MEM;
+		cfg = arch_pci_ecam_create(dev, &cfgres, bus_res, ecam_ops);
+	}
+
+=======
 	cfgres.start = root->mcfg_addr + (bus_res->start << bus_shift);
 	cfgres.end = cfgres.start + (resource_size(bus_res) << bus_shift) - 1;
 	cfgres.flags = IORESOURCE_MEM;
 
 	cfg = pci_ecam_create(dev, &cfgres, bus_res, ecam_ops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(cfg)) {
 		dev_err(dev, "%04x:%pR error %ld mapping ECAM\n", seg, bus_res, PTR_ERR(cfg));
 		return NULL;

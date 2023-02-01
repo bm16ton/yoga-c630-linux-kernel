@@ -1,0 +1,1 @@
+cmd_drivers/tty/built-in.a := rm -f drivers/tty/built-in.a;  printf "drivers/tty/%s " tty_io.o n_tty.o tty_ioctl.o tty_ldisc.o tty_buffer.o tty_port.o tty_mutex.o tty_ldsem.o tty_baudrate.o tty_jobctrl.o n_null.o pty.o tty_audit.o sysrq.o vt/built-in.a hvc/built-in.a serial/built-in.a serdev/built-in.a ipwireless/built-in.a | xargs ar cDPrST drivers/tty/built-in.a

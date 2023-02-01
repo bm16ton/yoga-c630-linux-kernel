@@ -3,6 +3,10 @@
  * Copyright 2020-2021 TQ-Systems GmbH
  */
 
+<<<<<<< HEAD
+#include <dt-bindings/phy/phy-imx8-pcie.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "imx8mm.dtsi"
 
 / {

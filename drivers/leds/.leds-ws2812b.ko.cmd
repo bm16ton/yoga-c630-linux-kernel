@@ -1,0 +1,1 @@
+cmd_drivers/leds/leds-ws2812b.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/leds-ws2812b.ko drivers/leds/leds-ws2812b.o drivers/leds/leds-ws2812b.mod.o;  true

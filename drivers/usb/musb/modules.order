@@ -1,0 +1,2 @@
+drivers/usb/musb/musb_hdrc.ko
+drivers/usb/musb/sunxi.ko

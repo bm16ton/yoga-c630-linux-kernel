@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-mecool-kiii-pro.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-mecool-kiii-pro.ko drivers/media/rc/keymaps/rc-mecool-kiii-pro.o drivers/media/rc/keymaps/rc-mecool-kiii-pro.mod.o;  true

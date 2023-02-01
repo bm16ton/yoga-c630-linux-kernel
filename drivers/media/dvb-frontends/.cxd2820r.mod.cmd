@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/cxd2820r.mod := printf '%s\n'   cxd2820r_core.o cxd2820r_c.o cxd2820r_t.o cxd2820r_t2.o | awk '!x[$$0]++ { print("drivers/media/dvb-frontends/"$$0) }' > drivers/media/dvb-frontends/cxd2820r.mod

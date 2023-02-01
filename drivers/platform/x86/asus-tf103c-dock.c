@@ -878,14 +878,21 @@ static int tf103c_dock_probe(struct i2c_client *client)
 	return 0;
 }
 
+<<<<<<< HEAD
+static void tf103c_dock_remove(struct i2c_client *client)
+=======
 static int tf103c_dock_remove(struct i2c_client *client)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct tf103c_dock_data *dock = i2c_get_clientdata(client);
 
 	tf103c_dock_stop_hpd(dock);
 	tf103c_dock_disable(dock);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused tf103c_dock_suspend(struct device *dev)

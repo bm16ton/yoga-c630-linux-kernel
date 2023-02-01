@@ -229,12 +229,21 @@ static bool alloc_covered_contains(u32 alloc_stack_hash)
 
 	return true;
 }
+<<<<<<< HEAD
 
 static bool kfence_protect(unsigned long addr)
 {
 	return !KFENCE_WARN_ON(!kfence_protect_page(ALIGN_DOWN(addr, PAGE_SIZE), true));
 }
 
+=======
+
+static bool kfence_protect(unsigned long addr)
+{
+	return !KFENCE_WARN_ON(!kfence_protect_page(ALIGN_DOWN(addr, PAGE_SIZE), true));
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool kfence_unprotect(unsigned long addr)
 {
 	return !KFENCE_WARN_ON(!kfence_protect_page(ALIGN_DOWN(addr, PAGE_SIZE), false));
@@ -719,12 +728,15 @@ static int show_object(struct seq_file *seq, void *v)
 	return 0;
 }
 
-static const struct seq_operations object_seqops = {
+static const struct seq_operations objects_sops = {
 	.start = start_object,
 	.next = next_object,
 	.stop = stop_object,
 	.show = show_object,
 };
+<<<<<<< HEAD
+DEFINE_SEQ_ATTRIBUTE(objects);
+=======
 
 static int open_objects(struct inode *inode, struct file *file)
 {
@@ -737,6 +749,7 @@ static const struct file_operations objects_fops = {
 	.llseek = seq_lseek,
 	.release = seq_release,
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int __init kfence_debugfs_init(void)
 {
@@ -864,7 +877,11 @@ static void kfence_init_enable(void)
 
 void __init kfence_init(void)
 {
+<<<<<<< HEAD
+	stack_hash_seed = get_random_u32();
+=======
 	stack_hash_seed = (u32)random_get_entropy();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Setting kfence_sample_interval to 0 on boot disables KFENCE. */
 	if (!kfence_sample_interval)
@@ -983,6 +1000,7 @@ void *__kfence_alloc(struct kmem_cache *s, size_t size, gfp_t flags)
 	size_t num_stack_entries;
 	u32 alloc_stack_hash;
 
+<<<<<<< HEAD
 	/*
 	 * Perform size check before switching kfence_allocation_gate, so that
 	 * we don't disable KFENCE without making an allocation.
@@ -1002,6 +1020,34 @@ void *__kfence_alloc(struct kmem_cache *s, size_t size, gfp_t flags)
 		atomic_long_inc(&counters[KFENCE_COUNTER_SKIP_INCOMPAT]);
 		return NULL;
 	}
+
+	/*
+	 * Skip allocations for this slab, if KFENCE has been disabled for
+	 * this slab.
+	 */
+	if (s->flags & SLAB_SKIP_KFENCE)
+		return NULL;
+=======
+	/*
+	 * Perform size check before switching kfence_allocation_gate, so that
+	 * we don't disable KFENCE without making an allocation.
+	 */
+	if (size > PAGE_SIZE) {
+		atomic_long_inc(&counters[KFENCE_COUNTER_SKIP_INCOMPAT]);
+		return NULL;
+	}
+
+	/*
+	 * Skip allocations from non-default zones, including DMA. We cannot
+	 * guarantee that pages in the KFENCE pool will have the requested
+	 * properties (e.g. reside in DMAable memory).
+	 */
+	if ((flags & GFP_ZONEMASK) ||
+	    (s->flags & (SLAB_CACHE_DMA | SLAB_CACHE_DMA32))) {
+		atomic_long_inc(&counters[KFENCE_COUNTER_SKIP_INCOMPAT]);
+		return NULL;
+	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (atomic_inc_return(&kfence_allocation_gate) > 1)
 		return NULL;

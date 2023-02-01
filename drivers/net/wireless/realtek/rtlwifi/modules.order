@@ -1,0 +1,15 @@
+drivers/net/wireless/realtek/rtlwifi/rtlwifi.ko
+drivers/net/wireless/realtek/rtlwifi/rtl_pci.ko
+drivers/net/wireless/realtek/rtlwifi/rtl_usb.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8192c/rtl8192c-common.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8192ce/rtl8192ce.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8192cu/rtl8192cu.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8192se/rtl8192se.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8192de/rtl8192de.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8723ae/rtl8723ae.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8723be/rtl8723be.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8188ee/rtl8188ee.ko
+drivers/net/wireless/realtek/rtlwifi/btcoexist/btcoexist.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8723com/rtl8723-common.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8821ae/rtl8821ae.ko
+drivers/net/wireless/realtek/rtlwifi/rtl8192ee/rtl8192ee.ko

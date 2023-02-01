@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intersil/hostap/modules.order := {   echo drivers/net/wireless/intersil/hostap/hostap.ko;   echo drivers/net/wireless/intersil/hostap/hostap_plx.ko;   echo drivers/net/wireless/intersil/hostap/hostap_pci.ko; :; } > drivers/net/wireless/intersil/hostap/modules.order

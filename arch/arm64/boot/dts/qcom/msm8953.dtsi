@@ -722,7 +722,11 @@
 		};
 
 		tcsr_phy_clk_scheme_sel: syscon@193f044 {
+<<<<<<< HEAD
+			compatible = "qcom,tcsr-msm8953", "syscon";
+=======
 			compatible = "syscon";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			reg = <0x193f044 0x4>;
 		};
 
@@ -799,7 +803,11 @@
 			compatible = "qcom,msm8953-sdhci", "qcom,sdhci-msm-v4";
 
 			reg = <0x7824900 0x500>, <0x7824000 0x800>;
+<<<<<<< HEAD
+			reg-names = "hc", "core";
+=======
 			reg-names = "hc_mem", "core_mem";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 138 IRQ_TYPE_LEVEL_HIGH>;
@@ -859,7 +867,11 @@
 			compatible = "qcom,msm8953-sdhci", "qcom,sdhci-msm-v4";
 
 			reg = <0x7864900 0x500>, <0x7864000 0x800>;
+<<<<<<< HEAD
+			reg-names = "hc", "core";
+=======
 			reg-names = "hc_mem", "core_mem";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH>;

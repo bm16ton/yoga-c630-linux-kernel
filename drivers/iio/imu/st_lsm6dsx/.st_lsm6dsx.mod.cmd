@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/st_lsm6dsx/st_lsm6dsx.mod := printf '%s\n'   st_lsm6dsx_core.o st_lsm6dsx_buffer.o st_lsm6dsx_shub.o | awk '!x[$$0]++ { print("drivers/iio/imu/st_lsm6dsx/"$$0) }' > drivers/iio/imu/st_lsm6dsx/st_lsm6dsx.mod

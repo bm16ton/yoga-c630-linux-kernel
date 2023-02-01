@@ -1,0 +1,1 @@
+cmd_drivers/net/wireguard/wireguard.mod := printf '%s\n'   main.o noise.o device.o peer.o timers.o queueing.o send.o receive.o socket.o peerlookup.o allowedips.o ratelimiter.o cookie.o netlink.o | awk '!x[$$0]++ { print("drivers/net/wireguard/"$$0) }' > drivers/net/wireguard/wireguard.mod

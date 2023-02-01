@@ -1,0 +1,1 @@
+cmd_fs/nfs/modules.order := {   echo fs/nfs/nfs.ko;   echo fs/nfs/nfsv2.ko;   echo fs/nfs/nfsv3.ko;   echo fs/nfs/nfsv4.ko;   cat fs/nfs/filelayout/modules.order;   cat fs/nfs/blocklayout/modules.order;   cat fs/nfs/flexfilelayout/modules.order; :; } > fs/nfs/modules.order

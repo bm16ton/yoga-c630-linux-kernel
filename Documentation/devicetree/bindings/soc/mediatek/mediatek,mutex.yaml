@@ -26,10 +26,18 @@ properties:
     enum:
       - mediatek,mt2701-disp-mutex
       - mediatek,mt2712-disp-mutex
+<<<<<<< HEAD
+      - mediatek,mt6795-disp-mutex
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - mediatek,mt8167-disp-mutex
       - mediatek,mt8173-disp-mutex
       - mediatek,mt8183-disp-mutex
       - mediatek,mt8186-disp-mutex
+<<<<<<< HEAD
+      - mediatek,mt8186-mdp3-mutex
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - mediatek,mt8192-disp-mutex
       - mediatek,mt8195-disp-mutex
 

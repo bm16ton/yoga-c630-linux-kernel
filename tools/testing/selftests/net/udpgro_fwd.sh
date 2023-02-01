@@ -1,6 +1,10 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
+<<<<<<< HEAD
+BPF_FILE="../bpf/xdp_dummy.bpf.o"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 readonly BASE="ns-$(mktemp -u XXXXXX)"
 readonly SRC=2
 readonly DST=1
@@ -46,7 +50,11 @@ create_ns() {
 		ip -n $BASE$ns addr add dev veth$ns $BM_NET_V4$ns/24
 		ip -n $BASE$ns addr add dev veth$ns $BM_NET_V6$ns/64 nodad
 	done
+<<<<<<< HEAD
+	ip -n $NS_DST link set veth$DST xdp object ${BPF_FILE} section xdp 2>/dev/null
+=======
 	ip -n $NS_DST link set veth$DST xdp object ../bpf/xdp_dummy.o section xdp 2>/dev/null
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 create_vxlan_endpoint() {

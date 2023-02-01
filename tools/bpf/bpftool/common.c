@@ -499,6 +499,10 @@ static int do_build_table_cb(const char *fpath, const struct stat *sb,
 	if (err) {
 		p_err("failed to append entry to hashmap for ID %u, path '%s': %s",
 		      pinned_info.id, path, strerror(errno));
+<<<<<<< HEAD
+		free(path);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_close;
 	}
 
@@ -725,6 +729,7 @@ print_all_levels(__maybe_unused enum libbpf_print_level level,
 
 static int prog_fd_by_nametag(void *nametag, int **fds, bool tag)
 {
+	char prog_name[MAX_PROG_FULL_NAME];
 	unsigned int id = 0;
 	int fd, nb_fds = 0;
 	void *tmp;
@@ -757,10 +762,18 @@ static int prog_fd_by_nametag(void *nametag, int **fds, bool tag)
 			goto err_close_fd;
 		}
 
-		if ((tag && memcmp(nametag, info.tag, BPF_TAG_SIZE)) ||
-		    (!tag && strncmp(nametag, info.name, BPF_OBJ_NAME_LEN))) {
+		if (tag && memcmp(nametag, info.tag, BPF_TAG_SIZE)) {
 			close(fd);
 			continue;
+		}
+
+		if (!tag) {
+			get_prog_full_name(&info, fd, prog_name,
+					   sizeof(prog_name));
+			if (strncmp(nametag, prog_name, sizeof(prog_name))) {
+				close(fd);
+				continue;
+			}
 		}
 
 		if (nb_fds > 0) {
@@ -823,7 +836,7 @@ int prog_parse_fds(int *argc, char ***argv, int **fds)
 		NEXT_ARGP();
 
 		name = **argv;
-		if (strlen(name) > BPF_OBJ_NAME_LEN - 1) {
+		if (strlen(name) > MAX_PROG_FULL_NAME - 1) {
 			p_err("can't parse name");
 			return -1;
 		}

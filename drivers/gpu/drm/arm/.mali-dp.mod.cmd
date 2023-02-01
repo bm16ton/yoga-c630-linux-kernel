@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/arm/mali-dp.mod := printf '%s\n'   malidp_drv.o malidp_hw.o malidp_planes.o malidp_crtc.o malidp_mw.o | awk '!x[$$0]++ { print("drivers/gpu/drm/arm/"$$0) }' > drivers/gpu/drm/arm/mali-dp.mod

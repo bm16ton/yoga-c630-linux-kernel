@@ -30,13 +30,27 @@
 #include "kasan.h"
 #include "../slab.h"
 
+<<<<<<< HEAD
+struct slab *kasan_addr_to_slab(const void *addr)
+{
+	if (virt_addr_valid(addr))
+		return virt_to_slab(addr);
+	return NULL;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 depot_stack_handle_t kasan_save_stack(gfp_t flags, bool can_alloc)
 {
 	unsigned long entries[KASAN_STACK_DEPTH];
 	unsigned int nr_entries;
 
 	nr_entries = stack_trace_save(entries, ARRAY_SIZE(entries), 0);
+<<<<<<< HEAD
+	return __stack_depot_save(entries, nr_entries, 0, flags, can_alloc);
+=======
 	return __stack_depot_save(entries, nr_entries, flags, can_alloc);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void kasan_set_track(struct kasan_track *track, gfp_t flags)
@@ -88,6 +102,8 @@ asmlinkage void kasan_unpoison_task_stack_below(const void *watermark)
 }
 #endif /* CONFIG_KASAN_STACK */
 
+<<<<<<< HEAD
+=======
 /*
  * Only allow cache merging when stack collection is disabled and no metadata
  * is present.
@@ -99,6 +115,7 @@ slab_flags_t __kasan_never_merge(void)
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void __kasan_unpoison_pages(struct page *page, unsigned int order, bool init)
 {
 	u8 tag;
@@ -119,6 +136,8 @@ void __kasan_poison_pages(struct page *page, unsigned int order, bool init)
 	if (likely(!PageHighMem(page)))
 		kasan_poison(page_address(page), PAGE_SIZE << order,
 			     KASAN_PAGE_FREE, init);
+<<<<<<< HEAD
+=======
 }
 
 /*
@@ -211,6 +230,7 @@ void __kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
 	/* Use optimal size if the size with added metas is not large enough. */
 	if (*size < optimal_size)
 		*size = optimal_size;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void __kasan_cache_create_kmalloc(struct kmem_cache *cache)
@@ -218,6 +238,8 @@ void __kasan_cache_create_kmalloc(struct kmem_cache *cache)
 	cache->kasan_info.is_kmalloc = true;
 }
 
+<<<<<<< HEAD
+=======
 size_t __kasan_metadata_size(struct kmem_cache *cache)
 {
 	if (!kasan_stack_collection_enabled())
@@ -247,6 +269,7 @@ struct kasan_free_meta *kasan_get_free_meta(struct kmem_cache *cache,
 }
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void __kasan_poison_slab(struct slab *slab)
 {
 	struct page *page = slab_page(slab);
@@ -312,13 +335,9 @@ static inline u8 assign_tag(struct kmem_cache *cache,
 void * __must_check __kasan_init_slab_obj(struct kmem_cache *cache,
 						const void *object)
 {
-	struct kasan_alloc_meta *alloc_meta;
-
-	if (kasan_stack_collection_enabled()) {
-		alloc_meta = kasan_get_alloc_meta(cache, object);
-		if (alloc_meta)
-			__memset(alloc_meta, 0, sizeof(*alloc_meta));
-	}
+	/* Initialize per-object metadata if it is present. */
+	if (kasan_requires_meta())
+		kasan_init_object_meta(cache, object);
 
 	/* Tag is ignored in set_tag() without CONFIG_KASAN_SW/HW_TAGS */
 	object = set_tag(object, assign_tag(cache, object, true));
@@ -329,13 +348,15 @@ void * __must_check __kasan_init_slab_obj(struct kmem_cache *cache,
 static inline bool ____kasan_slab_free(struct kmem_cache *cache, void *object,
 				unsigned long ip, bool quarantine, bool init)
 {
-	u8 tag;
 	void *tagged_object;
 
 	if (!kasan_arch_is_ready())
 		return false;
 
+<<<<<<< HEAD
+=======
 	tag = get_tag(object);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	tagged_object = object;
 	object = kasan_reset_tag(object);
 
@@ -364,7 +385,7 @@ static inline bool ____kasan_slab_free(struct kmem_cache *cache, void *object,
 		return false;
 
 	if (kasan_stack_collection_enabled())
-		kasan_set_free_info(cache, object, tag);
+		kasan_save_free_info(cache, tagged_object);
 
 	return kasan_quarantine_put(cache, object);
 }
@@ -418,23 +439,16 @@ void __kasan_slab_free_mempool(void *ptr, unsigned long ip)
 		kasan_poison(ptr, folio_size(folio), KASAN_PAGE_FREE, false);
 	} else {
 		struct slab *slab = folio_slab(folio);
+<<<<<<< HEAD
+=======
 
 		____kasan_slab_free(slab->slab_cache, ptr, ip, false, false);
 	}
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-static void set_alloc_info(struct kmem_cache *cache, void *object,
-				gfp_t flags, bool is_kmalloc)
-{
-	struct kasan_alloc_meta *alloc_meta;
-
-	/* Don't save alloc info for kmalloc caches in kasan_slab_alloc(). */
-	if (cache->kasan_info.is_kmalloc && !is_kmalloc)
-		return;
-
-	alloc_meta = kasan_get_alloc_meta(cache, object);
-	if (alloc_meta)
-		kasan_set_track(&alloc_meta->alloc_track, flags);
+		____kasan_slab_free(slab->slab_cache, ptr, ip, false, false);
+	}
 }
 
 void * __must_check __kasan_slab_alloc(struct kmem_cache *cache,
@@ -466,8 +480,8 @@ void * __must_check __kasan_slab_alloc(struct kmem_cache *cache,
 	kasan_unpoison(tagged_object, cache->object_size, init);
 
 	/* Save alloc info (if possible) for non-kmalloc() allocations. */
-	if (kasan_stack_collection_enabled())
-		set_alloc_info(cache, (void *)object, flags, false);
+	if (kasan_stack_collection_enabled() && !cache->kasan_info.is_kmalloc)
+		kasan_save_alloc_info(cache, tagged_object, flags);
 
 	return tagged_object;
 }
@@ -512,8 +526,8 @@ static inline void *____kasan_kmalloc(struct kmem_cache *cache,
 	 * Save alloc info (if possible) for kmalloc() allocations.
 	 * This also rewrites the alloc info when called from kasan_krealloc().
 	 */
-	if (kasan_stack_collection_enabled())
-		set_alloc_info(cache, (void *)object, flags, true);
+	if (kasan_stack_collection_enabled() && cache->kasan_info.is_kmalloc)
+		kasan_save_alloc_info(cache, (void *)object, flags);
 
 	/* Keep the tag that was set by kasan_slab_alloc(). */
 	return (void *)object;

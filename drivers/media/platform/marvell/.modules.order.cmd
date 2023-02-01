@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/marvell/modules.order := {   echo drivers/media/platform/marvell/cafe_ccic.ko;   echo drivers/media/platform/marvell/mcam-core.ko; :; } > drivers/media/platform/marvell/modules.order

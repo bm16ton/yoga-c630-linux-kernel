@@ -828,6 +828,8 @@ bool fscrypt_dummy_policies_equal(const struct fscrypt_dummy_policy *p1,
 	return fscrypt_policies_equal(p1->policy, p2->policy);
 }
 EXPORT_SYMBOL_GPL(fscrypt_dummy_policies_equal);
+<<<<<<< HEAD
+=======
 
 /* Deprecated, do not use */
 int fscrypt_set_test_dummy_encryption(struct super_block *sb, const char *arg,
@@ -841,6 +843,7 @@ int fscrypt_set_test_dummy_encryption(struct super_block *sb, const char *arg,
 		fscrypt_add_test_dummy_key(sb, dummy_policy);
 }
 EXPORT_SYMBOL_GPL(fscrypt_set_test_dummy_encryption);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * fscrypt_show_test_dummy_encryption() - show '-o test_dummy_encryption'

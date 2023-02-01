@@ -89,10 +89,19 @@ void ice_vsi_free_tx_rings(struct ice_vsi *vsi);
 
 void ice_vsi_manage_rss_lut(struct ice_vsi *vsi, bool ena);
 
+<<<<<<< HEAD
+void ice_vsi_cfg_crc_strip(struct ice_vsi *vsi, bool disable);
+
 void ice_update_tx_ring_stats(struct ice_tx_ring *ring, u64 pkts, u64 bytes);
 
 void ice_update_rx_ring_stats(struct ice_rx_ring *ring, u64 pkts, u64 bytes);
 
+=======
+void ice_update_tx_ring_stats(struct ice_tx_ring *ring, u64 pkts, u64 bytes);
+
+void ice_update_rx_ring_stats(struct ice_rx_ring *ring, u64 pkts, u64 bytes);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void ice_vsi_cfg_frame_size(struct ice_vsi *vsi);
 void ice_write_intrl(struct ice_q_vector *q_vector, u8 intrl);
 void ice_write_itr(struct ice_ring_container *rc, u16 itr);

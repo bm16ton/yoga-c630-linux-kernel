@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/lgdt3305.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/dvb-frontends/lgdt3305.ko drivers/media/dvb-frontends/lgdt3305.o drivers/media/dvb-frontends/lgdt3305.mod.o;  true

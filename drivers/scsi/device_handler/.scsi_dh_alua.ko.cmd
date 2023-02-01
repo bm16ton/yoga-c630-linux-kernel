@@ -1,0 +1,1 @@
+cmd_drivers/scsi/device_handler/scsi_dh_alua.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/device_handler/scsi_dh_alua.ko drivers/scsi/device_handler/scsi_dh_alua.o drivers/scsi/device_handler/scsi_dh_alua.mod.o;  true

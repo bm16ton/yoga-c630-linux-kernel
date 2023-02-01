@@ -262,6 +262,14 @@
 				quality = <100>;
 			};
 
+			hace: crypto@1e6e3000 {
+				compatible = "aspeed,ast2500-hace";
+				reg = <0x1e6e3000 0x100>;
+				interrupts = <4>;
+				clocks = <&syscon ASPEED_CLK_GATE_YCLK>;
+				resets = <&syscon ASPEED_RESET_HACE>;
+			};
+
 			gfx: display@1e6e6000 {
 				compatible = "aspeed,ast2500-gfx", "syscon";
 				reg = <0x1e6e6000 0x1000>;
@@ -468,6 +476,7 @@
 					interrupts = <8>;
 					clocks = <&syscon ASPEED_CLK_GATE_LCLK>;
 					status = "disabled";
+<<<<<<< HEAD
 				};
 
 				kcs4: kcs@114 {
@@ -478,11 +487,24 @@
 					status = "disabled";
 				};
 
+=======
+				};
+
+				kcs4: kcs@114 {
+					compatible = "aspeed,ast2500-kcs-bmc-v2";
+					reg = <0x114 0x1>, <0x118 0x1>, <0x11c 0x1>;
+					interrupts = <8>;
+					clocks = <&syscon ASPEED_CLK_GATE_LCLK>;
+					status = "disabled";
+				};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				lpc_ctrl: lpc-ctrl@80 {
 					compatible = "aspeed,ast2500-lpc-ctrl";
 					reg = <0x80 0x10>;
 					clocks = <&syscon ASPEED_CLK_GATE_LCLK>;
 					status = "disabled";
+<<<<<<< HEAD
 				};
 
 				lpc_snoop: lpc-snoop@90 {
@@ -493,6 +515,18 @@
 					status = "disabled";
 				};
 
+=======
+				};
+
+				lpc_snoop: lpc-snoop@90 {
+					compatible = "aspeed,ast2500-lpc-snoop";
+					reg = <0x90 0x8>;
+					interrupts = <8>;
+					clocks = <&syscon ASPEED_CLK_GATE_LCLK>;
+					status = "disabled";
+				};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				lpc_reset: reset-controller@98 {
 					compatible = "aspeed,ast2500-lpc-reset";
 					reg = <0x98 0x4>;

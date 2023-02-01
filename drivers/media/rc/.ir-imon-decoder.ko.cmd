@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/ir-imon-decoder.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/ir-imon-decoder.ko drivers/media/rc/ir-imon-decoder.o drivers/media/rc/ir-imon-decoder.mod.o;  true

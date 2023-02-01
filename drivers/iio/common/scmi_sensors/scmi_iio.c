@@ -18,6 +18,10 @@
 #include <linux/scmi_protocol.h>
 #include <linux/time.h>
 #include <linux/types.h>
+<<<<<<< HEAD
+#include <linux/units.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define SCMI_IIO_NUM_OF_AXIS 3
 
@@ -130,7 +134,10 @@ static const struct iio_buffer_setup_ops scmi_iio_buffer_ops = {
 static int scmi_iio_set_odr_val(struct iio_dev *iio_dev, int val, int val2)
 {
 	struct scmi_iio_priv *sensor = iio_priv(iio_dev);
+<<<<<<< HEAD
+=======
 	const unsigned long UHZ_PER_HZ = 1000000UL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 sec, mult, uHz, sf;
 	u32 sensor_config;
 	char buf[32];
@@ -145,7 +152,11 @@ static int scmi_iio_set_odr_val(struct iio_dev *iio_dev, int val, int val2)
 		return err;
 	}
 
+<<<<<<< HEAD
+	uHz = val * MICROHZ_PER_HZ + val2;
+=======
 	uHz = val * UHZ_PER_HZ + val2;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The seconds field in the sensor interval in SCMI is 16 bits long
@@ -156,10 +167,17 @@ static int scmi_iio_set_odr_val(struct iio_dev *iio_dev, int val, int val2)
 	 * count the number of characters
 	 */
 	sf = (u64)uHz * 0xFFFF;
+<<<<<<< HEAD
+	do_div(sf,  MICROHZ_PER_HZ);
+	mult = scnprintf(buf, sizeof(buf), "%llu", sf) - 1;
+
+	sec = int_pow(10, mult) * MICROHZ_PER_HZ;
+=======
 	do_div(sf,  UHZ_PER_HZ);
 	mult = scnprintf(buf, sizeof(buf), "%llu", sf) - 1;
 
 	sec = int_pow(10, mult) * UHZ_PER_HZ;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	do_div(sec, uHz);
 	if (sec == 0) {
 		dev_err(&iio_dev->dev,

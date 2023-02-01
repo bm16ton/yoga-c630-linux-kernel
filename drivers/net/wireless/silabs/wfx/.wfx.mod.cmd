@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/silabs/wfx/wfx.mod := printf '%s\n'   bh.o hwio.o fwio.o hif_tx_mib.o hif_tx.o hif_rx.o queue.o data_tx.o data_rx.o scan.o sta.o key.o main.o debug.o bus_spi.o bus_sdio.o | awk '!x[$$0]++ { print("drivers/net/wireless/silabs/wfx/"$$0) }' > drivers/net/wireless/silabs/wfx/wfx.mod

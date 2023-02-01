@@ -1,0 +1,1 @@
+cmd_drivers/dma/built-in.a := rm -f drivers/dma/built-in.a;  printf "drivers/dma/%s " dmaengine.o virt-dma.o acpi-dma.o of-dma.o idxd/built-in.a mv_xor.o mv_xor_v2.o tegra20-apb-dma.o tegra210-adma.o mediatek/built-in.a qcom/built-in.a ti/built-in.a xilinx/built-in.a | xargs ar cDPrST drivers/dma/built-in.a

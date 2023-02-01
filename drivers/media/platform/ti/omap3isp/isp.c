@@ -937,10 +937,15 @@ static int isp_pipeline_is_last(struct media_entity *me)
 	struct isp_pipeline *pipe;
 	struct media_pad *pad;
 
+<<<<<<< HEAD
+	pipe = to_isp_pipeline(me);
+	if (!pipe || pipe->stream_state == ISP_PIPELINE_STREAM_STOPPED)
+=======
 	if (!me->pipe)
 		return 0;
 	pipe = to_isp_pipeline(me);
 	if (pipe->stream_state == ISP_PIPELINE_STREAM_STOPPED)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	pad = media_pad_remote_pad_first(&pipe->output->pad);
 	return pad->entity == me;
@@ -1528,7 +1533,11 @@ void omap3isp_print_status(struct isp_device *isp)
  * To solve this problem power management support is split into prepare/complete
  * and suspend/resume operations. The pipelines are stopped in prepare() and the
  * ISP clocks get disabled in suspend(). Similarly, the clocks are re-enabled in
+<<<<<<< HEAD
+ * resume(), and the pipelines are restarted in complete().
+=======
  * resume(), and the the pipelines are restarted in complete().
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * TODO: PM dependencies between the ISP and sensors are not modelled explicitly
  * yet.

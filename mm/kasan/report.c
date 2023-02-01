@@ -164,8 +164,13 @@ static void end_report(unsigned long *flags, void *addr)
 				       (unsigned long)addr);
 	pr_err("==================================================================\n");
 	spin_unlock_irqrestore(&report_lock, *flags);
+<<<<<<< HEAD
+	if (!test_bit(KASAN_BIT_MULTI_SHOT, &kasan_flags))
+		check_panic_on_warn("KASAN");
+=======
 	if (panic_on_warn && !test_bit(KASAN_BIT_MULTI_SHOT, &kasan_flags))
 		panic("panic_on_warn set ...\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (kasan_arg_fault == KASAN_ARG_FAULT_PANIC)
 		panic("kasan.fault=panic set ...\n");
 	add_taint(TAINT_BAD_PAGE, LOCKDEP_NOW_UNRELIABLE);
@@ -175,6 +180,16 @@ static void end_report(unsigned long *flags, void *addr)
 
 static void print_error_description(struct kasan_report_info *info)
 {
+<<<<<<< HEAD
+	pr_err("BUG: KASAN: %s in %pS\n", info->bug_type, (void *)info->ip);
+
+	if (info->type != KASAN_REPORT_ACCESS) {
+		pr_err("Free of addr %px by task %s/%d\n",
+			info->access_addr, current->comm, task_pid_nr(current));
+		return;
+	}
+
+=======
 	if (info->type == KASAN_REPORT_INVALID_FREE) {
 		pr_err("BUG: KASAN: invalid-free in %pS\n", (void *)info->ip);
 		return;
@@ -187,6 +202,7 @@ static void print_error_description(struct kasan_report_info *info)
 
 	pr_err("BUG: KASAN: %s in %pS\n",
 		kasan_get_bug_type(info), (void *)info->ip);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (info->access_size)
 		pr_err("%s of size %zu at addr %px by task %s/%d\n",
 			info->is_write ? "Write" : "Read", info->access_size,
@@ -200,21 +216,29 @@ static void print_error_description(struct kasan_report_info *info)
 static void print_track(struct kasan_track *track, const char *prefix)
 {
 	pr_err("%s by task %u:\n", prefix, track->pid);
+<<<<<<< HEAD
+	if (track->stack)
+		stack_depot_print(track->stack);
+	else
+=======
 	if (track->stack) {
 		stack_depot_print(track->stack);
 	} else {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_err("(stack is not available)\n");
-	}
 }
 
-struct page *kasan_addr_to_page(const void *addr)
+static inline struct page *addr_to_page(const void *addr)
 {
-	if ((addr >= (void *)PAGE_OFFSET) &&
-			(addr < high_memory))
+	if (virt_addr_valid(addr))
 		return virt_to_head_page(addr);
 	return NULL;
 }
 
+<<<<<<< HEAD
+static void describe_object_addr(const void *addr, struct kmem_cache *cache,
+				 void *object)
+=======
 struct slab *kasan_addr_to_slab(const void *addr)
 {
 	if ((addr >= (void *)PAGE_OFFSET) &&
@@ -225,6 +249,7 @@ struct slab *kasan_addr_to_slab(const void *addr)
 
 static void describe_object_addr(struct kmem_cache *cache, void *object,
 				const void *addr)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long access_addr = (unsigned long)addr;
 	unsigned long object_addr = (unsigned long)object;
@@ -252,24 +277,21 @@ static void describe_object_addr(struct kmem_cache *cache, void *object,
 		(void *)(object_addr + cache->object_size));
 }
 
-static void describe_object_stacks(struct kmem_cache *cache, void *object,
-					const void *addr, u8 tag)
+static void describe_object_stacks(struct kasan_report_info *info)
 {
-	struct kasan_alloc_meta *alloc_meta;
-	struct kasan_track *free_track;
-
-	alloc_meta = kasan_get_alloc_meta(cache, object);
-	if (alloc_meta) {
-		print_track(&alloc_meta->alloc_track, "Allocated");
+	if (info->alloc_track.stack) {
+		print_track(&info->alloc_track, "Allocated");
 		pr_err("\n");
 	}
 
-	free_track = kasan_get_free_track(cache, object, tag);
-	if (free_track) {
-		print_track(free_track, "Freed");
+	if (info->free_track.stack) {
+		print_track(&info->free_track, "Freed");
 		pr_err("\n");
 	}
 
+<<<<<<< HEAD
+	kasan_print_aux_stacks(info->cache, info->object);
+=======
 #ifdef CONFIG_KASAN_GENERIC
 	if (!alloc_meta)
 		return;
@@ -284,14 +306,14 @@ static void describe_object_stacks(struct kmem_cache *cache, void *object,
 		pr_err("\n");
 	}
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
-static void describe_object(struct kmem_cache *cache, void *object,
-				const void *addr, u8 tag)
+static void describe_object(const void *addr, struct kasan_report_info *info)
 {
 	if (kasan_stack_collection_enabled())
-		describe_object_stacks(cache, object, addr, tag);
-	describe_object_addr(cache, object, addr);
+		describe_object_stacks(info);
+	describe_object_addr(addr, info->cache, info->object);
 }
 
 static inline bool kernel_or_module_addr(const void *addr)
@@ -310,19 +332,25 @@ static inline bool init_task_stack_addr(const void *addr)
 			sizeof(init_thread_union.stack));
 }
 
-static void print_address_description(void *addr, u8 tag)
+static void print_address_description(void *addr, u8 tag,
+				      struct kasan_report_info *info)
 {
-	struct page *page = kasan_addr_to_page(addr);
+	struct page *page = addr_to_page(addr);
 
 	dump_stack_lvl(KERN_ERR);
 	pr_err("\n");
 
+<<<<<<< HEAD
+	if (info->cache && info->object) {
+		describe_object(addr, info);
+=======
 	if (page && PageSlab(page)) {
 		struct slab *slab = page_slab(page);
 		struct kmem_cache *cache = slab->slab_cache;
 		void *object = nearest_obj(cache, slab,	addr);
 
 		describe_object(cache, object, addr, tag);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_err("\n");
 	}
 
@@ -419,6 +447,57 @@ static void print_memory_metadata(const void *addr)
 }
 
 static void print_report(struct kasan_report_info *info)
+<<<<<<< HEAD
+{
+	void *addr = kasan_reset_tag(info->access_addr);
+	u8 tag = get_tag(info->access_addr);
+
+	print_error_description(info);
+	if (addr_has_metadata(addr))
+		kasan_print_tags(tag, info->first_bad_addr);
+	pr_err("\n");
+
+	if (addr_has_metadata(addr)) {
+		print_address_description(addr, tag, info);
+		print_memory_metadata(info->first_bad_addr);
+	} else {
+		dump_stack_lvl(KERN_ERR);
+	}
+}
+
+static void complete_report_info(struct kasan_report_info *info)
+{
+	void *addr = kasan_reset_tag(info->access_addr);
+	struct slab *slab;
+
+	if (info->type == KASAN_REPORT_ACCESS)
+		info->first_bad_addr = kasan_find_first_bad_addr(
+					info->access_addr, info->access_size);
+	else
+		info->first_bad_addr = addr;
+
+	slab = kasan_addr_to_slab(addr);
+	if (slab) {
+		info->cache = slab->slab_cache;
+		info->object = nearest_obj(info->cache, slab, addr);
+	} else
+		info->cache = info->object = NULL;
+
+	switch (info->type) {
+	case KASAN_REPORT_INVALID_FREE:
+		info->bug_type = "invalid-free";
+		break;
+	case KASAN_REPORT_DOUBLE_FREE:
+		info->bug_type = "double-free";
+		break;
+	default:
+		/* bug_type filled in by kasan_complete_mode_report_info. */
+		break;
+	}
+
+	/* Fill in mode-specific report info fields. */
+	kasan_complete_mode_report_info(info);
+=======
 {
 	void *tagged_addr = info->access_addr;
 	void *untagged_addr = kasan_reset_tag(tagged_addr);
@@ -435,6 +514,7 @@ static void print_report(struct kasan_report_info *info)
 	} else {
 		dump_stack_lvl(KERN_ERR);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void kasan_report_invalid_free(void *ptr, unsigned long ip, enum kasan_report_type type)
@@ -452,18 +532,34 @@ void kasan_report_invalid_free(void *ptr, unsigned long ip, enum kasan_report_ty
 
 	start_report(&flags, true);
 
+<<<<<<< HEAD
+	memset(&info, 0, sizeof(info));
+	info.type = type;
+	info.access_addr = ptr;
+=======
 	info.type = type;
 	info.access_addr = ptr;
 	info.first_bad_addr = kasan_reset_tag(ptr);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	info.access_size = 0;
 	info.is_write = false;
 	info.ip = ip;
+
+<<<<<<< HEAD
+	complete_report_info(&info);
 
 	print_report(&info);
 
 	end_report(&flags, ptr);
 }
 
+=======
+	print_report(&info);
+
+	end_report(&flags, ptr);
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * kasan_report() is the only reporting function that uses
  * user_access_save/restore(): kasan_report_invalid_free() cannot be called
@@ -485,17 +581,32 @@ bool kasan_report(unsigned long addr, size_t size, bool is_write,
 
 	start_report(&irq_flags, true);
 
+<<<<<<< HEAD
+	memset(&info, 0, sizeof(info));
+	info.type = KASAN_REPORT_ACCESS;
+	info.access_addr = ptr;
+=======
 	info.type = KASAN_REPORT_ACCESS;
 	info.access_addr = ptr;
 	info.first_bad_addr = kasan_find_first_bad_addr(ptr, size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	info.access_size = size;
 	info.is_write = is_write;
 	info.ip = ip;
+
+<<<<<<< HEAD
+	complete_report_info(&info);
 
 	print_report(&info);
 
 	end_report(&irq_flags, ptr);
 
+=======
+	print_report(&info);
+
+	end_report(&irq_flags, ptr);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	user_access_restore(ua_flags);
 

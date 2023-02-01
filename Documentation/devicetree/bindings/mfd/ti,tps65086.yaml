@@ -38,6 +38,10 @@ properties:
 
   regulators:
     type: object
+<<<<<<< HEAD
+    additionalProperties: false
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     description: |
       List of child nodes that specify the regulator initialization data.
       Child nodes must be named after their hardware counterparts:

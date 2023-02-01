@@ -1,0 +1,1 @@
+cmd_drivers/phy/qualcomm/phy-qcom-pcie2.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/qualcomm/phy-qcom-pcie2.ko drivers/phy/qualcomm/phy-qcom-pcie2.o drivers/phy/qualcomm/phy-qcom-pcie2.mod.o;  true

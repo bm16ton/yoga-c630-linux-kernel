@@ -330,6 +330,14 @@ nla_put_failure:
 #ifdef CONFIG_NF_CONNTRACK_MARK
 static int ctnetlink_dump_mark(struct sk_buff *skb, u32 mark)
 {
+<<<<<<< HEAD
+	u32 mark = READ_ONCE(ct->mark);
+
+	if (!mark)
+		return 0;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (nla_put_be32(skb, CTA_MARK, htonl(mark)))
 		goto nla_put_failure;
 	return 0;
@@ -827,9 +835,14 @@ ctnetlink_conntrack_event(unsigned int events, const struct nf_ct_event *item)
 	}
 
 #ifdef CONFIG_NF_CONNTRACK_MARK
+<<<<<<< HEAD
+	if (events & (1 << IPCT_MARK) &&
+	    ctnetlink_dump_mark(skb, ct) < 0)
+=======
 	mark = READ_ONCE(ct->mark);
 	if ((events & (1 << IPCT_MARK) || mark) &&
 	    ctnetlink_dump_mark(skb, mark) < 0)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto nla_put_failure;
 #endif
 	nlmsg_end(skb, nlh);
@@ -2733,8 +2746,12 @@ static int __ctnetlink_glue_build(struct sk_buff *skb, struct nf_conn *ct)
 		goto nla_put_failure;
 
 #ifdef CONFIG_NF_CONNTRACK_MARK
+<<<<<<< HEAD
+	if (ctnetlink_dump_mark(skb, ct) < 0)
+=======
 	mark = READ_ONCE(ct->mark);
 	if (mark && ctnetlink_dump_mark(skb, mark) < 0)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto nla_put_failure;
 #endif
 	if (ctnetlink_dump_labels(skb, ct) < 0)

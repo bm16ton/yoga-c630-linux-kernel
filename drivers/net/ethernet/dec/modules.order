@@ -1,0 +1,5 @@
+drivers/net/ethernet/dec/tulip/dmfe.ko
+drivers/net/ethernet/dec/tulip/winbond-840.ko
+drivers/net/ethernet/dec/tulip/de2104x.ko
+drivers/net/ethernet/dec/tulip/tulip.ko
+drivers/net/ethernet/dec/tulip/uli526x.ko

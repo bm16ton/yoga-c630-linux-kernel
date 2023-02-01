@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/pl111/pl111_drm.mod := printf '%s\n'   pl111_display.o pl111_versatile.o pl111_drv.o pl111_debugfs.o | awk '!x[$$0]++ { print("drivers/gpu/drm/pl111/"$$0) }' > drivers/gpu/drm/pl111/pl111_drm.mod

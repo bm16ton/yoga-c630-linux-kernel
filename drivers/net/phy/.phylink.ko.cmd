@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/phylink.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/phylink.ko drivers/net/phy/phylink.o drivers/net/phy/phylink.mod.o;  true

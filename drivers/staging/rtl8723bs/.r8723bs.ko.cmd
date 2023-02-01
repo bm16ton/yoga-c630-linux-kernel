@@ -1,0 +1,1 @@
+cmd_drivers/staging/rtl8723bs/r8723bs.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/rtl8723bs/r8723bs.ko drivers/staging/rtl8723bs/r8723bs.o drivers/staging/rtl8723bs/r8723bs.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-adstech-dvb-t-pci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-adstech-dvb-t-pci.ko drivers/media/rc/keymaps/rc-adstech-dvb-t-pci.o drivers/media/rc/keymaps/rc-adstech-dvb-t-pci.mod.o;  true

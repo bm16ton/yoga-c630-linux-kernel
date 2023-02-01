@@ -277,6 +277,10 @@ static struct clk_hw *visconti_register_pll(struct visconti_pll_provider *ctx,
 	ret = clk_hw_register(NULL, &pll->hw);
 	if (ret) {
 		pr_err("failed to register pll clock %s : %d\n", name, ret);
+<<<<<<< HEAD
+		kfree(pll->rate_table);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(pll);
 		pll_hw_clk = ERR_PTR(ret);
 	}

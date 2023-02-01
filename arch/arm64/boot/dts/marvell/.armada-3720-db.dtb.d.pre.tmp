@@ -1,0 +1,6 @@
+armada-3720-db.o: arch/arm64/boot/dts/marvell/armada-3720-db.dts \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ arch/arm64/boot/dts/marvell/armada-372x.dtsi \
+ arch/arm64/boot/dts/marvell/armada-37xx.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

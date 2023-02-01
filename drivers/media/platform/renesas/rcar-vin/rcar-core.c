@@ -786,9 +786,14 @@ static int rvin_csi2_link_notify(struct media_link *link, u32 flags,
 		return 0;
 
 	/*
+<<<<<<< HEAD
+	 * Don't allow link changes if any stream in the graph is active as
+	 * modifying the CHSEL register fields can disrupt running streams.
+=======
 	 * Don't allow link changes if any entity in the graph is
 	 * streaming, modifying the CHSEL register fields can disrupt
 	 * running streams.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
 	media_device_for_each_entity(entity, &group->mdev)
 		if (media_entity_is_streaming(entity))

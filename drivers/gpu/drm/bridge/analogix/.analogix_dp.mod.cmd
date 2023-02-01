@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/bridge/analogix/analogix_dp.mod := printf '%s\n'   analogix_dp_core.o analogix_dp_reg.o analogix-i2c-dptx.o | awk '!x[$$0]++ { print("drivers/gpu/drm/bridge/analogix/"$$0) }' > drivers/gpu/drm/bridge/analogix/analogix_dp.mod

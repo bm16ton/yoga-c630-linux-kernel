@@ -555,6 +555,19 @@ int gma_crtc_page_flip(struct drm_crtc *crtc,
 	return ret;
 }
 
+<<<<<<< HEAD
+const struct drm_crtc_funcs gma_crtc_funcs = {
+	.cursor_set = gma_crtc_cursor_set,
+	.cursor_move = gma_crtc_cursor_move,
+	.gamma_set = gma_crtc_gamma_set,
+	.set_config = drm_crtc_helper_set_config,
+	.destroy = gma_crtc_destroy,
+	.page_flip = gma_crtc_page_flip,
+	.enable_vblank = gma_crtc_enable_vblank,
+	.disable_vblank = gma_crtc_disable_vblank,
+	.get_vblank_counter = gma_crtc_get_vblank_counter,
+};
+=======
 int gma_crtc_set_config(struct drm_mode_set *set,
 			struct drm_modeset_acquire_ctx *ctx)
 {
@@ -571,6 +584,7 @@ int gma_crtc_set_config(struct drm_mode_set *set,
 
 	return ret;
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 const struct drm_crtc_funcs gma_crtc_funcs = {
 	.cursor_set = gma_crtc_cursor_set,

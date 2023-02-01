@@ -17,7 +17,11 @@
 
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_drv.h>
+<<<<<<< HEAD
+#include <drm/drm_gem_dma_helper.h>
+=======
 #include <drm/drm_gem_cma_helper.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_module.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_vblank.h>
@@ -126,11 +130,15 @@ static irqreturn_t shmob_drm_irq(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
-DEFINE_DRM_GEM_CMA_FOPS(shmob_drm_fops);
+DEFINE_DRM_GEM_DMA_FOPS(shmob_drm_fops);
 
 static const struct drm_driver shmob_drm_driver = {
 	.driver_features	= DRIVER_GEM | DRIVER_MODESET,
+<<<<<<< HEAD
+	DRM_GEM_DMA_DRIVER_OPS,
+=======
 	DRM_GEM_CMA_DRIVER_OPS,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.fops			= &shmob_drm_fops,
 	.name			= "shmob-drm",
 	.desc			= "Renesas SH Mobile DRM",

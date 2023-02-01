@@ -65,6 +65,11 @@ enum {
 	 * on the same file.
 	 */
 	BTRFS_INODE_VERITY_IN_PROGRESS,
+<<<<<<< HEAD
+	/* Set when this inode is a free space inode. */
+	BTRFS_INODE_FREE_SPACE_INODE,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* in memory btrfs inode */
@@ -94,7 +99,8 @@ struct btrfs_inode {
 	/* special utility tree used to record which mirrors have already been
 	 * tried when checksums fail for a given block
 	 */
-	struct extent_io_tree io_failure_tree;
+	struct rb_root io_failure_tree;
+	spinlock_t io_failure_lock;
 
 	/*
 	 * Keep track of where the inode has extent items mapped in order to
@@ -250,11 +256,6 @@ struct btrfs_inode {
 	struct inode vfs_inode;
 };
 
-static inline u32 btrfs_inode_sectorsize(const struct btrfs_inode *inode)
-{
-	return inode->root->fs_info->sectorsize;
-}
-
 static inline struct btrfs_inode *BTRFS_I(const struct inode *inode)
 {
 	return container_of(inode, struct btrfs_inode, vfs_inode);
@@ -272,15 +273,13 @@ static inline unsigned long btrfs_inode_hash(u64 objectid,
 	return (unsigned long)h;
 }
 
-static inline void btrfs_insert_inode_hash(struct inode *inode)
-{
-	unsigned long h = btrfs_inode_hash(inode->i_ino, BTRFS_I(inode)->root);
-
-	__insert_inode_hash(inode, h);
-}
-
 #if BITS_PER_LONG == 32
 
+<<<<<<< HEAD
+=======
+#if BITS_PER_LONG == 32
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * On 32 bit systems the i_ino of struct inode is 32 bits (unsigned long), so
  * we use the inode's location objectid which is a u64 to avoid truncation.
@@ -312,6 +311,9 @@ static inline void btrfs_i_size_write(struct btrfs_inode *inode, u64 size)
 
 static inline bool btrfs_is_free_space_inode(struct btrfs_inode *inode)
 {
+<<<<<<< HEAD
+	return test_bit(BTRFS_INODE_FREE_SPACE_INODE, &inode->runtime_flags);
+=======
 	struct btrfs_root *root = inode->root;
 
 	if (root == root->fs_info->tree_root &&
@@ -319,6 +321,7 @@ static inline bool btrfs_is_free_space_inode(struct btrfs_inode *inode)
 		return true;
 
 	return false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool is_data_inode(struct inode *inode)
@@ -358,6 +361,7 @@ static inline void btrfs_set_inode_last_sub_trans(struct btrfs_inode *inode)
  * creation or when loading an inode from disk).
  */
 static inline void btrfs_set_inode_full_sync(struct btrfs_inode *inode)
+<<<<<<< HEAD
 {
 	set_bit(BTRFS_INODE_NEEDS_FULL_SYNC, &inode->runtime_flags);
 	/*
@@ -384,6 +388,34 @@ static inline void btrfs_set_inode_full_sync(struct btrfs_inode *inode)
 
 static inline bool btrfs_inode_in_log(struct btrfs_inode *inode, u64 generation)
 {
+=======
+{
+	set_bit(BTRFS_INODE_NEEDS_FULL_SYNC, &inode->runtime_flags);
+	/*
+	 * The inode may have been part of a reflink operation in the last
+	 * transaction that modified it, and then a fsync has reset the
+	 * last_reflink_trans to avoid subsequent fsyncs in the same
+	 * transaction to do unnecessary work. So update last_reflink_trans
+	 * to the last_trans value (we have to be pessimistic and assume a
+	 * reflink happened).
+	 *
+	 * The ->last_trans is protected by the inode's spinlock and we can
+	 * have a concurrent ordered extent completion update it. Also set
+	 * last_reflink_trans to ->last_trans only if the former is less than
+	 * the later, because we can be called in a context where
+	 * last_reflink_trans was set to the current transaction generation
+	 * while ->last_trans was not yet updated in the current transaction,
+	 * and therefore has a lower value.
+	 */
+	spin_lock(&inode->lock);
+	if (inode->last_reflink_trans < inode->last_trans)
+		inode->last_reflink_trans = inode->last_trans;
+	spin_unlock(&inode->lock);
+}
+
+static inline bool btrfs_inode_in_log(struct btrfs_inode *inode, u64 generation)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool ret = false;
 
 	spin_lock(&inode->lock);

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/thunder/thunder_bgx.mod := printf '%s\n'   thunder_bgx.o | awk '!x[$$0]++ { print("drivers/net/ethernet/cavium/thunder/"$$0) }' > drivers/net/ethernet/cavium/thunder/thunder_bgx.mod

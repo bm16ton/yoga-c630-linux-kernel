@@ -1,0 +1,10 @@
+arch/arm64/crypto/sha1-ce.ko
+arch/arm64/crypto/sha2-ce.ko
+arch/arm64/crypto/ghash-ce.ko
+arch/arm64/crypto/crct10dif-ce.ko
+arch/arm64/crypto/aes-ce-cipher.ko
+arch/arm64/crypto/aes-ce-ccm.ko
+arch/arm64/crypto/aes-ce-blk.ko
+arch/arm64/crypto/sha256-arm64.ko
+arch/arm64/crypto/chacha-neon.ko
+arch/arm64/crypto/poly1305-neon.ko

@@ -18,6 +18,7 @@
 #include <linux/moduleparam.h>
 #include <sound/hda_register.h>
 #include <sound/pcm_params.h>
+#include <trace/events/sof_intel.h>
 #include "../sof-audio.h"
 #include "../ops.h"
 #include "hda.h"
@@ -128,6 +129,7 @@ int hda_dsp_pcm_hw_params(struct snd_sof_dev *sdev,
 		hda_dsp_stream_spib_config(sdev, hext_stream, HDA_DSP_SPIB_ENABLE, 0);
 	else
 		hda_dsp_stream_spib_config(sdev, hext_stream, HDA_DSP_SPIB_DISABLE, 0);
+<<<<<<< HEAD
 
 	if (hda)
 		platform_params->no_ipc_position = hda->no_ipc_position;
@@ -151,6 +153,31 @@ int hda_dsp_pcm_ack(struct snd_sof_dev *sdev, struct snd_pcm_substream *substrea
 
 	spib = appl_pos % buf_size;
 
+=======
+
+	if (hda)
+		platform_params->no_ipc_position = hda->no_ipc_position;
+
+	platform_params->stream_tag = hstream->stream_tag;
+
+	return 0;
+}
+
+/* update SPIB register with appl position */
+int hda_dsp_pcm_ack(struct snd_sof_dev *sdev, struct snd_pcm_substream *substream)
+{
+	struct hdac_stream *hstream = substream->runtime->private_data;
+	struct hdac_ext_stream *hext_stream = stream_to_hdac_ext_stream(hstream);
+	struct snd_pcm_runtime *runtime = substream->runtime;
+	ssize_t appl_pos, buf_size;
+	u32 spib;
+
+	appl_pos = frames_to_bytes(runtime, runtime->control->appl_ptr);
+	buf_size = frames_to_bytes(runtime, runtime->buffer_size);
+
+	spib = appl_pos % buf_size;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Allowable value for SPIB is 1 byte to max buffer size */
 	if (!spib)
 		spib = buf_size;
@@ -192,6 +219,9 @@ snd_pcm_uframes_t hda_dsp_pcm_pointer(struct snd_sof_dev *sdev,
 		goto found;
 	}
 
+<<<<<<< HEAD
+	pos = hda_dsp_stream_get_position(hstream, substream->stream, true);
+=======
 	switch (sof_hda_position_quirk) {
 	case SOF_HDA_POSITION_QUIRK_USE_SKYLAKE_LEGACY:
 		/*
@@ -265,11 +295,11 @@ snd_pcm_uframes_t hda_dsp_pcm_pointer(struct snd_sof_dev *sdev,
 	if (pos >= hstream->bufsize)
 		pos = 0;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 found:
 	pos = bytes_to_frames(substream->runtime, pos);
 
-	dev_vdbg(sdev->dev, "PCM: stream %d dir %d position %lu\n",
-		 hstream->index, substream->stream, pos);
+	trace_sof_intel_hda_dsp_pcm(sdev, hstream, substream, pos);
 	return pos;
 }
 

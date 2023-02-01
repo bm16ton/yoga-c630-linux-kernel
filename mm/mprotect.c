@@ -31,6 +31,10 @@
 #include <linux/pgtable.h>
 #include <linux/sched/sysctl.h>
 #include <linux/userfaultfd_k.h>
+<<<<<<< HEAD
+#include <linux/memory-tiers.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/cacheflush.h>
 #include <asm/mmu_context.h>
 #include <asm/tlbflush.h>
@@ -121,6 +125,10 @@ static unsigned long change_pte_range(struct mmu_gather *tlb,
 			if (prot_numa) {
 				struct page *page;
 				int nid;
+<<<<<<< HEAD
+				bool toptier;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 				/* Avoid TLB flush if possible */
 				if (pte_protnone(oldpte))
@@ -149,6 +157,8 @@ static unsigned long change_pte_range(struct mmu_gather *tlb,
 				 */
 				nid = page_to_nid(page);
 				if (target_node == nid)
+<<<<<<< HEAD
+=======
 					continue;
 
 				/*
@@ -157,7 +167,21 @@ static unsigned long change_pte_range(struct mmu_gather *tlb,
 				 */
 				if (!(sysctl_numa_balancing_mode & NUMA_BALANCING_NORMAL) &&
 				    node_is_toptier(nid))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					continue;
+				toptier = node_is_toptier(nid);
+
+				/*
+				 * Skip scanning top tier node if normal numa
+				 * balancing is disabled
+				 */
+				if (!(sysctl_numa_balancing_mode & NUMA_BALANCING_NORMAL) &&
+				    toptier)
+					continue;
+				if (sysctl_numa_balancing_mode & NUMA_BALANCING_MEMORY_TIERING &&
+				    !toptier)
+					xchg_page_access_time(page,
+						jiffies_to_msecs(jiffies));
 			}
 
 			oldpte = ptep_modify_prot_start(vma, addr, pte);
@@ -671,6 +695,10 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 	const bool rier = (current->personality & READ_IMPLIES_EXEC) &&
 				(prot & PROT_READ);
 	struct mmu_gather tlb;
+<<<<<<< HEAD
+	MA_STATE(mas, &current->mm->mm_mt, 0, 0);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	start = untagged_addr(start);
 
@@ -702,7 +730,8 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 	if ((pkey != -1) && !mm_pkey_is_allocated(current->mm, pkey))
 		goto out;
 
-	vma = find_vma(current->mm, start);
+	mas_set(&mas, start);
+	vma = mas_find(&mas, ULONG_MAX);
 	error = -ENOMEM;
 	if (!vma)
 		goto out;
@@ -728,7 +757,11 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 	if (start > vma->vm_start)
 		prev = vma;
 	else
+<<<<<<< HEAD
+		prev = mas_prev(&mas, 0);
+=======
 		prev = vma->vm_prev;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	tlb_gather_mmu(&tlb, current->mm);
 	for (nstart = start ; ; ) {
@@ -791,7 +824,7 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 		if (nstart >= end)
 			break;
 
-		vma = prev->vm_next;
+		vma = find_vma(current->mm, prev->vm_end);
 		if (!vma || vma->vm_start != nstart) {
 			error = -ENOMEM;
 			break;

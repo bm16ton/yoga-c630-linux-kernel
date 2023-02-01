@@ -198,7 +198,7 @@ static void drm_sched_job_done_cb(struct dma_fence *f, struct dma_fence_cb *cb)
 }
 
 /**
- * drm_sched_dependency_optimized
+ * drm_sched_dependency_optimized - test if the dependency can be optimized
  *
  * @fence: the dependency fence
  * @entity: the entity which depends on the above fence
@@ -592,7 +592,10 @@ int drm_sched_job_init(struct drm_sched_job *job,
 		       struct drm_sched_entity *entity,
 		       void *owner)
 {
+<<<<<<< HEAD
+=======
 	drm_sched_entity_select_rq(entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!entity->rq)
 		return -ENOENT;
 
@@ -628,7 +631,11 @@ void drm_sched_job_arm(struct drm_sched_job *job)
 	struct drm_sched_entity *entity = job->entity;
 
 	BUG_ON(!entity);
+<<<<<<< HEAD
+	drm_sched_entity_select_rq(entity);
+=======
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sched = entity->rq->sched;
 
 	job->sched = sched;
@@ -643,6 +650,7 @@ EXPORT_SYMBOL(drm_sched_job_arm);
  * drm_sched_job_add_dependency - adds the fence as a job dependency
  * @job: scheduler job to add the dependencies to
  * @fence: the dma_fence to add to the list of dependencies.
+<<<<<<< HEAD
  *
  * Note that @fence is consumed in both the success and error cases.
  *
@@ -697,6 +705,62 @@ EXPORT_SYMBOL(drm_sched_job_add_dependency);
  * GEM objects used in the job but before updating the reservations with your
  * own fences.
  *
+=======
+ *
+ * Note that @fence is consumed in both the success and error cases.
+ *
+ * Returns:
+ * 0 on success, or an error on failing to expand the array.
+ */
+int drm_sched_job_add_dependency(struct drm_sched_job *job,
+				 struct dma_fence *fence)
+{
+	struct dma_fence *entry;
+	unsigned long index;
+	u32 id = 0;
+	int ret;
+
+	if (!fence)
+		return 0;
+
+	/* Deduplicate if we already depend on a fence from the same context.
+	 * This lets the size of the array of deps scale with the number of
+	 * engines involved, rather than the number of BOs.
+	 */
+	xa_for_each(&job->dependencies, index, entry) {
+		if (entry->context != fence->context)
+			continue;
+
+		if (dma_fence_is_later(fence, entry)) {
+			dma_fence_put(entry);
+			xa_store(&job->dependencies, index, fence, GFP_KERNEL);
+		} else {
+			dma_fence_put(fence);
+		}
+		return 0;
+	}
+
+	ret = xa_alloc(&job->dependencies, &id, fence, xa_limit_32b, GFP_KERNEL);
+	if (ret != 0)
+		dma_fence_put(fence);
+
+	return ret;
+}
+EXPORT_SYMBOL(drm_sched_job_add_dependency);
+
+/**
+ * drm_sched_job_add_implicit_dependencies - adds implicit dependencies as job
+ *   dependencies
+ * @job: scheduler job to add the dependencies to
+ * @obj: the gem object to add new dependencies from.
+ * @write: whether the job might write the object (so we need to depend on
+ * shared fences in the reservation object).
+ *
+ * This should be called after drm_gem_lock_reservations() on your array of
+ * GEM objects used in the job but before updating the reservations with your
+ * own fences.
+ *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Returns:
  * 0 on success, or an error on failing to expand the array.
  */
@@ -994,6 +1058,7 @@ static int drm_sched_main(void *param)
  *		used
  * @score: optional score atomic shared with other schedulers
  * @name: name used for debugging
+ * @dev: target &struct device
  *
  * Return 0 on success, otherwise error code.
  */

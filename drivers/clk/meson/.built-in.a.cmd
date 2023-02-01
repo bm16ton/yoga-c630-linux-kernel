@@ -1,0 +1,1 @@
+cmd_drivers/clk/meson/built-in.a := rm -f drivers/clk/meson/built-in.a;  printf "drivers/clk/meson/%s " meson-aoclk.o clk-cpu-dyndiv.o clk-dualdiv.o meson-eeclk.o clk-mpll.o clk-pll.o clk-regmap.o vid-pll-div.o axg.o axg-aoclk.o gxbb.o gxbb-aoclk.o g12a.o g12a-aoclk.o | xargs ar cDPrST drivers/clk/meson/built-in.a

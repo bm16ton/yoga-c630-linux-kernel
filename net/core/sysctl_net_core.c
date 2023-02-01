@@ -29,7 +29,10 @@ static int int_3600 = 3600;
 static int min_sndbuf = SOCK_MIN_SNDBUF;
 static int min_rcvbuf = SOCK_MIN_RCVBUF;
 static int max_skb_frags = MAX_SKB_FRAGS;
+<<<<<<< HEAD
+=======
 static long long_max __maybe_unused = LONG_MAX;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int net_msg_warn;	/* Unused, but still a sysctl */
 

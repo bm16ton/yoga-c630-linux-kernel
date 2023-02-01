@@ -1,0 +1,1 @@
+cmd_drivers/nvme/target/modules.order := {   echo drivers/nvme/target/nvmet.ko;   echo drivers/nvme/target/nvmet-rdma.ko;   echo drivers/nvme/target/nvmet-fc.ko; :; } > drivers/nvme/target/modules.order

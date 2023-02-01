@@ -1,0 +1,1 @@
+cmd_drivers/net/vxlan/vxlan.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/vxlan/vxlan.ko drivers/net/vxlan/vxlan.o drivers/net/vxlan/vxlan.mod.o;  true

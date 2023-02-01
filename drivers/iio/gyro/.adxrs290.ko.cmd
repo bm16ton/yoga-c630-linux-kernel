@@ -1,0 +1,1 @@
+cmd_drivers/iio/gyro/adxrs290.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/gyro/adxrs290.ko drivers/iio/gyro/adxrs290.o drivers/iio/gyro/adxrs290.mod.o;  true

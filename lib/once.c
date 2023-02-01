@@ -69,7 +69,11 @@ EXPORT_SYMBOL(__do_once_done);
 
 static DEFINE_MUTEX(once_mutex);
 
+<<<<<<< HEAD
+bool __do_once_sleepable_start(bool *done)
+=======
 bool __do_once_slow_start(bool *done)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__acquires(once_mutex)
 {
 	mutex_lock(&once_mutex);
@@ -77,7 +81,11 @@ bool __do_once_slow_start(bool *done)
 		mutex_unlock(&once_mutex);
 		/* Keep sparse happy by restoring an even lock count on
 		 * this mutex. In case we return here, we don't call into
+<<<<<<< HEAD
+		 * __do_once_done but return early in the DO_ONCE_SLEEPABLE() macro.
+=======
 		 * __do_once_done but return early in the DO_ONCE_SLOW() macro.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 */
 		__acquire(once_mutex);
 		return false;
@@ -85,9 +93,15 @@ bool __do_once_slow_start(bool *done)
 
 	return true;
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL(__do_once_sleepable_start);
+
+void __do_once_sleepable_done(bool *done, struct static_key_true *once_key,
+=======
 EXPORT_SYMBOL(__do_once_slow_start);
 
 void __do_once_slow_done(bool *done, struct static_key_true *once_key,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 struct module *mod)
 	__releases(once_mutex)
 {
@@ -95,4 +109,8 @@ void __do_once_slow_done(bool *done, struct static_key_true *once_key,
 	mutex_unlock(&once_mutex);
 	once_disable_jump(once_key, mod);
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL(__do_once_sleepable_done);
+=======
 EXPORT_SYMBOL(__do_once_slow_done);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

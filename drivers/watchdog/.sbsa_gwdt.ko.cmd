@@ -1,0 +1,1 @@
+cmd_drivers/watchdog/sbsa_gwdt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/watchdog/sbsa_gwdt.ko drivers/watchdog/sbsa_gwdt.o drivers/watchdog/sbsa_gwdt.mod.o;  true

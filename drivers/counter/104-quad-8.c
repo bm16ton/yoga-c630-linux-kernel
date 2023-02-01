@@ -28,7 +28,12 @@ module_param_hw_array(base, uint, ioport, &num_quad8, 0);
 MODULE_PARM_DESC(base, "ACCES 104-QUAD-8 base addresses");
 
 static unsigned int irq[max_num_isa_dev(QUAD8_EXTENT)];
+<<<<<<< HEAD
+static unsigned int num_irq;
+module_param_hw_array(irq, uint, irq, &num_irq, 0);
+=======
 module_param_hw_array(irq, uint, irq, NULL, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_PARM_DESC(irq, "ACCES 104-QUAD-8 interrupt line numbers");
 
 #define QUAD8_NUM_COUNTERS 8
@@ -391,6 +396,7 @@ static int quad8_action_read(struct counter_device *counter,
 	err = quad8_function_get(priv, count->id, &function);
 	if (err) {
 		spin_unlock_irqrestore(&priv->lock, irqflags);
+<<<<<<< HEAD
 		return err;
 	}
 	err = quad8_direction_read(counter, count, &direction);
@@ -398,6 +404,15 @@ static int quad8_action_read(struct counter_device *counter,
 		spin_unlock_irqrestore(&priv->lock, irqflags);
 		return err;
 	}
+=======
+		return err;
+	}
+	err = quad8_direction_read(counter, count, &direction);
+	if (err) {
+		spin_unlock_irqrestore(&priv->lock, irqflags);
+		return err;
+	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	spin_unlock_irqrestore(&priv->lock, irqflags);
 
@@ -428,6 +443,66 @@ static int quad8_action_read(struct counter_device *counter,
 	default:
 		/* should never reach this path */
 		return -EINVAL;
+<<<<<<< HEAD
+	}
+}
+
+enum {
+	QUAD8_EVENT_CARRY = 0,
+	QUAD8_EVENT_COMPARE = 1,
+	QUAD8_EVENT_CARRY_BORROW = 2,
+	QUAD8_EVENT_INDEX = 3,
+};
+
+static int quad8_events_configure(struct counter_device *counter)
+{
+	struct quad8 *const priv = counter_priv(counter);
+	unsigned long irq_enabled = 0;
+	unsigned long irqflags;
+	struct counter_event_node *event_node;
+	unsigned int next_irq_trigger;
+	unsigned long ior_cfg;
+
+	spin_lock_irqsave(&priv->lock, irqflags);
+
+	list_for_each_entry(event_node, &counter->events_list, l) {
+		switch (event_node->event) {
+		case COUNTER_EVENT_OVERFLOW:
+			next_irq_trigger = QUAD8_EVENT_CARRY;
+			break;
+		case COUNTER_EVENT_THRESHOLD:
+			next_irq_trigger = QUAD8_EVENT_COMPARE;
+			break;
+		case COUNTER_EVENT_OVERFLOW_UNDERFLOW:
+			next_irq_trigger = QUAD8_EVENT_CARRY_BORROW;
+			break;
+		case COUNTER_EVENT_INDEX:
+			next_irq_trigger = QUAD8_EVENT_INDEX;
+			break;
+		default:
+			/* should never reach this path */
+			spin_unlock_irqrestore(&priv->lock, irqflags);
+			return -EINVAL;
+		}
+
+		/* Enable IRQ line */
+		irq_enabled |= BIT(event_node->channel);
+
+		/* Skip configuration if it is the same as previously set */
+		if (priv->irq_trigger[event_node->channel] == next_irq_trigger)
+			continue;
+
+		/* Save new IRQ function configuration */
+		priv->irq_trigger[event_node->channel] = next_irq_trigger;
+
+		/* Load configuration to I/O Control Register */
+		ior_cfg = priv->ab_enable[event_node->channel] |
+			  priv->preset_enable[event_node->channel] << 1 |
+			  priv->irq_trigger[event_node->channel] << 3;
+		iowrite8(QUAD8_CTR_IOR | ior_cfg,
+			 &priv->reg->channel[event_node->channel].control);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -486,6 +561,10 @@ static int quad8_events_configure(struct counter_device *counter)
 		/* Enable IRQ line */
 		irq_enabled |= BIT(event_node->channel);
 	}
+
+	iowrite8(irq_enabled, &priv->reg->index_interrupt);
+
+	spin_unlock_irqrestore(&priv->lock, irqflags);
 
 	iowrite8(irq_enabled, &priv->reg->index_interrupt);
 
@@ -569,6 +648,35 @@ static int quad8_index_polarity_set(struct counter_device *counter,
 	return 0;
 }
 
+<<<<<<< HEAD
+static int quad8_polarity_read(struct counter_device *counter,
+			       struct counter_signal *signal,
+			       enum counter_signal_polarity *polarity)
+{
+	int err;
+	u32 index_polarity;
+
+	err = quad8_index_polarity_get(counter, signal, &index_polarity);
+	if (err)
+		return err;
+
+	*polarity = (index_polarity) ? COUNTER_SIGNAL_POLARITY_POSITIVE :
+		COUNTER_SIGNAL_POLARITY_NEGATIVE;
+
+	return 0;
+}
+
+static int quad8_polarity_write(struct counter_device *counter,
+				struct counter_signal *signal,
+				enum counter_signal_polarity polarity)
+{
+	const u32 pol = (polarity == COUNTER_SIGNAL_POLARITY_POSITIVE) ? 1 : 0;
+
+	return quad8_index_polarity_set(counter, signal, pol);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const char *const quad8_synchronous_modes[] = {
 	"non-synchronous",
 	"synchronous"
@@ -702,9 +810,15 @@ static int quad8_count_enable_read(struct counter_device *counter,
 				   struct counter_count *count, u8 *enable)
 {
 	const struct quad8 *const priv = counter_priv(counter);
+<<<<<<< HEAD
 
 	*enable = priv->ab_enable[count->id];
 
+=======
+
+	*enable = priv->ab_enable[count->id];
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -717,9 +831,15 @@ static int quad8_count_enable_write(struct counter_device *counter,
 	unsigned int ior_cfg;
 
 	spin_lock_irqsave(&priv->lock, irqflags);
+<<<<<<< HEAD
 
 	priv->ab_enable[count->id] = enable;
 
+=======
+
+	priv->ab_enable[count->id] = enable;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ior_cfg = enable | priv->preset_enable[count->id] << 1 |
 		  priv->irq_trigger[count->id] << 3;
 
@@ -997,6 +1117,16 @@ static struct counter_comp quad8_signal_ext[] = {
 			       quad8_signal_fck_prescaler_write)
 };
 
+<<<<<<< HEAD
+static const enum counter_signal_polarity quad8_polarities[] = {
+	COUNTER_SIGNAL_POLARITY_POSITIVE,
+	COUNTER_SIGNAL_POLARITY_NEGATIVE,
+};
+
+static DEFINE_COUNTER_AVAILABLE(quad8_polarity_available, quad8_polarities);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static DEFINE_COUNTER_ENUM(quad8_index_pol_enum, quad8_index_polarity_modes);
 static DEFINE_COUNTER_ENUM(quad8_synch_mode_enum, quad8_synchronous_modes);
 
@@ -1004,6 +1134,11 @@ static struct counter_comp quad8_index_ext[] = {
 	COUNTER_COMP_SIGNAL_ENUM("index_polarity", quad8_index_polarity_get,
 				 quad8_index_polarity_set,
 				 quad8_index_pol_enum),
+<<<<<<< HEAD
+	COUNTER_COMP_POLARITY(quad8_polarity_read, quad8_polarity_write,
+			      quad8_polarity_available),
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	COUNTER_COMP_SIGNAL_ENUM("synchronous_mode", quad8_synchronous_mode_get,
 				 quad8_synchronous_mode_set,
 				 quad8_synch_mode_enum),
@@ -1256,8 +1391,9 @@ static struct isa_driver quad8_driver = {
 	}
 };
 
-module_isa_driver(quad8_driver, num_quad8);
+module_isa_driver_with_irq(quad8_driver, num_quad8, num_irq);
 
 MODULE_AUTHOR("William Breathitt Gray <vilhelm.gray@gmail.com>");
 MODULE_DESCRIPTION("ACCES 104-QUAD-8 driver");
 MODULE_LICENSE("GPL v2");
+MODULE_IMPORT_NS(COUNTER);

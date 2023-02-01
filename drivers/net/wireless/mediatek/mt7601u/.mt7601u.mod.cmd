@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt7601u/mt7601u.mod := printf '%s\n'   usb.o init.o main.o mcu.o trace.o dma.o core.o eeprom.o phy.o mac.o util.o debugfs.o tx.o | awk '!x[$$0]++ { print("drivers/net/wireless/mediatek/mt7601u/"$$0) }' > drivers/net/wireless/mediatek/mt7601u/mt7601u.mod

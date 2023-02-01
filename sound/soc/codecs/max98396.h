@@ -212,8 +212,22 @@
 #define MAX98396_CLK_MON_AUTO_RESTART_MASK	(0x1 << 0)
 #define MAX98396_CLK_MON_AUTO_RESTART_SHIFT	(0)
 
+<<<<<<< HEAD
+/* MAX98396_R2039_DATA_MON_CTRL */
+#define MAX98396_DMON_MAG_THRESH_SHIFT		(4)
+#define MAX98396_DMON_MAG_THRESH_MASK		(0x3 << MAX98396_DMON_MAG_THRESH_SHIFT)
+#define MAX98396_DMON_STUCK_THRESH_SHIFT	(2)
+#define MAX98396_DMON_STUCK_THRESH_MASK		(0x3 << MAX98396_DMON_STUCK_THRESH_SHIFT)
+#define MAX98396_DMON_DURATION_MASK		(0x3)
+
 /* MAX98396_R203F_ENABLE_CTRLS */
 #define MAX98396_CTRL_CMON_EN_SHIFT		(0)
+#define MAX98396_CTRL_DMON_STUCK_EN_MASK	(0x1 << 1)
+#define MAX98396_CTRL_DMON_MAG_EN_MASK		(0x1 << 2)
+=======
+/* MAX98396_R203F_ENABLE_CTRLS */
+#define MAX98396_CTRL_CMON_EN_SHIFT		(0)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* MAX98396_R2041_PCM_MODE_CFG */
 #define MAX98396_PCM_MODE_CFG_FORMAT_MASK	(0x7 << 3)
@@ -305,6 +319,14 @@ struct max98396_priv {
 	unsigned int i_slot;
 	unsigned int spkfb_slot;
 	unsigned int bypass_slot;
+<<<<<<< HEAD
+	bool dmon_stuck_enable;
+	unsigned int dmon_stuck_threshold;
+	bool dmon_mag_enable;
+	unsigned int dmon_mag_threshold;
+	unsigned int dmon_duration;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool interleave_mode;
 	bool tdm_mode;
 	int tdm_max_samplerate;

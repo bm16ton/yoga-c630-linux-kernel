@@ -340,6 +340,15 @@ static inline void
 intel_engine_clear_hung_context(struct intel_engine_cs *engine)
 {
 	intel_engine_set_hung_context(engine, NULL);
+<<<<<<< HEAD
+=======
+}
+
+static inline struct intel_context *
+intel_engine_get_hung_context(struct intel_engine_cs *engine)
+{
+	return engine->hung_ce;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline struct intel_context *
@@ -347,5 +356,11 @@ intel_engine_get_hung_context(struct intel_engine_cs *engine)
 {
 	return engine->hung_ce;
 }
+
+u64 intel_clamp_heartbeat_interval_ms(struct intel_engine_cs *engine, u64 value);
+u64 intel_clamp_max_busywait_duration_ns(struct intel_engine_cs *engine, u64 value);
+u64 intel_clamp_preempt_timeout_ms(struct intel_engine_cs *engine, u64 value);
+u64 intel_clamp_stop_timeout_ms(struct intel_engine_cs *engine, u64 value);
+u64 intel_clamp_timeslice_duration_ms(struct intel_engine_cs *engine, u64 value);
 
 #endif /* _INTEL_RINGBUFFER_H_ */

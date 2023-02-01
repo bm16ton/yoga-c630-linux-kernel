@@ -88,6 +88,11 @@ void lruvec_init(struct lruvec *lruvec)
 	 * Poison its list head, so that any operations on it would crash.
 	 */
 	list_del(&lruvec->lists[LRU_UNEVICTABLE]);
+<<<<<<< HEAD
+
+	lru_gen_init_lruvec(lruvec);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #if defined(CONFIG_NUMA_BALANCING) && !defined(LAST_CPUPID_NOT_IN_PAGE_FLAGS)

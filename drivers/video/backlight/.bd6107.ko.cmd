@@ -1,0 +1,1 @@
+cmd_drivers/video/backlight/bd6107.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/backlight/bd6107.ko drivers/video/backlight/bd6107.o drivers/video/backlight/bd6107.mod.o;  true

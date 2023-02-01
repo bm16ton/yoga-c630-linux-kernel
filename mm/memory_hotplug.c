@@ -1085,8 +1085,12 @@ int __ref online_pages(unsigned long pfn, unsigned long nr_pages,
 	 * of the physical memory space for vmemmaps. That space is pageblock
 	 * aligned.
 	 */
+<<<<<<< HEAD
+	if (WARN_ON_ONCE(!nr_pages || !pageblock_aligned(pfn) ||
+=======
 	if (WARN_ON_ONCE(!nr_pages ||
 			 !IS_ALIGNED(pfn, pageblock_nr_pages) ||
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 !IS_ALIGNED(pfn + nr_pages, PAGES_PER_SECTION)))
 		return -EINVAL;
 
@@ -1806,8 +1810,12 @@ int __ref offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 	 * of the physical memory space for vmemmaps. That space is pageblock
 	 * aligned.
 	 */
+<<<<<<< HEAD
+	if (WARN_ON_ONCE(!nr_pages || !pageblock_aligned(start_pfn) ||
+=======
 	if (WARN_ON_ONCE(!nr_pages ||
 			 !IS_ALIGNED(start_pfn, pageblock_nr_pages) ||
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 !IS_ALIGNED(start_pfn + nr_pages, PAGES_PER_SECTION)))
 		return -EINVAL;
 
@@ -1940,8 +1948,8 @@ int __ref offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 
 	node_states_clear_node(node, &arg);
 	if (arg.status_change_nid >= 0) {
-		kswapd_stop(node);
 		kcompactd_stop(node);
+		kswapd_stop(node);
 	}
 
 	writeback_set_ratelimit();
@@ -1969,11 +1977,18 @@ failed_removal:
 
 static int check_memblock_offlined_cb(struct memory_block *mem, void *arg)
 {
+<<<<<<< HEAD
+	int *nid = arg;
+
+	*nid = mem->nid;
+	if (unlikely(mem->state != MEM_OFFLINE)) {
+=======
 	int ret = !is_memblock_offlined(mem);
 	int *nid = arg;
 
 	*nid = mem->nid;
 	if (unlikely(ret)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		phys_addr_t beginpa, endpa;
 
 		beginpa = PFN_PHYS(section_nr_to_pfn(mem->start_section_nr));

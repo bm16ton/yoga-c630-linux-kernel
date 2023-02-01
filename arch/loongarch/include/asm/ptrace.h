@@ -29,7 +29,11 @@ struct pt_regs {
 	unsigned long csr_euen;
 	unsigned long csr_ecfg;
 	unsigned long csr_estat;
+<<<<<<< HEAD
+	unsigned long __last[];
+=======
 	unsigned long __last[0];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __aligned(8);
 
 static inline int regs_irqs_disabled(struct pt_regs *regs)
@@ -133,7 +137,11 @@ static inline void die_if_kernel(const char *str, struct pt_regs *regs)
 #define current_pt_regs()						\
 ({									\
 	unsigned long sp = (unsigned long)__builtin_frame_address(0);	\
+<<<<<<< HEAD
+	(struct pt_regs *)((sp | (THREAD_SIZE - 1)) + 1) - 1;		\
+=======
 	(struct pt_regs *)((sp | (THREAD_SIZE - 1)) + 1 - 32) - 1;	\
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 })
 
 /* Helpers for working with the user stack pointer */

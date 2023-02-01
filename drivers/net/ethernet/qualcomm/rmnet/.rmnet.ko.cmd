@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qualcomm/rmnet/rmnet.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/qualcomm/rmnet/rmnet.ko drivers/net/ethernet/qualcomm/rmnet/rmnet.o drivers/net/ethernet/qualcomm/rmnet/rmnet.mod.o;  true

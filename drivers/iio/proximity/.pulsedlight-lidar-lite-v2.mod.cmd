@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/pulsedlight-lidar-lite-v2.mod := printf '%s\n'   pulsedlight-lidar-lite-v2.o | awk '!x[$$0]++ { print("drivers/iio/proximity/"$$0) }' > drivers/iio/proximity/pulsedlight-lidar-lite-v2.mod

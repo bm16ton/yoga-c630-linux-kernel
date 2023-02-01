@@ -7,7 +7,6 @@
  *             Kirti Wankhede <kwankhede@nvidia.com>
  */
 
-#include <linux/device.h>
 #include <linux/iommu.h>
 #include <linux/mdev.h>
 
@@ -17,12 +16,21 @@ static int mdev_probe(struct device *dev)
 {
 	struct mdev_driver *drv =
 		container_of(dev->driver, struct mdev_driver, driver);
+<<<<<<< HEAD
 
 	if (!drv->probe)
 		return 0;
 	return drv->probe(to_mdev_device(dev));
 }
 
+=======
+
+	if (!drv->probe)
+		return 0;
+	return drv->probe(to_mdev_device(dev));
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void mdev_remove(struct device *dev)
 {
 	struct mdev_driver *drv =
@@ -47,7 +55,6 @@ struct bus_type mdev_bus_type = {
 	.remove		= mdev_remove,
 	.match		= mdev_match,
 };
-EXPORT_SYMBOL_GPL(mdev_bus_type);
 
 /**
  * mdev_register_driver - register a new MDEV driver
@@ -57,10 +64,16 @@ EXPORT_SYMBOL_GPL(mdev_bus_type);
  **/
 int mdev_register_driver(struct mdev_driver *drv)
 {
+	if (!drv->device_api)
+		return -EINVAL;
+
 	/* initialize common driver fields */
 	drv->driver.bus = &mdev_bus_type;
+<<<<<<< HEAD
+=======
 
 	/* register with core */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return driver_register(&drv->driver);
 }
 EXPORT_SYMBOL(mdev_register_driver);

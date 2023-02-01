@@ -1,0 +1,1 @@
+cmd_arch/arm64/kernel/pi/lib-fdt.pi.o := objcopy --prefix-symbols=__pi_ --remove-section=.note.gnu.property --prefix-alloc-sections=.init  arch/arm64/kernel/pi/lib-fdt.o arch/arm64/kernel/pi/lib-fdt.pi.o

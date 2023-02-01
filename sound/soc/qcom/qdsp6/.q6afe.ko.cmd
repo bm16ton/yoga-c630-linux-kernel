@@ -1,0 +1,1 @@
+cmd_sound/soc/qcom/qdsp6/q6afe.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/qcom/qdsp6/q6afe.ko sound/soc/qcom/qdsp6/q6afe.o sound/soc/qcom/qdsp6/q6afe.mod.o;  true

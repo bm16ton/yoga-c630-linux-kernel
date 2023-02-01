@@ -1,0 +1,1 @@
+cmd_crypto/camellia_generic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o crypto/camellia_generic.ko crypto/camellia_generic.o crypto/camellia_generic.mod.o;  true

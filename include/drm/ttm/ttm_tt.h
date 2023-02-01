@@ -88,7 +88,11 @@ struct ttm_tt {
 #define TTM_TT_FLAG_EXTERNAL		(1 << 2)
 #define TTM_TT_FLAG_EXTERNAL_MAPPABLE	(1 << 3)
 
+<<<<<<< HEAD
+#define TTM_TT_FLAG_PRIV_POPULATED  (1U << 31)
+=======
 #define TTM_TT_FLAG_PRIV_POPULATED  (1 << 31)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	uint32_t page_flags;
 	/** @num_pages: Number of pages in the page array. */
 	uint32_t num_pages;

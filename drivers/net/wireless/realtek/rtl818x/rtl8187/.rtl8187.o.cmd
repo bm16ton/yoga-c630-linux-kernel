@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtl818x/rtl8187/rtl8187.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/realtek/rtl818x/rtl8187/rtl8187.o @drivers/net/wireless/realtek/rtl818x/rtl8187/rtl8187.mod 

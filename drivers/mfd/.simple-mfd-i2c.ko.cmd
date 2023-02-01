@@ -1,0 +1,1 @@
+cmd_drivers/mfd/simple-mfd-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mfd/simple-mfd-i2c.ko drivers/mfd/simple-mfd-i2c.o drivers/mfd/simple-mfd-i2c.mod.o;  true

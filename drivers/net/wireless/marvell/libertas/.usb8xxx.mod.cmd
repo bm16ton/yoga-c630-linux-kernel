@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/libertas/usb8xxx.mod := printf '%s\n'   if_usb.o | awk '!x[$$0]++ { print("drivers/net/wireless/marvell/libertas/"$$0) }' > drivers/net/wireless/marvell/libertas/usb8xxx.mod

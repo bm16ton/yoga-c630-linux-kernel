@@ -1080,7 +1080,11 @@ static int misaligned_case(struct i915_address_space *vm, struct intel_memory_re
 	bool is_stolen = mr->type == INTEL_MEMORY_STOLEN_SYSTEM ||
 			 mr->type == INTEL_MEMORY_STOLEN_LOCAL;
 
+<<<<<<< HEAD
+	obj = i915_gem_object_create_region(mr, size, 0, I915_BO_ALLOC_GPU_ONLY);
+=======
 	obj = i915_gem_object_create_region(mr, size, 0, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(obj)) {
 		/* if iGVT-g or DMAR is active, stolen mem will be uninitialized */
 		if (PTR_ERR(obj) == -ENODEV && is_stolen)
@@ -2324,5 +2328,5 @@ int i915_gem_gtt_live_selftests(struct drm_i915_private *i915)
 
 	GEM_BUG_ON(offset_in_page(to_gt(i915)->ggtt->vm.total));
 
-	return i915_subtests(tests, i915);
+	return i915_live_subtests(tests, i915);
 }

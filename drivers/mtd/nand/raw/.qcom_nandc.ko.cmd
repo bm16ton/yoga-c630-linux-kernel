@@ -1,0 +1,1 @@
+cmd_drivers/mtd/nand/raw/qcom_nandc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/nand/raw/qcom_nandc.ko drivers/mtd/nand/raw/qcom_nandc.o drivers/mtd/nand/raw/qcom_nandc.mod.o;  true

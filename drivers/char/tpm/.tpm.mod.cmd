@@ -1,0 +1,1 @@
+cmd_drivers/char/tpm/tpm.mod := printf '%s\n'   tpm-chip.o tpm-dev-common.o tpm-dev.o tpm-interface.o tpm1-cmd.o tpm2-cmd.o tpmrm-dev.o tpm2-space.o tpm-sysfs.o eventlog/common.o eventlog/tpm1.o eventlog/tpm2.o tpm_ppi.o eventlog/acpi.o eventlog/efi.o eventlog/of.o | awk '!x[$$0]++ { print("drivers/char/tpm/"$$0) }' > drivers/char/tpm/tpm.mod

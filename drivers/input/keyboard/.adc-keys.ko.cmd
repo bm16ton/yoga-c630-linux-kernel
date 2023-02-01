@@ -1,0 +1,1 @@
+cmd_drivers/input/keyboard/adc-keys.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/keyboard/adc-keys.ko drivers/input/keyboard/adc-keys.o drivers/input/keyboard/adc-keys.mod.o;  true

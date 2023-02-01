@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-total-media-in-hand.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-total-media-in-hand.ko drivers/media/rc/keymaps/rc-total-media-in-hand.o drivers/media/rc/keymaps/rc-total-media-in-hand.mod.o;  true

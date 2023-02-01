@@ -13,6 +13,7 @@
 #include <linux/interconnect.h>
 #include <linux/pm_opp.h>
 #include <linux/regulator/consumer.h>
+#include <linux/reset.h>
 
 #include "msm_drv.h"
 #include "msm_fence.h"
@@ -184,14 +185,40 @@ struct msm_gpu {
 	 * that support per-context pgtables).  Tracked by seqno rather
 	 * than pointer value to avoid dangling pointers, and cases where
 	 * a ctx can be freed and a new one created with the same address.
+<<<<<<< HEAD
+=======
 	 */
 	int cur_ctx_seqno;
 
 	/*
 	 * List of GEM active objects on this gpu.  Protected by
 	 * msm_drm_private::mm_lock
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
-	struct list_head active_list;
+	int cur_ctx_seqno;
+
+	/**
+	 * lock:
+	 *
+	 * General lock for serializing all the gpu things.
+	 *
+	 * TODO move to per-ring locking where feasible (ie. submit/retire
+	 * path, etc)
+	 */
+	struct mutex lock;
+
+	/**
+	 * active_submits:
+	 *
+	 * The number of submitted but not yet retired submits, used to
+	 * determine transitions between active and idle.
+	 *
+	 * Protected by active_lock
+	 */
+	int active_submits;
+
+	/** lock: protects active_submits and idle/active transitions */
+	struct mutex active_lock;
 
 	/**
 	 * lock:
@@ -277,6 +304,9 @@ struct msm_gpu {
 	bool hw_apriv;
 
 	struct thermal_cooling_device *cooling;
+
+	/* To poll for cx gdsc collapse during gpu recovery */
+	struct reset_control *cx_collapse;
 };
 
 static inline struct msm_gpu *dev_to_gpu(struct device *dev)
@@ -470,7 +500,12 @@ static inline int msm_gpu_convert_priority(struct msm_gpu *gpu, int prio,
  * @node:      node in the context's list of submitqueues
  * @fence_idr: maps fence-id to dma_fence for userspace visible fence
  *             seqno, protected by submitqueue lock
+<<<<<<< HEAD
+ * @idr_lock:  for serializing access to fence_idr
+ * @lock:      submitqueue lock for serializing submits on a queue
+=======
  * @lock:      submitqueue lock
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @ref:       reference count
  * @entity:    the submit job-queue
  */
@@ -483,6 +518,10 @@ struct msm_gpu_submitqueue {
 	struct msm_file_private *ctx;
 	struct list_head node;
 	struct idr fence_idr;
+<<<<<<< HEAD
+	struct mutex idr_lock;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mutex lock;
 	struct kref ref;
 	struct drm_sched_entity *entity;

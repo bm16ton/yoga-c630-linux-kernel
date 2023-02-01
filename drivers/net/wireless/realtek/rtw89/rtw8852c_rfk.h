@@ -21,7 +21,11 @@ void rtw8852c_tssi_cont_en_phyidx(struct rtw89_dev *rtwdev, bool en, u8 phy_idx)
 void rtw8852c_wifi_scan_notify(struct rtw89_dev *rtwdev, bool scan_start,
 			       enum rtw89_phy_idx phy_idx);
 void rtw8852c_set_channel_rf(struct rtw89_dev *rtwdev,
+<<<<<<< HEAD
+			     const struct rtw89_chan *chan,
+=======
 			     struct rtw89_channel_params *param,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			     enum rtw89_phy_idx phy_idx);
 void rtw8852c_lck_init(struct rtw89_dev *rtwdev);
 void rtw8852c_lck_track(struct rtw89_dev *rtwdev);

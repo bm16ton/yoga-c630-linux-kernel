@@ -18,13 +18,21 @@
         "EventCode": "0x48",
         "EventName": "L1D_PEND_MISS.FB_FULL",
         "PEBScounters": "0,1,2,3",
+<<<<<<< HEAD
+        "PublicDescription": "Counts number of cycles a demand request has waited due to L1D Fill Buffer (FB) unavailability. Demand requests include cacheable/uncacheable demand load, store, lock or SW prefetch accesses.",
+=======
         "PublicDescription": "Counts number of cycles a demand request has waited due to L1D Fill Buffer (FB) unavailablability. Demand requests include cacheable/uncacheable demand load, store, lock or SW prefetch accesses.",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "SampleAfterValue": "1000003",
         "Speculative": "1",
         "UMask": "0x2"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "Number of phases a demand request has waited due to L1D Fill Buffer (FB) unavailability.",
+=======
         "BriefDescription": "Number of phases a demand request has waited due to L1D Fill Buffer (FB) unavailablability.",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
@@ -32,7 +40,11 @@
         "EventCode": "0x48",
         "EventName": "L1D_PEND_MISS.FB_FULL_PERIODS",
         "PEBScounters": "0,1,2,3",
+<<<<<<< HEAD
+        "PublicDescription": "Counts number of phases a demand request has waited due to L1D Fill Buffer (FB) unavailability. Demand requests include cacheable/uncacheable demand load, store, lock or SW prefetch accesses.",
+=======
         "PublicDescription": "Counts number of phases a demand request has waited due to L1D Fill Buffer (FB) unavailablability. Demand requests include cacheable/uncacheable demand load, store, lock or SW prefetch accesses.",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "SampleAfterValue": "1000003",
         "Speculative": "1",
         "UMask": "0x2"

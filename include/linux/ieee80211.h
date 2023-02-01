@@ -2888,7 +2888,12 @@ ieee80211_he_spr_size(const u8 *he_spr_ie)
 /* Calculate 802.11be EHT capabilities IE Tx/Rx EHT MCS NSS Support Field size */
 static inline u8
 ieee80211_eht_mcs_nss_size(const struct ieee80211_he_cap_elem *he_cap,
+<<<<<<< HEAD
+			   const struct ieee80211_eht_cap_elem_fixed *eht_cap,
+			   bool from_ap)
+=======
 			   const struct ieee80211_eht_cap_elem_fixed *eht_cap)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u8 count = 0;
 
@@ -2909,7 +2914,14 @@ ieee80211_eht_mcs_nss_size(const struct ieee80211_he_cap_elem *he_cap,
 	if (eht_cap->phy_cap_info[0] & IEEE80211_EHT_PHY_CAP0_320MHZ_IN_6GHZ)
 		count += 3;
 
+<<<<<<< HEAD
+	if (count)
+		return count;
+
+	return from_ap ? 3 : 4;
+=======
 	return count ? count : 4;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* 802.11be EHT PPE Thresholds */
@@ -2945,7 +2957,12 @@ ieee80211_eht_ppe_size(u16 ppe_thres_hdr, const u8 *phy_cap_info)
 }
 
 static inline bool
+<<<<<<< HEAD
+ieee80211_eht_capa_size_ok(const u8 *he_capa, const u8 *data, u8 len,
+			   bool from_ap)
+=======
 ieee80211_eht_capa_size_ok(const u8 *he_capa, const u8 *data, u8 len)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const struct ieee80211_eht_cap_elem_fixed *elem = (const void *)data;
 	u8 needed = sizeof(struct ieee80211_eht_cap_elem_fixed);
@@ -2954,7 +2971,12 @@ ieee80211_eht_capa_size_ok(const u8 *he_capa, const u8 *data, u8 len)
 		return false;
 
 	needed += ieee80211_eht_mcs_nss_size((const void *)he_capa,
+<<<<<<< HEAD
+					     (const void *)data,
+					     from_ap);
+=======
 					     (const void *)data);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (len < needed)
 		return false;
 
@@ -4588,7 +4610,11 @@ static inline u8 ieee80211_mle_common_size(const u8 *data)
 		return 0;
 	}
 
+<<<<<<< HEAD
+	return sizeof(*mle) + common + mle->variable[0];
+=======
 	return common + mle->variable[0];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

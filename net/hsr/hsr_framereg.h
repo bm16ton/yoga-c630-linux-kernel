@@ -76,7 +76,13 @@ void prp_handle_san_frame(bool san, enum hsr_port_type port,
 void prp_update_san_info(struct hsr_node *node, bool is_sup);
 
 struct hsr_node {
+<<<<<<< HEAD
+	struct list_head	mac_list;
+	/* Protect R/W access to seq_out */
+	spinlock_t		seq_out_lock;
+=======
 	struct hlist_node	mac_list;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned char		macaddress_A[ETH_ALEN];
 	unsigned char		macaddress_B[ETH_ALEN];
 	/* Local slave through which AddrB frames are received from this node */
@@ -88,6 +94,7 @@ struct hsr_node {
 	bool			san_a;
 	bool			san_b;
 	u16			seq_out[HSR_PT_PORTS];
+	bool			removed;
 	struct rcu_head		rcu_head;
 };
 

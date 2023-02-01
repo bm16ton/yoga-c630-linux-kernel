@@ -1,0 +1,1 @@
+cmd_drivers/usb/typec/tipd/tps6598x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/typec/tipd/tps6598x.ko drivers/usb/typec/tipd/tps6598x.o drivers/usb/typec/tipd/tps6598x.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/brocade/bna/bna.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/brocade/bna/bna.ko drivers/net/ethernet/brocade/bna/bna.o drivers/net/ethernet/brocade/bna/bna.mod.o;  true

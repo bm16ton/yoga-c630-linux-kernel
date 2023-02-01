@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt7921/mt7921u.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/mediatek/mt76/mt7921/mt7921u.o @drivers/net/wireless/mediatek/mt76/mt7921/mt7921u.mod 

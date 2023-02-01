@@ -15,7 +15,10 @@
 #include "../include/gaudi2/gaudi2_packets.h"
 #include "../include/gaudi2/gaudi2_fw_if.h"
 #include "../include/gaudi2/gaudi2_async_events.h"
+<<<<<<< HEAD
+=======
 #include "../include/gaudi2/gaudi2_async_virt_events.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define GAUDI2_LINUX_FW_FILE	"habanalabs/gaudi2/gaudi2-fit.itb"
 #define GAUDI2_BOOT_FIT_FILE	"habanalabs/gaudi2/gaudi2-boot-fit.itb"
@@ -140,9 +143,12 @@
 #define VA_HOST_SPACE_HPAGE_START		0xFFF0800000000000ull
 #define VA_HOST_SPACE_HPAGE_END			0xFFF1000000000000ull /* 140TB */
 
+<<<<<<< HEAD
+=======
 #define VA_HOST_SPACE_USER_MAPPED_CB_START	0xFFF1000000000000ull
 #define VA_HOST_SPACE_USER_MAPPED_CB_END	0xFFF1000100000000ull /* 4GB */
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* 140TB */
 #define VA_HOST_SPACE_PAGE_SIZE		(VA_HOST_SPACE_PAGE_END - VA_HOST_SPACE_PAGE_START)
 
@@ -458,7 +464,10 @@ struct dup_block_ctx {
  *                 the user can map.
  * @lfsr_rand_seeds: array of MME ACC random seeds to set.
  * @hw_queues_lock: protects the H/W queues from concurrent access.
+<<<<<<< HEAD
+=======
  * @kdma_lock: protects the KDMA engine from concurrent access.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @scratchpad_kernel_address: general purpose PAGE_SIZE contiguous memory,
  *                             this memory region should be write-only.
  *                             currently used for HBW QMAN writes which is
@@ -510,9 +519,12 @@ struct dup_block_ctx {
  * @flush_db_fifo: flag to force flush DB FIFO after a write.
  * @hbm_cfg: HBM subsystem settings
  * @hw_queues_lock_mutex: used by simulator instead of hw_queues_lock.
+<<<<<<< HEAD
+=======
  * @kdma_lock_mutex: used by simulator instead of kdma_lock.
  * @use_deprecated_event_mappings: use old event mappings which are about to be
  *                                 deprecated
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct gaudi2_device {
 	int (*cpucp_info_get)(struct hl_device *hdev);
@@ -521,7 +533,10 @@ struct gaudi2_device {
 	int				lfsr_rand_seeds[MME_NUM_OF_LFSR_SEEDS];
 
 	spinlock_t			hw_queues_lock;
+<<<<<<< HEAD
+=======
 	spinlock_t			kdma_lock;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	void				*scratchpad_kernel_address;
 	dma_addr_t			scratchpad_bus_address;
@@ -562,5 +577,9 @@ void gaudi2_pb_print_security_errors(struct hl_device *hdev, u32 block_addr, u32
 					u32 offended_addr);
 int gaudi2_init_security(struct hl_device *hdev);
 void gaudi2_ack_protection_bits_errors(struct hl_device *hdev);
+<<<<<<< HEAD
+int gaudi2_send_device_activity(struct hl_device *hdev, bool open);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* GAUDI2P_H_ */

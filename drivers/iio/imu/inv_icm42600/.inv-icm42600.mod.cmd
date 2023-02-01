@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/inv_icm42600/inv-icm42600.mod := printf '%s\n'   inv_icm42600_core.o inv_icm42600_gyro.o inv_icm42600_accel.o inv_icm42600_temp.o inv_icm42600_buffer.o inv_icm42600_timestamp.o | awk '!x[$$0]++ { print("drivers/iio/imu/inv_icm42600/"$$0) }' > drivers/iio/imu/inv_icm42600/inv-icm42600.mod

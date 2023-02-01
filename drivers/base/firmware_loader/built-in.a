@@ -1,0 +1,16 @@
+!<thin>
+//                                              108       `
+fallback_table.o/
+main.o/
+fallback.o/
+sysfs.o/
+sysfs_upload.o/
+builtin/main.o/
+builtin/regulatory.db.gen.o/
+/0              0           0     0     644     5464      `
+/18             0           0     0     644     35232     `
+/26             0           0     0     644     7088      `
+/38             0           0     0     644     10648     `
+/47             0           0     0     644     11872     `
+/63             0           0     0     644     3488      `
+/79             0           0     0     644     5792      `

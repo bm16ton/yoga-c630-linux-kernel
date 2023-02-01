@@ -323,6 +323,16 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	 */
 	switch (vht_cap->cap & IEEE80211_VHT_CAP_MAX_MPDU_MASK) {
 	case IEEE80211_VHT_CAP_MAX_MPDU_LENGTH_11454:
+<<<<<<< HEAD
+		link_sta->pub->agg.max_amsdu_len = IEEE80211_MAX_MPDU_LEN_VHT_11454;
+		break;
+	case IEEE80211_VHT_CAP_MAX_MPDU_LENGTH_7991:
+		link_sta->pub->agg.max_amsdu_len = IEEE80211_MAX_MPDU_LEN_VHT_7991;
+		break;
+	case IEEE80211_VHT_CAP_MAX_MPDU_LENGTH_3895:
+	default:
+		link_sta->pub->agg.max_amsdu_len = IEEE80211_MAX_MPDU_LEN_VHT_3895;
+=======
 		link_sta->sta->sta.max_amsdu_len = IEEE80211_MAX_MPDU_LEN_VHT_11454;
 		break;
 	case IEEE80211_VHT_CAP_MAX_MPDU_LENGTH_7991:
@@ -331,8 +341,11 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	case IEEE80211_VHT_CAP_MAX_MPDU_LENGTH_3895:
 	default:
 		link_sta->sta->sta.max_amsdu_len = IEEE80211_MAX_MPDU_LEN_VHT_3895;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
+
+	ieee80211_sta_recalc_aggregates(&link_sta->sta->sta);
 }
 
 /* FIXME: move this to some better location - parses HE/EHT now */
@@ -350,6 +363,7 @@ ieee80211_sta_cap_rx_bw(struct link_sta_info *link_sta)
 		struct ieee80211_bss_conf *link_conf;
 		enum ieee80211_sta_rx_bandwidth ret;
 		u8 info;
+<<<<<<< HEAD
 
 		rcu_read_lock();
 		link_conf = rcu_dereference(sdata->vif.link_conf[link_id]);
@@ -358,6 +372,16 @@ ieee80211_sta_cap_rx_bw(struct link_sta_info *link_sta)
 		    link_conf->chandef.chan->band == NL80211_BAND_6GHZ) {
 			info = eht_cap->eht_cap_elem.phy_cap_info[0];
 
+=======
+
+		rcu_read_lock();
+		link_conf = rcu_dereference(sdata->vif.link_conf[link_id]);
+
+		if (eht_cap->has_eht &&
+		    link_conf->chandef.chan->band == NL80211_BAND_6GHZ) {
+			info = eht_cap->eht_cap_elem.phy_cap_info[0];
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (info & IEEE80211_EHT_PHY_CAP0_320MHZ_IN_6GHZ) {
 				ret = IEEE80211_STA_RX_BW_320;
 				goto out;

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+// SPDX-License-Identifier: GPL-2.0-or-later
+=======
 // SPDX-License-Identifier: GPL-2.0=or-later
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Copyright (C) 2022 Hewlett-Packard Development Company, L.P. */
 
 #include <linux/iopoll.h>
@@ -254,7 +258,10 @@ static int gxp_spifi_probe(struct platform_device *pdev)
 	const struct gxp_spi_data *data;
 	struct spi_controller *ctlr;
 	struct gxp_spi *spifi;
+<<<<<<< HEAD
+=======
 	struct resource *res;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	data = of_device_get_match_data(&pdev->dev);
@@ -269,6 +276,17 @@ static int gxp_spifi_probe(struct platform_device *pdev)
 	spifi->data = data;
 	spifi->dev = dev;
 
+<<<<<<< HEAD
+	spifi->reg_base = devm_platform_ioremap_resource(pdev, 0);
+	if (IS_ERR(spifi->reg_base))
+		return PTR_ERR(spifi->reg_base);
+
+	spifi->dat_base = devm_platform_ioremap_resource(pdev, 1);
+	if (IS_ERR(spifi->dat_base))
+		return PTR_ERR(spifi->dat_base);
+
+	spifi->dir_base = devm_platform_ioremap_resource(pdev, 2);
+=======
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	spifi->reg_base = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(spifi->reg_base))
@@ -281,6 +299,7 @@ static int gxp_spifi_probe(struct platform_device *pdev)
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
 	spifi->dir_base = devm_ioremap_resource(&pdev->dev, res);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(spifi->dir_base))
 		return PTR_ERR(spifi->dir_base);
 

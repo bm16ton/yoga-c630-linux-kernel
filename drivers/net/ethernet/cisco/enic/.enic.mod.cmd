@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cisco/enic/enic.mod := printf '%s\n'   enic_main.o vnic_cq.o vnic_intr.o vnic_wq.o enic_res.o enic_dev.o enic_pp.o vnic_dev.o vnic_rq.o vnic_vic.o enic_ethtool.o enic_api.o enic_clsf.o | awk '!x[$$0]++ { print("drivers/net/ethernet/cisco/enic/"$$0) }' > drivers/net/ethernet/cisco/enic/enic.mod

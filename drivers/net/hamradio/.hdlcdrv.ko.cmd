@@ -1,0 +1,1 @@
+cmd_drivers/net/hamradio/hdlcdrv.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/hamradio/hdlcdrv.ko drivers/net/hamradio/hdlcdrv.o drivers/net/hamradio/hdlcdrv.mod.o;  true

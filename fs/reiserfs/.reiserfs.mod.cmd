@@ -1,0 +1,1 @@
+cmd_fs/reiserfs/reiserfs.mod := printf '%s\n'   bitmap.o do_balan.o namei.o inode.o file.o dir.o fix_node.o super.o prints.o objectid.o lbalance.o ibalance.o stree.o hashes.o tail_conversion.o journal.o resize.o item_ops.o ioctl.o xattr.o lock.o xattr_user.o xattr_trusted.o xattr_security.o xattr_acl.o | awk '!x[$$0]++ { print("fs/reiserfs/"$$0) }' > fs/reiserfs/reiserfs.mod

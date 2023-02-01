@@ -88,6 +88,39 @@ const char *intel_platform_name(enum intel_platform platform)
 	return platform_names[platform];
 }
 
+<<<<<<< HEAD
+void intel_device_info_print(const struct intel_device_info *info,
+			     const struct intel_runtime_info *runtime,
+			     struct drm_printer *p)
+{
+	if (runtime->graphics.ip.rel)
+		drm_printf(p, "graphics version: %u.%02u\n",
+			   runtime->graphics.ip.ver,
+			   runtime->graphics.ip.rel);
+	else
+		drm_printf(p, "graphics version: %u\n",
+			   runtime->graphics.ip.ver);
+
+	if (runtime->media.ip.rel)
+		drm_printf(p, "media version: %u.%02u\n",
+			   runtime->media.ip.ver,
+			   runtime->media.ip.rel);
+	else
+		drm_printf(p, "media version: %u\n",
+			   runtime->media.ip.ver);
+
+	if (runtime->display.ip.rel)
+		drm_printf(p, "display version: %u.%02u\n",
+			   runtime->display.ip.ver,
+			   runtime->display.ip.rel);
+	else
+		drm_printf(p, "display version: %u\n",
+			   runtime->display.ip.ver);
+
+	drm_printf(p, "gt: %d\n", info->gt);
+	drm_printf(p, "memory-regions: %x\n", runtime->memory_regions);
+	drm_printf(p, "page-sizes: %x\n", runtime->page_sizes);
+=======
 void intel_device_info_print_static(const struct intel_device_info *info,
 				    struct drm_printer *p)
 {
@@ -110,24 +143,30 @@ void intel_device_info_print_static(const struct intel_device_info *info,
 	drm_printf(p, "gt: %d\n", info->gt);
 	drm_printf(p, "memory-regions: %x\n", info->memory_regions);
 	drm_printf(p, "page-sizes: %x\n", info->page_sizes);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	drm_printf(p, "platform: %s\n", intel_platform_name(info->platform));
-	drm_printf(p, "ppgtt-size: %d\n", info->ppgtt_size);
-	drm_printf(p, "ppgtt-type: %d\n", info->ppgtt_type);
+	drm_printf(p, "ppgtt-size: %d\n", runtime->ppgtt_size);
+	drm_printf(p, "ppgtt-type: %d\n", runtime->ppgtt_type);
 	drm_printf(p, "dma_mask_size: %u\n", info->dma_mask_size);
 
 #define PRINT_FLAG(name) drm_printf(p, "%s: %s\n", #name, str_yes_no(info->name))
 	DEV_INFO_FOR_EACH_FLAG(PRINT_FLAG);
 #undef PRINT_FLAG
 
+<<<<<<< HEAD
+	drm_printf(p, "has_pooled_eu: %s\n", str_yes_no(runtime->has_pooled_eu));
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PRINT_FLAG(name) drm_printf(p, "%s: %s\n", #name, str_yes_no(info->display.name))
 	DEV_INFO_DISPLAY_FOR_EACH_FLAG(PRINT_FLAG);
 #undef PRINT_FLAG
-}
 
-void intel_device_info_print_runtime(const struct intel_runtime_info *info,
-				     struct drm_printer *p)
-{
-	drm_printf(p, "rawclk rate: %u kHz\n", info->rawclk_freq);
+	drm_printf(p, "has_hdcp: %s\n", str_yes_no(runtime->has_hdcp));
+	drm_printf(p, "has_dmc: %s\n", str_yes_no(runtime->has_dmc));
+	drm_printf(p, "has_dsc: %s\n", str_yes_no(runtime->has_dsc));
+
+	drm_printf(p, "rawclk rate: %u kHz\n", runtime->rawclk_freq);
 }
 
 #undef INTEL_VGA_DEVICE
@@ -364,6 +403,15 @@ void intel_device_info_runtime_init(struct drm_i915_private *dev_priv)
 		     !(sfuse_strap & SFUSE_STRAP_FUSE_LOCK))) {
 			drm_info(&dev_priv->drm,
 				 "Display fused off, disabling\n");
+<<<<<<< HEAD
+			runtime->pipe_mask = 0;
+			runtime->cpu_transcoder_mask = 0;
+			runtime->fbc_mask = 0;
+		} else if (fuse_strap & IVB_PIPE_C_DISABLE) {
+			drm_info(&dev_priv->drm, "PipeC fused off\n");
+			runtime->pipe_mask &= ~BIT(PIPE_C);
+			runtime->cpu_transcoder_mask &= ~BIT(TRANSCODER_C);
+=======
 			info->display.pipe_mask = 0;
 			info->display.cpu_transcoder_mask = 0;
 			info->display.fbc_mask = 0;
@@ -371,11 +419,25 @@ void intel_device_info_runtime_init(struct drm_i915_private *dev_priv)
 			drm_info(&dev_priv->drm, "PipeC fused off\n");
 			info->display.pipe_mask &= ~BIT(PIPE_C);
 			info->display.cpu_transcoder_mask &= ~BIT(TRANSCODER_C);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	} else if (HAS_DISPLAY(dev_priv) && DISPLAY_VER(dev_priv) >= 9) {
 		u32 dfsm = intel_de_read(dev_priv, SKL_DFSM);
 
 		if (dfsm & SKL_DFSM_PIPE_A_DISABLE) {
+<<<<<<< HEAD
+			runtime->pipe_mask &= ~BIT(PIPE_A);
+			runtime->cpu_transcoder_mask &= ~BIT(TRANSCODER_A);
+			runtime->fbc_mask &= ~BIT(INTEL_FBC_A);
+		}
+		if (dfsm & SKL_DFSM_PIPE_B_DISABLE) {
+			runtime->pipe_mask &= ~BIT(PIPE_B);
+			runtime->cpu_transcoder_mask &= ~BIT(TRANSCODER_B);
+		}
+		if (dfsm & SKL_DFSM_PIPE_C_DISABLE) {
+			runtime->pipe_mask &= ~BIT(PIPE_C);
+			runtime->cpu_transcoder_mask &= ~BIT(TRANSCODER_C);
+=======
 			info->display.pipe_mask &= ~BIT(PIPE_A);
 			info->display.cpu_transcoder_mask &= ~BIT(TRANSCODER_A);
 			info->display.fbc_mask &= ~BIT(INTEL_FBC_A);
@@ -387,18 +449,34 @@ void intel_device_info_runtime_init(struct drm_i915_private *dev_priv)
 		if (dfsm & SKL_DFSM_PIPE_C_DISABLE) {
 			info->display.pipe_mask &= ~BIT(PIPE_C);
 			info->display.cpu_transcoder_mask &= ~BIT(TRANSCODER_C);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (DISPLAY_VER(dev_priv) >= 12 &&
 		    (dfsm & TGL_DFSM_PIPE_D_DISABLE)) {
+<<<<<<< HEAD
+			runtime->pipe_mask &= ~BIT(PIPE_D);
+			runtime->cpu_transcoder_mask &= ~BIT(TRANSCODER_D);
+=======
 			info->display.pipe_mask &= ~BIT(PIPE_D);
 			info->display.cpu_transcoder_mask &= ~BIT(TRANSCODER_D);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (dfsm & SKL_DFSM_DISPLAY_HDCP_DISABLE)
-			info->display.has_hdcp = 0;
+			runtime->has_hdcp = 0;
 
 		if (dfsm & SKL_DFSM_DISPLAY_PM_DISABLE)
+<<<<<<< HEAD
+			runtime->fbc_mask = 0;
+
+		if (DISPLAY_VER(dev_priv) >= 11 && (dfsm & ICL_DFSM_DMC_DISABLE))
+			runtime->has_dmc = 0;
+
+		if (DISPLAY_VER(dev_priv) >= 10 &&
+		    (dfsm & GLK_DFSM_DISPLAY_DSC_DISABLE))
+			runtime->has_dsc = 0;
+=======
 			info->display.fbc_mask = 0;
 
 		if (DISPLAY_VER(dev_priv) >= 11 && (dfsm & ICL_DFSM_DMC_DISABLE))
@@ -407,12 +485,13 @@ void intel_device_info_runtime_init(struct drm_i915_private *dev_priv)
 		if (DISPLAY_VER(dev_priv) >= 10 &&
 		    (dfsm & GLK_DFSM_DISPLAY_DSC_DISABLE))
 			info->display.has_dsc = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (GRAPHICS_VER(dev_priv) == 6 && i915_vtd_active(dev_priv)) {
 		drm_info(&dev_priv->drm,
 			 "Disabling ppGTT for VT-d support\n");
-		info->ppgtt_type = INTEL_PPGTT_NONE;
+		runtime->ppgtt_type = INTEL_PPGTT_NONE;
 	}
 
 	runtime->rawclk_freq = intel_read_rawclk(dev_priv);
@@ -422,8 +501,14 @@ void intel_device_info_runtime_init(struct drm_i915_private *dev_priv)
 		dev_priv->drm.driver_features &= ~(DRIVER_MODESET |
 						   DRIVER_ATOMIC);
 		memset(&info->display, 0, sizeof(info->display));
+
+		runtime->cpu_transcoder_mask = 0;
 		memset(runtime->num_sprites, 0, sizeof(runtime->num_sprites));
 		memset(runtime->num_scalers, 0, sizeof(runtime->num_scalers));
+		runtime->fbc_mask = 0;
+		runtime->has_hdcp = false;
+		runtime->has_dmc = false;
+		runtime->has_dsc = false;
 	}
 }
 

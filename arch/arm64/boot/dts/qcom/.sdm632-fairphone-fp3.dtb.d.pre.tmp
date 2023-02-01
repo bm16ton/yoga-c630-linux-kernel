@@ -1,0 +1,13 @@
+sdm632-fairphone-fp3.o: arch/arm64/boot/dts/qcom/sdm632-fairphone-fp3.dts \
+ arch/arm64/boot/dts/qcom/sdm632.dtsi \
+ arch/arm64/boot/dts/qcom/msm8953.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/qcom,gcc-msm8953.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/qcom-rpmpd.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ arch/arm64/boot/dts/qcom/pm8953.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/iio/qcom,spmi-vadc.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/linux-event-codes.h \
+ scripts/dtc/include-prefixes/dt-bindings/spmi/spmi.h

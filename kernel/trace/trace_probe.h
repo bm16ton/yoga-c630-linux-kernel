@@ -445,7 +445,12 @@ extern int traceprobe_define_arg_fields(struct trace_event_call *event_call,
 	C(SAME_PROBE,		"There is already the exact same probe event"),\
 	C(NO_EVENT_INFO,	"This requires both group and event name to attach"),\
 	C(BAD_ATTACH_EVENT,	"Attached event does not exist"),\
+<<<<<<< HEAD
+	C(BAD_ATTACH_ARG,	"Attached event does not have this field"),\
+	C(NO_EP_FILTER,		"No filter rule after 'if'"),
+=======
 	C(BAD_ATTACH_ARG,	"Attached event does not have this field"),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #undef C
 #define C(a, b)		TP_ERR_##a

@@ -16,7 +16,10 @@
 struct dp_ctrl {
 	bool orientation;
 	atomic_t aborted;
+<<<<<<< HEAD
+=======
 	u32 pixel_rate;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool wide_bus_en;
 };
 

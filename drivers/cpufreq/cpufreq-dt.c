@@ -222,10 +222,15 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 	if (reg_name[0]) {
 		priv->opp_token = dev_pm_opp_set_regulators(cpu_dev, reg_name);
 		if (priv->opp_token < 0) {
+<<<<<<< HEAD
+			ret = dev_err_probe(cpu_dev, priv->opp_token,
+					    "failed to set regulators\n");
+=======
 			ret = priv->opp_token;
 			if (ret != -EPROBE_DEFER)
 				dev_err(cpu_dev, "failed to set regulators: %d\n",
 					ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto free_cpumask;
 		}
 	}

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-leadtek-y04g0051.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-leadtek-y04g0051.ko drivers/media/rc/keymaps/rc-leadtek-y04g0051.o drivers/media/rc/keymaps/rc-leadtek-y04g0051.mod.o;  true

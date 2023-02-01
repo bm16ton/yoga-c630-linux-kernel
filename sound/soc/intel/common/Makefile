@@ -9,6 +9,10 @@ snd-soc-acpi-intel-match-objs := soc-acpi-intel-byt-match.o soc-acpi-intel-cht-m
 	soc-acpi-intel-cml-match.o soc-acpi-intel-icl-match.o \
 	soc-acpi-intel-tgl-match.o soc-acpi-intel-ehl-match.o \
 	soc-acpi-intel-jsl-match.o soc-acpi-intel-adl-match.o \
+<<<<<<< HEAD
+	soc-acpi-intel-rpl-match.o soc-acpi-intel-mtl-match.o \
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	soc-acpi-intel-hda-match.o \
 	soc-acpi-intel-sdw-mockup-match.o
 

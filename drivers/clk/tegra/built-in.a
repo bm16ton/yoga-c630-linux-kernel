@@ -1,0 +1,49 @@
+!<thin>
+//                                              380       `
+clk.o/
+clk-audio-sync.o/
+clk-device.o/
+clk-dfll.o/
+clk-divider.o/
+clk-periph.o/
+clk-periph-fixed.o/
+clk-periph-gate.o/
+clk-pll.o/
+clk-pll-out.o/
+clk-sdmmc-mux.o/
+clk-super.o/
+clk-tegra-audio.o/
+clk-tegra-periph.o/
+clk-tegra-fixed.o/
+clk-tegra-super-cclk.o/
+clk-tegra-super-gen4.o/
+clk-tegra124-dfll-fcpu.o/
+clk-tegra124.o/
+cvb.o/
+clk-tegra210.o/
+clk-tegra210-emc.o/
+clk-utils.o/
+
+/0              0           0     0     644     13704     `
+/7              0           0     0     644     3360      `
+/25             0           0     0     644     8136      `
+/39             0           0     0     644     37136     `
+/51             0           0     0     644     6280      `
+/66             0           0     0     644     6216      `
+/80             0           0     0     644     3696      `
+/100            0           0     0     644     7736      `
+/119            0           0     0     644     52896     `
+/130            0           0     0     644     5504      `
+/145            0           0     0     644     8216      `
+/162            0           0     0     644     7576      `
+/175            0           0     0     644     8488      `
+/194            0           0     0     644     110552    `
+/214            0           0     0     644     4400      `
+/233            0           0     0     644     6608      `
+/257            0           0     0     644     8312      `
+/281            0           0     0     644     30040     `
+/307            0           0     0     644     36624     `
+/323            0           0     0     644     2408      `
+/330            0           0     0     644     89704     `
+/346            0           0     0     644     9952      `
+/366            0           0     0     644     1560      `

@@ -1,0 +1,1 @@
+cmd_drivers/accessibility/speakup/speakup.mod := printf '%s\n'   buffers.o devsynth.o i18n.o fakekey.o main.o keyhelp.o kobjects.o selection.o spk_ttyio.o synth.o thread.o varhandlers.o | awk '!x[$$0]++ { print("drivers/accessibility/speakup/"$$0) }' > drivers/accessibility/speakup/speakup.mod

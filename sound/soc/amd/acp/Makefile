@@ -12,6 +12,10 @@ snd-acp-pci-objs     := acp-pci.o
 
 #platform specific driver
 snd-acp-renoir-objs     := acp-renoir.o
+<<<<<<< HEAD
+snd-acp-rembrandt-objs  := acp-rembrandt.o
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #machine specific driver
 snd-acp-mach-objs     := acp-mach-common.o
@@ -24,6 +28,10 @@ obj-$(CONFIG_SND_SOC_AMD_ACP_PDM) += snd-acp-pdm.o
 obj-$(CONFIG_SND_SOC_AMD_ACP_PCI) += snd-acp-pci.o
 
 obj-$(CONFIG_SND_AMD_ASOC_RENOIR) += snd-acp-renoir.o
+<<<<<<< HEAD
+obj-$(CONFIG_SND_AMD_ASOC_REMBRANDT) += snd-acp-rembrandt.o
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 obj-$(CONFIG_SND_SOC_AMD_MACH_COMMON) += snd-acp-mach.o
 obj-$(CONFIG_SND_SOC_AMD_LEGACY_MACH) += snd-acp-legacy-mach.o

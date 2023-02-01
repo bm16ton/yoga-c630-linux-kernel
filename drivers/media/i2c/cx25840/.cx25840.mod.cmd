@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/cx25840/cx25840.mod := printf '%s\n'   cx25840-core.o cx25840-audio.o cx25840-firmware.o cx25840-vbi.o cx25840-ir.o | awk '!x[$$0]++ { print("drivers/media/i2c/cx25840/"$$0) }' > drivers/media/i2c/cx25840/cx25840.mod

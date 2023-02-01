@@ -3,7 +3,11 @@ config DRM_TILCDC
 	tristate "DRM Support for TI LCDC Display Controller"
 	depends on DRM && OF && ARM
 	select DRM_KMS_HELPER
+<<<<<<< HEAD
+	select DRM_GEM_DMA_HELPER
+=======
 	select DRM_GEM_CMA_HELPER
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select DRM_BRIDGE
 	select DRM_PANEL_BRIDGE
 	select VIDEOMODE_HELPERS

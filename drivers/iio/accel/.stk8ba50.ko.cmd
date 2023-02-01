@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/stk8ba50.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/stk8ba50.ko drivers/iio/accel/stk8ba50.o drivers/iio/accel/stk8ba50.mod.o;  true

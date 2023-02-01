@@ -1,12 +1,20 @@
 # SPDX-License-Identifier: GPL-2.0
 generic-y += dma-contiguous.h
 generic-y += export.h
+<<<<<<< HEAD
+generic-y += mcs_spinlock.h
+generic-y += parport.h
+generic-y += early_ioremap.h
+generic-y += qrwlock.h
+generic-y += qspinlock.h
+=======
 generic-y += parport.h
 generic-y += early_ioremap.h
 generic-y += qrwlock.h
 generic-y += qrwlock_types.h
 generic-y += spinlock.h
 generic-y += spinlock_types.h
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 generic-y += rwsem.h
 generic-y += segment.h
 generic-y += user.h
@@ -21,7 +29,10 @@ generic-y += shmbuf.h
 generic-y += statfs.h
 generic-y += socket.h
 generic-y += sockios.h
+<<<<<<< HEAD
+=======
 generic-y += termios.h
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 generic-y += termbits.h
 generic-y += poll.h
 generic-y += param.h

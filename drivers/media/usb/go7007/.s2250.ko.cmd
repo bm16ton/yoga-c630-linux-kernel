@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/go7007/s2250.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/go7007/s2250.ko drivers/media/usb/go7007/s2250.o drivers/media/usb/go7007/s2250.mod.o;  true

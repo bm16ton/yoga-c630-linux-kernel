@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/saa7164/saa7164.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/saa7164/saa7164.ko drivers/media/pci/saa7164/saa7164.o drivers/media/pci/saa7164/saa7164.mod.o;  true

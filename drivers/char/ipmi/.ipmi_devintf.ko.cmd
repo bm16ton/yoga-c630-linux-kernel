@@ -1,0 +1,1 @@
+cmd_drivers/char/ipmi/ipmi_devintf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/char/ipmi/ipmi_devintf.ko drivers/char/ipmi/ipmi_devintf.o drivers/char/ipmi/ipmi_devintf.mod.o;  true

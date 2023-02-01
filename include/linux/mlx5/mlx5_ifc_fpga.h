@@ -32,6 +32,8 @@
 #ifndef MLX5_IFC_FPGA_H
 #define MLX5_IFC_FPGA_H
 
+<<<<<<< HEAD
+=======
 struct mlx5_ifc_ipv4_layout_bits {
 	u8         reserved_at_0[0x60];
 
@@ -56,6 +58,7 @@ enum {
 	MLX5_FPGA_CAP_SANDBOX_PRODUCT_ID_IPSEC    = 0x2,
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct mlx5_ifc_fpga_shell_caps_bits {
 	u8         max_num_qps[0x10];
 	u8         reserved_at_10[0x8];

@@ -27,7 +27,10 @@ static struct acp_card_drvdata sof_rt5682_rt1019_data = {
 	.hs_codec_id = RT5682,
 	.amp_codec_id = RT1019,
 	.dmic_codec_id = DMIC,
+<<<<<<< HEAD
+=======
 	.gpio_spkr_en = EN_SPKR_GPIO_GB,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct acp_card_drvdata sof_rt5682_max_data = {
@@ -37,7 +40,10 @@ static struct acp_card_drvdata sof_rt5682_max_data = {
 	.hs_codec_id = RT5682,
 	.amp_codec_id = MAX98360A,
 	.dmic_codec_id = DMIC,
+<<<<<<< HEAD
+=======
 	.gpio_spkr_en = EN_SPKR_GPIO_NONE,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static struct acp_card_drvdata sof_rt5682s_rt1019_data = {
@@ -56,7 +62,30 @@ static struct acp_card_drvdata sof_rt5682s_max_data = {
 	.hs_codec_id = RT5682S,
 	.amp_codec_id = MAX98360A,
 	.dmic_codec_id = DMIC,
+<<<<<<< HEAD
+};
+
+static struct acp_card_drvdata sof_nau8825_data = {
+	.hs_cpu_id = I2S_HS,
+	.amp_cpu_id = I2S_HS,
+	.dmic_cpu_id = DMIC,
+	.hs_codec_id = NAU8825,
+	.amp_codec_id = MAX98360A,
+	.dmic_codec_id = DMIC,
+	.soc_mclk = true,
+};
+
+static struct acp_card_drvdata sof_rt5682s_hs_rt1019_data = {
+	.hs_cpu_id = I2S_HS,
+	.amp_cpu_id = I2S_HS,
+	.dmic_cpu_id = DMIC,
+	.hs_codec_id = RT5682S,
+	.amp_codec_id = RT1019,
+	.dmic_codec_id = DMIC,
+	.soc_mclk = true,
+=======
 	.gpio_spkr_en = EN_SPKR_GPIO_NONE,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct snd_kcontrol_new acp_controls[] = {
@@ -70,16 +99,25 @@ static const struct snd_kcontrol_new acp_controls[] = {
 static const struct snd_soc_dapm_widget acp_widgets[] = {
 	SND_SOC_DAPM_HP("Headphone Jack", NULL),
 	SND_SOC_DAPM_MIC("Headset Mic", NULL),
+<<<<<<< HEAD
+	SND_SOC_DAPM_SPK("Spk", NULL),
+	SND_SOC_DAPM_SPK("Left Spk", NULL),
+	SND_SOC_DAPM_SPK("Right Spk", NULL),
+=======
 	SND_SOC_DAPM_SPK("Spk", event_spkr_handler),
 	SND_SOC_DAPM_SPK("Left Spk", event_spkr_handler),
 	SND_SOC_DAPM_SPK("Right Spk", event_spkr_handler),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int acp_sof_probe(struct platform_device *pdev)
 {
 	struct snd_soc_card *card = NULL;
 	struct device *dev = &pdev->dev;
+<<<<<<< HEAD
+=======
 	unsigned int spkr_gpio;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (!pdev->id_entry)
@@ -97,6 +135,11 @@ static int acp_sof_probe(struct platform_device *pdev)
 	card->controls = acp_controls;
 	card->num_controls = ARRAY_SIZE(acp_controls);
 	card->drvdata = (struct acp_card_drvdata *)pdev->id_entry->driver_data;
+<<<<<<< HEAD
+
+	acp_sofdsp_dai_links_create(card);
+
+=======
 	spkr_gpio = ((struct acp_card_drvdata *)(card->drvdata))->gpio_spkr_en;
 
 	acp_sofdsp_dai_links_create(card);
@@ -111,6 +154,7 @@ static int acp_sof_probe(struct platform_device *pdev)
 		gpio_direction_output(spkr_gpio, 0);
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = devm_snd_soc_register_card(&pdev->dev, card);
 	if (ret) {
 		dev_err(&pdev->dev,
@@ -139,11 +183,26 @@ static const struct platform_device_id board_ids[] = {
 		.name = "rt5682s-rt1019",
 		.driver_data = (kernel_ulong_t)&sof_rt5682s_rt1019_data
 	},
+<<<<<<< HEAD
+	{
+		.name = "nau8825-max",
+		.driver_data = (kernel_ulong_t)&sof_nau8825_data
+	},
+	{
+		.name = "rt5682s-hs-rt1019",
+		.driver_data = (kernel_ulong_t)&sof_rt5682s_hs_rt1019_data
+	},
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 static struct platform_driver acp_asoc_audio = {
 	.driver = {
 		.name = "sof_mach",
+<<<<<<< HEAD
+		.pm = &snd_soc_pm_ops,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	.probe = acp_sof_probe,
 	.id_table = board_ids,
@@ -157,4 +216,9 @@ MODULE_ALIAS("platform:rt5682-rt1019");
 MODULE_ALIAS("platform:rt5682-max");
 MODULE_ALIAS("platform:rt5682s-max");
 MODULE_ALIAS("platform:rt5682s-rt1019");
+<<<<<<< HEAD
+MODULE_ALIAS("platform:nau8825-max");
+MODULE_ALIAS("platform:rt5682s-hs-rt1019");
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_LICENSE("GPL v2");

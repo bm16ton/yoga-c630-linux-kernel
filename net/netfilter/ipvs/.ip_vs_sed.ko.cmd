@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipvs/ip_vs_sed.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/ipvs/ip_vs_sed.ko net/netfilter/ipvs/ip_vs_sed.o net/netfilter/ipvs/ip_vs_sed.mod.o;  true

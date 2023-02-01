@@ -1,0 +1,1 @@
+cmd_drivers/video/backlight/platform_lcd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/backlight/platform_lcd.ko drivers/video/backlight/platform_lcd.o drivers/video/backlight/platform_lcd.mod.o;  true

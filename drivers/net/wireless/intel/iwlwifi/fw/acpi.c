@@ -689,6 +689,7 @@ int iwl_sar_get_ewrd_table(struct iwl_fw_runtime *fwrt)
 		num_sub_bands = ACPI_SAR_NUM_SUB_BANDS_REV1;
 
 		goto read_table;
+<<<<<<< HEAD
 	}
 
 	/* then finally revision 0 */
@@ -707,6 +708,26 @@ int iwl_sar_get_ewrd_table(struct iwl_fw_runtime *fwrt)
 		goto read_table;
 	}
 
+=======
+	}
+
+	/* then finally revision 0 */
+	wifi_pkg = iwl_acpi_get_wifi_pkg(fwrt->dev, data,
+					 ACPI_EWRD_WIFI_DATA_SIZE_REV0,
+					 &tbl_rev);
+	if (!IS_ERR(wifi_pkg)) {
+		if (tbl_rev != 0) {
+			ret = PTR_ERR(wifi_pkg);
+			goto out_free;
+		}
+
+		num_chains = ACPI_SAR_NUM_CHAINS_REV0;
+		num_sub_bands = ACPI_SAR_NUM_SUB_BANDS_REV0;
+
+		goto read_table;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = PTR_ERR(wifi_pkg);
 	goto out_free;
 
@@ -1106,6 +1127,14 @@ int iwl_read_ppag_table(struct iwl_fw_runtime *fwrt, union iwl_ppag_table_cmd *c
         int i, j, num_sub_bands;
         s8 *gain;
 
+<<<<<<< HEAD
+	/* many firmware images for JF lie about this */
+	if (CSR_HW_RFID_TYPE(fwrt->trans->hw_rf_id) ==
+	    CSR_HW_RFID_TYPE(CSR_HW_RF_ID_TYPE_JF))
+		return -EOPNOTSUPP;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         if (!fw_has_capa(&fwrt->fw->ucode_capa, IWL_UCODE_TLV_CAPA_SET_PPAG)) {
                 IWL_DEBUG_RADIO(fwrt,
                                 "PPAG capability not supported by FW, command not sent.\n");

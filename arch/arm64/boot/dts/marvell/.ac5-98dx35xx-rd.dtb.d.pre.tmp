@@ -1,0 +1,6 @@
+ac5-98dx35xx-rd.o: arch/arm64/boot/dts/marvell/ac5-98dx35xx-rd.dts \
+ arch/arm64/boot/dts/marvell/ac5-98dx35xx.dtsi \
+ arch/arm64/boot/dts/marvell/ac5-98dx25xx.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

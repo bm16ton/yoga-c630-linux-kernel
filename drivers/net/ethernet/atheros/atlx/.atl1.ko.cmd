@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/atheros/atlx/atl1.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/atheros/atlx/atl1.ko drivers/net/ethernet/atheros/atlx/atl1.o drivers/net/ethernet/atheros/atlx/atl1.mod.o;  true

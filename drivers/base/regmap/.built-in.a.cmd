@@ -1,0 +1,1 @@
+cmd_drivers/base/regmap/built-in.a := rm -f drivers/base/regmap/built-in.a;  printf "drivers/base/regmap/%s " regmap.o regcache.o regcache-rbtree.o regcache-flat.o regmap-debugfs.o regmap-i2c.o regmap-spmi.o regmap-mmio.o regmap-irq.o | xargs ar cDPrST drivers/base/regmap/built-in.a

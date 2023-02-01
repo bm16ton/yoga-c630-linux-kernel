@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath9k/modules.order := {   echo drivers/net/wireless/ath/ath9k/ath9k.ko;   echo drivers/net/wireless/ath/ath9k/ath9k_hw.ko;   echo drivers/net/wireless/ath/ath9k/ath9k_common.ko;   echo drivers/net/wireless/ath/ath9k/ath9k_htc.ko; :; } > drivers/net/wireless/ath/ath9k/modules.order

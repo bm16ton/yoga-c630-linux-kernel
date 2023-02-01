@@ -1,0 +1,1 @@
+cmd_drivers/mtd/ubi/gluebi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/ubi/gluebi.ko drivers/mtd/ubi/gluebi.o drivers/mtd/ubi/gluebi.mod.o;  true

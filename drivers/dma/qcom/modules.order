@@ -1,0 +1,3 @@
+drivers/dma/qcom/gpi.ko
+drivers/dma/qcom/hdma_mgmt.ko
+drivers/dma/qcom/hdma.ko

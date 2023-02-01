@@ -567,7 +567,11 @@ static struct snd_soc_dai_driver bdw_dai[] = {
 };
 
 /* broadwell ops */
+<<<<<<< HEAD
+static struct snd_sof_dsp_ops sof_bdw_ops = {
+=======
 static const struct snd_sof_dsp_ops sof_bdw_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*Device init */
 	.probe          = bdw_probe,
 
@@ -591,7 +595,6 @@ static const struct snd_sof_dsp_ops sof_bdw_ops = {
 
 	/* ipc */
 	.send_msg	= bdw_send_msg,
-	.fw_ready	= sof_fw_ready,
 	.get_mailbox_offset = bdw_get_mailbox_offset,
 	.get_window_offset = bdw_get_window_offset,
 
@@ -613,9 +616,12 @@ static const struct snd_sof_dsp_ops sof_bdw_ops = {
 	/* stream callbacks */
 	.pcm_open	= sof_stream_pcm_open,
 	.pcm_close	= sof_stream_pcm_close,
+<<<<<<< HEAD
+=======
 
 	/* Module loading */
 	.load_module    = snd_sof_parse_module_memcpy,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*Firmware loading */
 	.load_firmware	= snd_sof_load_firmware_memcpy,
@@ -637,7 +643,70 @@ static const struct snd_sof_dsp_ops sof_bdw_ops = {
 static const struct sof_intel_dsp_desc bdw_chip_info = {
 	.cores_num = 1,
 	.host_managed_cores_mask = 1,
+	.hw_ip_version = SOF_INTEL_BROADWELL,
 };
+
+static const struct sof_dev_desc sof_acpi_broadwell_desc = {
+	.machines = snd_soc_acpi_intel_broadwell_machines,
+	.resindex_lpe_base = 0,
+	.resindex_pcicfg_base = 1,
+	.resindex_imr_base = -1,
+	.irqindex_host_ipc = 0,
+	.chip_info = &bdw_chip_info,
+	.ipc_supported_mask = BIT(SOF_IPC),
+	.ipc_default = SOF_IPC,
+	.default_fw_path = {
+		[SOF_IPC] = "intel/sof",
+	},
+	.default_tplg_path = {
+		[SOF_IPC] = "intel/sof-tplg",
+	},
+	.default_fw_filename = {
+		[SOF_IPC] = "sof-bdw.ri",
+	},
+	.nocodec_tplg_filename = "sof-bdw-nocodec.tplg",
+	.ops = &sof_bdw_ops,
+};
+
+static const struct acpi_device_id sof_broadwell_match[] = {
+	{ "INT3438", (unsigned long)&sof_acpi_broadwell_desc },
+	{ }
+};
+MODULE_DEVICE_TABLE(acpi, sof_broadwell_match);
+
+static int sof_broadwell_probe(struct platform_device *pdev)
+{
+	struct device *dev = &pdev->dev;
+	const struct acpi_device_id *id;
+	const struct sof_dev_desc *desc;
+	int ret;
+
+	id = acpi_match_device(dev->driver->acpi_match_table, dev);
+	if (!id)
+		return -ENODEV;
+
+	ret = snd_intel_acpi_dsp_driver_probe(dev, id->id);
+	if (ret != SND_INTEL_DSP_DRIVER_ANY && ret != SND_INTEL_DSP_DRIVER_SOF) {
+		dev_dbg(dev, "SOF ACPI driver not selected, aborting probe\n");
+		return -ENODEV;
+	}
+
+	desc = (const struct sof_dev_desc *)id->driver_data;
+	return sof_acpi_probe(pdev, desc);
+}
+
+/* acpi_driver definition */
+static struct platform_driver snd_sof_acpi_intel_bdw_driver = {
+	.probe = sof_broadwell_probe,
+	.remove = sof_acpi_remove,
+	.driver = {
+		.name = "sof-audio-acpi-intel-bdw",
+		.pm = &sof_acpi_pm,
+		.acpi_match_table = sof_broadwell_match,
+	},
+};
+<<<<<<< HEAD
+=======
 
 static const struct sof_dev_desc sof_acpi_broadwell_desc = {
 	.machines = snd_soc_acpi_intel_broadwell_machines,
@@ -693,6 +762,7 @@ static struct platform_driver snd_sof_acpi_intel_bdw_driver = {
 		.acpi_match_table = sof_broadwell_match,
 	},
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 module_platform_driver(snd_sof_acpi_intel_bdw_driver);
 
 MODULE_LICENSE("Dual BSD/GPL");

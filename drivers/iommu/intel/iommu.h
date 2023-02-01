@@ -146,7 +146,13 @@
 /*
  * Decoding Capability Register
  */
+<<<<<<< HEAD
+#define cap_esrtps(c)		(((c) >> 63) & 1)
+#define cap_esirtps(c)		(((c) >> 62) & 1)
+#define cap_fl5lp_support(c)	(((c) >> 60) & 1)
+=======
 #define cap_5lp_support(c)	(((c) >> 60) & 1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define cap_pi_support(c)	(((c) >> 59) & 1)
 #define cap_fl1gp_support(c)	(((c) >> 56) & 1)
 #define cap_read_drain(c)	(((c) >> 55) & 1)
@@ -586,6 +592,10 @@ struct intel_iommu {
 #ifdef CONFIG_INTEL_IOMMU_SVM
 	struct page_req_dsc *prq;
 	unsigned char prq_name[16];    /* Name for PRQ interrupt */
+<<<<<<< HEAD
+	unsigned long prq_seq_number;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct completion prq_complete;
 	struct ioasid_allocator_ops pasid_allocator; /* Custom allocator for PASIDs */
 #endif
@@ -620,6 +630,10 @@ struct device_domain_info {
 	u8 pri_enabled:1;
 	u8 ats_supported:1;
 	u8 ats_enabled:1;
+<<<<<<< HEAD
+	u8 dtlb_extra_inval:1;	/* Quirk for devices need extra flush */
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 ats_qdep;
 	struct device *dev; /* it's NULL for PCIe-to-PCI bridge */
 	struct intel_iommu *iommu; /* IOMMU used by this device */
@@ -725,6 +739,12 @@ void qi_flush_piotlb(struct intel_iommu *iommu, u16 did, u32 pasid, u64 addr,
 void qi_flush_dev_iotlb_pasid(struct intel_iommu *iommu, u16 sid, u16 pfsid,
 			      u32 pasid, u16 qdep, u64 addr,
 			      unsigned int size_order);
+<<<<<<< HEAD
+void quirk_extra_dev_tlb_flush(struct device_domain_info *info,
+			       unsigned long address, unsigned long pages,
+			       u32 pasid, u16 qdep);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void qi_flush_pasid_cache(struct intel_iommu *iommu, u16 did, u64 granu,
 			  u32 pasid);
 
@@ -741,7 +761,10 @@ extern int dmar_ir_support(void);
 void *alloc_pgtable_page(int node);
 void free_pgtable_page(void *vaddr);
 void iommu_flush_write_buffer(struct intel_iommu *iommu);
+<<<<<<< HEAD
+=======
 int intel_iommu_enable_pasid(struct intel_iommu *iommu, struct device *dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct intel_iommu *device_to_iommu(struct device *dev, u8 *bus, u8 *devfn);
 
 #ifdef CONFIG_INTEL_IOMMU_SVM
@@ -761,7 +784,10 @@ struct intel_svm_dev {
 	struct device *dev;
 	struct intel_iommu *iommu;
 	struct iommu_sva sva;
+<<<<<<< HEAD
+=======
 	unsigned long prq_seq_number;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 pasid;
 	int users;
 	u16 did;

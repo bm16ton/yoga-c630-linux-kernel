@@ -1,0 +1,1 @@
+cmd_drivers/media/radio/si470x/radio-si470x-usb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/radio/si470x/radio-si470x-usb.ko drivers/media/radio/si470x/radio-si470x-usb.o drivers/media/radio/si470x/radio-si470x-usb.mod.o;  true

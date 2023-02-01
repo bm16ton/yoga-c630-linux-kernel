@@ -27,15 +27,25 @@ properties:
   interrupts:
     maxItems: 1
 
+<<<<<<< HEAD
+=======
   spi-max-frequency: true
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   vdd-supply: true
 
 required:
   - compatible
   - reg
 
+<<<<<<< HEAD
+allOf:
+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+
+unevaluatedProperties: false
+=======
 additionalProperties: false
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

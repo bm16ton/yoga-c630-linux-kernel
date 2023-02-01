@@ -102,6 +102,11 @@ static int sanitycheck(void *arg)
 	if (!f)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	array = mock_array(1, f);
 	if (!array)
 		return -ENOMEM;
@@ -124,12 +129,22 @@ static int unwrap_array(void *arg)
 	if (!f1)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f1);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f2 = mock_fence();
 	if (!f2) {
 		dma_fence_put(f1);
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f2);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	array = mock_array(2, f1, f2);
 	if (!array)
 		return -ENOMEM;
@@ -164,12 +179,22 @@ static int unwrap_chain(void *arg)
 	if (!f1)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f1);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f2 = mock_fence();
 	if (!f2) {
 		dma_fence_put(f1);
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f2);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	chain = mock_chain(f1, f2);
 	if (!chain)
 		return -ENOMEM;
@@ -204,12 +229,22 @@ static int unwrap_chain_array(void *arg)
 	if (!f1)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f1);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f2 = mock_fence();
 	if (!f2) {
 		dma_fence_put(f1);
 		return -ENOMEM;
 	}
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f2);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	array = mock_array(2, f1, f2);
 	if (!array)
 		return -ENOMEM;
@@ -248,12 +283,22 @@ static int unwrap_merge(void *arg)
 	if (!f1)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f1);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f2 = mock_fence();
 	if (!f2) {
 		err = -ENOMEM;
 		goto error_put_f1;
 	}
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f2);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f3 = dma_fence_unwrap_merge(f1, f2);
 	if (!f3) {
 		err = -ENOMEM;
@@ -296,10 +341,20 @@ static int unwrap_merge_complex(void *arg)
 	if (!f1)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f1);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f2 = mock_fence();
 	if (!f2)
 		goto error_put_f1;
 
+<<<<<<< HEAD
+	dma_fence_enable_sw_signaling(f2);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	f3 = dma_fence_unwrap_merge(f1, f2);
 	if (!f3)
 		goto error_put_f2;

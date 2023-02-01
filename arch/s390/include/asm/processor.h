@@ -186,9 +186,6 @@ struct pt_regs;
 void show_registers(struct pt_regs *regs);
 void show_cacheinfo(struct seq_file *m);
 
-/* Free all resources held by a thread. */
-static inline void release_thread(struct task_struct *tsk) { }
-
 /* Free guarded storage control block */
 void guarded_storage_release(struct task_struct *tsk);
 void gs_load_bc_cb(struct pt_regs *regs);
@@ -315,6 +312,8 @@ static __always_inline void __noreturn disabled_wait(void)
 
 #define ARCH_LOW_ADDRESS_LIMIT	0x7fffffffUL
 
+<<<<<<< HEAD
+=======
 extern int memcpy_real(void *, unsigned long, size_t);
 extern void memcpy_absolute(void *, void *, size_t);
 
@@ -332,6 +331,7 @@ extern void memcpy_absolute(void *, void *, size_t);
 	memcpy_absolute(__ptr, __va(__abs_address), sizeof(*__ptr));	\
 } while (0)
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern int s390_isolate_bp(void);
 extern int s390_isolate_bp_guest(void);
 

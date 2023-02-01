@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt76-usb.mod := printf '%s\n'   usb.o usb_trace.o | awk '!x[$$0]++ { print("drivers/net/wireless/mediatek/mt76/"$$0) }' > drivers/net/wireless/mediatek/mt76/mt76-usb.mod

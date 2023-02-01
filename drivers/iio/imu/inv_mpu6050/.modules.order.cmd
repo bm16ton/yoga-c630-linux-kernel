@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/inv_mpu6050/modules.order := {   echo drivers/iio/imu/inv_mpu6050/inv-mpu6050.ko;   echo drivers/iio/imu/inv_mpu6050/inv-mpu6050-i2c.ko;   echo drivers/iio/imu/inv_mpu6050/inv-mpu6050-spi.ko; :; } > drivers/iio/imu/inv_mpu6050/modules.order

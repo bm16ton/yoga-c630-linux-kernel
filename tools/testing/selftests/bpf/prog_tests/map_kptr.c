@@ -105,7 +105,11 @@ static void test_map_kptr_success(bool test_run)
 	ASSERT_OK(opts.retval, "test_map_kptr_ref2 retval");
 
 	if (test_run)
+<<<<<<< HEAD
+		goto exit;
+=======
 		return;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = bpf_map__update_elem(skel->maps.array_map,
 				   &key, sizeof(key), buf, sizeof(buf), 0);
@@ -132,6 +136,10 @@ static void test_map_kptr_success(bool test_run)
 	ret = bpf_map__delete_elem(skel->maps.lru_hash_map, &key, sizeof(key), 0);
 	ASSERT_OK(ret, "lru_hash_map delete");
 
+<<<<<<< HEAD
+exit:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	map_kptr__destroy(skel);
 }
 

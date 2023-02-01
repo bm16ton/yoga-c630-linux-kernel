@@ -36,6 +36,20 @@ void prestera_queue_work(struct work_struct *work)
 	queue_work(prestera_owq, work);
 }
 
+<<<<<<< HEAD
+void prestera_queue_delayed_work(struct delayed_work *work, unsigned long delay)
+{
+	queue_delayed_work(prestera_wq, work, delay);
+}
+
+void prestera_queue_drain(void)
+{
+	drain_workqueue(prestera_wq);
+	drain_workqueue(prestera_owq);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int prestera_port_learning_set(struct prestera_port *port, bool learn)
 {
 	return prestera_hw_port_learning_set(port, learn);
@@ -50,6 +64,14 @@ int prestera_port_mc_flood_set(struct prestera_port *port, bool flood)
 {
 	return prestera_hw_port_mc_flood_set(port, flood);
 }
+<<<<<<< HEAD
+
+int prestera_port_br_locked_set(struct prestera_port *port, bool br_locked)
+{
+	return prestera_hw_port_br_locked_set(port, br_locked);
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int prestera_port_pvid_set(struct prestera_port *port, u16 vid)
 {
@@ -368,6 +390,10 @@ static int prestera_port_sfp_bind(struct prestera_port *port)
 	if (!sw->np)
 		return 0;
 
+<<<<<<< HEAD
+	of_node_get(sw->np);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ports = of_find_node_by_name(sw->np, "ports");
 
 	for_each_child_of_node(ports, node) {
@@ -417,6 +443,10 @@ static int prestera_port_sfp_bind(struct prestera_port *port)
 	}
 
 out:
+<<<<<<< HEAD
+	of_node_put(node);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	of_node_put(ports);
 	return err;
 }
@@ -1161,6 +1191,7 @@ static int prestera_netdev_port_event(struct net_device *lower,
 
 	case NETDEV_CHANGELOWERSTATE:
 		return prestera_netdev_port_lower_event(dev, event, ptr);
+<<<<<<< HEAD
 	}
 
 	return 0;
@@ -1183,6 +1214,30 @@ static int prestera_netdevice_lag_event(struct net_device *lag_dev,
 	}
 
 	return 0;
+=======
+	}
+
+	return 0;
+}
+
+static int prestera_netdevice_lag_event(struct net_device *lag_dev,
+					unsigned long event, void *ptr)
+{
+	struct net_device *dev;
+	struct list_head *iter;
+	int err;
+
+	netdev_for_each_lower_dev(lag_dev, dev, iter) {
+		if (prestera_netdev_check(dev)) {
+			err = prestera_netdev_port_event(lag_dev, dev, event,
+							 ptr);
+			if (err)
+				return err;
+		}
+	}
+
+	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int prestera_netdev_event_handler(struct notifier_block *nb,

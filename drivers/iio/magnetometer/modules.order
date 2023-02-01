@@ -1,0 +1,17 @@
+drivers/iio/magnetometer/ak8974.ko
+drivers/iio/magnetometer/ak8975.ko
+drivers/iio/magnetometer/bmc150_magn.ko
+drivers/iio/magnetometer/bmc150_magn_i2c.ko
+drivers/iio/magnetometer/bmc150_magn_spi.ko
+drivers/iio/magnetometer/mag3110.ko
+drivers/iio/magnetometer/mmc35240.ko
+drivers/iio/magnetometer/st_magn.ko
+drivers/iio/magnetometer/st_magn_i2c.ko
+drivers/iio/magnetometer/st_magn_spi.ko
+drivers/iio/magnetometer/hmc5843_core.ko
+drivers/iio/magnetometer/hmc5843_i2c.ko
+drivers/iio/magnetometer/hmc5843_spi.ko
+drivers/iio/magnetometer/rm3100-core.ko
+drivers/iio/magnetometer/rm3100-i2c.ko
+drivers/iio/magnetometer/rm3100-spi.ko
+drivers/iio/magnetometer/yamaha-yas530.ko

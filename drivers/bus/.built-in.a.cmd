@@ -1,0 +1,1 @@
+cmd_drivers/bus/built-in.a := rm -f drivers/bus/built-in.a;  printf "drivers/bus/%s " arm-cci.o hisi_lpc.o qcom-ebi2.o sun50i-de2.o sunxi-rsb.o simple-pm-bus.o tegra-aconnect.o vexpress-config.o mhi/built-in.a | xargs ar cDPrST drivers/bus/built-in.a

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/modules.order := {   cat drivers/net/wireless/intel/ipw2x00/modules.order;   cat drivers/net/wireless/intel/iwlegacy/modules.order;   cat drivers/net/wireless/intel/iwlwifi/modules.order; :; } > drivers/net/wireless/intel/modules.order

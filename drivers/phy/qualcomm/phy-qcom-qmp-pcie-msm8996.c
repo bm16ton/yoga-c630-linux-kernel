@@ -36,6 +36,11 @@
 /* QPHY_PCS_STATUS bit */
 #define PHYSTATUS				BIT(6)
 #define PHYSTATUS_4_20				BIT(7)
+<<<<<<< HEAD
+/* QPHY_COM_PCS_READY_STATUS bit */
+#define PCS_READY				BIT(0)
+
+=======
 /* QPHY_PCS_READY_STATUS & QPHY_COM_PCS_READY_STATUS bit */
 #define PCS_READY				BIT(0)
 
@@ -67,15 +72,19 @@
 /* QPHY_V3_PCS_MISC_CLAMP_ENABLE register bits */
 #define CLAMP_EN				BIT(0) /* enables i/o clamp_n */
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PHY_INIT_COMPLETE_TIMEOUT		10000
 #define POWER_DOWN_DELAY_US_MIN			10
 #define POWER_DOWN_DELAY_US_MAX			11
 
+<<<<<<< HEAD
+=======
 #define MAX_PROP_NAME				32
 
 /* Define the assumed distance between lanes for underspecified device trees. */
 #define QMP_PHY_LEGACY_LANE_STRIDE		0x400
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct qmp_phy_init_tbl {
 	unsigned int offset;
 	unsigned int val;
@@ -123,6 +132,10 @@ enum qphy_reg_layout {
 	/* PCS registers */
 	QPHY_SW_RESET,
 	QPHY_START_CTRL,
+<<<<<<< HEAD
+	QPHY_PCS_STATUS,
+	QPHY_PCS_POWER_DOWN_CONTROL,
+=======
 	QPHY_PCS_READY_STATUS,
 	QPHY_PCS_STATUS,
 	QPHY_PCS_AUTONOMOUS_MODE_CTRL,
@@ -131,6 +144,7 @@ enum qphy_reg_layout {
 	QPHY_PCS_POWER_DOWN_CONTROL,
 	/* PCS_MISC registers */
 	QPHY_PCS_MISC_TYPEC_CTRL,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Keep last to ensure regs_layout arrays are properly initialized */
 	QPHY_LAYOUT_SIZE
 };
@@ -223,6 +237,12 @@ static const struct qmp_phy_init_tbl msm8996_pcie_pcs_tbl[] = {
 	QMP_PHY_INIT_CFG(QPHY_V2_PCS_TXDEEMPH_M3P5DB_V0, 0x0e),
 };
 
+<<<<<<< HEAD
+/* struct qmp_phy_cfg - per-PHY initialization config */
+struct qmp_phy_cfg {
+	/* number of PHYs provided by this block */
+	int num_phys;
+=======
 struct qmp_phy;
 
 /* struct qmp_phy_cfg - per-PHY initialization config */
@@ -231,10 +251,19 @@ struct qmp_phy_cfg {
 	unsigned int type;
 	/* number of lanes provided by phy */
 	int nlanes;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Init sequence for PHY blocks - serdes, tx, rx, pcs */
 	const struct qmp_phy_init_tbl *serdes_tbl;
 	int serdes_tbl_num;
+<<<<<<< HEAD
+	const struct qmp_phy_init_tbl *tx_tbl;
+	int tx_tbl_num;
+	const struct qmp_phy_init_tbl *rx_tbl;
+	int rx_tbl_num;
+	const struct qmp_phy_init_tbl *pcs_tbl;
+	int pcs_tbl_num;
+=======
 	const struct qmp_phy_init_tbl *serdes_tbl_sec;
 	int serdes_tbl_num_sec;
 	const struct qmp_phy_init_tbl *tx_tbl;
@@ -253,6 +282,7 @@ struct qmp_phy_cfg {
 	int pcs_misc_tbl_num;
 	const struct qmp_phy_init_tbl *pcs_misc_tbl_sec;
 	int pcs_misc_tbl_num_sec;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* clock ids to be requested */
 	const char * const *clk_list;
@@ -289,12 +319,18 @@ struct qmp_phy_cfg {
  * @tx: iomapped memory space for lane's tx
  * @rx: iomapped memory space for lane's rx
  * @pcs: iomapped memory space for lane's pcs
+<<<<<<< HEAD
+=======
  * @pcs_misc: iomapped memory space for lane's pcs_misc
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @pipe_clk: pipe clock
  * @index: lane index
  * @qmp: QMP phy to which this lane belongs
  * @lane_rst: lane's reset controller
+<<<<<<< HEAD
+=======
  * @mode: current PHY mode
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct qmp_phy {
 	struct phy *phy;
@@ -303,12 +339,18 @@ struct qmp_phy {
 	void __iomem *tx;
 	void __iomem *rx;
 	void __iomem *pcs;
+<<<<<<< HEAD
+=======
 	void __iomem *pcs_misc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct clk *pipe_clk;
 	unsigned int index;
 	struct qcom_qmp *qmp;
 	struct reset_control *lane_rst;
+<<<<<<< HEAD
+=======
 	enum phy_mode mode;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -377,8 +419,12 @@ static const char * const qmp_phy_vreg_l[] = {
 };
 
 static const struct qmp_phy_cfg msm8996_pciephy_cfg = {
+<<<<<<< HEAD
+	.num_phys		= 3,
+=======
 	.type			= PHY_TYPE_PCIE,
 	.nlanes			= 3,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.serdes_tbl		= msm8996_pcie_serdes_tbl,
 	.serdes_tbl_num		= ARRAY_SIZE(msm8996_pcie_serdes_tbl),
@@ -406,7 +452,11 @@ static const struct qmp_phy_cfg msm8996_pciephy_cfg = {
 	.pwrdn_delay_max	= POWER_DOWN_DELAY_US_MAX,
 };
 
+<<<<<<< HEAD
+static void qmp_pcie_msm8996_configure_lane(void __iomem *base,
+=======
 static void qcom_qmp_phy_pcie_msm8996_configure_lane(void __iomem *base,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					const unsigned int *regs,
 					const struct qmp_phy_init_tbl tbl[],
 					int num,
@@ -429,15 +479,26 @@ static void qcom_qmp_phy_pcie_msm8996_configure_lane(void __iomem *base,
 	}
 }
 
+<<<<<<< HEAD
+static void qmp_pcie_msm8996_configure(void __iomem *base,
+=======
 static void qcom_qmp_phy_pcie_msm8996_configure(void __iomem *base,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   const unsigned int *regs,
 				   const struct qmp_phy_init_tbl tbl[],
 				   int num)
 {
+<<<<<<< HEAD
+	qmp_pcie_msm8996_configure_lane(base, regs, tbl, num, 0xff);
+}
+
+static int qmp_pcie_msm8996_serdes_init(struct qmp_phy *qphy)
+=======
 	qcom_qmp_phy_pcie_msm8996_configure_lane(base, regs, tbl, num, 0xff);
 }
 
 static int qcom_qmp_phy_pcie_msm8996_serdes_init(struct qmp_phy *qphy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = qphy->qmp;
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
@@ -448,11 +509,15 @@ static int qcom_qmp_phy_pcie_msm8996_serdes_init(struct qmp_phy *qphy)
 	unsigned int mask, val;
 	int ret;
 
+<<<<<<< HEAD
+	qmp_pcie_msm8996_configure(serdes, cfg->regs, serdes_tbl, serdes_tbl_num);
+=======
 	qcom_qmp_phy_pcie_msm8996_configure(serdes, cfg->regs, serdes_tbl, serdes_tbl_num);
 	if (cfg->serdes_tbl_sec)
 		qcom_qmp_phy_pcie_msm8996_configure(serdes, cfg->regs, cfg->serdes_tbl_sec,
 				       cfg->serdes_tbl_num_sec);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	qphy_clrbits(serdes, cfg->regs[QPHY_COM_SW_RESET], SW_RESET);
 	qphy_setbits(serdes, cfg->regs[QPHY_COM_START_CONTROL],
@@ -472,7 +537,11 @@ static int qcom_qmp_phy_pcie_msm8996_serdes_init(struct qmp_phy *qphy)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_com_init(struct qmp_phy *qphy)
+=======
 static int qcom_qmp_phy_pcie_msm8996_com_init(struct qmp_phy *qphy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = qphy->qmp;
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
@@ -525,7 +594,11 @@ err_unlock:
 	return ret;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_com_exit(struct qmp_phy *qphy)
+=======
 static int qcom_qmp_phy_pcie_msm8996_com_exit(struct qmp_phy *qphy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = qphy->qmp;
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
@@ -555,21 +628,33 @@ static int qcom_qmp_phy_pcie_msm8996_com_exit(struct qmp_phy *qphy)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_init(struct phy *phy)
+=======
 static int qcom_qmp_phy_pcie_msm8996_init(struct phy *phy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 	struct qcom_qmp *qmp = qphy->qmp;
 	int ret;
 	dev_vdbg(qmp->dev, "Initializing QMP phy\n");
 
+<<<<<<< HEAD
+	ret = qmp_pcie_msm8996_com_init(qphy);
+=======
 	ret = qcom_qmp_phy_pcie_msm8996_com_init(qphy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_power_on(struct phy *phy)
+=======
 static int qcom_qmp_phy_pcie_msm8996_power_on(struct phy *phy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 	struct qcom_qmp *qmp = qphy->qmp;
@@ -577,12 +662,19 @@ static int qcom_qmp_phy_pcie_msm8996_power_on(struct phy *phy)
 	void __iomem *tx = qphy->tx;
 	void __iomem *rx = qphy->rx;
 	void __iomem *pcs = qphy->pcs;
+<<<<<<< HEAD
+=======
 	void __iomem *pcs_misc = qphy->pcs_misc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void __iomem *status;
 	unsigned int mask, val, ready;
 	int ret;
 
+<<<<<<< HEAD
+	qmp_pcie_msm8996_serdes_init(qphy);
+=======
 	qcom_qmp_phy_pcie_msm8996_serdes_init(qphy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = reset_control_deassert(qphy->lane_rst);
 	if (ret) {
@@ -598,6 +690,15 @@ static int qcom_qmp_phy_pcie_msm8996_power_on(struct phy *phy)
 	}
 
 	/* Tx, Rx, and PCS configurations */
+<<<<<<< HEAD
+	qmp_pcie_msm8996_configure_lane(tx, cfg->regs, cfg->tx_tbl,
+					cfg->tx_tbl_num, 1);
+
+	qmp_pcie_msm8996_configure_lane(rx, cfg->regs, cfg->rx_tbl,
+					cfg->rx_tbl_num, 1);
+
+	qmp_pcie_msm8996_configure(pcs, cfg->regs, cfg->pcs_tbl, cfg->pcs_tbl_num);
+=======
 	qcom_qmp_phy_pcie_msm8996_configure_lane(tx, cfg->regs,
 				    cfg->tx_tbl, cfg->tx_tbl_num, 1);
 	if (cfg->tx_tbl_sec)
@@ -620,6 +721,7 @@ static int qcom_qmp_phy_pcie_msm8996_power_on(struct phy *phy)
 	if (cfg->pcs_misc_tbl_sec)
 		qcom_qmp_phy_pcie_msm8996_configure(pcs_misc, cfg->regs, cfg->pcs_misc_tbl_sec,
 				       cfg->pcs_misc_tbl_num_sec);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Pull out PHY from POWER DOWN state.
@@ -657,7 +759,11 @@ err_reset_lane:
 	return ret;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_power_off(struct phy *phy)
+=======
 static int qcom_qmp_phy_pcie_msm8996_power_off(struct phy *phy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
@@ -682,17 +788,38 @@ static int qcom_qmp_phy_pcie_msm8996_power_off(struct phy *phy)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_exit(struct phy *phy)
+=======
 static int qcom_qmp_phy_pcie_msm8996_exit(struct phy *phy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 
 	reset_control_assert(qphy->lane_rst);
 
+<<<<<<< HEAD
+	qmp_pcie_msm8996_com_exit(qphy);
+=======
 	qcom_qmp_phy_pcie_msm8996_com_exit(qphy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_enable(struct phy *phy)
+{
+	int ret;
+
+	ret = qmp_pcie_msm8996_init(phy);
+	if (ret)
+		return ret;
+
+	ret = qmp_pcie_msm8996_power_on(phy);
+	if (ret)
+		qmp_pcie_msm8996_exit(phy);
+=======
 static int qcom_qmp_phy_pcie_msm8996_enable(struct phy *phy)
 {
 	int ret;
@@ -704,10 +831,24 @@ static int qcom_qmp_phy_pcie_msm8996_enable(struct phy *phy)
 	ret = qcom_qmp_phy_pcie_msm8996_power_on(phy);
 	if (ret)
 		qcom_qmp_phy_pcie_msm8996_exit(phy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_disable(struct phy *phy)
+{
+	int ret;
+
+	ret = qmp_pcie_msm8996_power_off(phy);
+	if (ret)
+		return ret;
+	return qmp_pcie_msm8996_exit(phy);
+}
+
+static int qmp_pcie_msm8996_vreg_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+=======
 static int qcom_qmp_phy_pcie_msm8996_disable(struct phy *phy)
 {
 	int ret;
@@ -729,6 +870,7 @@ static int qcom_qmp_phy_pcie_msm8996_set_mode(struct phy *phy,
 }
 
 static int qcom_qmp_phy_pcie_msm8996_vreg_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = dev_get_drvdata(dev);
 	int num = cfg->num_vregs;
@@ -744,7 +886,11 @@ static int qcom_qmp_phy_pcie_msm8996_vreg_init(struct device *dev, const struct 
 	return devm_regulator_bulk_get(dev, num, qmp->vregs);
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_reset_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+=======
 static int qcom_qmp_phy_pcie_msm8996_reset_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = dev_get_drvdata(dev);
 	int i;
@@ -765,7 +911,11 @@ static int qcom_qmp_phy_pcie_msm8996_reset_init(struct device *dev, const struct
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_clk_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+=======
 static int qcom_qmp_phy_pcie_msm8996_clk_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = dev_get_drvdata(dev);
 	int num = cfg->num_clks;
@@ -841,10 +991,16 @@ static int phy_pipe_clk_register(struct qcom_qmp *qmp, struct device_node *np)
 	return devm_add_action_or_reset(qmp->dev, phy_clk_release_provider, np);
 }
 
+<<<<<<< HEAD
+static const struct phy_ops qmp_pcie_msm8996_ops = {
+	.power_on	= qmp_pcie_msm8996_enable,
+	.power_off	= qmp_pcie_msm8996_disable,
+=======
 static const struct phy_ops qcom_qmp_phy_pcie_msm8996_ops = {
 	.power_on	= qcom_qmp_phy_pcie_msm8996_enable,
 	.power_off	= qcom_qmp_phy_pcie_msm8996_disable,
 	.set_mode	= qcom_qmp_phy_pcie_msm8996_set_mode,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.owner		= THIS_MODULE,
 };
 
@@ -853,14 +1009,21 @@ static void qcom_qmp_reset_control_put(void *data)
 	reset_control_put(data);
 }
 
+<<<<<<< HEAD
+static int qmp_pcie_msm8996_create(struct device *dev, struct device_node *np, int id,
+=======
 static
 int qcom_qmp_phy_pcie_msm8996_create(struct device *dev, struct device_node *np, int id,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			void __iomem *serdes, const struct qmp_phy_cfg *cfg)
 {
 	struct qcom_qmp *qmp = dev_get_drvdata(dev);
 	struct phy *generic_phy;
 	struct qmp_phy *qphy;
+<<<<<<< HEAD
+=======
 	char prop_name[MAX_PROP_NAME];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	qphy = devm_kzalloc(dev, sizeof(*qphy), GFP_KERNEL);
@@ -872,6 +1035,22 @@ int qcom_qmp_phy_pcie_msm8996_create(struct device *dev, struct device_node *np,
 	/*
 	 * Get memory resources for each phy lane:
 	 * Resources are indexed as: tx -> 0; rx -> 1; pcs -> 2.
+<<<<<<< HEAD
+	 */
+	qphy->tx = devm_of_iomap(dev, np, 0, NULL);
+	if (IS_ERR(qphy->tx))
+		return PTR_ERR(qphy->tx);
+
+	qphy->rx = devm_of_iomap(dev, np, 1, NULL);
+	if (IS_ERR(qphy->rx))
+		return PTR_ERR(qphy->rx);
+
+	qphy->pcs = devm_of_iomap(dev, np, 2, NULL);
+	if (IS_ERR(qphy->pcs))
+		return PTR_ERR(qphy->pcs);
+
+	qphy->pipe_clk = devm_get_clk_from_child(dev, np, NULL);
+=======
 	 * For dual lane PHYs: tx2 -> 3, rx2 -> 4, pcs_misc (optional) -> 5
 	 * For single lane PHYs: pcs_misc (optional) -> 3.
 	 */
@@ -894,14 +1073,19 @@ int qcom_qmp_phy_pcie_msm8996_create(struct device *dev, struct device_node *np,
 
 	snprintf(prop_name, sizeof(prop_name), "pipe%d", id);
 	qphy->pipe_clk = devm_get_clk_from_child(dev, np, prop_name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(qphy->pipe_clk)) {
 		return dev_err_probe(dev, PTR_ERR(qphy->pipe_clk),
 				     "failed to get lane%d pipe clock\n", id);
 	}
 
+<<<<<<< HEAD
+	qphy->lane_rst = of_reset_control_get_exclusive_by_index(np, 0);
+=======
 	/* Get lane reset, if any */
 	snprintf(prop_name, sizeof(prop_name), "lane%d", id);
 	qphy->lane_rst = of_reset_control_get_exclusive(np, prop_name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(qphy->lane_rst)) {
 		dev_err(dev, "failed to get lane%d reset\n", id);
 		return PTR_ERR(qphy->lane_rst);
@@ -911,7 +1095,11 @@ int qcom_qmp_phy_pcie_msm8996_create(struct device *dev, struct device_node *np,
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	generic_phy = devm_phy_create(dev, np, &qmp_pcie_msm8996_ops);
+=======
 	generic_phy = devm_phy_create(dev, np, &qcom_qmp_phy_pcie_msm8996_ops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(generic_phy)) {
 		ret = PTR_ERR(generic_phy);
 		dev_err(dev, "failed to create qphy %d\n", ret);
@@ -927,16 +1115,26 @@ int qcom_qmp_phy_pcie_msm8996_create(struct device *dev, struct device_node *np,
 	return 0;
 }
 
+<<<<<<< HEAD
+static const struct of_device_id qmp_pcie_msm8996_of_match_table[] = {
+=======
 static const struct of_device_id qcom_qmp_phy_pcie_msm8996_of_match_table[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{
 		.compatible = "qcom,msm8996-qmp-pcie-phy",
 		.data = &msm8996_pciephy_cfg,
 	},
 	{ },
 };
+<<<<<<< HEAD
+MODULE_DEVICE_TABLE(of, qmp_pcie_msm8996_of_match_table);
+
+static int qmp_pcie_msm8996_probe(struct platform_device *pdev)
+=======
 MODULE_DEVICE_TABLE(of, qcom_qmp_phy_pcie_msm8996_of_match_table);
 
 static int qcom_qmp_phy_pcie_msm8996_probe(struct platform_device *pdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp;
 	struct device *dev = &pdev->dev;
@@ -964,6 +1162,24 @@ static int qcom_qmp_phy_pcie_msm8996_probe(struct platform_device *pdev)
 	if (IS_ERR(serdes))
 		return PTR_ERR(serdes);
 
+<<<<<<< HEAD
+	expected_phys = cfg->num_phys;
+
+	mutex_init(&qmp->phy_mutex);
+
+	ret = qmp_pcie_msm8996_clk_init(dev, cfg);
+	if (ret)
+		return ret;
+
+	ret = qmp_pcie_msm8996_reset_init(dev, cfg);
+	if (ret)
+		return ret;
+
+	ret = qmp_pcie_msm8996_vreg_init(dev, cfg);
+	if (ret)
+		return dev_err_probe(dev, ret,
+				     "failed to get regulator supplies\n");
+=======
 	expected_phys = cfg->nlanes;
 
 	mutex_init(&qmp->phy_mutex);
@@ -983,6 +1199,7 @@ static int qcom_qmp_phy_pcie_msm8996_probe(struct platform_device *pdev)
 				ret);
 		return ret;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	num = of_get_available_child_count(dev->of_node);
 	/* do we have a rogue child node ? */
@@ -993,6 +1210,12 @@ static int qcom_qmp_phy_pcie_msm8996_probe(struct platform_device *pdev)
 	if (!qmp->phys)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	id = 0;
+	for_each_available_child_of_node(dev->of_node, child) {
+		/* Create per-lane phy */
+		ret = qmp_pcie_msm8996_create(dev, child, id, serdes, cfg);
+=======
 	pm_runtime_set_active(dev);
 	pm_runtime_enable(dev);
 	/*
@@ -1005,6 +1228,7 @@ static int qcom_qmp_phy_pcie_msm8996_probe(struct platform_device *pdev)
 	for_each_available_child_of_node(dev->of_node, child) {
 		/* Create per-lane phy */
 		ret = qcom_qmp_phy_pcie_msm8996_create(dev, child, id, serdes, cfg);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret) {
 			dev_err(dev, "failed to create lane%d phy, %d\n",
 				id, ret);
@@ -1026,19 +1250,36 @@ static int qcom_qmp_phy_pcie_msm8996_probe(struct platform_device *pdev)
 	}
 
 	phy_provider = devm_of_phy_provider_register(dev, of_phy_simple_xlate);
+<<<<<<< HEAD
+=======
 	if (!IS_ERR(phy_provider))
 		dev_info(dev, "Registered Qcom-QMP phy\n");
 	else
 		pm_runtime_disable(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return PTR_ERR_OR_ZERO(phy_provider);
 
 err_node_put:
+<<<<<<< HEAD
+=======
 	pm_runtime_disable(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	of_node_put(child);
 	return ret;
 }
 
+<<<<<<< HEAD
+static struct platform_driver qmp_pcie_msm8996_driver = {
+	.probe		= qmp_pcie_msm8996_probe,
+	.driver = {
+		.name	= "qcom-qmp-msm8996-pcie-phy",
+		.of_match_table = qmp_pcie_msm8996_of_match_table,
+	},
+};
+
+module_platform_driver(qmp_pcie_msm8996_driver);
+=======
 static struct platform_driver qcom_qmp_phy_pcie_msm8996_driver = {
 	.probe		= qcom_qmp_phy_pcie_msm8996_probe,
 	.driver = {
@@ -1048,6 +1289,7 @@ static struct platform_driver qcom_qmp_phy_pcie_msm8996_driver = {
 };
 
 module_platform_driver(qcom_qmp_phy_pcie_msm8996_driver);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MODULE_AUTHOR("Vivek Gautam <vivek.gautam@codeaurora.org>");
 MODULE_DESCRIPTION("Qualcomm QMP MSM8996 PCIe PHY driver");

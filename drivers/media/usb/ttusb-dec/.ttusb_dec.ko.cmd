@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/ttusb-dec/ttusb_dec.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/ttusb-dec/ttusb_dec.ko drivers/media/usb/ttusb-dec/ttusb_dec.o drivers/media/usb/ttusb-dec/ttusb_dec.mod.o;  true

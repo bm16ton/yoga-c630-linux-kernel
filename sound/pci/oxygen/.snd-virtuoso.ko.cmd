@@ -1,0 +1,1 @@
+cmd_sound/pci/oxygen/snd-virtuoso.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/oxygen/snd-virtuoso.ko sound/pci/oxygen/snd-virtuoso.o sound/pci/oxygen/snd-virtuoso.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/as73211.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/as73211.ko drivers/iio/light/as73211.o drivers/iio/light/as73211.mod.o;  true

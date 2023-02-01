@@ -1,0 +1,1 @@
+cmd_fs/9p/9p.mod := printf '%s\n'   vfs_super.o vfs_inode.o vfs_inode_dotl.o vfs_addr.o vfs_file.o vfs_dir.o vfs_dentry.o v9fs.o fid.o xattr.o cache.o acl.o | awk '!x[$$0]++ { print("fs/9p/"$$0) }' > fs/9p/9p.mod

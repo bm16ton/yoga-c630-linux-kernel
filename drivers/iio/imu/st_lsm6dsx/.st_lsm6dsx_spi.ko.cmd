@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_spi.ko drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_spi.o drivers/iio/imu/st_lsm6dsx/st_lsm6dsx_spi.mod.o;  true

@@ -26,9 +26,15 @@
  * initialize the stream, if ppcap is enabled then init those and then
  * invoke hdac stream initialization routine
  */
+<<<<<<< HEAD
+static void snd_hdac_ext_stream_init(struct hdac_bus *bus,
+				     struct hdac_ext_stream *hext_stream,
+				     int idx, int direction, int tag)
+=======
 void snd_hdac_ext_stream_init(struct hdac_bus *bus,
 			      struct hdac_ext_stream *hext_stream,
 			      int idx, int direction, int tag)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (bus->ppcap) {
 		hext_stream->pphc_addr = bus->ppcap + AZX_PPHC_BASE +
@@ -56,7 +62,6 @@ void snd_hdac_ext_stream_init(struct hdac_bus *bus,
 	hext_stream->decoupled = false;
 	snd_hdac_stream_init(bus, &hext_stream->hstream, idx, direction, tag);
 }
-EXPORT_SYMBOL_GPL(snd_hdac_ext_stream_init);
 
 /**
  * snd_hdac_ext_stream_init_all - create and initialize the stream objects
@@ -88,11 +93,11 @@ int snd_hdac_ext_stream_init_all(struct hdac_bus *bus, int start_idx,
 EXPORT_SYMBOL_GPL(snd_hdac_ext_stream_init_all);
 
 /**
- * snd_hdac_stream_free_all - free hdac extended stream objects
+ * snd_hdac_ext_stream_free_all - free hdac extended stream objects
  *
  * @bus: HD-audio core bus
  */
-void snd_hdac_stream_free_all(struct hdac_bus *bus)
+void snd_hdac_ext_stream_free_all(struct hdac_bus *bus)
 {
 	struct hdac_stream *s, *_s;
 	struct hdac_ext_stream *hext_stream;
@@ -104,7 +109,7 @@ void snd_hdac_stream_free_all(struct hdac_bus *bus)
 		kfree(hext_stream);
 	}
 }
-EXPORT_SYMBOL_GPL(snd_hdac_stream_free_all);
+EXPORT_SYMBOL_GPL(snd_hdac_ext_stream_free_all);
 
 void snd_hdac_ext_stream_decouple_locked(struct hdac_bus *bus,
 					 struct hdac_ext_stream *hext_stream,
@@ -268,12 +273,22 @@ hdac_ext_link_stream_assign(struct hdac_bus *bus,
 		if (hstream->direction != substream->stream)
 			continue;
 
+<<<<<<< HEAD
+		/* check if link stream is available */
+		if (!hext_stream->link_locked) {
+=======
 		/* check if decoupled stream and not in use is available */
 		if (hext_stream->decoupled && !hext_stream->link_locked) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			res = hext_stream;
 			break;
 		}
 
+<<<<<<< HEAD
+	}
+	if (res) {
+		snd_hdac_ext_stream_decouple_locked(bus, res, true);
+=======
 		if (!hext_stream->link_locked) {
 			snd_hdac_ext_stream_decouple_locked(bus, hext_stream, true);
 			res = hext_stream;
@@ -281,6 +296,7 @@ hdac_ext_link_stream_assign(struct hdac_bus *bus,
 		}
 	}
 	if (res) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		res->link_locked = 1;
 		res->link_substream = substream;
 	}
@@ -309,13 +325,20 @@ hdac_ext_host_stream_assign(struct hdac_bus *bus,
 			continue;
 
 		if (!hstream->opened) {
+<<<<<<< HEAD
+=======
 			if (!hext_stream->decoupled)
 				snd_hdac_ext_stream_decouple_locked(bus, hext_stream, true);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			res = hext_stream;
 			break;
 		}
 	}
 	if (res) {
+<<<<<<< HEAD
+		snd_hdac_ext_stream_decouple_locked(bus, res, true);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		res->hstream.opened = 1;
 		res->hstream.running = 0;
 		res->hstream.substream = substream;
@@ -388,15 +411,28 @@ void snd_hdac_ext_stream_release(struct hdac_ext_stream *hext_stream, int type)
 
 	case HDAC_EXT_STREAM_TYPE_HOST:
 		spin_lock_irq(&bus->reg_lock);
+<<<<<<< HEAD
+		/* couple link only if not in use */
+		if (!hext_stream->link_locked)
+			snd_hdac_ext_stream_decouple_locked(bus, hext_stream, false);
+		snd_hdac_stream_release_locked(&hext_stream->hstream);
+		spin_unlock_irq(&bus->reg_lock);
+=======
 		if (hext_stream->decoupled && !hext_stream->link_locked)
 			snd_hdac_ext_stream_decouple_locked(bus, hext_stream, false);
 		spin_unlock_irq(&bus->reg_lock);
 		snd_hdac_stream_release(&hext_stream->hstream);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 
 	case HDAC_EXT_STREAM_TYPE_LINK:
 		spin_lock_irq(&bus->reg_lock);
+<<<<<<< HEAD
+		/* couple host only if not in use */
+		if (!hext_stream->hstream.opened)
+=======
 		if (hext_stream->decoupled && !hext_stream->hstream.opened)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			snd_hdac_ext_stream_decouple_locked(bus, hext_stream, false);
 		hext_stream->link_locked = 0;
 		hext_stream->link_substream = NULL;

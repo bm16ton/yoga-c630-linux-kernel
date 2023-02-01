@@ -156,12 +156,86 @@ void perf_mem_events__list(void)
 	for (j = 0; j < PERF_MEM_EVENTS__MAX; j++) {
 		struct perf_mem_event *e = perf_mem_events__ptr(j);
 
+<<<<<<< HEAD
+		fprintf(stderr, "%-*s%-*s%s",
+			e->tag ? 13 : 0,
+			e->tag ? : "",
+			e->tag && verbose > 0 ? 25 : 0,
+			e->tag && verbose > 0 ? perf_mem_events__name(j, NULL) : "",
+			e->supported ? ": available\n" : "");
+	}
+}
+
+static void perf_mem_events__print_unsupport_hybrid(struct perf_mem_event *e,
+						    int idx)
+{
+	const char *mnt = sysfs__mount();
+	char sysfs_name[100];
+	struct perf_pmu *pmu;
+
+	perf_pmu__for_each_hybrid_pmu(pmu) {
+		scnprintf(sysfs_name, sizeof(sysfs_name), e->sysfs_name,
+			  pmu->name);
+		if (!perf_mem_event__supported(mnt, sysfs_name)) {
+			pr_err("failed: event '%s' not supported\n",
+			       perf_mem_events__name(idx, pmu->name));
+		}
+	}
+}
+
+int perf_mem_events__record_args(const char **rec_argv, int *argv_nr,
+				 char **rec_tmp, int *tmp_nr)
+{
+	int i = *argv_nr, k = 0;
+	struct perf_mem_event *e;
+	struct perf_pmu *pmu;
+	char *s;
+
+	for (int j = 0; j < PERF_MEM_EVENTS__MAX; j++) {
+		e = perf_mem_events__ptr(j);
+		if (!e->record)
+			continue;
+
+		if (!perf_pmu__has_hybrid()) {
+			if (!e->supported) {
+				pr_err("failed: event '%s' not supported\n",
+				       perf_mem_events__name(j, NULL));
+				return -1;
+			}
+
+			rec_argv[i++] = "-e";
+			rec_argv[i++] = perf_mem_events__name(j, NULL);
+		} else {
+			if (!e->supported) {
+				perf_mem_events__print_unsupport_hybrid(e, j);
+				return -1;
+			}
+
+			perf_pmu__for_each_hybrid_pmu(pmu) {
+				rec_argv[i++] = "-e";
+				s = perf_mem_events__name(j, pmu->name);
+				if (s) {
+					s = strdup(s);
+					if (!s)
+						return -1;
+
+					rec_argv[i++] = s;
+					rec_tmp[k++] = s;
+				}
+			}
+		}
+=======
 		fprintf(stderr, "%-13s%-*s%s\n",
 			e->tag ?: "",
 			verbose > 0 ? 25 : 0,
 			verbose > 0 ? perf_mem_events__name(j, NULL) : "",
 			e->supported ? ": available" : "");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
+
+	*argv_nr = i;
+	*tmp_nr = k;
+	return 0;
 }
 
 static void perf_mem_events__print_unsupport_hybrid(struct perf_mem_event *e,
@@ -281,7 +355,7 @@ static const char * const mem_lvl[] = {
 	"HIT",
 	"MISS",
 	"L1",
-	"LFB",
+	"LFB/MAB",
 	"L2",
 	"L3",
 	"Local RAM",
@@ -294,8 +368,10 @@ static const char * const mem_lvl[] = {
 };
 
 static const char * const mem_lvlnum[] = {
+	[PERF_MEM_LVLNUM_CXL] = "CXL",
+	[PERF_MEM_LVLNUM_IO] = "I/O",
 	[PERF_MEM_LVLNUM_ANY_CACHE] = "Any cache",
-	[PERF_MEM_LVLNUM_LFB] = "LFB",
+	[PERF_MEM_LVLNUM_LFB] = "LFB/MAB",
 	[PERF_MEM_LVLNUM_RAM] = "RAM",
 	[PERF_MEM_LVLNUM_PMEM] = "PMEM",
 	[PERF_MEM_LVLNUM_NA] = "N/A",

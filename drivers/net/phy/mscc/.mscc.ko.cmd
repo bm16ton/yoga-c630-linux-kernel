@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/mscc/mscc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/mscc/mscc.ko drivers/net/phy/mscc/mscc.o drivers/net/phy/mscc/mscc.mod.o;  true

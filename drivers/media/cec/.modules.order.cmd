@@ -1,0 +1,1 @@
+cmd_drivers/media/cec/modules.order := {   cat drivers/media/cec/core/modules.order;   cat drivers/media/cec/i2c/modules.order;   cat drivers/media/cec/platform/modules.order;   cat drivers/media/cec/usb/modules.order; :; } > drivers/media/cec/modules.order

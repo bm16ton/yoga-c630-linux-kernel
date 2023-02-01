@@ -1,0 +1,2 @@
+drivers/nvmem/nvmem_qfprom.ko
+drivers/nvmem/nvmem_sunxi_sid.ko

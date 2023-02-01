@@ -55,7 +55,7 @@ MODULE_PARM_DESC(ignore_special_drivers, "Ignore any special drivers and handle 
  */
 
 struct hid_report *hid_register_report(struct hid_device *device,
-				       unsigned int type, unsigned int id,
+				       enum hid_report_type type, unsigned int id,
 				       unsigned int application)
 {
 	struct hid_report_enum *report_enum = device->report_enum + type;
@@ -967,7 +967,7 @@ static const char * const hid_report_names[] = {
  * parsing.
  */
 struct hid_report *hid_validate_values(struct hid_device *hid,
-				       unsigned int type, unsigned int id,
+				       enum hid_report_type type, unsigned int id,
 				       unsigned int field_index,
 				       unsigned int report_counts)
 {
@@ -1314,6 +1314,9 @@ static s32 snto32(__u32 value, unsigned n)
 {
 	if (!value || !n)
 		return 0;
+
+	if (n > 32)
+		n = 32;
 
 	switch (n) {
 	case 8:  return ((__s8)value);
@@ -1684,6 +1687,22 @@ static void hid_process_report(struct hid_device *hid,
 		/* we need to do the memcpy at the end for var items */
 		for (a = 0; a < report->maxfield; a++) {
 			field = report->field[a];
+<<<<<<< HEAD
+
+			if (field->flags & HID_MAIN_ITEM_VARIABLE)
+				memcpy(field->value, field->new_value,
+				       field->report_count * sizeof(__s32));
+		}
+	} else {
+		/* FEATURE_REPORT, regular processing */
+		for (a = 0; a < report->maxfield; a++) {
+			field = report->field[a];
+
+			if (field->flags & HID_MAIN_ITEM_VARIABLE)
+				hid_input_var_field(hid, field, interrupt);
+			else
+				hid_input_array_field(hid, field, interrupt);
+=======
 
 			if (field->flags & HID_MAIN_ITEM_VARIABLE)
 				memcpy(field->value, field->new_value,
@@ -1732,9 +1751,47 @@ static void __hid_insert_field_entry(struct hid_device *hid,
 		if (entry->priority > next->priority) {
 			list_add_tail(&entry->list, &next->list);
 			return;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		}
+	}
+}
+
+<<<<<<< HEAD
+/*
+ * Insert a given usage_index in a field in the list
+ * of processed usages in the report.
+ *
+ * The elements of lower priority score are processed
+ * first.
+ */
+static void __hid_insert_field_entry(struct hid_device *hid,
+				     struct hid_report *report,
+				     struct hid_field_entry *entry,
+				     struct hid_field *field,
+				     unsigned int usage_index)
+{
+	struct hid_field_entry *next;
+
+	entry->field = field;
+	entry->index = usage_index;
+	entry->priority = field->usages_priorities[usage_index];
+
+	/* insert the element at the correct position */
+	list_for_each_entry(next,
+			    &report->field_entry_list,
+			    list) {
+		/*
+		 * the priority of our element is strictly higher
+		 * than the next one, insert it before
+		 */
+		if (entry->priority > next->priority) {
+			list_add_tail(&entry->list, &next->list);
+			return;
 		}
 	}
 
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* lowest priority score: insert at the end */
 	list_add_tail(&entry->list, &report->field_entry_list);
 }
@@ -1921,7 +1978,7 @@ static struct hid_report *hid_get_report(struct hid_report_enum *report_enum,
  * DO NOT USE in hid drivers directly, but through hid_hw_request instead.
  */
 int __hid_request(struct hid_device *hid, struct hid_report *report,
-		int reqtype)
+		enum hid_class_request reqtype)
 {
 	char *buf;
 	int ret;
@@ -1954,8 +2011,8 @@ out:
 }
 EXPORT_SYMBOL_GPL(__hid_request);
 
-int hid_report_raw_event(struct hid_device *hid, int type, u8 *data, u32 size,
-		int interrupt)
+int hid_report_raw_event(struct hid_device *hid, enum hid_report_type type, u8 *data, u32 size,
+			 int interrupt)
 {
 	struct hid_report_enum *report_enum = hid->report_enum + type;
 	struct hid_report *report;
@@ -2019,7 +2076,8 @@ EXPORT_SYMBOL_GPL(hid_report_raw_event);
  *
  * This is data entry for lower layers.
  */
-int hid_input_report(struct hid_device *hid, int type, u8 *data, u32 size, int interrupt)
+int hid_input_report(struct hid_device *hid, enum hid_report_type type, u8 *data, u32 size,
+		     int interrupt)
 {
 	struct hid_report_enum *report_enum;
 	struct hid_driver *hdrv;
@@ -2088,6 +2146,7 @@ const struct hid_device_id *hid_match_id(const struct hid_device *hdev,
 
 	return NULL;
 }
+EXPORT_SYMBOL_GPL(hid_match_id);
 
 static const struct hid_device_id hid_hiddev_list[] = {
 	{ HID_USB_DEVICE(USB_VENDOR_ID_MGE, USB_DEVICE_ID_MGE_UPS) },
@@ -2352,7 +2411,11 @@ EXPORT_SYMBOL_GPL(hid_hw_close);
  * @reqtype: hid request type
  */
 void hid_hw_request(struct hid_device *hdev,
+<<<<<<< HEAD
+		    struct hid_report *report, enum hid_class_request reqtype)
+=======
 		    struct hid_report *report, int reqtype)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (hdev->ll_driver->request)
 		return hdev->ll_driver->request(hdev, report, reqtype);
@@ -2377,7 +2440,11 @@ EXPORT_SYMBOL_GPL(hid_hw_request);
  */
 int hid_hw_raw_request(struct hid_device *hdev,
 		       unsigned char reportnum, __u8 *buf,
+<<<<<<< HEAD
+		       size_t len, enum hid_report_type rtype, enum hid_class_request reqtype)
+=======
 		       size_t len, unsigned char rtype, int reqtype)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (len < 1 || len > HID_MAX_BUFFER_SIZE || !buf)
 		return -EINVAL;
@@ -2739,10 +2806,12 @@ int hid_add_device(struct hid_device *hdev)
 			hid_warn(hdev, "bad device descriptor (%d)\n", ret);
 	}
 
+	hdev->id = atomic_inc_return(&id);
+
 	/* XXX hack, any other cleaner solution after the driver core
 	 * is converted to allow more than 20 bytes as the device name? */
 	dev_set_name(&hdev->dev, "%04X:%04X:%04X.%04X", hdev->bus,
-		     hdev->vendor, hdev->product, atomic_inc_return(&id));
+		     hdev->vendor, hdev->product, hdev->id);
 
 	hid_debug_register(hdev, dev_name(&hdev->dev));
 	ret = device_add(&hdev->dev);

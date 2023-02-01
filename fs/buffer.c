@@ -52,8 +52,13 @@
 #include "internal.h"
 
 static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
+<<<<<<< HEAD
+static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
+			  struct writeback_control *wbc);
+=======
 static int submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
 			 struct writeback_control *wbc);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
 
@@ -152,7 +157,7 @@ static void __end_buffer_read_notouch(struct buffer_head *bh, int uptodate)
 
 /*
  * Default synchronous end-of-IO handler..  Just mark it up-to-date and
- * unlock the buffer. This is what ll_rw_block uses too.
+ * unlock the buffer.
  */
 void end_buffer_read_sync(struct buffer_head *bh, int uptodate)
 {
@@ -491,8 +496,8 @@ int inode_has_buffers(struct inode *inode)
  * all already-submitted IO to complete, but does not queue any new
  * writes to the disk.
  *
- * To do O_SYNC writes, just queue the buffer writes with ll_rw_block as
- * you dirty the buffers, and then use osync_inode_buffers to wait for
+ * To do O_SYNC writes, just queue the buffer writes with write_dirty_buffer
+ * as you dirty the buffers, and then use osync_inode_buffers to wait for
  * completion.  Any other dirty buffers which are not yet queued for
  * write will not be flushed to disk by the osync.
  */
@@ -562,7 +567,11 @@ void write_boundary_block(struct block_device *bdev,
 	struct buffer_head *bh = __find_get_block(bdev, bblock + 1, blocksize);
 	if (bh) {
 		if (buffer_dirty(bh))
+<<<<<<< HEAD
+			write_dirty_buffer(bh, 0);
+=======
 			ll_rw_block(REQ_OP_WRITE, 1, &bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		put_bh(bh);
 	}
 }
@@ -1342,12 +1351,18 @@ void __breadahead(struct block_device *bdev, sector_t block, unsigned size)
 {
 	struct buffer_head *bh = __getblk(bdev, block, size);
 	if (likely(bh)) {
+<<<<<<< HEAD
+		bh_readahead(bh, REQ_RAHEAD);
+=======
 		ll_rw_block(REQ_OP_READ | REQ_RAHEAD, 1, &bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		brelse(bh);
 	}
 }
 EXPORT_SYMBOL(__breadahead);
 
+<<<<<<< HEAD
+=======
 void __breadahead_gfp(struct block_device *bdev, sector_t block, unsigned size,
 		      gfp_t gfp)
 {
@@ -1359,6 +1374,7 @@ void __breadahead_gfp(struct block_device *bdev, sector_t block, unsigned size,
 }
 EXPORT_SYMBOL(__breadahead_gfp);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  *  __bread_gfp() - reads a specified block and returns the bh
  *  @bdev: the block_device to read from
@@ -1464,19 +1480,15 @@ EXPORT_SYMBOL(set_bh_page);
 
 static void discard_buffer(struct buffer_head * bh)
 {
-	unsigned long b_state, b_state_old;
+	unsigned long b_state;
 
 	lock_buffer(bh);
 	clear_buffer_dirty(bh);
 	bh->b_bdev = NULL;
-	b_state = bh->b_state;
-	for (;;) {
-		b_state_old = cmpxchg(&bh->b_state, b_state,
-				      (b_state & ~BUFFER_FLAGS_DISCARD));
-		if (b_state_old == b_state)
-			break;
-		b_state = b_state_old;
-	}
+	b_state = READ_ONCE(bh->b_state);
+	do {
+	} while (!try_cmpxchg(&bh->b_state, &b_state,
+			      b_state & ~BUFFER_FLAGS_DISCARD));
 	unlock_buffer(bh);
 }
 
@@ -1817,7 +1829,7 @@ done:
 		/*
 		 * The page was marked dirty, but the buffers were
 		 * clean.  Someone wrote them back by hand with
-		 * ll_rw_block/submit_bh.  A rare case.
+		 * write_dirty_buffer/submit_bh.  A rare case.
 		 */
 		end_page_writeback(page);
 
@@ -2033,7 +2045,11 @@ int __block_write_begin_int(struct folio *folio, loff_t pos, unsigned len,
 		if (!buffer_uptodate(bh) && !buffer_delay(bh) &&
 		    !buffer_unwritten(bh) &&
 		     (block_start < from || block_end > to)) {
+<<<<<<< HEAD
+			bh_read_nowait(bh, 0);
+=======
 			ll_rw_block(REQ_OP_READ, 1, &bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			*wait_bh++=bh;
 		}
 	}
@@ -2260,9 +2276,15 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
 	int nr, i;
 	int fully_mapped = 1;
 	bool page_error = false;
+<<<<<<< HEAD
 
 	VM_BUG_ON_FOLIO(folio_test_large(folio), folio);
 
+=======
+
+	VM_BUG_ON_FOLIO(folio_test_large(folio), folio);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	head = create_page_buffers(&folio->page, inode, 0);
 	blocksize = head->b_size;
 	bbits = block_size_bits(blocksize);
@@ -2593,11 +2615,15 @@ int block_truncate_page(struct address_space *mapping,
 		set_buffer_uptodate(bh);
 
 	if (!buffer_uptodate(bh) && !buffer_delay(bh) && !buffer_unwritten(bh)) {
+<<<<<<< HEAD
+		err = bh_read(bh, 0);
+=======
 		err = -EIO;
 		ll_rw_block(REQ_OP_READ, 1, &bh);
 		wait_on_buffer(bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Uhhuh. Read error. Complain and punt. */
-		if (!buffer_uptodate(bh))
+		if (err < 0)
 			goto unlock;
 	}
 
@@ -2673,8 +2699,13 @@ static void end_bio_bh_io_sync(struct bio *bio)
 	bio_put(bio);
 }
 
+<<<<<<< HEAD
+static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
+			  struct writeback_control *wbc)
+=======
 static int submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
 			 struct writeback_control *wbc)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const enum req_op op = opf & REQ_OP_MASK;
 	struct bio *bio;
@@ -2717,9 +2748,16 @@ static int submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
 	}
 
 	submit_bio(bio);
-	return 0;
 }
 
+<<<<<<< HEAD
+void submit_bh(blk_opf_t opf, struct buffer_head *bh)
+{
+	submit_bh_wbc(opf, bh, NULL);
+}
+EXPORT_SYMBOL(submit_bh);
+
+=======
 int submit_bh(blk_opf_t opf, struct buffer_head *bh)
 {
 	return submit_bh_wbc(opf, bh, NULL);
@@ -2781,6 +2819,7 @@ void ll_rw_block(const blk_opf_t opf, int nr, struct buffer_head *bhs[])
 }
 EXPORT_SYMBOL(ll_rw_block);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void write_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
 {
 	lock_buffer(bh);
@@ -2801,8 +2840,6 @@ EXPORT_SYMBOL(write_dirty_buffer);
  */
 int __sync_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
 {
-	int ret = 0;
-
 	WARN_ON(atomic_read(&bh->b_count) < 1);
 	lock_buffer(bh);
 	if (test_clear_buffer_dirty(bh)) {
@@ -2817,14 +2854,18 @@ int __sync_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
 
 		get_bh(bh);
 		bh->b_end_io = end_buffer_write_sync;
+<<<<<<< HEAD
+		submit_bh(REQ_OP_WRITE | op_flags, bh);
+=======
 		ret = submit_bh(REQ_OP_WRITE | op_flags, bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		wait_on_buffer(bh);
-		if (!ret && !buffer_uptodate(bh))
-			ret = -EIO;
+		if (!buffer_uptodate(bh))
+			return -EIO;
 	} else {
 		unlock_buffer(bh);
 	}
-	return ret;
+	return 0;
 }
 EXPORT_SYMBOL(__sync_dirty_buffer);
 
@@ -3029,29 +3070,77 @@ int bh_uptodate_or_lock(struct buffer_head *bh)
 EXPORT_SYMBOL(bh_uptodate_or_lock);
 
 /**
- * bh_submit_read - Submit a locked buffer for reading
+ * __bh_read - Submit read for a locked buffer
  * @bh: struct buffer_head
+ * @op_flags: appending REQ_OP_* flags besides REQ_OP_READ
+ * @wait: wait until reading finish
  *
- * Returns zero on success and -EIO on error.
+ * Returns zero on success or don't wait, and -EIO on error.
  */
-int bh_submit_read(struct buffer_head *bh)
+int __bh_read(struct buffer_head *bh, blk_opf_t op_flags, bool wait)
 {
-	BUG_ON(!buffer_locked(bh));
+	int ret = 0;
 
-	if (buffer_uptodate(bh)) {
-		unlock_buffer(bh);
-		return 0;
-	}
+	BUG_ON(!buffer_locked(bh));
 
 	get_bh(bh);
 	bh->b_end_io = end_buffer_read_sync;
+<<<<<<< HEAD
+	submit_bh(REQ_OP_READ | op_flags, bh);
+	if (wait) {
+		wait_on_buffer(bh);
+		if (!buffer_uptodate(bh))
+			ret = -EIO;
+	}
+	return ret;
+}
+EXPORT_SYMBOL(__bh_read);
+
+/**
+ * __bh_read_batch - Submit read for a batch of unlocked buffers
+ * @nr: entry number of the buffer batch
+ * @bhs: a batch of struct buffer_head
+ * @op_flags: appending REQ_OP_* flags besides REQ_OP_READ
+ * @force_lock: force to get a lock on the buffer if set, otherwise drops any
+ *              buffer that cannot lock.
+ *
+ * Returns zero on success or don't wait, and -EIO on error.
+ */
+void __bh_read_batch(int nr, struct buffer_head *bhs[],
+		     blk_opf_t op_flags, bool force_lock)
+{
+	int i;
+
+	for (i = 0; i < nr; i++) {
+		struct buffer_head *bh = bhs[i];
+
+		if (buffer_uptodate(bh))
+			continue;
+
+		if (force_lock)
+			lock_buffer(bh);
+		else
+			if (!trylock_buffer(bh))
+				continue;
+
+		if (buffer_uptodate(bh)) {
+			unlock_buffer(bh);
+			continue;
+		}
+
+		bh->b_end_io = end_buffer_read_sync;
+		get_bh(bh);
+		submit_bh(REQ_OP_READ | op_flags, bh);
+	}
+=======
 	submit_bh(REQ_OP_READ, bh);
 	wait_on_buffer(bh);
 	if (buffer_uptodate(bh))
 		return 0;
 	return -EIO;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
-EXPORT_SYMBOL(bh_submit_read);
+EXPORT_SYMBOL(__bh_read_batch);
 
 void __init buffer_init(void)
 {

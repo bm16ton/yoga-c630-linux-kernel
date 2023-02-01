@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/kxsd9.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/kxsd9.ko drivers/iio/accel/kxsd9.o drivers/iio/accel/kxsd9.mod.o;  true

@@ -9,7 +9,11 @@ sfc-y			+= efx.o efx_common.o efx_channels.o nic.o \
 			   ef100_ethtool.o ef100_rx.o ef100_tx.o
 sfc-$(CONFIG_SFC_MTD)	+= mtd.o
 sfc-$(CONFIG_SFC_SRIOV)	+= sriov.o ef10_sriov.o ef100_sriov.o ef100_rep.o \
+<<<<<<< HEAD
+                           mae.o tc.o tc_bindings.o
+=======
                            mae.o tc.o
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 obj-$(CONFIG_SFC)	+= sfc.o
 

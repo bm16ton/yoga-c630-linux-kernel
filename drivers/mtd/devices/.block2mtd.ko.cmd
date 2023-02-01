@@ -1,0 +1,1 @@
+cmd_drivers/mtd/devices/block2mtd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/devices/block2mtd.ko drivers/mtd/devices/block2mtd.o drivers/mtd/devices/block2mtd.mod.o;  true

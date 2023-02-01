@@ -1,0 +1,1 @@
+cmd_sound/firewire/fireworks/snd-fireworks.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/fireworks/snd-fireworks.ko sound/firewire/fireworks/snd-fireworks.o sound/firewire/fireworks/snd-fireworks.mod.o;  true

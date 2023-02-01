@@ -1,0 +1,1 @@
+cmd_drivers/i2c/busses/i2c-thunderx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/busses/i2c-thunderx.ko drivers/i2c/busses/i2c-thunderx.o drivers/i2c/busses/i2c-thunderx.mod.o;  true

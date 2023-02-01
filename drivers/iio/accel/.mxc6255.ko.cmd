@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/mxc6255.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/mxc6255.ko drivers/iio/accel/mxc6255.o drivers/iio/accel/mxc6255.mod.o;  true

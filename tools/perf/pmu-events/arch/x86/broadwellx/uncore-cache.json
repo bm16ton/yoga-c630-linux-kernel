@@ -947,6 +947,13 @@
         "Unit": "CBO"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "TOR Inserts; Miss Opcode Match",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x35",
+        "EventName": "UNC_C_TOR_INSERTS.MISS_OPCODE",
+        "PerPkg": "1",
+=======
         "BriefDescription": "LLC misses - demand and prefetch data reads - excludes LLC prefetches. Derived from unc_c_tor_inserts.miss_opcode",
         "Counter": "0,1,2,3",
         "EventCode": "0x35",
@@ -954,14 +961,22 @@
         "Filter": "filter_opc=0x182",
         "PerPkg": "1",
         "ScaleUnit": "64Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x3",
         "Unit": "CBO"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "LLC misses - demand and prefetch data reads - excludes LLC prefetches. Derived from unc_c_tor_inserts.miss_opcode",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x35",
+        "EventName": "LLC_MISSES.DATA_READ",
+=======
         "BriefDescription": "LLC misses - demand and prefetch data reads - excludes LLC prefetches",
         "Counter": "0,1,2,3",
         "EventCode": "0x35",
         "EventName": "UNC_C_TOR_INSERTS.MISS_OPCODE",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Filter": "filter_opc=0x182",
         "PerPkg": "1",
         "ScaleUnit": "64Bytes",

@@ -180,7 +180,11 @@ struct qcom_pcie_resources_2_3_3 {
 
 /* 6 clocks typically, 7 for sm8250 */
 struct qcom_pcie_resources_2_7_0 {
+<<<<<<< HEAD
+	struct clk_bulk_data clks[12];
+=======
 	struct clk_bulk_data clks[9];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int num_clks;
 	struct regulator_bulk_data supplies[2];
 	struct reset_control *pci_reset;
@@ -208,17 +212,19 @@ struct qcom_pcie_ops {
 	int (*init)(struct qcom_pcie *pcie);
 	int (*post_init)(struct qcom_pcie *pcie);
 	void (*deinit)(struct qcom_pcie *pcie);
-	void (*post_deinit)(struct qcom_pcie *pcie);
 	void (*ltssm_enable)(struct qcom_pcie *pcie);
 	int (*config_sid)(struct qcom_pcie *pcie);
 };
 
 struct qcom_pcie_cfg {
 	const struct qcom_pcie_ops *ops;
+<<<<<<< HEAD
+=======
 	unsigned int has_tbu_clk:1;
 	unsigned int has_ddrss_sf_tbu_clk:1;
 	unsigned int has_aggre0_clk:1;
 	unsigned int has_aggre1_clk:1;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct qcom_pcie {
@@ -1175,6 +1181,10 @@ static int qcom_pcie_get_resources_2_7_0(struct qcom_pcie *pcie)
 	struct qcom_pcie_resources_2_7_0 *res = &pcie->res.v2_7_0;
 	struct dw_pcie *pci = pcie->pci;
 	struct device *dev = pci->dev;
+<<<<<<< HEAD
+	unsigned int num_clks, num_opt_clks;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int idx;
 	int ret;
 
@@ -1195,6 +1205,8 @@ static int qcom_pcie_get_resources_2_7_0(struct qcom_pcie *pcie)
 	res->clks[idx++].id = "bus_master";
 	res->clks[idx++].id = "bus_slave";
 	res->clks[idx++].id = "slave_q2a";
+<<<<<<< HEAD
+=======
 	if (pcie->cfg->has_tbu_clk)
 		res->clks[idx++].id = "tbu";
 	if (pcie->cfg->has_ddrss_sf_tbu_clk)
@@ -1205,11 +1217,32 @@ static int qcom_pcie_get_resources_2_7_0(struct qcom_pcie *pcie)
 		res->clks[idx++].id = "aggre1";
 
 	res->num_clks = idx;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	ret = devm_clk_bulk_get(dev, res->num_clks, res->clks);
+	num_clks = idx;
+
+	ret = devm_clk_bulk_get(dev, num_clks, res->clks);
 	if (ret < 0)
 		return ret;
 
+<<<<<<< HEAD
+	res->clks[idx++].id = "tbu";
+	res->clks[idx++].id = "ddrss_sf_tbu";
+	res->clks[idx++].id = "aggre0";
+	res->clks[idx++].id = "aggre1";
+	res->clks[idx++].id = "noc_aggr_4";
+	res->clks[idx++].id = "noc_aggr_south_sf";
+	res->clks[idx++].id = "cnoc_qx";
+
+	num_opt_clks = idx - num_clks;
+	res->num_clks = idx;
+
+	ret = devm_clk_bulk_get_optional(dev, num_opt_clks, res->clks + num_clks);
+	if (ret < 0)
+		return ret;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -1345,6 +1378,7 @@ static int qcom_pcie_init_2_9_0(struct qcom_pcie *pcie)
 	 * from downstream Codeaurora kernel
 	 */
 	usleep_range(2000, 2500);
+<<<<<<< HEAD
 
 	ret = reset_control_deassert(res->rst);
 	if (ret) {
@@ -1371,6 +1405,34 @@ static int qcom_pcie_post_init_2_9_0(struct qcom_pcie *pcie)
 	val &= ~BIT(0);
 	writel(val, pcie->parf + PCIE20_PARF_PHY_CTRL);
 
+=======
+
+	ret = reset_control_deassert(res->rst);
+	if (ret) {
+		dev_err(dev, "reset deassert failed (%d)\n", ret);
+		return ret;
+	}
+
+	usleep_range(2000, 2500);
+
+	return clk_bulk_prepare_enable(ARRAY_SIZE(res->clks), res->clks);
+}
+
+static int qcom_pcie_post_init_2_9_0(struct qcom_pcie *pcie)
+{
+	struct dw_pcie *pci = pcie->pci;
+	u16 offset = dw_pcie_find_capability(pci, PCI_CAP_ID_EXP);
+	u32 val;
+	int i;
+
+	writel(SLV_ADDR_SPACE_SZ,
+		pcie->parf + PCIE20_v3_PARF_SLV_ADDR_SPACE_SIZE);
+
+	val = readl(pcie->parf + PCIE20_PARF_PHY_CTRL);
+	val &= ~BIT(0);
+	writel(val, pcie->parf + PCIE20_PARF_PHY_CTRL);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	writel(0, pcie->parf + PCIE20_PARF_DBI_BASE_ADDR);
 
 	writel(DEVICE_TYPE_RC, pcie->parf + PCIE20_PARF_DEVICE_TYPE);
@@ -1509,15 +1571,18 @@ static int qcom_pcie_host_init(struct dw_pcie_rp *pp)
 	if (pcie->cfg->ops->config_sid) {
 		ret = pcie->cfg->ops->config_sid(pcie);
 		if (ret)
-			goto err;
+			goto err_assert_reset;
 	}
 
 	return 0;
 
-err:
+err_assert_reset:
 	qcom_ep_reset_assert(pcie);
+<<<<<<< HEAD
+=======
 	if (pcie->cfg->ops->post_deinit)
 		pcie->cfg->ops->post_deinit(pcie);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_disable_phy:
 	phy_power_off(pcie->phy);
 err_deinit:
@@ -1601,6 +1666,37 @@ static const struct qcom_pcie_ops ops_2_9_0 = {
 	.ltssm_enable = qcom_pcie_2_3_2_ltssm_enable,
 };
 
+<<<<<<< HEAD
+static const struct qcom_pcie_cfg cfg_1_0_0 = {
+	.ops = &ops_1_0_0,
+};
+
+static const struct qcom_pcie_cfg cfg_1_9_0 = {
+	.ops = &ops_1_9_0,
+};
+
+static const struct qcom_pcie_cfg cfg_2_1_0 = {
+	.ops = &ops_2_1_0,
+};
+
+static const struct qcom_pcie_cfg cfg_2_3_2 = {
+	.ops = &ops_2_3_2,
+};
+
+static const struct qcom_pcie_cfg cfg_2_3_3 = {
+	.ops = &ops_2_3_3,
+};
+
+static const struct qcom_pcie_cfg cfg_2_4_0 = {
+	.ops = &ops_2_4_0,
+};
+
+static const struct qcom_pcie_cfg cfg_2_7_0 = {
+	.ops = &ops_2_7_0,
+};
+
+static const struct qcom_pcie_cfg cfg_2_9_0 = {
+=======
 static const struct qcom_pcie_cfg apq8084_cfg = {
 	.ops = &ops_1_0_0,
 };
@@ -1663,6 +1759,7 @@ static const struct qcom_pcie_cfg sc8180x_cfg = {
 };
 
 static const struct qcom_pcie_cfg ipq6018_cfg = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ops = &ops_2_9_0,
 };
 
@@ -1761,6 +1858,26 @@ err_pm_runtime_put:
 }
 
 static const struct of_device_id qcom_pcie_match[] = {
+<<<<<<< HEAD
+	{ .compatible = "qcom,pcie-apq8064", .data = &cfg_2_1_0 },
+	{ .compatible = "qcom,pcie-apq8084", .data = &cfg_1_0_0 },
+	{ .compatible = "qcom,pcie-ipq4019", .data = &cfg_2_4_0 },
+	{ .compatible = "qcom,pcie-ipq6018", .data = &cfg_2_9_0 },
+	{ .compatible = "qcom,pcie-ipq8064", .data = &cfg_2_1_0 },
+	{ .compatible = "qcom,pcie-ipq8064-v2", .data = &cfg_2_1_0 },
+	{ .compatible = "qcom,pcie-ipq8074", .data = &cfg_2_3_3 },
+	{ .compatible = "qcom,pcie-msm8996", .data = &cfg_2_3_2 },
+	{ .compatible = "qcom,pcie-qcs404", .data = &cfg_2_4_0 },
+	{ .compatible = "qcom,pcie-sa8540p", .data = &cfg_1_9_0 },
+	{ .compatible = "qcom,pcie-sc7280", .data = &cfg_1_9_0 },
+	{ .compatible = "qcom,pcie-sc8180x", .data = &cfg_1_9_0 },
+	{ .compatible = "qcom,pcie-sc8280xp", .data = &cfg_1_9_0 },
+	{ .compatible = "qcom,pcie-sdm845", .data = &cfg_2_7_0 },
+	{ .compatible = "qcom,pcie-sm8150", .data = &cfg_1_9_0 },
+	{ .compatible = "qcom,pcie-sm8250", .data = &cfg_1_9_0 },
+	{ .compatible = "qcom,pcie-sm8450-pcie0", .data = &cfg_1_9_0 },
+	{ .compatible = "qcom,pcie-sm8450-pcie1", .data = &cfg_1_9_0 },
+=======
 	{ .compatible = "qcom,pcie-apq8084", .data = &apq8084_cfg },
 	{ .compatible = "qcom,pcie-ipq8064", .data = &ipq8064_cfg },
 	{ .compatible = "qcom,pcie-ipq8064-v2", .data = &ipq8064_cfg },
@@ -1777,6 +1894,7 @@ static const struct of_device_id qcom_pcie_match[] = {
 	{ .compatible = "qcom,pcie-sm8450-pcie1", .data = &sm8450_pcie1_cfg },
 	{ .compatible = "qcom,pcie-sc7280", .data = &sc7280_cfg },
 	{ .compatible = "qcom,pcie-ipq6018", .data = &ipq6018_cfg },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 

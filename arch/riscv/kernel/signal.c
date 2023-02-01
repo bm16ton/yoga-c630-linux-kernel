@@ -124,6 +124,8 @@ SYSCALL_DEFINE0(rt_sigreturn)
 	if (restore_altstack(&frame->uc.uc_stack))
 		goto badframe;
 
+	regs->cause = -1UL;
+
 	return regs->a0;
 
 badframe:
@@ -311,12 +313,31 @@ static void do_signal(struct pt_regs *regs)
 }
 
 /*
- * notification of userspace execution resumption
- * - triggered by the _TIF_WORK_MASK flags
+ * Handle any pending work on the resume-to-userspace path, as indicated by
+ * _TIF_WORK_MASK. Entered from assembly with IRQs off.
  */
-asmlinkage __visible void do_notify_resume(struct pt_regs *regs,
-					   unsigned long thread_info_flags)
+asmlinkage __visible void do_work_pending(struct pt_regs *regs,
+					  unsigned long thread_info_flags)
 {
+<<<<<<< HEAD
+	do {
+		if (thread_info_flags & _TIF_NEED_RESCHED) {
+			schedule();
+		} else {
+			local_irq_enable();
+			if (thread_info_flags & _TIF_UPROBE)
+				uprobe_notify_resume(regs);
+			/* Handle pending signal delivery */
+			if (thread_info_flags & (_TIF_SIGPENDING |
+						 _TIF_NOTIFY_SIGNAL))
+				do_signal(regs);
+			if (thread_info_flags & _TIF_NOTIFY_RESUME)
+				resume_user_mode_work(regs);
+		}
+		local_irq_disable();
+		thread_info_flags = read_thread_flags();
+	} while (thread_info_flags & _TIF_WORK_MASK);
+=======
 	if (thread_info_flags & _TIF_UPROBE)
 		uprobe_notify_resume(regs);
 
@@ -326,4 +347,5 @@ asmlinkage __visible void do_notify_resume(struct pt_regs *regs,
 
 	if (thread_info_flags & _TIF_NOTIFY_RESUME)
 		resume_user_mode_work(regs);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

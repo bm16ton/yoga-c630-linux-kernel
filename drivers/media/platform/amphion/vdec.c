@@ -286,6 +286,10 @@ static int vdec_g_fmt(struct file *file, void *fh, struct v4l2_format *f)
 	struct vpu_format *cur_fmt;
 	int i;
 
+<<<<<<< HEAD
+	vpu_inst_lock(inst);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cur_fmt = vpu_get_format(inst, f->type);
 
 	pixmp->pixelformat = cur_fmt->pixfmt;
@@ -303,6 +307,10 @@ static int vdec_g_fmt(struct file *file, void *fh, struct v4l2_format *f)
 	f->fmt.pix_mp.xfer_func = vdec->codec_info.transfer_chars;
 	f->fmt.pix_mp.ycbcr_enc = vdec->codec_info.matrix_coeffs;
 	f->fmt.pix_mp.quantization = vdec->codec_info.full_range;
+<<<<<<< HEAD
+	vpu_inst_unlock(inst);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -753,6 +761,12 @@ static bool vdec_check_source_change(struct vpu_inst *inst)
 	if (!inst->fh.m2m_ctx)
 		return false;
 
+<<<<<<< HEAD
+	if (vdec->reset_codec)
+		return false;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!vb2_is_streaming(v4l2_m2m_get_dst_vq(inst->fh.m2m_ctx)))
 		return true;
 	fmt = vpu_helper_find_format(inst, inst->cap_format.type, vdec->codec_info.pixfmt);
@@ -1088,7 +1102,12 @@ static void vdec_event_seq_hdr(struct vpu_inst *inst, struct vpu_dec_codec_info 
 		vdec->seq_tag = vdec->codec_info.tag;
 		if (vdec->is_source_changed) {
 			vdec_update_state(inst, VPU_CODEC_STATE_DYAMIC_RESOLUTION_CHANGE, 0);
+<<<<<<< HEAD
+			vdec->source_change++;
+			vdec_handle_resolution_change(inst);
+=======
 			vpu_notify_source_change(inst);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			vdec->is_source_changed = false;
 		}
 	}
@@ -1335,6 +1354,11 @@ static void vdec_abort(struct vpu_inst *inst)
 		  vdec->decoded_frame_count,
 		  vdec->display_frame_count,
 		  vdec->sequence);
+<<<<<<< HEAD
+	if (!vdec->seq_hdr_found)
+		vdec->reset_codec = true;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vdec->params.end_flag = 0;
 	vdec->drain = 0;
 	vdec->params.frame_count = 0;
@@ -1342,6 +1366,10 @@ static void vdec_abort(struct vpu_inst *inst)
 	vdec->display_frame_count = 0;
 	vdec->sequence = 0;
 	vdec->aborting = false;
+<<<<<<< HEAD
+	inst->extra_size = 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void vdec_stop(struct vpu_inst *inst, bool free)
@@ -1464,8 +1492,12 @@ static int vdec_start_session(struct vpu_inst *inst, u32 type)
 	}
 
 	if (V4L2_TYPE_IS_OUTPUT(type)) {
+<<<<<<< HEAD
+		vdec_update_state(inst, vdec->state, 1);
+=======
 		if (inst->state == VPU_CODEC_STATE_SEEK)
 			vdec_update_state(inst, vdec->state, 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		vdec->eos_received = 0;
 		vpu_process_output_buffer(inst);
 	} else {
@@ -1629,6 +1661,10 @@ static int vdec_open(struct file *file)
 		return ret;
 
 	vdec->fixed_fmt = false;
+<<<<<<< HEAD
+	vdec->state = VPU_CODEC_STATE_ACTIVE;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	inst->min_buffer_cap = VDEC_MIN_BUFFER_CAP;
 	inst->min_buffer_out = VDEC_MIN_BUFFER_OUT;
 	vdec_init(file);

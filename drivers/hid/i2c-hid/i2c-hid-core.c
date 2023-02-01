@@ -554,7 +554,12 @@ static void i2c_hid_get_input(struct i2c_hid *ihid)
 	i2c_hid_dbg(ihid, "input: %*ph\n", ret_size, ihid->inbuf);
 
 	if (test_bit(I2C_HID_STARTED, &ihid->flags)) {
+<<<<<<< HEAD
+		if (ihid->hid->group != HID_GROUP_RMI)
+			pm_wakeup_event(&ihid->client->dev, 0);
+=======
 		pm_wakeup_event(&ihid->client->dev, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		hid_input_report(ihid->hid, HID_INPUT_REPORT,
 				ihid->inbuf + sizeof(__le16),
@@ -665,10 +670,17 @@ static int i2c_hid_get_raw_report(struct hid_device *hid,
 	ret_count = i2c_hid_get_report(ihid,
 			report_type == HID_FEATURE_REPORT ? 0x03 : 0x01,
 			report_id, buf, count);
+<<<<<<< HEAD
 
 	if (ret_count > 0 && !report_id)
 		ret_count++;
 
+=======
+
+	if (ret_count > 0 && !report_id)
+		ret_count++;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret_count;
 }
 
@@ -1036,7 +1048,7 @@ int i2c_hid_core_probe(struct i2c_client *client, struct i2chid_ops *ops,
 
 	snprintf(hid->name, sizeof(hid->name), "%s %04X:%04X",
 		 client->name, (u16)hid->vendor, (u16)hid->product);
-	strlcpy(hid->phys, dev_name(&client->dev), sizeof(hid->phys));
+	strscpy(hid->phys, dev_name(&client->dev), sizeof(hid->phys));
 
 	ihid->quirks = i2c_hid_lookup_quirk(hid->vendor, hid->product);
 
@@ -1064,7 +1076,7 @@ err_powered:
 }
 EXPORT_SYMBOL_GPL(i2c_hid_core_probe);
 
-int i2c_hid_core_remove(struct i2c_client *client)
+void i2c_hid_core_remove(struct i2c_client *client)
 {
 	struct i2c_hid *ihid = i2c_get_clientdata(client);
 	struct hid_device *hid;
@@ -1078,8 +1090,6 @@ int i2c_hid_core_remove(struct i2c_client *client)
 		i2c_hid_free_buffers(ihid);
 
 	i2c_hid_core_power_down(ihid);
-
-	return 0;
 }
 EXPORT_SYMBOL_GPL(i2c_hid_core_remove);
 

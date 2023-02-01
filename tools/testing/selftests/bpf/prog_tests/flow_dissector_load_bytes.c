@@ -44,7 +44,11 @@ void serial_test_flow_dissector_load_bytes(void)
 	ASSERT_OK(err, "test_run");
 	ASSERT_EQ(topts.data_size_out, sizeof(flow_keys),
 		  "test_run data_size_out");
+<<<<<<< HEAD
+	ASSERT_EQ(topts.retval, BPF_OK, "test_run retval");
+=======
 	ASSERT_EQ(topts.retval, 1, "test_run retval");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (fd >= -1)
 		close(fd);

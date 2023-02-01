@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/rtsx_pci_sdmmc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/rtsx_pci_sdmmc.ko drivers/mmc/host/rtsx_pci_sdmmc.o drivers/mmc/host/rtsx_pci_sdmmc.mod.o;  true

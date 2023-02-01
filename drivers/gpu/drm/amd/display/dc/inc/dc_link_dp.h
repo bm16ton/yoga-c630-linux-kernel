@@ -194,6 +194,14 @@ enum dc_status dpcd_configure_lttpr_mode(
 
 enum dp_link_encoding dp_get_link_encoding_format(const struct dc_link_settings *link_settings);
 bool dp_retrieve_lttpr_cap(struct dc_link *link);
+<<<<<<< HEAD
+bool dp_is_lttpr_present(struct dc_link *link);
+enum lttpr_mode dp_decide_lttpr_mode(struct dc_link *link, struct dc_link_settings *link_setting);
+void dp_get_lttpr_mode_override(struct dc_link *link, enum lttpr_mode *override);
+enum lttpr_mode dp_decide_8b_10b_lttpr_mode(struct dc_link *link);
+enum lttpr_mode dp_decide_128b_132b_lttpr_mode(struct dc_link *link);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bool dpcd_write_128b_132b_sst_payload_allocation_table(
 		const struct dc_stream_state *stream,
 		struct dc_link *link,

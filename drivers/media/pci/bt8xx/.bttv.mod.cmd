@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/bt8xx/bttv.mod := printf '%s\n'   bttv-driver.o bttv-cards.o bttv-if.o bttv-risc.o bttv-vbi.o bttv-i2c.o bttv-gpio.o bttv-input.o bttv-audio-hook.o btcx-risc.o | awk '!x[$$0]++ { print("drivers/media/pci/bt8xx/"$$0) }' > drivers/media/pci/bt8xx/bttv.mod

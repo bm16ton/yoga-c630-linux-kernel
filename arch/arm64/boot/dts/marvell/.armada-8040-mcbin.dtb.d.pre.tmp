@@ -1,0 +1,15 @@
+armada-8040-mcbin.o: arch/arm64/boot/dts/marvell/armada-8040-mcbin.dts \
+ arch/arm64/boot/dts/marvell/armada-8040-mcbin.dtsi \
+ arch/arm64/boot/dts/marvell/armada-8040.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap806-quad.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap806.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap80x.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ arch/arm64/boot/dts/marvell/armada-80x0.dtsi \
+ arch/arm64/boot/dts/marvell/armada-cp110.dtsi \
+ arch/arm64/boot/dts/marvell/armada-cp11x.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/mvebu-icu.h \
+ arch/arm64/boot/dts/marvell/armada-common.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h

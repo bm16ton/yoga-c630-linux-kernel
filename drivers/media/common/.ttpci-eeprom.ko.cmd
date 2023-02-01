@@ -1,0 +1,1 @@
+cmd_drivers/media/common/ttpci-eeprom.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/common/ttpci-eeprom.ko drivers/media/common/ttpci-eeprom.o drivers/media/common/ttpci-eeprom.mod.o;  true

@@ -560,7 +560,11 @@ int i915_ttm_move(struct ttm_buffer_object *bo, bool evict,
 	bool clear;
 	int ret;
 
+<<<<<<< HEAD
+	if (GEM_WARN_ON(i915_ttm_is_ghost_object(bo))) {
+=======
 	if (GEM_WARN_ON(!obj)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ttm_bo_move_null(bo, dst_mem);
 		return 0;
 	}

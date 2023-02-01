@@ -135,7 +135,12 @@ static struct snd_soc_dai_driver fsl_rpmsg_dai = {
 };
 
 static const struct snd_soc_component_driver fsl_component = {
+<<<<<<< HEAD
+	.name			= "fsl-rpmsg",
+	.legacy_dai_naming	= 1,
+=======
 	.name           = "fsl-rpmsg",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct fsl_rpmsg_soc_data imx7ulp_data = {

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/myricom/myri10ge/myri10ge.mod := printf '%s\n'   myri10ge.o | awk '!x[$$0]++ { print("drivers/net/ethernet/myricom/myri10ge/"$$0) }' > drivers/net/ethernet/myricom/myri10ge/myri10ge.mod

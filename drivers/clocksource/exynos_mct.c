@@ -33,7 +33,7 @@
 #define EXYNOS4_MCT_G_INT_ENB		EXYNOS4_MCTREG(0x248)
 #define EXYNOS4_MCT_G_WSTAT		EXYNOS4_MCTREG(0x24C)
 #define _EXYNOS4_MCT_L_BASE		EXYNOS4_MCTREG(0x300)
-#define EXYNOS4_MCT_L_BASE(x)		(_EXYNOS4_MCT_L_BASE + (0x100 * x))
+#define EXYNOS4_MCT_L_BASE(x)		(_EXYNOS4_MCT_L_BASE + (0x100 * (x)))
 #define EXYNOS4_MCT_L_MASK		(0xffffff00)
 
 #define MCT_L_TCNTB_OFFSET		(0x00)
@@ -66,6 +66,11 @@
 #define MCT_L0_IRQ	4
 /* Max number of IRQ as per DT binding document */
 #define MCT_NR_IRQS	20
+<<<<<<< HEAD
+/* Max number of local timers */
+#define MCT_NR_LOCAL	(MCT_NR_IRQS - MCT_L0_IRQ)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum {
 	MCT_INT_SPI,
@@ -233,9 +238,16 @@ static cycles_t exynos4_read_current_timer(void)
 }
 #endif
 
-static int __init exynos4_clocksource_init(void)
+static int __init exynos4_clocksource_init(bool frc_shared)
 {
-	exynos4_mct_frc_start();
+	/*
+	 * When the frc is shared, the main processer should have already
+	 * turned it on and we shouldn't be writing to TCON.
+	 */
+	if (frc_shared)
+		mct_frc.resume = NULL;
+	else
+		exynos4_mct_frc_start();
 
 #if defined(CONFIG_ARM)
 	exynos4_delay_timer.read_current_timer = &exynos4_read_current_timer;
@@ -449,7 +461,6 @@ static int exynos4_mct_starting_cpu(unsigned int cpu)
 		per_cpu_ptr(&percpu_mct_tick, cpu);
 	struct clock_event_device *evt = &mevt->evt;
 
-	mevt->base = EXYNOS4_MCT_L_BASE(cpu);
 	snprintf(mevt->name, sizeof(mevt->name), "mct_tick%d", cpu);
 
 	evt->name = mevt->name;
@@ -520,8 +531,22 @@ static int __init exynos4_timer_resources(struct device_node *np)
 	return 0;
 }
 
+<<<<<<< HEAD
+/**
+ * exynos4_timer_interrupts - initialize MCT interrupts
+ * @np: device node for MCT
+ * @int_type: interrupt type, MCT_INT_PPI or MCT_INT_SPI
+ * @local_idx: array mapping CPU numbers to local timer indices
+ * @nr_local: size of @local_idx array
+ */
+static int __init exynos4_timer_interrupts(struct device_node *np,
+					   unsigned int int_type,
+					   const u32 *local_idx,
+					   size_t nr_local)
+=======
 static int __init exynos4_timer_interrupts(struct device_node *np,
 					   unsigned int int_type)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int nr_irqs, i, err, cpu;
 
@@ -554,13 +579,30 @@ static int __init exynos4_timer_interrupts(struct device_node *np,
 	} else {
 		for_each_possible_cpu(cpu) {
 			int mct_irq;
+<<<<<<< HEAD
+			unsigned int irq_idx;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			struct mct_clock_event_device *pcpu_mevt =
 				per_cpu_ptr(&percpu_mct_tick, cpu);
 
+			if (cpu >= nr_local) {
+				err = -EINVAL;
+				goto out_irq;
+			}
+
+			irq_idx = MCT_L0_IRQ + local_idx[cpu];
+
 			pcpu_mevt->evt.irq = -1;
+<<<<<<< HEAD
+			if (irq_idx >= ARRAY_SIZE(mct_irqs))
+				break;
+			mct_irq = mct_irqs[irq_idx];
+=======
 			if (MCT_L0_IRQ + cpu >= ARRAY_SIZE(mct_irqs))
 				break;
 			mct_irq = mct_irqs[MCT_L0_IRQ + cpu];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			irq_set_status_flags(mct_irq, IRQ_NOAUTOEN);
 			if (request_irq(mct_irq,
@@ -574,6 +616,17 @@ static int __init exynos4_timer_interrupts(struct device_node *np,
 			}
 			pcpu_mevt->evt.irq = mct_irq;
 		}
+	}
+
+	for_each_possible_cpu(cpu) {
+		struct mct_clock_event_device *mevt = per_cpu_ptr(&percpu_mct_tick, cpu);
+
+		if (cpu >= nr_local) {
+			err = -EINVAL;
+			goto out_irq;
+		}
+
+		mevt->base = EXYNOS4_MCT_L_BASE(local_idx[cpu]);
 	}
 
 	/* Install hotplug callbacks which configure the timer on this CPU */
@@ -605,18 +658,56 @@ out_irq:
 
 static int __init mct_init_dt(struct device_node *np, unsigned int int_type)
 {
+<<<<<<< HEAD
+	bool frc_shared = of_property_read_bool(np, "samsung,frc-shared");
+	u32 local_idx[MCT_NR_LOCAL] = {0};
+	int nr_local;
 	int ret;
 
+	nr_local = of_property_count_u32_elems(np, "samsung,local-timers");
+	if (nr_local == 0)
+		return -EINVAL;
+	if (nr_local > 0) {
+		if (nr_local > ARRAY_SIZE(local_idx))
+			return -EINVAL;
+
+		ret = of_property_read_u32_array(np, "samsung,local-timers",
+						 local_idx, nr_local);
+		if (ret)
+			return ret;
+	} else {
+		int i;
+
+		nr_local = ARRAY_SIZE(local_idx);
+		for (i = 0; i < nr_local; i++)
+			local_idx[i] = i;
+	}
+
+=======
+	int ret;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = exynos4_timer_resources(np);
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	ret = exynos4_timer_interrupts(np, int_type, local_idx, nr_local);
+=======
 	ret = exynos4_timer_interrupts(np, int_type);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
-	ret = exynos4_clocksource_init();
+	ret = exynos4_clocksource_init(frc_shared);
 	if (ret)
+		return ret;
+
+	/*
+	 * When the FRC is shared with a main processor, this secondary
+	 * processor cannot use the global comparator.
+	 */
+	if (frc_shared)
 		return ret;
 
 	return exynos4_clockevent_init();

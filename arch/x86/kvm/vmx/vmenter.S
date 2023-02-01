@@ -153,9 +153,15 @@ SYM_FUNC_START(__vmx_vcpu_run)
 
 	_ASM_EXTABLE(.Lvmresume, .Lfixup)
 	_ASM_EXTABLE(.Lvmlaunch, .Lfixup)
+<<<<<<< HEAD
 
 SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
 
+=======
+
+SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Restore unwind state from before the VMRESUME/VMLAUNCH. */
 	UNWIND_HINT_RESTORE
 	ENDBR
@@ -187,6 +193,13 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
 
 	/* Clear return value to indicate VM-Exit (as opposed to VM-Fail). */
 	xor %ebx, %ebx
+<<<<<<< HEAD
+
+.Lclear_regs:
+	/* Discard @regs.  The register is irrelevant, it just can't be RBX. */
+	pop %_ASM_AX
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 .Lclear_regs:
 	/*
@@ -195,7 +208,11 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
 	 * via the stack.  In theory, an L1 cache miss when restoring registers
 	 * could lead to speculative execution with the guest's values.
 	 * Zeroing XORs are dirt cheap, i.e. the extra paranoia is essentially
+<<<<<<< HEAD
+	 * free.  RSP and RBX are exempt as RSP is restored by hardware during
+=======
 	 * free.  RSP and RAX are exempt as RSP is restored by hardware during
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * VM-Exit and RBX is explicitly loaded with 0 or 1 to hold the return
 	 * value.
 	 */
@@ -216,6 +233,23 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
 	xor %r15d, %r15d
 #endif
 
+<<<<<<< HEAD
+	/*
+	 * IMPORTANT: RSB filling and SPEC_CTRL handling must be done before
+	 * the first unbalanced RET after vmexit!
+	 *
+	 * For retpoline or IBRS, RSB filling is needed to prevent poisoned RSB
+	 * entries and (in some cases) RSB underflow.
+	 *
+	 * eIBRS has its own protection against poisoned RSB, so it doesn't
+	 * need the RSB filling sequence.  But it does need to be enabled, and a
+	 * single call to retire, before the first unbalanced RET.
+         */
+
+	FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
+			   X86_FEATURE_RSB_VMEXIT_LITE
+
+=======
 	/* "POP" @regs. */
 	add $WORD_SIZE, %_ASM_SP
 
@@ -235,6 +269,7 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
 			   X86_FEATURE_RSB_VMEXIT_LITE
 
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pop %_ASM_ARG2	/* @flags */
 	pop %_ASM_ARG1	/* @vmx */
 
@@ -293,21 +328,12 @@ SYM_FUNC_START(vmread_error_trampoline)
 	push %r10
 	push %r11
 #endif
-#ifdef CONFIG_X86_64
+
 	/* Load @field and @fault to arg1 and arg2 respectively. */
-	mov 3*WORD_SIZE(%rbp), %_ASM_ARG2
-	mov 2*WORD_SIZE(%rbp), %_ASM_ARG1
-#else
-	/* Parameters are passed on the stack for 32-bit (see asmlinkage). */
-	push 3*WORD_SIZE(%ebp)
-	push 2*WORD_SIZE(%ebp)
-#endif
+	mov 3*WORD_SIZE(%_ASM_BP), %_ASM_ARG2
+	mov 2*WORD_SIZE(%_ASM_BP), %_ASM_ARG1
 
 	call vmread_error
-
-#ifndef CONFIG_X86_64
-	add $8, %esp
-#endif
 
 	/* Zero out @fault, which will be popped into the result register. */
 	_ASM_MOV $0, 3*WORD_SIZE(%_ASM_BP)

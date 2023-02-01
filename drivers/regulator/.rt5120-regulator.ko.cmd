@@ -1,0 +1,1 @@
+cmd_drivers/regulator/rt5120-regulator.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/regulator/rt5120-regulator.ko drivers/regulator/rt5120-regulator.o drivers/regulator/rt5120-regulator.mod.o;  true

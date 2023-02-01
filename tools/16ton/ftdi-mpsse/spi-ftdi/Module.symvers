@@ -1,0 +1,2 @@
+0x00000000	ft232h_intf_get_model	/Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/ft232h-intf	EXPORT_SYMBOL_GPL	
+0x00000000	ft232h_intf_get_numgpio	/Part/ft2232-mpsse-i2c-spi-kern-drivers/spi-ftdi/ft232h-intf	EXPORT_SYMBOL_GPL	

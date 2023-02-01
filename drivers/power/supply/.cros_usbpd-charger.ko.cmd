@@ -1,0 +1,1 @@
+cmd_drivers/power/supply/cros_usbpd-charger.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/power/supply/cros_usbpd-charger.ko drivers/power/supply/cros_usbpd-charger.o drivers/power/supply/cros_usbpd-charger.mod.o;  true

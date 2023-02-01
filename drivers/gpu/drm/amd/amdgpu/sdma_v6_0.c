@@ -47,6 +47,10 @@
 MODULE_FIRMWARE("amdgpu/sdma_6_0_0.bin");
 MODULE_FIRMWARE("amdgpu/sdma_6_0_1.bin");
 MODULE_FIRMWARE("amdgpu/sdma_6_0_2.bin");
+<<<<<<< HEAD
+MODULE_FIRMWARE("amdgpu/sdma_6_0_3.bin");
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define SDMA1_REG_OFFSET 0x600
 #define SDMA0_HYP_DEC_REG_START 0x5880
@@ -77,6 +81,8 @@ static u32 sdma_v6_0_get_reg_offset(struct amdgpu_device *adev, u32 instance, u3
 	return base + internal_offset;
 }
 
+<<<<<<< HEAD
+=======
 static int sdma_v6_0_init_inst_ctx(struct amdgpu_sdma_instance *sdma_inst)
 {
 	int err = 0;
@@ -104,6 +110,7 @@ static void sdma_v6_0_destroy_inst_ctx(struct amdgpu_device *adev)
 	       sizeof(struct amdgpu_sdma_instance) * AMDGPU_MAX_SDMA_INSTANCES);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * sdma_v6_0_init_microcode - load ucode images from disk
  *
@@ -113,16 +120,22 @@ static void sdma_v6_0_destroy_inst_ctx(struct amdgpu_device *adev)
  * the driver (not loaded into hw).
  * Returns 0 on success, error on failure.
  */
+<<<<<<< HEAD
+=======
 
 // emulation only, won't work on real chip
 // sdma 6.0.0 real chip need to use PSP to load firmware
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int sdma_v6_0_init_microcode(struct amdgpu_device *adev)
 {
 	char fw_name[30];
 	char ucode_prefix[30];
+<<<<<<< HEAD
+=======
 	int err = 0, i;
 	struct amdgpu_firmware_info *info = NULL;
 	const struct sdma_firmware_header_v2_0 *sdma_hdr;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	DRM_DEBUG("\n");
 
@@ -130,6 +143,9 @@ static int sdma_v6_0_init_microcode(struct amdgpu_device *adev)
 
 	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s.bin", ucode_prefix);
 
+<<<<<<< HEAD
+	return amdgpu_sdma_init_microcode(adev, fw_name, 0, true);
+=======
 	err = request_firmware(&adev->sdma.instance[0].fw, fw_name, adev->dev);
 	if (err)
 		goto out;
@@ -167,6 +183,7 @@ out:
 		sdma_v6_0_destroy_inst_ctx(adev);
 	}
 	return err;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static unsigned sdma_v6_0_ring_init_cond_exec(struct amdgpu_ring *ring)
@@ -466,6 +483,12 @@ static void sdma_v6_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 se
  */
 static void sdma_v6_0_gfx_stop(struct amdgpu_device *adev)
 {
+<<<<<<< HEAD
+	u32 rb_cntl, ib_cntl;
+	int i;
+
+	amdgpu_sdma_unset_buffer_funcs_helper(adev);
+=======
 	struct amdgpu_ring *sdma0 = &adev->sdma.instance[0].ring;
 	struct amdgpu_ring *sdma1 = &adev->sdma.instance[1].ring;
 	u32 rb_cntl, ib_cntl;
@@ -474,6 +497,7 @@ static void sdma_v6_0_gfx_stop(struct amdgpu_device *adev)
 	if ((adev->mman.buffer_funcs_ring == sdma0) ||
 	    (adev->mman.buffer_funcs_ring == sdma1))
 		amdgpu_ttm_set_buffer_funcs_status(adev, false);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; i < adev->sdma.num_instances; i++) {
 		rb_cntl = RREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_CNTL));
@@ -483,9 +507,12 @@ static void sdma_v6_0_gfx_stop(struct amdgpu_device *adev)
 		ib_cntl = REG_SET_FIELD(ib_cntl, SDMA0_QUEUE0_IB_CNTL, IB_ENABLE, 0);
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_IB_CNTL), ib_cntl);
 	}
+<<<<<<< HEAD
+=======
 
 	sdma0->sched.ready = false;
 	sdma1->sched.ready = false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -559,7 +586,12 @@ static int sdma_v6_0_gfx_resume(struct amdgpu_device *adev)
 	for (i = 0; i < adev->sdma.num_instances; i++) {
 		ring = &adev->sdma.instance[i].ring;
 
+<<<<<<< HEAD
+		if (!amdgpu_sriov_vf(adev))
+			WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_SEM_WAIT_FAIL_TIMER_CNTL), 0);
+=======
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_SEM_WAIT_FAIL_TIMER_CNTL), 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Set ring buffer size in dwords */
 		rb_bufsz = order_base_2(ring->ring_size / 4);
@@ -593,7 +625,14 @@ static int sdma_v6_0_gfx_resume(struct amdgpu_device *adev)
 		       lower_32_bits(ring->rptr_gpu_addr) & 0xFFFFFFFC);
 
 		rb_cntl = REG_SET_FIELD(rb_cntl, SDMA0_QUEUE0_RB_CNTL, RPTR_WRITEBACK_ENABLE, 1);
+<<<<<<< HEAD
+		if (amdgpu_sriov_vf(adev))
+			rb_cntl = REG_SET_FIELD(rb_cntl, SDMA0_QUEUE0_RB_CNTL, WPTR_POLL_ENABLE, 1);
+		else
+			rb_cntl = REG_SET_FIELD(rb_cntl, SDMA0_QUEUE0_RB_CNTL, WPTR_POLL_ENABLE, 0);
+=======
 		rb_cntl = REG_SET_FIELD(rb_cntl, SDMA0_QUEUE0_RB_CNTL, WPTR_POLL_ENABLE, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rb_cntl = REG_SET_FIELD(rb_cntl, SDMA0_QUEUE0_RB_CNTL, F32_WPTR_POLL_ENABLE, 1);
 
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_BASE), ring->gpu_addr >> 8);
@@ -1366,27 +1405,45 @@ static int sdma_v6_0_sw_fini(void *handle)
 	for (i = 0; i < adev->sdma.num_instances; i++)
 		amdgpu_ring_fini(&adev->sdma.instance[i].ring);
 
+<<<<<<< HEAD
+	amdgpu_sdma_destroy_inst_ctx(adev, true);
+=======
 	sdma_v6_0_destroy_inst_ctx(adev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
 static int sdma_v6_0_hw_init(void *handle)
 {
+<<<<<<< HEAD
+	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
+
+	return sdma_v6_0_start(adev);
+=======
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	r = sdma_v6_0_start(adev);
 
 	return r;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int sdma_v6_0_hw_fini(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
+<<<<<<< HEAD
+	if (amdgpu_sriov_vf(adev)) {
+		/* disable the scheduler for SDMA */
+		amdgpu_sdma_unset_buffer_funcs_helper(adev);
+		return 0;
+	}
+=======
 	if (amdgpu_sriov_vf(adev))
 		return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	sdma_v6_0_ctx_switch_enable(adev, false);
 	sdma_v6_0_enable(adev, false);

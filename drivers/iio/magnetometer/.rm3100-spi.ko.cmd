@@ -1,0 +1,1 @@
+cmd_drivers/iio/magnetometer/rm3100-spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/magnetometer/rm3100-spi.ko drivers/iio/magnetometer/rm3100-spi.o drivers/iio/magnetometer/rm3100-spi.mod.o;  true

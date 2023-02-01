@@ -445,6 +445,8 @@
 	type DSCRM_DSC_FORWARD_EN; \
 	type DSCRM_DSC_OPP_PIPE_SOURCE
 
+<<<<<<< HEAD
+=======
 #define DSC_REG_LIST_DCN314(id) \
 	SRI(DSC_TOP_CONTROL, DSC_TOP, id),\
 	SRI(DSC_DEBUG_CONTROL, DSC_TOP, id),\
@@ -665,6 +667,7 @@
 	DSC_SF(DSCRM0_DSCRM_DSC_FORWARD_CONFIG, DSCRM_DSC_OPP_PIPE_SOURCE, mask_sh)
 
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct dcn20_dsc_registers {
 	uint32_t DSC_TOP_CONTROL;
 	uint32_t DSC_DEBUG_CONTROL;

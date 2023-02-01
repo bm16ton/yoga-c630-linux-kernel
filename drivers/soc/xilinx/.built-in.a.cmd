@@ -1,0 +1,1 @@
+cmd_drivers/soc/xilinx/built-in.a := rm -f drivers/soc/xilinx/built-in.a;  printf "drivers/soc/xilinx/%s " zynqmp_power.o zynqmp_pm_domains.o xlnx_event_manager.o | xargs ar cDPrST drivers/soc/xilinx/built-in.a

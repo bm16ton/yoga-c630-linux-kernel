@@ -30,6 +30,8 @@ properties:
       - const: bi_tcxo
       - const: sleep_clk
 
+<<<<<<< HEAD
+=======
   '#clock-cells':
     const: 1
 
@@ -46,16 +48,25 @@ properties:
     description:
       Protected clock specifier list as per common clock binding.
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - clocks
   - clock-names
+<<<<<<< HEAD
+
+allOf:
+  - $ref: qcom,gcc.yaml#
+
+unevaluatedProperties: false
+=======
   - reg
   - '#clock-cells'
   - '#reset-cells'
   - '#power-domain-cells'
 
 additionalProperties: false
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

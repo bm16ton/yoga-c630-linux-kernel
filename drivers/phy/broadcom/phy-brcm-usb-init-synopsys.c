@@ -331,6 +331,14 @@ static void usb_uninit_common_7216(struct brcm_usb_init_params *params)
 
 	pr_debug("%s\n", __func__);
 
+<<<<<<< HEAD
+	if (params->wake_enabled) {
+		/* Switch to using slower clock during suspend to save power */
+		USB_CTRL_SET(ctrl, USB_PM, XHC_S2_CLK_SWITCH_EN);
+		usb_wake_enable_7216(params, true);
+	} else {
+		USB_CTRL_SET(ctrl, USB_PM, USB_PWRDN);
+=======
 	if (!params->wake_enabled) {
 		USB_CTRL_SET(ctrl, USB_PM, USB_PWRDN);
 
@@ -338,6 +346,7 @@ static void usb_uninit_common_7216(struct brcm_usb_init_params *params)
 		USB_CTRL_SET(ctrl, USB_PM, XHC_S2_CLK_SWITCH_EN);
 	} else {
 		usb_wake_enable_7216(params, true);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -435,5 +444,4 @@ void brcm_usb_dvr_init_7211b0(struct brcm_usb_init_params *params)
 
 	params->family_name = "7211";
 	params->ops = &bcm7211b0_ops;
-	params->suspend_with_clocks = true;
 }

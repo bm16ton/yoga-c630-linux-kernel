@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qlogic/qlcnic/qlcnic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/qlogic/qlcnic/qlcnic.ko drivers/net/ethernet/qlogic/qlcnic/qlcnic.o drivers/net/ethernet/qlogic/qlcnic/qlcnic.mod.o;  true

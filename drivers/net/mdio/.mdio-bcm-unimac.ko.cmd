@@ -1,0 +1,1 @@
+cmd_drivers/net/mdio/mdio-bcm-unimac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/mdio/mdio-bcm-unimac.ko drivers/net/mdio/mdio-bcm-unimac.o drivers/net/mdio/mdio-bcm-unimac.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/iwlegacy/iwlegacy.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/intel/iwlegacy/iwlegacy.ko drivers/net/wireless/intel/iwlegacy/iwlegacy.o drivers/net/wireless/intel/iwlegacy/iwlegacy.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/zydas/zd1211rw/zd1211rw.mod := printf '%s\n'   zd_chip.o zd_mac.o zd_rf_al2230.o zd_rf_rf2959.o zd_rf_al7230b.o zd_rf_uw2453.o zd_rf.o zd_usb.o | awk '!x[$$0]++ { print("drivers/net/wireless/zydas/zd1211rw/"$$0) }' > drivers/net/wireless/zydas/zd1211rw/zd1211rw.mod

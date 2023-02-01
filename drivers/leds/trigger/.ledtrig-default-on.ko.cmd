@@ -1,0 +1,1 @@
+cmd_drivers/leds/trigger/ledtrig-default-on.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/trigger/ledtrig-default-on.ko drivers/leds/trigger/ledtrig-default-on.o drivers/leds/trigger/ledtrig-default-on.mod.o;  true

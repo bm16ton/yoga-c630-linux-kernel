@@ -1,0 +1,1 @@
+cmd_drivers/soc/qcom/pdr_interface.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/soc/qcom/pdr_interface.ko drivers/soc/qcom/pdr_interface.o drivers/soc/qcom/pdr_interface.mod.o;  true

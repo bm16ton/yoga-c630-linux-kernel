@@ -1,0 +1,1 @@
+cmd_drivers/virtio/virtio_balloon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/virtio/virtio_balloon.ko drivers/virtio/virtio_balloon.o drivers/virtio/virtio_balloon.mod.o;  true

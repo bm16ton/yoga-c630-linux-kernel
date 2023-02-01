@@ -1,0 +1,1 @@
+cmd_drivers/phy/qualcomm/built-in.a := rm -f drivers/phy/qualcomm/built-in.a;  printf "drivers/phy/qualcomm/%s " phy-qcom-edp.o phy-qcom-qmp-combo.o phy-qcom-qmp-pcie.o phy-qcom-qmp-pcie-msm8996.o phy-qcom-qmp-ufs.o phy-qcom-qmp-usb.o phy-qcom-qusb2.o phy-qcom-snps-femto-v2.o | xargs ar cDPrST drivers/phy/qualcomm/built-in.a

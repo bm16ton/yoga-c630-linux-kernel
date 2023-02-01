@@ -1,0 +1,1 @@
+drivers/nvmem/qfprom.o

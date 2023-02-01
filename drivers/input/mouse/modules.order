@@ -1,0 +1,3 @@
+drivers/input/mouse/elan_i2c.ko
+drivers/input/mouse/synaptics_i2c.ko
+drivers/input/mouse/synaptics_usb.ko

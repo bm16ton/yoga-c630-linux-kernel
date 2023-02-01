@@ -12,6 +12,10 @@
 #include <linux/iopoll.h>
 #include <linux/kernel.h>
 #include <linux/mdio/mdio-mscc-miim.h>
+<<<<<<< HEAD
+#include <linux/mfd/ocelot.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/module.h>
 #include <linux/of_mdio.h>
 #include <linux/phy.h>
@@ -190,6 +194,7 @@ static int mscc_miim_reset(struct mii_bus *bus)
 	if (ret < 0) {
 		WARN_ONCE(1, "mscc reset set error %d\n", ret);
 		return ret;
+<<<<<<< HEAD
 	}
 
 	ret = regmap_update_bits(miim->phy_regs, offset, bits, bits);
@@ -198,6 +203,16 @@ static int mscc_miim_reset(struct mii_bus *bus)
 		return ret;
 	}
 
+=======
+	}
+
+	ret = regmap_update_bits(miim->phy_regs, offset, bits, bits);
+	if (ret < 0) {
+		WARN_ONCE(1, "mscc reset clear error %d\n", ret);
+		return ret;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mdelay(500);
 
 	return 0;
@@ -255,6 +270,43 @@ static int mscc_miim_clk_set(struct mii_bus *bus)
 	/* Keep the current settings */
 	if (!miim->bus_freq)
 		return 0;
+<<<<<<< HEAD
+
+	rate = clk_get_rate(miim->clk);
+
+	div = DIV_ROUND_UP(rate, 2 * miim->bus_freq) - 1;
+	if (div == 0 || div & ~MSCC_MIIM_CFG_PRESCALE_MASK) {
+		dev_err(&bus->dev, "Incorrect MDIO clock frequency\n");
+		return -EINVAL;
+	}
+
+	return regmap_update_bits(miim->regs, MSCC_MIIM_REG_CFG,
+				  MSCC_MIIM_CFG_PRESCALE_MASK, div);
+}
+
+static int mscc_miim_probe(struct platform_device *pdev)
+{
+	struct device_node *np = pdev->dev.of_node;
+	struct regmap *mii_regmap, *phy_regmap;
+	struct device *dev = &pdev->dev;
+	struct mscc_miim_dev *miim;
+	struct mii_bus *bus;
+	int ret;
+
+	mii_regmap = ocelot_regmap_from_resource(pdev, 0,
+						 &mscc_miim_regmap_config);
+	if (IS_ERR(mii_regmap))
+		return dev_err_probe(dev, PTR_ERR(mii_regmap),
+				     "Unable to create MIIM regmap\n");
+
+	/* This resource is optional */
+	phy_regmap = ocelot_regmap_from_resource_optional(pdev, 1,
+						 &mscc_miim_phy_regmap_config);
+	if (IS_ERR(phy_regmap))
+		return dev_err_probe(dev, PTR_ERR(phy_regmap),
+				     "Unable to create phy register regmap\n");
+
+=======
 
 	rate = clk_get_rate(miim->clk);
 
@@ -309,6 +361,7 @@ static int mscc_miim_probe(struct platform_device *pdev)
 		}
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = mscc_miim_setup(dev, &bus, "mscc_miim", mii_regmap, 0);
 	if (ret < 0) {
 		dev_err(dev, "Unable to setup the MDIO bus\n");

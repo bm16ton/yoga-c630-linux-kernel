@@ -41,11 +41,14 @@ static const char * const btf_kind_str[NR_BTF_KINDS] = {
 	[BTF_KIND_DECL_TAG]	= "DECL_TAG",
 	[BTF_KIND_TYPE_TAG]	= "TYPE_TAG",
 	[BTF_KIND_ENUM64]	= "ENUM64",
+<<<<<<< HEAD
+=======
 };
 
 struct btf_attach_point {
 	__u32 obj_id;
 	__u32 btf_id;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const char *btf_int_enc_str(__u8 encoding)
@@ -640,10 +643,14 @@ static int do_dump(int argc, char **argv)
 
 		btf = btf__parse_split(*argv, base ?: base_btf);
 		err = libbpf_get_error(btf);
+<<<<<<< HEAD
+		if (!btf) {
+=======
 		if (err) {
 			btf = NULL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			p_err("failed to load BTF from %s: %s",
-			      *argv, strerror(err));
+			      *argv, strerror(errno));
 			goto done;
 		}
 		NEXT_ARG();
@@ -684,6 +691,16 @@ static int do_dump(int argc, char **argv)
 			p_info("Warning: valid base BTF was not specified with -B option, falling back to standard base BTF (%s)",
 			       sysfs_vmlinux);
 			base_btf = get_vmlinux_btf_from_sysfs();
+<<<<<<< HEAD
+		}
+
+		btf = btf__load_from_kernel_by_id_split(btf_id, base_btf);
+		err = libbpf_get_error(btf);
+		if (!btf) {
+			p_err("get btf by id (%u): %s", btf_id, strerror(errno));
+			goto done;
+		}
+=======
 		}
 
 		btf = btf__load_from_kernel_by_id_split(btf_id, base_btf);
@@ -692,6 +709,7 @@ static int do_dump(int argc, char **argv)
 			p_err("get btf by id (%u): %s", btf_id, strerror(err));
 			goto done;
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (dump_c) {
@@ -825,7 +843,11 @@ build_btf_type_table(struct hashmap *tab, enum bpf_obj_type type,
 				      u32_as_hash_field(id));
 		if (err) {
 			p_err("failed to append entry to hashmap for BTF ID %u, object ID %u: %s",
+<<<<<<< HEAD
+			      btf_id, id, strerror(-err));
+=======
 			      btf_id, id, strerror(errno));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto err_free;
 		}
 	}

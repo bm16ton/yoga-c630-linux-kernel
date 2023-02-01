@@ -8,11 +8,17 @@
 
 /dts-v1/;
 #include "r8a77980.dtsi"
+<<<<<<< HEAD
+#include "condor-common.dtsi"
+=======
 #include <dt-bindings/gpio/gpio.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 / {
 	model = "Renesas Condor board based on r8a77980";
 	compatible = "renesas,condor", "renesas,r8a77980";
+<<<<<<< HEAD
+=======
 
 	aliases {
 		serial0 = &scif0;
@@ -545,4 +551,5 @@
 
 &scif_clk {
 	clock-frequency = <14745600>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

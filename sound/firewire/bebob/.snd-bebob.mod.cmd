@@ -1,0 +1,1 @@
+cmd_sound/firewire/bebob/snd-bebob.mod := printf '%s\n'   bebob_command.o bebob_stream.o bebob_proc.o bebob_midi.o bebob_pcm.o bebob_hwdep.o bebob_terratec.o bebob_yamaha_terratec.o bebob_focusrite.o bebob_maudio.o bebob.o | awk '!x[$$0]++ { print("sound/firewire/bebob/"$$0) }' > sound/firewire/bebob/snd-bebob.mod

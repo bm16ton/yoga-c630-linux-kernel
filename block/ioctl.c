@@ -126,6 +126,7 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, fmode_t mode,
 	uint64_t start, len;
 	uint64_t range[2];
 	int err;
+<<<<<<< HEAD
 
 	if (!(mode & FMODE_WRITE))
 		return -EBADF;
@@ -134,6 +135,16 @@ static int blk_ioctl_secure_erase(struct block_device *bdev, fmode_t mode,
 	if (copy_from_user(range, argp, sizeof(range)))
 		return -EFAULT;
 
+=======
+
+	if (!(mode & FMODE_WRITE))
+		return -EBADF;
+	if (!bdev_max_secure_erase_sectors(bdev))
+		return -EOPNOTSUPP;
+	if (copy_from_user(range, argp, sizeof(range)))
+		return -EFAULT;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	start = range[0];
 	len = range[1];
 	if ((start & 511) || (len & 511))
@@ -467,9 +478,10 @@ static int blkdev_bszset(struct block_device *bdev, fmode_t mode,
  * user space. Note the separate arg/argp parameters that are needed
  * to deal with the compat_ptr() conversion.
  */
-static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
-				unsigned cmd, unsigned long arg, void __user *argp)
+static int blkdev_common_ioctl(struct file *file, fmode_t mode, unsigned cmd,
+			       unsigned long arg, void __user *argp)
 {
+	struct block_device *bdev = I_BDEV(file->f_mapping->host);
 	unsigned int max_sectors;
 
 	switch (cmd) {
@@ -527,7 +539,12 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
 			return -EACCES;
 		if (bdev_is_partition(bdev))
 			return -EINVAL;
+<<<<<<< HEAD
+		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL,
+					    file);
+=======
 		return disk_scan_partitions(bdev->bd_disk, mode & ~FMODE_EXCL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case BLKTRACESTART:
 	case BLKTRACESTOP:
 	case BLKTRACETEARDOWN:
@@ -605,7 +622,7 @@ long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
 		break;
 	}
 
-	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
+	ret = blkdev_common_ioctl(file, mode, cmd, arg, argp);
 	if (ret != -ENOIOCTLCMD)
 		return ret;
 
@@ -674,7 +691,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
 		break;
 	}
 
-	ret = blkdev_common_ioctl(bdev, mode, cmd, arg, argp);
+	ret = blkdev_common_ioctl(file, mode, cmd, arg, argp);
 	if (ret == -ENOIOCTLCMD && disk->fops->compat_ioctl)
 		ret = disk->fops->compat_ioctl(bdev, mode, cmd, arg);
 

@@ -1,0 +1,1 @@
+cmd_drivers/input/misc/pm8941-pwrkey.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/misc/pm8941-pwrkey.ko drivers/input/misc/pm8941-pwrkey.o drivers/input/misc/pm8941-pwrkey.mod.o;  true

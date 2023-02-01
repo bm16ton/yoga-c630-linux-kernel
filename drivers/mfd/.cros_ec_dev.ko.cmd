@@ -1,0 +1,1 @@
+cmd_drivers/mfd/cros_ec_dev.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mfd/cros_ec_dev.ko drivers/mfd/cros_ec_dev.o drivers/mfd/cros_ec_dev.mod.o;  true

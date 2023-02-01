@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/ntc_thermistor.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/ntc_thermistor.ko drivers/hwmon/ntc_thermistor.o drivers/hwmon/ntc_thermistor.mod.o;  true

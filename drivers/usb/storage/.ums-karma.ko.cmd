@@ -1,0 +1,1 @@
+cmd_drivers/usb/storage/ums-karma.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/storage/ums-karma.ko drivers/usb/storage/ums-karma.o drivers/usb/storage/ums-karma.mod.o;  true

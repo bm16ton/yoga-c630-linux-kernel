@@ -1,0 +1,14 @@
+!<thin>
+//                                              138       `
+armada_ap_cp_helper.o/
+armada-37xx-xtal.o/
+armada-37xx-tbg.o/
+armada-37xx-periph.o/
+ap806-system-controller.o/
+cp110-system-controller.o/
+/0              0           0     0     644     2048      `
+/23             0           0     0     644     5400      `
+/43             0           0     0     644     6216      `
+/62             0           0     0     644     37984     `
+/84             0           0     0     644     9752      `
+/111            0           0     0     644     11488     `

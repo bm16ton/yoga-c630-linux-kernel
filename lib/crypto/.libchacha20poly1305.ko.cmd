@@ -1,0 +1,1 @@
+cmd_lib/crypto/libchacha20poly1305.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o lib/crypto/libchacha20poly1305.ko lib/crypto/libchacha20poly1305.o lib/crypto/libchacha20poly1305.mod.o;  true

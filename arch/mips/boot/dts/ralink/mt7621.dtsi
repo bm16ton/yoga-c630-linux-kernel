@@ -33,11 +33,14 @@
 		compatible = "mti,cpu-interrupt-controller";
 	};
 
+<<<<<<< HEAD
+=======
 	aliases {
 		serial0 = &uartlite;
 	};
 
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mmc_fixed_3v3: regulator-3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "mmc_power";
@@ -110,17 +113,28 @@
 			pinctrl-0 = <&i2c_pins>;
 		};
 
+<<<<<<< HEAD
+		memc: memory-controller@5000 {
+=======
 		memc: syscon@5000 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "mediatek,mt7621-memc", "syscon";
 			reg = <0x5000 0x1000>;
 		};
 
+<<<<<<< HEAD
+		serial0: serial@c00 {
+=======
 		uartlite: uartlite@c00 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "ns16550a";
 			reg = <0xc00 0x100>;
 
 			clocks = <&sysc MT7621_CLK_UART1>;
+<<<<<<< HEAD
+=======
 			clock-names = "uart1";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SHARED 26 IRQ_TYPE_LEVEL_HIGH>;
@@ -236,7 +250,11 @@
 		};
 	};
 
+<<<<<<< HEAD
+	mmc: mmc@1e130000 {
+=======
 	sdhci: sdhci@1e130000 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		status = "disabled";
 
 		compatible = "mediatek,mt7620-mmc";
@@ -262,8 +280,13 @@
 		interrupts = <GIC_SHARED 20 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
+<<<<<<< HEAD
+	usb: usb@1e1c0000 {
+		compatible = "mediatek,mt8173-xhci", "mediatek,mtk-xhci";
+=======
 	xhci: xhci@1e1c0000 {
 		compatible = "mediatek,mt8173-xhci";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		reg = <0x1e1c0000 0x1000
 		       0x1e1d0700 0x0100>;
 		reg-names = "mac", "ippc";
@@ -338,23 +361,37 @@
 		gmac1: mac@1 {
 			compatible = "mediatek,eth-mac";
 			reg = <1>;
+<<<<<<< HEAD
+			status = "disabled";
+			phy-mode = "rgmii";
+=======
 			status = "off";
 			phy-mode = "rgmii-rxid";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 
 		mdio: mdio-bus {
 			#address-cells = <1>;
 			#size-cells = <0>;
 
+<<<<<<< HEAD
+			switch0: switch@1f {
+				compatible = "mediatek,mt7621";
+				reg = <0x1f>;
+=======
 			switch0: switch0@0 {
 				compatible = "mediatek,mt7621";
 				reg = <0>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				mediatek,mcm;
 				resets = <&sysc MT7621_RST_MCM>;
 				reset-names = "mcm";
 				interrupt-controller;
 				#interrupt-cells = <1>;
+<<<<<<< HEAD
+=======
 				interrupt-parent = <&gic>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				interrupts = <GIC_SHARED 23 IRQ_TYPE_LEVEL_HIGH>;
 
 				ports {
@@ -362,31 +399,51 @@
 					#size-cells = <0>;
 
 					port@0 {
+<<<<<<< HEAD
+						status = "disabled";
+=======
 						status = "off";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						reg = <0>;
 						label = "lan0";
 					};
 
 					port@1 {
+<<<<<<< HEAD
+						status = "disabled";
+=======
 						status = "off";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						reg = <1>;
 						label = "lan1";
 					};
 
 					port@2 {
+<<<<<<< HEAD
+						status = "disabled";
+=======
 						status = "off";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						reg = <2>;
 						label = "lan2";
 					};
 
 					port@3 {
+<<<<<<< HEAD
+						status = "disabled";
+=======
 						status = "off";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						reg = <3>;
 						label = "lan3";
 					};
 
 					port@4 {
+<<<<<<< HEAD
+						status = "disabled";
+=======
 						status = "off";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						reg = <4>;
 						label = "lan4";
 					};

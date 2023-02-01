@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/fealnx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/fealnx.ko drivers/net/ethernet/fealnx.o drivers/net/ethernet/fealnx.mod.o;  true

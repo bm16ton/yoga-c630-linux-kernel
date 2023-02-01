@@ -1,0 +1,2 @@
+drivers/net/ethernet/apm/xgene/xgene-enet.ko
+drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.ko

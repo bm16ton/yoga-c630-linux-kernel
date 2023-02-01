@@ -1,0 +1,1 @@
+cmd_drivers/power/supply/qcom_smbb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/power/supply/qcom_smbb.ko drivers/power/supply/qcom_smbb.o drivers/power/supply/qcom_smbb.mod.o;  true

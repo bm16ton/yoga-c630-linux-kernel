@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/smscufx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/fbdev/smscufx.ko drivers/video/fbdev/smscufx.o drivers/video/fbdev/smscufx.mod.o;  true

@@ -1,0 +1,6 @@
+drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.ko
+drivers/iio/common/cros_ec_sensors/cros_ec_sensors.ko
+drivers/iio/common/ms_sensors/ms_sensors_i2c.ko
+drivers/iio/common/st_sensors/st_sensors_i2c.ko
+drivers/iio/common/st_sensors/st_sensors_spi.ko
+drivers/iio/common/st_sensors/st_sensors.ko

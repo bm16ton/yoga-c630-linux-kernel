@@ -35,6 +35,11 @@ properties:
       - samsung,exynosautov9-cmu-top
       - samsung,exynosautov9-cmu-busmc
       - samsung,exynosautov9-cmu-core
+<<<<<<< HEAD
+      - samsung,exynosautov9-cmu-fsys0
+      - samsung,exynosautov9-cmu-fsys1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - samsung,exynosautov9-cmu-fsys2
       - samsung,exynosautov9-cmu-peric0
       - samsung,exynosautov9-cmu-peric1
@@ -111,6 +116,51 @@ allOf:
       properties:
         compatible:
           contains:
+<<<<<<< HEAD
+            const: samsung,exynosautov9-cmu-fsys0
+
+    then:
+      properties:
+        clocks:
+          items:
+            - description: External reference clock (26 MHz)
+            - description: CMU_FSYS0 bus clock (from CMU_TOP)
+            - description: CMU_FSYS0 pcie clock (from CMU_TOP)
+
+        clock-names:
+          items:
+            - const: oscclk
+            - const: dout_clkcmu_fsys0_bus
+            - const: dout_clkcmu_fsys0_pcie
+
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: samsung,exynosautov9-cmu-fsys1
+
+    then:
+      properties:
+        clocks:
+          items:
+            - description: External reference clock (26 MHz)
+            - description: CMU_FSYS1 bus clock (from CMU_TOP)
+            - description: CMU_FSYS1 mmc card clock (from CMU_TOP)
+            - description: CMU_FSYS1 usb clock (from CMU_TOP)
+
+        clock-names:
+          items:
+            - const: oscclk
+            - const: dout_clkcmu_fsys1_bus
+            - const: gout_clkcmu_fsys1_mmc_card
+            - const: dout_clkcmu_fsys1_usbdrd
+
+  - if:
+      properties:
+        compatible:
+          contains:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             const: samsung,exynosautov9-cmu-fsys2
 
     then:

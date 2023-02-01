@@ -1,0 +1,1 @@
+cmd_drivers/iio/buffer/industrialio-buffer-dma.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/buffer/industrialio-buffer-dma.ko drivers/iio/buffer/industrialio-buffer-dma.o drivers/iio/buffer/industrialio-buffer-dma.mod.o;  true

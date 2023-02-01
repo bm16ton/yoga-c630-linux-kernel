@@ -1,0 +1,1 @@
+cmd_drivers/regulator/vctrl-regulator.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/regulator/vctrl-regulator.ko drivers/regulator/vctrl-regulator.o drivers/regulator/vctrl-regulator.mod.o;  true

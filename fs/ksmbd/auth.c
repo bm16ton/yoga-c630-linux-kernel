@@ -322,7 +322,12 @@ int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
 	dn_off = le32_to_cpu(authblob->DomainName.BufferOffset);
 	dn_len = le16_to_cpu(authblob->DomainName.Length);
 
+<<<<<<< HEAD
+	if (blob_len < (u64)dn_off + dn_len || blob_len < (u64)nt_off + nt_len ||
+	    nt_len < CIFS_ENCPWD_SIZE)
+=======
 	if (blob_len < (u64)dn_off + dn_len || blob_len < (u64)nt_off + nt_len)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	/* TODO : use domain name that imported from configuration file */
@@ -424,6 +429,12 @@ ksmbd_build_ntlmssp_challenge_blob(struct challenge_message *chgblob,
 				   NTLMSSP_NEGOTIATE_56);
 	}
 
+<<<<<<< HEAD
+	if (cflags & NTLMSSP_NEGOTIATE_SEAL && smb3_encryption_negotiated(conn))
+		flags |= NTLMSSP_NEGOTIATE_SEAL;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (cflags & NTLMSSP_NEGOTIATE_ALWAYS_SIGN)
 		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
 
@@ -984,13 +995,24 @@ out:
 	return rc;
 }
 
+<<<<<<< HEAD
+static int ksmbd_get_encryption_key(struct ksmbd_work *work, __u64 ses_id,
+=======
 static int ksmbd_get_encryption_key(struct ksmbd_conn *conn, __u64 ses_id,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				    int enc, u8 *key)
 {
 	struct ksmbd_session *sess;
 	u8 *ses_enc_key;
 
+<<<<<<< HEAD
+	if (enc)
+		sess = work->sess;
+	else
+		sess = ksmbd_session_lookup_all(work->conn, ses_id);
+=======
 	sess = ksmbd_session_lookup_all(conn, ses_id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!sess)
 		return -EINVAL;
 
@@ -1078,9 +1100,16 @@ static struct scatterlist *ksmbd_init_sg(struct kvec *iov, unsigned int nvec,
 	return sg;
 }
 
+<<<<<<< HEAD
+int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
+			unsigned int nvec, int enc)
+{
+	struct ksmbd_conn *conn = work->conn;
+=======
 int ksmbd_crypt_message(struct ksmbd_conn *conn, struct kvec *iov,
 			unsigned int nvec, int enc)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct smb2_transform_hdr *tr_hdr = smb2_get_msg(iov[0].iov_base);
 	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 20;
 	int rc;
@@ -1094,7 +1123,11 @@ int ksmbd_crypt_message(struct ksmbd_conn *conn, struct kvec *iov,
 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
 	struct ksmbd_crypto_ctx *ctx;
 
+<<<<<<< HEAD
+	rc = ksmbd_get_encryption_key(work,
+=======
 	rc = ksmbd_get_encryption_key(conn,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				      le64_to_cpu(tr_hdr->SessionId),
 				      enc,
 				      key);

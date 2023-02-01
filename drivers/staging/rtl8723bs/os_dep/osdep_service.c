@@ -108,6 +108,8 @@ RETURN:
 	return;
 }
 
+<<<<<<< HEAD
+=======
 int rtw_change_ifname(struct adapter *padapter, const char *ifname)
 {
 	struct net_device *pnetdev;
@@ -158,6 +160,7 @@ error:
 	return -1;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtw_buf_free(u8 **buf, u32 *buf_len)
 {
 	if (!buf || !buf_len)

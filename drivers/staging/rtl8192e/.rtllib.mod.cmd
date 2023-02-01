@@ -1,0 +1,1 @@
+cmd_drivers/staging/rtl8192e/rtllib.mod := printf '%s\n'   dot11d.o rtllib_module.o rtllib_rx.o rtllib_tx.o rtllib_wx.o rtllib_softmac.o rtllib_softmac_wx.o rtl819x_BAProc.o rtl819x_HTProc.o rtl819x_TSProc.o | awk '!x[$$0]++ { print("drivers/staging/rtl8192e/"$$0) }' > drivers/staging/rtl8192e/rtllib.mod

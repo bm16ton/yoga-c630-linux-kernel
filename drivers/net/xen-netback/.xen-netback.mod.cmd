@@ -1,0 +1,1 @@
+cmd_drivers/net/xen-netback/xen-netback.mod := printf '%s\n'   netback.o xenbus.o interface.o hash.o rx.o | awk '!x[$$0]++ { print("drivers/net/xen-netback/"$$0) }' > drivers/net/xen-netback/xen-netback.mod

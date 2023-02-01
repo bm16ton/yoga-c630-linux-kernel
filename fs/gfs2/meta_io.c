@@ -525,8 +525,12 @@ struct buffer_head *gfs2_meta_ra(struct gfs2_glock *gl, u64 dblock, u32 extlen)
 
 	if (buffer_uptodate(first_bh))
 		goto out;
+<<<<<<< HEAD
+	bh_read_nowait(first_bh, REQ_META | REQ_PRIO);
+=======
 	if (!buffer_locked(first_bh))
 		ll_rw_block(REQ_OP_READ | REQ_META | REQ_PRIO, 1, &first_bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dblock++;
 	extlen--;
@@ -534,9 +538,13 @@ struct buffer_head *gfs2_meta_ra(struct gfs2_glock *gl, u64 dblock, u32 extlen)
 	while (extlen) {
 		bh = gfs2_getbuf(gl, dblock, CREATE);
 
+<<<<<<< HEAD
+		bh_readahead(bh, REQ_RAHEAD | REQ_META | REQ_PRIO);
+=======
 		if (!buffer_uptodate(bh) && !buffer_locked(bh))
 			ll_rw_block(REQ_OP_READ | REQ_RAHEAD | REQ_META |
 				    REQ_PRIO, 1, &bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		brelse(bh);
 		dblock++;
 		extlen--;

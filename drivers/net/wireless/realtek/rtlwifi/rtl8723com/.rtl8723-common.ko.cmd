@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8723com/rtl8723-common.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/realtek/rtlwifi/rtl8723com/rtl8723-common.ko drivers/net/wireless/realtek/rtlwifi/rtl8723com/rtl8723-common.o drivers/net/wireless/realtek/rtlwifi/rtl8723com/rtl8723-common.mod.o;  true

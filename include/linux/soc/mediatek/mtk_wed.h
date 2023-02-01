@@ -11,9 +11,21 @@
 struct mtk_wed_hw;
 struct mtk_wdma_desc;
 
+<<<<<<< HEAD
+enum mtk_wed_bus_tye {
+	MTK_WED_BUS_PCIE,
+	MTK_WED_BUS_AXI,
+};
+
 struct mtk_wed_ring {
 	struct mtk_wdma_desc *desc;
 	dma_addr_t desc_phys;
+	u32 desc_size;
+=======
+struct mtk_wed_ring {
+	struct mtk_wdma_desc *desc;
+	dma_addr_t desc_phys;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int size;
 
 	u32 reg_base;
@@ -42,13 +54,33 @@ struct mtk_wed_device {
 
 	/* filled by driver: */
 	struct {
+<<<<<<< HEAD
+		union {
+			struct platform_device *platform_dev;
+			struct pci_dev *pci_dev;
+		};
+		enum mtk_wed_bus_tye bus_type;
+
+		u32 wpdma_phys;
+		u32 wpdma_int;
+		u32 wpdma_mask;
+		u32 wpdma_tx;
+		u32 wpdma_txfree;
+=======
 		struct pci_dev *pci_dev;
 
 		u32 wpdma_phys;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		u16 token_start;
 		unsigned int nbuf;
 
+<<<<<<< HEAD
+		u8 tx_tbit[MTK_WED_TX_QUEUES];
+		u8 txfree_tbit;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		u32 (*init_buf)(void *ptr, dma_addr_t phys, int token_id);
 		int (*offload_enable)(struct mtk_wed_device *wed);
 		void (*offload_disable)(struct mtk_wed_device *wed);

@@ -634,6 +634,8 @@ void rtw_get_sec_ie(u8 *in_ie, uint in_len, u8 *rsn_ie, u16 *rsn_len, u8 *wpa_ie
 	}
 }
 
+<<<<<<< HEAD
+=======
 u8 rtw_is_wps_ie(u8 *ie_ptr, uint *wps_ielen)
 {
 	u8 match = false;
@@ -651,6 +653,7 @@ u8 rtw_is_wps_ie(u8 *ie_ptr, uint *wps_ielen)
 	return match;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * rtw_get_wps_ie - Search WPS IE from a series of IEs
  * @in_ie: Address of IEs to search

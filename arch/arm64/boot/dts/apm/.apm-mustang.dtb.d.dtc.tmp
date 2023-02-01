@@ -1,0 +1,1 @@
+arch/arm64/boot/dts/apm/apm-mustang.dtb: arch/arm64/boot/dts/apm/.apm-mustang.dtb.dts.tmp arch/arm64/boot/dts/apm/apm-storm.dtsi

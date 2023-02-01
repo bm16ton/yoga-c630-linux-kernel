@@ -29,6 +29,11 @@ static bool running_exclusive_ctxs;
 static DEFINE_MUTEX(damon_ops_lock);
 static struct damon_operations damon_registered_ops[NR_DAMON_OPS];
 
+<<<<<<< HEAD
+static struct kmem_cache *damon_region_cache __ro_after_init;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Should be called under damon_ops_lock with id smaller than NR_DAMON_OPS */
 static bool __damon_is_registered_ops(enum damon_ops_id id)
 {
@@ -119,7 +124,11 @@ struct damon_region *damon_new_region(unsigned long start, unsigned long end)
 {
 	struct damon_region *region;
 
+<<<<<<< HEAD
+	region = kmem_cache_alloc(damon_region_cache, GFP_KERNEL);
+=======
 	region = kmalloc(sizeof(*region), GFP_KERNEL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!region)
 		return NULL;
 
@@ -148,7 +157,11 @@ static void damon_del_region(struct damon_region *r, struct damon_target *t)
 
 static void damon_free_region(struct damon_region *r)
 {
+<<<<<<< HEAD
+	kmem_cache_free(damon_region_cache, r);
+=======
 	kfree(r);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void damon_destroy_region(struct damon_region *r, struct damon_target *t)
@@ -169,6 +182,33 @@ static bool damon_intersect(struct damon_region *r,
 }
 
 /*
+<<<<<<< HEAD
+ * Fill holes in regions with new regions.
+ */
+static int damon_fill_regions_holes(struct damon_region *first,
+		struct damon_region *last, struct damon_target *t)
+{
+	struct damon_region *r = first;
+
+	damon_for_each_region_from(r, t) {
+		struct damon_region *next, *newr;
+
+		if (r == last)
+			break;
+		next = damon_next_region(r);
+		if (r->ar.end != next->ar.start) {
+			newr = damon_new_region(r->ar.end, next->ar.start);
+			if (!newr)
+				return -ENOMEM;
+			damon_insert_region(newr, r, next, t);
+		}
+	}
+	return 0;
+}
+
+/*
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * damon_set_regions() - Set regions of a target for given address ranges.
  * @t:		the given target.
  * @ranges:	array of new monitoring target ranges.
@@ -184,6 +224,10 @@ int damon_set_regions(struct damon_target *t, struct damon_addr_range *ranges,
 {
 	struct damon_region *r, *next;
 	unsigned int i;
+<<<<<<< HEAD
+	int err;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Remove regions which are not in the new ranges */
 	damon_for_each_region_safe(r, next, t) {
@@ -195,6 +239,10 @@ int damon_set_regions(struct damon_target *t, struct damon_addr_range *ranges,
 			damon_destroy_region(r, t);
 	}
 
+<<<<<<< HEAD
+	r = damon_first_region(t);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Add new regions or resize existing regions to fit in the ranges */
 	for (i = 0; i < nr_ranges; i++) {
 		struct damon_region *first = NULL, *last, *newr;
@@ -202,7 +250,11 @@ int damon_set_regions(struct damon_target *t, struct damon_addr_range *ranges,
 
 		range = &ranges[i];
 		/* Get the first/last regions intersecting with the range */
+<<<<<<< HEAD
+		damon_for_each_region_from(r, t) {
+=======
 		damon_for_each_region(r, t) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (damon_intersect(r, range)) {
 				if (!first)
 					first = r;
@@ -225,11 +277,35 @@ int damon_set_regions(struct damon_target *t, struct damon_addr_range *ranges,
 			first->ar.start = ALIGN_DOWN(range->start,
 					DAMON_MIN_REGION);
 			last->ar.end = ALIGN(range->end, DAMON_MIN_REGION);
+<<<<<<< HEAD
+
+			/* fill possible holes in the range */
+			err = damon_fill_regions_holes(first, last, t);
+			if (err)
+				return err;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 	return 0;
 }
 
+<<<<<<< HEAD
+/* initialize private fields of damos_quota and return the pointer */
+static struct damos_quota *damos_quota_init_priv(struct damos_quota *quota)
+{
+	quota->total_charged_sz = 0;
+	quota->total_charged_ns = 0;
+	quota->esz = 0;
+	quota->charged_sz = 0;
+	quota->charged_from = 0;
+	quota->charge_target_from = NULL;
+	quota->charge_addr_from = 0;
+	return quota;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct damos *damon_new_scheme(struct damos_access_pattern *pattern,
 			enum damos_action action, struct damos_quota *quota,
 			struct damos_watermarks *wmarks)
@@ -239,16 +315,25 @@ struct damos *damon_new_scheme(struct damos_access_pattern *pattern,
 	scheme = kmalloc(sizeof(*scheme), GFP_KERNEL);
 	if (!scheme)
 		return NULL;
+<<<<<<< HEAD
+	scheme->pattern = *pattern;
+=======
 	scheme->pattern.min_sz_region = pattern->min_sz_region;
 	scheme->pattern.max_sz_region = pattern->max_sz_region;
 	scheme->pattern.min_nr_accesses = pattern->min_nr_accesses;
 	scheme->pattern.max_nr_accesses = pattern->max_nr_accesses;
 	scheme->pattern.min_age_region = pattern->min_age_region;
 	scheme->pattern.max_age_region = pattern->max_age_region;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	scheme->action = action;
 	scheme->stat = (struct damos_stat){};
 	INIT_LIST_HEAD(&scheme->list);
 
+<<<<<<< HEAD
+	scheme->quota = *(damos_quota_init_priv(quota));
+
+	scheme->wmarks = *wmarks;
+=======
 	scheme->quota.ms = quota->ms;
 	scheme->quota.sz = quota->sz;
 	scheme->quota.reset_interval = quota->reset_interval;
@@ -268,6 +353,7 @@ struct damos *damon_new_scheme(struct damos_access_pattern *pattern,
 	scheme->wmarks.high = wmarks->high;
 	scheme->wmarks.mid = wmarks->mid;
 	scheme->wmarks.low = wmarks->low;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	scheme->wmarks.activated = true;
 
 	return scheme;
@@ -310,6 +396,10 @@ struct damon_target *damon_new_target(void)
 	t->pid = NULL;
 	t->nr_regions = 0;
 	INIT_LIST_HEAD(&t->regions_list);
+<<<<<<< HEAD
+	INIT_LIST_HEAD(&t->list);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return t;
 }
@@ -357,17 +447,28 @@ struct damon_ctx *damon_new_ctx(void)
 	if (!ctx)
 		return NULL;
 
+<<<<<<< HEAD
+	ctx->attrs.sample_interval = 5 * 1000;
+	ctx->attrs.aggr_interval = 100 * 1000;
+	ctx->attrs.ops_update_interval = 60 * 1000 * 1000;
+=======
 	ctx->sample_interval = 5 * 1000;
 	ctx->aggr_interval = 100 * 1000;
 	ctx->ops_update_interval = 60 * 1000 * 1000;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ktime_get_coarse_ts64(&ctx->last_aggregation);
 	ctx->last_ops_update = ctx->last_aggregation;
 
 	mutex_init(&ctx->kdamond_lock);
 
+<<<<<<< HEAD
+	ctx->attrs.min_nr_regions = 10;
+	ctx->attrs.max_nr_regions = 1000;
+=======
 	ctx->min_nr_regions = 10;
 	ctx->max_nr_regions = 1000;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	INIT_LIST_HEAD(&ctx->adaptive_targets);
 	INIT_LIST_HEAD(&ctx->schemes);
@@ -403,17 +504,31 @@ void damon_destroy_ctx(struct damon_ctx *ctx)
 /**
  * damon_set_attrs() - Set attributes for the monitoring.
  * @ctx:		monitoring context
+<<<<<<< HEAD
+ * @attrs:		monitoring attributes
+=======
  * @sample_int:		time interval between samplings
  * @aggr_int:		time interval between aggregations
  * @ops_upd_int:	time interval between monitoring operations updates
  * @min_nr_reg:		minimal number of regions
  * @max_nr_reg:		maximum number of regions
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * This function should not be called while the kdamond is running.
  * Every time interval is in micro-seconds.
  *
  * Return: 0 on success, negative error code otherwise.
  */
+<<<<<<< HEAD
+int damon_set_attrs(struct damon_ctx *ctx, struct damon_attrs *attrs)
+{
+	if (attrs->min_nr_regions < 3)
+		return -EINVAL;
+	if (attrs->min_nr_regions > attrs->max_nr_regions)
+		return -EINVAL;
+
+	ctx->attrs = *attrs;
+=======
 int damon_set_attrs(struct damon_ctx *ctx, unsigned long sample_int,
 		    unsigned long aggr_int, unsigned long ops_upd_int,
 		    unsigned long min_nr_reg, unsigned long max_nr_reg)
@@ -429,6 +544,7 @@ int damon_set_attrs(struct damon_ctx *ctx, unsigned long sample_int,
 	ctx->min_nr_regions = min_nr_reg;
 	ctx->max_nr_regions = max_nr_reg;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -440,10 +556,15 @@ int damon_set_attrs(struct damon_ctx *ctx, unsigned long sample_int,
  *
  * This function should not be called while the kdamond of the context is
  * running.
+<<<<<<< HEAD
+ */
+void damon_set_schemes(struct damon_ctx *ctx, struct damos **schemes,
+=======
  *
  * Return: 0 if success, or negative error code otherwise.
  */
 int damon_set_schemes(struct damon_ctx *ctx, struct damos **schemes,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ssize_t nr_schemes)
 {
 	struct damos *s, *next;
@@ -453,7 +574,10 @@ int damon_set_schemes(struct damon_ctx *ctx, struct damos **schemes,
 		damon_destroy_scheme(s);
 	for (i = 0; i < nr_schemes; i++)
 		damon_add_scheme(ctx, schemes[i]);
+<<<<<<< HEAD
+=======
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -479,11 +603,19 @@ static unsigned long damon_region_sz_limit(struct damon_ctx *ctx)
 
 	damon_for_each_target(t, ctx) {
 		damon_for_each_region(r, t)
+<<<<<<< HEAD
+			sz += damon_sz_region(r);
+	}
+
+	if (ctx->attrs.min_nr_regions)
+		sz /= ctx->attrs.min_nr_regions;
+=======
 			sz += r->ar.end - r->ar.start;
 	}
 
 	if (ctx->min_nr_regions)
 		sz /= ctx->min_nr_regions;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (sz < DAMON_MIN_REGION)
 		sz = DAMON_MIN_REGION;
 
@@ -632,7 +764,11 @@ static bool damon_check_reset_time_interval(struct timespec64 *baseline,
 static bool kdamond_aggregate_interval_passed(struct damon_ctx *ctx)
 {
 	return damon_check_reset_time_interval(&ctx->last_aggregation,
+<<<<<<< HEAD
+			ctx->attrs.aggr_interval);
+=======
 			ctx->aggr_interval);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -655,15 +791,24 @@ static void kdamond_reset_aggregated(struct damon_ctx *c)
 	}
 }
 
+<<<<<<< HEAD
+static void damon_split_region_at(struct damon_target *t,
+				  struct damon_region *r, unsigned long sz_r);
+=======
 static void damon_split_region_at(struct damon_ctx *ctx,
 		struct damon_target *t, struct damon_region *r,
 		unsigned long sz_r);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static bool __damos_valid_target(struct damon_region *r, struct damos *s)
 {
 	unsigned long sz;
 
+<<<<<<< HEAD
+	sz = damon_sz_region(r);
+=======
 	sz = r->ar.end - r->ar.start;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return s->pattern.min_sz_region <= sz &&
 		sz <= s->pattern.max_sz_region &&
 		s->pattern.min_nr_accesses <= r->nr_accesses &&
@@ -691,7 +836,11 @@ static void damon_do_apply_schemes(struct damon_ctx *c,
 
 	damon_for_each_scheme(s, c) {
 		struct damos_quota *quota = &s->quota;
+<<<<<<< HEAD
+		unsigned long sz = damon_sz_region(r);
+=======
 		unsigned long sz = r->ar.end - r->ar.start;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct timespec64 begin, end;
 		unsigned long sz_applied = 0;
 
@@ -720,6 +869,16 @@ static void damon_do_apply_schemes(struct damon_ctx *c,
 				sz = ALIGN_DOWN(quota->charge_addr_from -
 						r->ar.start, DAMON_MIN_REGION);
 				if (!sz) {
+<<<<<<< HEAD
+					if (damon_sz_region(r) <=
+					    DAMON_MIN_REGION)
+						continue;
+					sz = DAMON_MIN_REGION;
+				}
+				damon_split_region_at(t, r, sz);
+				r = damon_next_region(r);
+				sz = damon_sz_region(r);
+=======
 					if (r->ar.end - r->ar.start <=
 							DAMON_MIN_REGION)
 						continue;
@@ -728,6 +887,7 @@ static void damon_do_apply_schemes(struct damon_ctx *c,
 				damon_split_region_at(c, t, r, sz);
 				r = damon_next_region(r);
 				sz = r->ar.end - r->ar.start;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			quota->charge_target_from = NULL;
 			quota->charge_addr_from = 0;
@@ -744,7 +904,11 @@ static void damon_do_apply_schemes(struct damon_ctx *c,
 						DAMON_MIN_REGION);
 				if (!sz)
 					goto update_stat;
+<<<<<<< HEAD
+				damon_split_region_at(t, r, sz);
+=======
 				damon_split_region_at(c, t, r, sz);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			ktime_get_coarse_ts64(&begin);
 			sz_applied = c->ops.apply_scheme(c, t, r, s);
@@ -832,8 +996,12 @@ static void kdamond_apply_schemes(struct damon_ctx *c)
 					continue;
 				score = c->ops.get_scheme_score(
 						c, t, r, s);
+<<<<<<< HEAD
+				quota->histogram[score] += damon_sz_region(r);
+=======
 				quota->histogram[score] +=
 					r->ar.end - r->ar.start;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				if (score > max_score)
 					max_score = score;
 			}
@@ -854,18 +1022,25 @@ static void kdamond_apply_schemes(struct damon_ctx *c)
 	}
 }
 
+<<<<<<< HEAD
+=======
 static inline unsigned long sz_damon_region(struct damon_region *r)
 {
 	return r->ar.end - r->ar.start;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Merge two adjacent regions into one region
  */
 static void damon_merge_two_regions(struct damon_target *t,
 		struct damon_region *l, struct damon_region *r)
 {
+<<<<<<< HEAD
+	unsigned long sz_l = damon_sz_region(l), sz_r = damon_sz_region(r);
+=======
 	unsigned long sz_l = sz_damon_region(l), sz_r = sz_damon_region(r);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	l->nr_accesses = (l->nr_accesses * sz_l + r->nr_accesses * sz_r) /
 			(sz_l + sz_r);
@@ -894,7 +1069,11 @@ static void damon_merge_regions_of(struct damon_target *t, unsigned int thres,
 
 		if (prev && prev->ar.end == r->ar.start &&
 		    abs(prev->nr_accesses - r->nr_accesses) <= thres &&
+<<<<<<< HEAD
+		    damon_sz_region(prev) + damon_sz_region(r) <= sz_limit)
+=======
 		    sz_damon_region(prev) + sz_damon_region(r) <= sz_limit)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			damon_merge_two_regions(t, prev, r);
 		else
 			prev = r;
@@ -927,9 +1106,14 @@ static void kdamond_merge_regions(struct damon_ctx *c, unsigned int threshold,
  * r		the region to be split
  * sz_r		size of the first sub-region that will be made
  */
+<<<<<<< HEAD
+static void damon_split_region_at(struct damon_target *t,
+				  struct damon_region *r, unsigned long sz_r)
+=======
 static void damon_split_region_at(struct damon_ctx *ctx,
 		struct damon_target *t, struct damon_region *r,
 		unsigned long sz_r)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct damon_region *new;
 
@@ -946,15 +1130,23 @@ static void damon_split_region_at(struct damon_ctx *ctx,
 }
 
 /* Split every region in the given target into 'nr_subs' regions */
+<<<<<<< HEAD
+static void damon_split_regions_of(struct damon_target *t, int nr_subs)
+=======
 static void damon_split_regions_of(struct damon_ctx *ctx,
 				     struct damon_target *t, int nr_subs)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct damon_region *r, *next;
 	unsigned long sz_region, sz_sub = 0;
 	int i;
 
 	damon_for_each_region_safe(r, next, t) {
+<<<<<<< HEAD
+		sz_region = damon_sz_region(r);
+=======
 		sz_region = r->ar.end - r->ar.start;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		for (i = 0; i < nr_subs - 1 &&
 				sz_region > 2 * DAMON_MIN_REGION; i++) {
@@ -968,7 +1160,11 @@ static void damon_split_regions_of(struct damon_ctx *ctx,
 			if (sz_sub == 0 || sz_sub >= sz_region)
 				continue;
 
+<<<<<<< HEAD
+			damon_split_region_at(t, r, sz_sub);
+=======
 			damon_split_region_at(ctx, t, r, sz_sub);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			sz_region = sz_sub;
 		}
 	}
@@ -994,16 +1190,28 @@ static void kdamond_split_regions(struct damon_ctx *ctx)
 	damon_for_each_target(t, ctx)
 		nr_regions += damon_nr_regions(t);
 
+<<<<<<< HEAD
+	if (nr_regions > ctx->attrs.max_nr_regions / 2)
+=======
 	if (nr_regions > ctx->max_nr_regions / 2)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	/* Maybe the middle of the region has different access frequency */
 	if (last_nr_regions == nr_regions &&
+<<<<<<< HEAD
+			nr_regions < ctx->attrs.max_nr_regions / 3)
+		nr_subregions = 3;
+
+	damon_for_each_target(t, ctx)
+		damon_split_regions_of(t, nr_subregions);
+=======
 			nr_regions < ctx->max_nr_regions / 3)
 		nr_subregions = 3;
 
 	damon_for_each_target(t, ctx)
 		damon_split_regions_of(ctx, t, nr_subregions);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	last_nr_regions = nr_regions;
 }
@@ -1017,7 +1225,11 @@ static void kdamond_split_regions(struct damon_ctx *ctx)
 static bool kdamond_need_update_operations(struct damon_ctx *ctx)
 {
 	return damon_check_reset_time_interval(&ctx->last_ops_update,
+<<<<<<< HEAD
+			ctx->attrs.ops_update_interval);
+=======
 			ctx->ops_update_interval);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -1141,13 +1353,25 @@ static int kdamond_fn(void *data)
 	struct damon_region *r, *next;
 	unsigned int max_nr_accesses = 0;
 	unsigned long sz_limit = 0;
+<<<<<<< HEAD
+=======
 	bool done = false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pr_debug("kdamond (%d) starts\n", current->pid);
 
 	if (ctx->ops.init)
 		ctx->ops.init(ctx);
 	if (ctx->callback.before_start && ctx->callback.before_start(ctx))
+<<<<<<< HEAD
+		goto done;
+
+	sz_limit = damon_region_sz_limit(ctx);
+
+	while (!kdamond_need_stop(ctx)) {
+		if (kdamond_wait_activation(ctx))
+			break;
+=======
 		done = true;
 
 	sz_limit = damon_region_sz_limit(ctx);
@@ -1157,16 +1381,24 @@ static int kdamond_fn(void *data)
 			done = true;
 			continue;
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (ctx->ops.prepare_access_checks)
 			ctx->ops.prepare_access_checks(ctx);
 		if (ctx->callback.after_sampling &&
+<<<<<<< HEAD
+				ctx->callback.after_sampling(ctx))
+			break;
+
+		kdamond_usleep(ctx->attrs.sample_interval);
+=======
 				ctx->callback.after_sampling(ctx)) {
 			done = true;
 			continue;
 		}
 
 		kdamond_usleep(ctx->sample_interval);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (ctx->ops.check_accesses)
 			max_nr_accesses = ctx->ops.check_accesses(ctx);
@@ -1176,10 +1408,15 @@ static int kdamond_fn(void *data)
 					max_nr_accesses / 10,
 					sz_limit);
 			if (ctx->callback.after_aggregation &&
+<<<<<<< HEAD
+					ctx->callback.after_aggregation(ctx))
+				break;
+=======
 					ctx->callback.after_aggregation(ctx)) {
 				done = true;
 				continue;
 			}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			kdamond_apply_schemes(ctx);
 			kdamond_reset_aggregated(ctx);
 			kdamond_split_regions(ctx);
@@ -1193,6 +1430,10 @@ static int kdamond_fn(void *data)
 			sz_limit = damon_region_sz_limit(ctx);
 		}
 	}
+<<<<<<< HEAD
+done:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	damon_for_each_target(t, ctx) {
 		damon_for_each_region_safe(r, next, t)
 			damon_destroy_region(r, t);
@@ -1217,4 +1458,93 @@ static int kdamond_fn(void *data)
 	return 0;
 }
 
+<<<<<<< HEAD
+/*
+ * struct damon_system_ram_region - System RAM resource address region of
+ *				    [@start, @end).
+ * @start:	Start address of the region (inclusive).
+ * @end:	End address of the region (exclusive).
+ */
+struct damon_system_ram_region {
+	unsigned long start;
+	unsigned long end;
+};
+
+static int walk_system_ram(struct resource *res, void *arg)
+{
+	struct damon_system_ram_region *a = arg;
+
+	if (a->end - a->start < resource_size(res)) {
+		a->start = res->start;
+		a->end = res->end;
+	}
+	return 0;
+}
+
+/*
+ * Find biggest 'System RAM' resource and store its start and end address in
+ * @start and @end, respectively.  If no System RAM is found, returns false.
+ */
+static bool damon_find_biggest_system_ram(unsigned long *start,
+						unsigned long *end)
+
+{
+	struct damon_system_ram_region arg = {};
+
+	walk_system_ram_res(0, ULONG_MAX, &arg, walk_system_ram);
+	if (arg.end <= arg.start)
+		return false;
+
+	*start = arg.start;
+	*end = arg.end;
+	return true;
+}
+
+/**
+ * damon_set_region_biggest_system_ram_default() - Set the region of the given
+ * monitoring target as requested, or biggest 'System RAM'.
+ * @t:		The monitoring target to set the region.
+ * @start:	The pointer to the start address of the region.
+ * @end:	The pointer to the end address of the region.
+ *
+ * This function sets the region of @t as requested by @start and @end.  If the
+ * values of @start and @end are zero, however, this function finds the biggest
+ * 'System RAM' resource and sets the region to cover the resource.  In the
+ * latter case, this function saves the start and end addresses of the resource
+ * in @start and @end, respectively.
+ *
+ * Return: 0 on success, negative error code otherwise.
+ */
+int damon_set_region_biggest_system_ram_default(struct damon_target *t,
+			unsigned long *start, unsigned long *end)
+{
+	struct damon_addr_range addr_range;
+
+	if (*start > *end)
+		return -EINVAL;
+
+	if (!*start && !*end &&
+		!damon_find_biggest_system_ram(start, end))
+		return -EINVAL;
+
+	addr_range.start = *start;
+	addr_range.end = *end;
+	return damon_set_regions(t, &addr_range, 1);
+}
+
+static int __init damon_init(void)
+{
+	damon_region_cache = KMEM_CACHE(damon_region, 0);
+	if (unlikely(!damon_region_cache)) {
+		pr_err("creating damon_region_cache fails\n");
+		return -ENOMEM;
+	}
+
+	return 0;
+}
+
+subsys_initcall(damon_init);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "core-test.h"

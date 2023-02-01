@@ -498,7 +498,11 @@ static u32 bdw_vgpu_get_dp_bitrate(struct intel_vgpu *vgpu, enum port port)
 
 		switch (wrpll_ctl & WRPLL_REF_MASK) {
 		case WRPLL_REF_PCH_SSC:
+<<<<<<< HEAD
+			refclk = vgpu->gvt->gt->i915->display.dpll.ref_clks.ssc;
+=======
 			refclk = vgpu->gvt->gt->i915->dpll.ref_clks.ssc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 		case WRPLL_REF_LCPLL:
 			refclk = 2700000;
@@ -529,7 +533,11 @@ out:
 static u32 bxt_vgpu_get_dp_bitrate(struct intel_vgpu *vgpu, enum port port)
 {
 	u32 dp_br = 0;
+<<<<<<< HEAD
+	int refclk = vgpu->gvt->gt->i915->display.dpll.ref_clks.nssc;
+=======
 	int refclk = vgpu->gvt->gt->i915->dpll.ref_clks.nssc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	enum dpio_phy phy = DPIO_PHY0;
 	enum dpio_channel ch = DPIO_CH0;
 	struct dpll clock = {0};

@@ -1,0 +1,1 @@
+cmd_sound/soc/qcom/snd-soc-sdm845.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/qcom/snd-soc-sdm845.ko sound/soc/qcom/snd-soc-sdm845.o sound/soc/qcom/snd-soc-sdm845.mod.o;  true

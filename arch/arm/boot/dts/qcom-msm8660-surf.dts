@@ -15,24 +15,25 @@
 		stdout-path = "serial0:115200n8";
 	};
 
-	soc {
-		gsbi@19c00000 {
-			status = "okay";
-			qcom,mode = <GSBI_PROT_I2C_UART>;
-			serial@19c40000 {
-				status = "okay";
-			};
-		};
+	/* Temporary fixed regulator */
+	vsdcc_fixed: vsdcc-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "SDCC Power";
+		regulator-min-microvolt = <2700000>;
+		regulator-max-microvolt = <2700000>;
+		regulator-always-on;
+	};
+};
 
-		/* Temporary fixed regulator */
-		vsdcc_fixed: vsdcc-regulator {
-			compatible = "regulator-fixed";
-			regulator-name = "SDCC Power";
-			regulator-min-microvolt = <2700000>;
-			regulator-max-microvolt = <2700000>;
-			regulator-always-on;
-		};
+<<<<<<< HEAD
+&gsbi12 {
+	qcom,mode = <GSBI_PROT_I2C_UART>;
+	status = "okay";
+};
 
+&gsbi12_serial {
+	status = "okay";
+=======
 		amba {
 			/* eMMC */
 			sdcc1: mmc@12400000 {
@@ -47,6 +48,7 @@
 			};
 		};
 	};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &pm8058 {
@@ -75,4 +77,16 @@
 		keypad,num-rows = <6>;
 		keypad,num-columns = <5>;
 	};
+};
+
+/* eMMC */
+&sdcc1 {
+	vmmc-supply = <&vsdcc_fixed>;
+	status = "okay";
+};
+
+/* External micro SD card */
+&sdcc3 {
+	vmmc-supply = <&vsdcc_fixed>;
+	status = "okay";
 };

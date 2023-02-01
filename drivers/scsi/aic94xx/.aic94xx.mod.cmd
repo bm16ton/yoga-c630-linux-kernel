@@ -1,0 +1,1 @@
+cmd_drivers/scsi/aic94xx/aic94xx.mod := printf '%s\n'   aic94xx_init.o aic94xx_hwi.o aic94xx_reg.o aic94xx_sds.o aic94xx_seq.o aic94xx_dump.o aic94xx_scb.o aic94xx_dev.o aic94xx_tmf.o aic94xx_task.o | awk '!x[$$0]++ { print("drivers/scsi/aic94xx/"$$0) }' > drivers/scsi/aic94xx/aic94xx.mod

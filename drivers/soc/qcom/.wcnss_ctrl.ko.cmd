@@ -1,0 +1,1 @@
+cmd_drivers/soc/qcom/wcnss_ctrl.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/soc/qcom/wcnss_ctrl.ko drivers/soc/qcom/wcnss_ctrl.o drivers/soc/qcom/wcnss_ctrl.mod.o;  true

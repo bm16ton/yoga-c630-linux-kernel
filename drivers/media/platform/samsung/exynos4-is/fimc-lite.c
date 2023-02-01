@@ -516,7 +516,11 @@ static int fimc_lite_release(struct file *file)
 	if (v4l2_fh_is_singular_file(file) &&
 	    atomic_read(&fimc->out_path) == FIMC_IO_DMA) {
 		if (fimc->streaming) {
+<<<<<<< HEAD
+			video_device_pipeline_stop(&fimc->ve.vdev);
+=======
 			media_pipeline_stop(entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			fimc->streaming = false;
 		}
 		fimc_lite_stop_capture(fimc, false);
@@ -812,13 +816,20 @@ static int fimc_lite_streamon(struct file *file, void *priv,
 			      enum v4l2_buf_type type)
 {
 	struct fimc_lite *fimc = video_drvdata(file);
+<<<<<<< HEAD
+=======
 	struct media_entity *entity = &fimc->ve.vdev.entity;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (fimc_lite_active(fimc))
 		return -EBUSY;
 
+<<<<<<< HEAD
+	ret = video_device_pipeline_start(&fimc->ve.vdev, &fimc->ve.pipe->mp);
+=======
 	ret = media_pipeline_start(entity, &fimc->ve.pipe->mp);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0)
 		return ret;
 
@@ -835,7 +846,11 @@ static int fimc_lite_streamon(struct file *file, void *priv,
 	}
 
 err_p_stop:
+<<<<<<< HEAD
+	video_device_pipeline_stop(&fimc->ve.vdev);
+=======
 	media_pipeline_stop(entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -849,7 +864,11 @@ static int fimc_lite_streamoff(struct file *file, void *priv,
 	if (ret < 0)
 		return ret;
 
+<<<<<<< HEAD
+	video_device_pipeline_stop(&fimc->ve.vdev);
+=======
 	media_pipeline_stop(&fimc->ve.vdev.entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fimc->streaming = false;
 	return 0;
 }

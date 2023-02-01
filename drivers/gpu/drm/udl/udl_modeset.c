@@ -242,6 +242,11 @@ static long udl_log_cpp(unsigned int cpp)
 	return __ffs(cpp);
 }
 
+<<<<<<< HEAD
+static int udl_handle_damage(struct drm_framebuffer *fb,
+			     const struct iosys_map *map,
+			     const struct drm_rect *clip)
+=======
 static int udl_aligned_damage_clip(struct drm_rect *clip, int x, int y,
 				   int width, int height)
 {
@@ -267,13 +272,13 @@ static int udl_aligned_damage_clip(struct drm_rect *clip, int x, int y,
 static int udl_handle_damage(struct drm_framebuffer *fb,
 			     const struct iosys_map *map,
 			     int x, int y, int width, int height)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct drm_device *dev = fb->dev;
 	void *vaddr = map->vaddr; /* TODO: Use mapping abstraction properly */
 	int i, ret;
 	char *cmd;
 	struct urb *urb;
-	struct drm_rect clip;
 	int log_bpp;
 
 	ret = udl_log_cpp(fb->format->cpp[0]);
@@ -281,15 +286,18 @@ static int udl_handle_damage(struct drm_framebuffer *fb,
 		return ret;
 	log_bpp = ret;
 
-	ret = udl_aligned_damage_clip(&clip, x, y, width, height);
+	ret = drm_gem_fb_begin_cpu_access(fb, DMA_FROM_DEVICE);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
+=======
 	else if ((clip.x2 > fb->width) || (clip.y2 > fb->height))
 		return -EINVAL;
 
 	ret = drm_gem_fb_begin_cpu_access(fb, DMA_FROM_DEVICE);
 	if (ret)
 		return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	urb = udl_get_urb(dev);
 	if (!urb) {
@@ -298,11 +306,11 @@ static int udl_handle_damage(struct drm_framebuffer *fb,
 	}
 	cmd = urb->transfer_buffer;
 
-	for (i = clip.y1; i < clip.y2; i++) {
+	for (i = clip->y1; i < clip->y2; i++) {
 		const int line_offset = fb->pitches[0] * i;
-		const int byte_offset = line_offset + (clip.x1 << log_bpp);
-		const int dev_byte_offset = (fb->width * i + clip.x1) << log_bpp;
-		const int byte_width = (clip.x2 - clip.x1) << log_bpp;
+		const int byte_offset = line_offset + (clip->x1 << log_bpp);
+		const int dev_byte_offset = (fb->width * i + clip->x1) << log_bpp;
+		const int byte_width = drm_rect_width(clip) << log_bpp;
 		ret = udl_render_hline(dev, log_bpp, &urb, (char *)vaddr,
 				       &cmd, byte_offset, dev_byte_offset,
 				       byte_width);
@@ -355,6 +363,10 @@ udl_simple_display_pipe_enable(struct drm_simple_display_pipe *pipe,
 	struct udl_device *udl = to_udl(dev);
 	struct drm_display_mode *mode = &crtc_state->mode;
 	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(plane_state);
+<<<<<<< HEAD
+	struct drm_rect clip = DRM_RECT_INIT(0, 0, fb->width, fb->height);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	char *buf;
 	char *wrptr;
 	int color_depth = UDL_COLOR_DEPTH_16BPP;
@@ -380,7 +392,11 @@ udl_simple_display_pipe_enable(struct drm_simple_display_pipe *pipe,
 
 	udl->mode_buf_len = wrptr - buf;
 
+<<<<<<< HEAD
+	udl_handle_damage(fb, &shadow_plane_state->data[0], &clip);
+=======
 	udl_handle_damage(fb, &shadow_plane_state->data[0], 0, 0, fb->width, fb->height);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* enable display */
 	udl_crtc_write_mode_to_hw(crtc);
@@ -420,8 +436,12 @@ udl_simple_display_pipe_update(struct drm_simple_display_pipe *pipe,
 		return;
 
 	if (drm_atomic_helper_damage_merged(old_plane_state, state, &rect))
+<<<<<<< HEAD
+		udl_handle_damage(fb, &shadow_plane_state->data[0], &rect);
+=======
 		udl_handle_damage(fb, &shadow_plane_state->data[0], rect.x1, rect.y1,
 				  rect.x2 - rect.x1, rect.y2 - rect.y1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct drm_simple_display_pipe_funcs udl_simple_display_pipe_funcs = {
@@ -476,6 +496,7 @@ int udl_modeset_init(struct drm_device *dev)
 					   format_count, NULL, connector);
 	if (ret)
 		return ret;
+	drm_plane_enable_fb_damage_clips(&udl->display_pipe.plane);
 
 	drm_mode_config_reset(dev);
 

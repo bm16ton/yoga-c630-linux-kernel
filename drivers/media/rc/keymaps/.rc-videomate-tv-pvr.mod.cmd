@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-videomate-tv-pvr.mod := printf '%s\n'   rc-videomate-tv-pvr.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-videomate-tv-pvr.mod

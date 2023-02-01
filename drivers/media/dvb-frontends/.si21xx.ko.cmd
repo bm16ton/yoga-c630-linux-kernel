@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/si21xx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/dvb-frontends/si21xx.ko drivers/media/dvb-frontends/si21xx.o drivers/media/dvb-frontends/si21xx.mod.o;  true

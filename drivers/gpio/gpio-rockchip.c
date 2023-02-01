@@ -332,12 +332,21 @@ static void rockchip_irq_demux(struct irq_desc *desc)
 {
 	struct irq_chip *chip = irq_desc_get_chip(desc);
 	struct rockchip_pin_bank *bank = irq_desc_get_handler_data(desc);
+<<<<<<< HEAD
+	unsigned long pending;
+	unsigned int irq;
+=======
 	u32 pend;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev_dbg(bank->dev, "got irq for bank %s\n", bank->name);
 
 	chained_irq_enter(chip, desc);
 
+<<<<<<< HEAD
+	pending = readl_relaxed(bank->reg_base + bank->gpio_regs->int_status);
+	for_each_set_bit(irq, &pending, 32) {
+=======
 	pend = readl_relaxed(bank->reg_base + bank->gpio_regs->int_status);
 
 	while (pend) {
@@ -352,6 +361,7 @@ static void rockchip_irq_demux(struct irq_desc *desc)
 			continue;
 		}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_dbg(bank->dev, "handling irq %d\n", irq);
 
 		/*
@@ -385,7 +395,11 @@ static void rockchip_irq_demux(struct irq_desc *desc)
 			} while ((data & BIT(irq)) != (data_old & BIT(irq)));
 		}
 
+<<<<<<< HEAD
+		generic_handle_domain_irq(bank->domain, irq);
+=======
 		generic_handle_irq(virq);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	chained_irq_exit(chip, desc);
@@ -621,6 +635,10 @@ static int rockchip_gpiolib_register(struct rockchip_pin_bank *bank)
 			return -ENODATA;
 
 		pctldev = of_pinctrl_get(pctlnp);
+<<<<<<< HEAD
+		of_node_put(pctlnp);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!pctldev)
 			return -ENODEV;
 

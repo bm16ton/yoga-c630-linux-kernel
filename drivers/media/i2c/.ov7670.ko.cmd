@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/ov7670.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/i2c/ov7670.ko drivers/media/i2c/ov7670.o drivers/media/i2c/ov7670.mod.o;  true

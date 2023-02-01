@@ -3,6 +3,10 @@
  * Copyright (c) 2021, Luca Weiss <luca@z3ntu.xyz>
  */
 
+<<<<<<< HEAD
+#include <dt-bindings/input/input.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <dt-bindings/spmi/spmi.h>
 
 &spmi_bus {

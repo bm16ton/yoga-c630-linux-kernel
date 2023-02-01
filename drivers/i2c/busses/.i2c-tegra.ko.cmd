@@ -1,0 +1,1 @@
+cmd_drivers/i2c/busses/i2c-tegra.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/busses/i2c-tegra.ko drivers/i2c/busses/i2c-tegra.o drivers/i2c/busses/i2c-tegra.mod.o;  true

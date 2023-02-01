@@ -20,9 +20,12 @@ properties:
   compatible:
     const: qcom,gcc-sdx65
 
+<<<<<<< HEAD
+=======
   reg:
     maxItems: 1
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   clocks:
     items:
       - description: Board XO source
@@ -43,6 +46,17 @@ properties:
       - const: core_bi_pll_test_se # Optional clock
     minItems: 5
 
+<<<<<<< HEAD
+required:
+  - compatible
+  - clocks
+  - clock-names
+
+allOf:
+  - $ref: qcom,gcc.yaml#
+
+unevaluatedProperties: false
+=======
   '#clock-cells':
     const: 1
 
@@ -62,6 +76,7 @@ required:
   - '#power-domain-cells'
 
 additionalProperties: false
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

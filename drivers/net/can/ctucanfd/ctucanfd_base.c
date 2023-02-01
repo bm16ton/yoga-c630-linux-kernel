@@ -657,7 +657,10 @@ static void ctucan_read_rx_frame(struct ctucan_priv *priv, struct canfd_frame *c
 		cf->can_id = (idw >> 18) & CAN_SFF_MASK;
 
 	/* BRS, ESI, RTR Flags */
+<<<<<<< HEAD
+=======
 	cf->flags = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (FIELD_GET(REG_FRAME_FORMAT_W_FDF, ffw)) {
 		if (FIELD_GET(REG_FRAME_FORMAT_W_BRS, ffw))
 			cf->flags |= CANFD_BRS;
@@ -1425,7 +1428,11 @@ int ctucan_probe_common(struct device *dev, void __iomem *addr, int irq, unsigne
 
 	priv->can.clock.freq = can_clk_rate;
 
+<<<<<<< HEAD
+	netif_napi_add(ndev, &priv->napi, ctucan_rx_poll);
+=======
 	netif_napi_add(ndev, &priv->napi, ctucan_rx_poll, NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = register_candev(ndev);
 	if (ret) {

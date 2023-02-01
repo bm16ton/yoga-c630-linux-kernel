@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/tdfxfb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/fbdev/tdfxfb.ko drivers/video/fbdev/tdfxfb.o drivers/video/fbdev/tdfxfb.mod.o;  true

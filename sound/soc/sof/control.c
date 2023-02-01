@@ -15,6 +15,8 @@
 #include "sof-priv.h"
 #include "sof-audio.h"
 
+<<<<<<< HEAD
+=======
 static void update_mute_led(struct snd_sof_control *scontrol,
 			    struct snd_kcontrol *kcontrol,
 			    struct snd_ctl_elem_value *ucontrol)
@@ -45,6 +47,7 @@ static void update_mute_led(struct snd_sof_control *scontrol,
 #endif
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int snd_sof_volume_get(struct snd_kcontrol *kcontrol,
 		       struct snd_ctl_elem_value *ucontrol)
 {
@@ -68,6 +71,7 @@ int snd_sof_volume_put(struct snd_kcontrol *kcontrol,
 	struct snd_soc_component *scomp = scontrol->scomp;
 	struct snd_sof_dev *sdev = snd_soc_component_get_drvdata(scomp);
 	const struct sof_ipc_tplg_ops *tplg_ops = sdev->ipc->ops->tplg;
+<<<<<<< HEAD
 
 	if (tplg_ops->control->volume_put)
 		return tplg_ops->control->volume_put(scontrol, ucontrol);
@@ -82,6 +86,22 @@ int snd_sof_volume_info(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_info 
 	unsigned int channels = scontrol->num_channels;
 	int platform_max;
 
+=======
+
+	if (tplg_ops->control->volume_put)
+		return tplg_ops->control->volume_put(scontrol, ucontrol);
+
+	return false;
+}
+
+int snd_sof_volume_info(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_info *uinfo)
+{
+	struct soc_mixer_control *sm = (struct soc_mixer_control *)kcontrol->private_value;
+	struct snd_sof_control *scontrol = sm->dobj.private;
+	unsigned int channels = scontrol->num_channels;
+	int platform_max;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!sm->platform_max)
 		sm->platform_max = sm->max;
 	platform_max = sm->platform_max;
@@ -120,9 +140,12 @@ int snd_sof_switch_put(struct snd_kcontrol *kcontrol,
 	struct snd_soc_component *scomp = scontrol->scomp;
 	struct snd_sof_dev *sdev = snd_soc_component_get_drvdata(scomp);
 	const struct sof_ipc_tplg_ops *tplg_ops = sdev->ipc->ops->tplg;
+<<<<<<< HEAD
+=======
 
 	if (scontrol->led_ctl.use_led)
 		update_mute_led(scontrol, kcontrol, ucontrol);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (tplg_ops->control->switch_put)
 		return tplg_ops->control->switch_put(scontrol, ucontrol);
@@ -220,10 +243,13 @@ int snd_sof_bytes_ext_volatile_get(struct snd_kcontrol *kcontrol, unsigned int _
 	const struct sof_ipc_tplg_ops *tplg_ops = sdev->ipc->ops->tplg;
 	int ret, err;
 
-	ret = pm_runtime_get_sync(scomp->dev);
+	ret = pm_runtime_resume_and_get(scomp->dev);
 	if (ret < 0 && ret != -EACCES) {
 		dev_err_ratelimited(scomp->dev, "%s: failed to resume %d\n", __func__, ret);
+<<<<<<< HEAD
+=======
 		pm_runtime_put_noidle(scomp->dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
 

@@ -453,6 +453,10 @@ static const struct mtk_pinctrl_devdata mt8365_pinctrl_data = {
 		.ports     = 5,
 		.ap_num = 160,
 		.db_cnt = 160,
+<<<<<<< HEAD
+		.db_time   = debounce_time_mt6765,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 };
 

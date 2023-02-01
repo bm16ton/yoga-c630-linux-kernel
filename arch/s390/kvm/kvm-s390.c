@@ -505,7 +505,11 @@ int kvm_arch_init(void *opaque)
 		goto out;
 	}
 
+<<<<<<< HEAD
+	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)) {
+=======
 	if (kvm_s390_pci_interp_allowed()) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		rc = kvm_s390_pci_init();
 		if (rc) {
 			pr_err("Unable to allocate AIFT for PCI\n");
@@ -527,7 +531,11 @@ out:
 void kvm_arch_exit(void)
 {
 	kvm_s390_gib_destroy();
+<<<<<<< HEAD
+	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
+=======
 	if (kvm_s390_pci_interp_allowed())
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kvm_s390_pci_exit();
 	debug_unregister(kvm_s390_dbf);
 	debug_unregister(kvm_s390_dbf_uv);
@@ -4358,8 +4366,6 @@ retry:
 		goto retry;
 	}
 
-	/* nothing to do, just clear the request */
-	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
 	/* we left the vsie handler, nothing to do, just clear the request */
 	kvm_clear_request(KVM_REQ_VSIE_RESTART, vcpu);
 

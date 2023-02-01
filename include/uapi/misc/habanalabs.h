@@ -707,6 +707,25 @@ enum hl_server_type {
 	HL_SERVER_GAUDI2_HLS2 = 5
 };
 
+/*
+ * Notifier event values - for the notification mechanism and the HL_INFO_GET_EVENTS command
+ *
+ * HL_NOTIFIER_EVENT_TPC_ASSERT		- Indicates TPC assert event
+ * HL_NOTIFIER_EVENT_UNDEFINED_OPCODE	- Indicates undefined operation code
+ * HL_NOTIFIER_EVENT_DEVICE_RESET	- Indicates device requires a reset
+ * HL_NOTIFIER_EVENT_CS_TIMEOUT		- Indicates CS timeout error
+ * HL_NOTIFIER_EVENT_DEVICE_UNAVAILABLE	- Indicates device is unavailable
+ * HL_NOTIFIER_EVENT_USER_ENGINE_ERR	- Indicates device engine in error state
+ * HL_NOTIFIER_EVENT_GENERAL_HW_ERR     - Indicates device HW error
+ */
+#define HL_NOTIFIER_EVENT_TPC_ASSERT		(1ULL << 0)
+#define HL_NOTIFIER_EVENT_UNDEFINED_OPCODE	(1ULL << 1)
+#define HL_NOTIFIER_EVENT_DEVICE_RESET		(1ULL << 2)
+#define HL_NOTIFIER_EVENT_CS_TIMEOUT		(1ULL << 3)
+#define HL_NOTIFIER_EVENT_DEVICE_UNAVAILABLE	(1ULL << 4)
+#define HL_NOTIFIER_EVENT_USER_ENGINE_ERR	(1ULL << 5)
+#define HL_NOTIFIER_EVENT_GENERAL_HW_ERR	(1ULL << 6)
+
 /* Opcode for management ioctl
  *
  * HW_IP_INFO            - Receive information about different IP blocks in the
@@ -754,6 +773,10 @@ enum hl_server_type {
  *                            Razwi initiator.
  *                            Razwi cause, was it a page fault or MMU access error.
  * HL_INFO_DEV_MEM_ALLOC_PAGE_SIZES - Retrieve valid page sizes for device memory allocation
+<<<<<<< HEAD
+ * HL_INFO_SECURED_ATTESTATION - Retrieve attestation report of the boot.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * HL_INFO_REGISTER_EVENTFD   - Register eventfd for event notifications.
  * HL_INFO_UNREGISTER_EVENTFD - Unregister eventfd
  * HL_INFO_GET_EVENTS         - Retrieve the last occurred events
@@ -783,13 +806,27 @@ enum hl_server_type {
 #define HL_INFO_CS_TIMEOUT_EVENT		24
 #define HL_INFO_RAZWI_EVENT			25
 #define HL_INFO_DEV_MEM_ALLOC_PAGE_SIZES	26
+<<<<<<< HEAD
+#define HL_INFO_SECURED_ATTESTATION		27
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define HL_INFO_REGISTER_EVENTFD		28
 #define HL_INFO_UNREGISTER_EVENTFD		29
 #define HL_INFO_GET_EVENTS			30
 #define HL_INFO_UNDEFINED_OPCODE_EVENT		31
+<<<<<<< HEAD
+#define HL_INFO_ENGINE_STATUS			32
 
 #define HL_INFO_VERSION_MAX_LEN			128
 #define HL_INFO_CARD_NAME_MAX_LEN		16
+
+/* Maximum buffer size for retrieving engines status */
+#define HL_ENGINES_DATA_MAX_SIZE	SZ_1M
+=======
+
+#define HL_INFO_VERSION_MAX_LEN			128
+#define HL_INFO_CARD_NAME_MAX_LEN		16
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * struct hl_info_hw_ip_info - hardware information on various IPs in the ASIC
@@ -821,6 +858,10 @@ enum hl_server_type {
  * @tpc_enabled_mask: Bit-mask that represents which TPCs are enabled. Relevant
  *                    for Goya/Gaudi only.
  * @dram_enabled: Whether the DRAM is enabled.
+<<<<<<< HEAD
+ * @security_enabled: Whether security is enabled on device.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @mme_master_slave_mode: Indicate whether the MME is working in master/slave
  *                         configuration. Relevant for Greco and later.
  * @cpucp_version: The CPUCP f/w version.
@@ -852,7 +893,11 @@ struct hl_info_hw_ip_info {
 	__u32 psoc_pci_pll_div_factor;
 	__u8 tpc_enabled_mask;
 	__u8 dram_enabled;
+<<<<<<< HEAD
+	__u8 security_enabled;
+=======
 	__u8 reserved;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__u8 mme_master_slave_mode;
 	__u8 cpucp_version[HL_INFO_VERSION_MAX_LEN];
 	__u8 card_name[HL_INFO_CARD_NAME_MAX_LEN];
@@ -876,13 +921,13 @@ struct hl_info_hw_idle {
 	__u32 is_idle;
 	/*
 	 * Bitmask of busy engines.
-	 * Bits definition is according to `enum <chip>_enging_id'.
+	 * Bits definition is according to `enum <chip>_engine_id'.
 	 */
 	__u32 busy_engines_mask;
 
 	/*
 	 * Extended Bitmask of busy engines.
-	 * Bits definition is according to `enum <chip>_enging_id'.
+	 * Bits definition is according to `enum <chip>_engine_id'.
 	 */
 	__u64 busy_engines_mask_ext[HL_BUSY_ENGINES_MASK_EXT_SIZE];
 };
@@ -1078,12 +1123,20 @@ struct hl_info_razwi_event {
  * struct hl_info_undefined_opcode_event - info about last undefined opcode error
  * @timestamp: timestamp of the undefined opcode error
  * @cb_addr_streams: CB addresses (per stream) that are currently exists in the PQ
+<<<<<<< HEAD
+ *                   entries. In case all streams array entries are
+=======
  *                   entiers. In case all streams array entries are
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *                   filled with values, it means the execution was in Lower-CP.
  * @cq_addr: the address of the current handled command buffer
  * @cq_size: the size of the current handled command buffer
  * @cb_addr_streams_len: num of streams - actual len of cb_addr_streams array.
+<<<<<<< HEAD
+ *                       should be equal to 1 in case of undefined opcode
+=======
  *                       should be equal to 1 incase of undefined opcode
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *                       in Upper-CP (specific stream) and equal to 4 incase
  *                       of undefined opcode in Lower-CP.
  * @engine_id: engine-id that the error occurred on
@@ -1109,6 +1162,48 @@ struct hl_info_dev_memalloc_page_sizes {
 	__u64 page_order_bitmask;
 };
 
+<<<<<<< HEAD
+#define SEC_PCR_DATA_BUF_SZ	256
+#define SEC_PCR_QUOTE_BUF_SZ	510	/* (512 - 2) 2 bytes used for size */
+#define SEC_SIGNATURE_BUF_SZ	255	/* (256 - 1) 1 byte used for size */
+#define SEC_PUB_DATA_BUF_SZ	510	/* (512 - 2) 2 bytes used for size */
+#define SEC_CERTIFICATE_BUF_SZ	2046	/* (2048 - 2) 2 bytes used for size */
+
+/*
+ * struct hl_info_sec_attest - attestation report of the boot
+ * @nonce: number only used once. random number provided by host. this also passed to the quote
+ *         command as a qualifying data.
+ * @pcr_quote_len: length of the attestation quote data (bytes)
+ * @pub_data_len: length of the public data (bytes)
+ * @certificate_len: length of the certificate (bytes)
+ * @pcr_num_reg: number of PCR registers in the pcr_data array
+ * @pcr_reg_len: length of each PCR register in the pcr_data array (bytes)
+ * @quote_sig_len: length of the attestation report signature (bytes)
+ * @pcr_data: raw values of the PCR registers
+ * @pcr_quote: attestation report data structure
+ * @quote_sig: signature structure of the attestation report
+ * @public_data: public key for the signed attestation
+ *		 (outPublic + name + qualifiedName)
+ * @certificate: certificate for the attestation signing key
+ */
+struct hl_info_sec_attest {
+	__u32 nonce;
+	__u16 pcr_quote_len;
+	__u16 pub_data_len;
+	__u16 certificate_len;
+	__u8 pcr_num_reg;
+	__u8 pcr_reg_len;
+	__u8 quote_sig_len;
+	__u8 pcr_data[SEC_PCR_DATA_BUF_SZ];
+	__u8 pcr_quote[SEC_PCR_QUOTE_BUF_SZ];
+	__u8 quote_sig[SEC_SIGNATURE_BUF_SZ];
+	__u8 public_data[SEC_PUB_DATA_BUF_SZ];
+	__u8 certificate[SEC_CERTIFICATE_BUF_SZ];
+	__u8 pad0[2];
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum gaudi_dcores {
 	HL_GAUDI_WS_DCORE,
 	HL_GAUDI_WN_DCORE,
@@ -1130,6 +1225,14 @@ enum gaudi_dcores {
  *             resolution. Currently not in use.
  * @pll_index: Index as defined in hl_<asic type>_pll_index enumeration.
  * @eventfd: event file descriptor for event notifications.
+<<<<<<< HEAD
+ * @user_buffer_actual_size: Actual data size which was copied to user allocated buffer by the
+ *                           driver. It is possible for the user to allocate buffer larger than
+ *                           needed, hence updating this variable so user will know the exact amount
+ *                           of bytes copied by the kernel to the buffer.
+ * @sec_attest_nonce: Nonce number used for attestation report.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @pad: Padding to 64 bit.
  */
 struct hl_info_args {
@@ -1143,6 +1246,11 @@ struct hl_info_args {
 		__u32 period_ms;
 		__u32 pll_index;
 		__u32 eventfd;
+<<<<<<< HEAD
+		__u32 user_buffer_actual_size;
+		__u32 sec_attest_nonce;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	__u32 pad;
@@ -1336,18 +1444,51 @@ struct hl_cs_chunk {
 #define HL_CS_FLAGS_ENCAP_SIGNALS		0x800
 #define HL_CS_FLAGS_RESERVE_SIGNALS_ONLY	0x1000
 #define HL_CS_FLAGS_UNRESERVE_SIGNALS_ONLY	0x2000
+<<<<<<< HEAD
+
+/*
+ * The engine cores CS is merged into the existing CS ioctls.
+ * Use it to control the engine cores mode.
+ */
+#define HL_CS_FLAGS_ENGINE_CORE_COMMAND		0x4000
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define HL_CS_STATUS_SUCCESS		0
 
 #define HL_MAX_JOBS_PER_CS		512
 
+/* HL_ENGINE_CORE_ values
+ *
+ * HL_ENGINE_CORE_HALT: engine core halt
+ * HL_ENGINE_CORE_RUN:  engine core run
+ */
+#define HL_ENGINE_CORE_HALT	(1 << 0)
+#define HL_ENGINE_CORE_RUN	(1 << 1)
+
 struct hl_cs_in {
 
-	/* this holds address of array of hl_cs_chunk for restore phase */
-	__u64 chunks_restore;
+	union {
+		struct {
+			/* this holds address of array of hl_cs_chunk for restore phase */
+			__u64 chunks_restore;
 
-	/* holds address of array of hl_cs_chunk for execution phase */
-	__u64 chunks_execute;
+			/* holds address of array of hl_cs_chunk for execution phase */
+			__u64 chunks_execute;
+		};
+
+		/* Valid only when HL_CS_FLAGS_ENGINE_CORE_COMMAND is set */
+		struct {
+			/* this holds address of array of uint32 for engine_cores */
+			__u64 engine_cores;
+
+			/* number of engine cores in engine_cores array */
+			__u32 num_engine_cores;
+
+			/* the core command to be sent towards engine cores */
+			__u32 core_command;
+		};
+	};
 
 	union {
 		/*
@@ -1412,7 +1553,11 @@ struct hl_cs_out {
 
 		/* Valid only when HL_CS_FLAGS_RESERVE_SIGNALS_ONLY is set */
 		struct {
+<<<<<<< HEAD
+			/* This is the reserved signal handle id */
+=======
 			/* This is the resereved signal handle id */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			__u32 handle_id;
 
 			/* This is the signals count */

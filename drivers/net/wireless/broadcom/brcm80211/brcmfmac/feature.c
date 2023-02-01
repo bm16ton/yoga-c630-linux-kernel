@@ -249,7 +249,12 @@ void brcmf_feat_attach(struct brcmf_pub *drvr)
 	memset(&gscan_cfg, 0, sizeof(gscan_cfg));
 	if (drvr->bus_if->chip != BRCM_CC_43430_CHIP_ID &&
 	    drvr->bus_if->chip != BRCM_CC_4345_CHIP_ID &&
+<<<<<<< HEAD
+	    drvr->bus_if->chip != BRCM_CC_43454_CHIP_ID &&
+	    drvr->bus_if->chip != CY_CC_43439_CHIP_ID)
+=======
 	    drvr->bus_if->chip != BRCM_CC_43454_CHIP_ID)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		brcmf_feat_iovar_data_set(ifp, BRCMF_FEAT_GSCAN,
 					  "pfn_gscan_cfg",
 					  &gscan_cfg, sizeof(gscan_cfg));

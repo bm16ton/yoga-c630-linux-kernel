@@ -1,0 +1,1 @@
+cmd_drivers/media/test-drivers/vivid/vivid.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/test-drivers/vivid/vivid.ko drivers/media/test-drivers/vivid/vivid.o drivers/media/test-drivers/vivid/vivid.mod.o;  true

@@ -2597,6 +2597,9 @@ EXPORT_SYMBOL(d_rehash);
 
 static inline unsigned start_dir_add(struct inode *dir)
 {
+<<<<<<< HEAD
+	preempt_disable_nested();
+=======
 	/*
 	 * The caller holds a spinlock (dentry::d_lock). On !PREEMPT_RT
 	 * kernels spin_lock() implicitly disables preemption, but not on
@@ -2606,6 +2609,7 @@ static inline unsigned start_dir_add(struct inode *dir)
 	 */
 	if (IS_ENABLED(CONFIG_PREEMPT_RT))
 		preempt_disable();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (;;) {
 		unsigned n = dir->i_dir_seq;
 		if (!(n & 1) && cmpxchg(&dir->i_dir_seq, n, n + 1) == n)
@@ -2618,8 +2622,12 @@ static inline void end_dir_add(struct inode *dir, unsigned int n,
 			       wait_queue_head_t *d_wait)
 {
 	smp_store_release(&dir->i_dir_seq, n + 2);
+<<<<<<< HEAD
+	preempt_enable_nested();
+=======
 	if (IS_ENABLED(CONFIG_PREEMPT_RT))
 		preempt_enable();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wake_up_all(d_wait);
 }
 
@@ -3258,8 +3266,10 @@ void d_genocide(struct dentry *parent)
 
 EXPORT_SYMBOL(d_genocide);
 
-void d_tmpfile(struct dentry *dentry, struct inode *inode)
+void d_tmpfile(struct file *file, struct inode *inode)
 {
+	struct dentry *dentry = file->f_path.dentry;
+
 	inode_dec_link_count(inode);
 	BUG_ON(dentry->d_name.name != dentry->d_iname ||
 		!hlist_unhashed(&dentry->d_u.d_alias) ||

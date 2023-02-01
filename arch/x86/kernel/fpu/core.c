@@ -103,6 +103,7 @@ static void update_avx_timestamp(struct fpu *fpu)
  * preserved.
  *
  * Must be called with fpregs_lock() held.
+<<<<<<< HEAD
  *
  * The legacy FNSAVE instruction clears all FPU state unconditionally, so
  * register state has to be reloaded. That might be a pointless exercise
@@ -110,6 +111,15 @@ static void update_avx_timestamp(struct fpu *fpu)
  * this only affects 20+ years old 32bit systems and avoids conditionals all
  * over the place.
  *
+=======
+ *
+ * The legacy FNSAVE instruction clears all FPU state unconditionally, so
+ * register state has to be reloaded. That might be a pointless exercise
+ * when the FPU is going to be used by another task right after that. But
+ * this only affects 20+ years old 32bit systems and avoids conditionals all
+ * over the place.
+ *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * FXSAVE and all XSAVE variants preserve the FPU register state.
  */
 void save_fpregs_to_fpstate(struct fpu *fpu)
@@ -304,6 +314,7 @@ EXPORT_SYMBOL_GPL(fpu_update_guest_xfd);
 
 /**
  * fpu_sync_guest_vmexit_xfd_state - Synchronize XFD MSR and software state
+<<<<<<< HEAD
  *
  * Must be invoked from KVM after a VMEXIT before enabling interrupts when
  * XFD write emulation is disabled. This is required because the guest can
@@ -311,6 +322,15 @@ EXPORT_SYMBOL_GPL(fpu_update_guest_xfd);
  * same as the state on VMENTER. So software state has to be udpated before
  * any operation which depends on it can take place.
  *
+=======
+ *
+ * Must be invoked from KVM after a VMEXIT before enabling interrupts when
+ * XFD write emulation is disabled. This is required because the guest can
+ * freely modify XFD and the state at VMEXIT is not guaranteed to be the
+ * same as the state on VMENTER. So software state has to be udpated before
+ * any operation which depends on it can take place.
+ *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Note: It can be invoked unconditionally even when write emulation is
  * enabled for the price of a then pointless MSR read.
  */
@@ -347,9 +367,15 @@ int fpu_swap_kvm_fpstate(struct fpu_guest *guest_fpu, bool enter_guest)
 		fpu->fpstate = fpu->__task_fpstate;
 		fpu->__task_fpstate = NULL;
 	}
+<<<<<<< HEAD
 
 	cur_fps = fpu->fpstate;
 
+=======
+
+	cur_fps = fpu->fpstate;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!cur_fps->is_confidential) {
 		/* Includes XFD update */
 		restore_fpregs_from_fpstate(cur_fps, XFEATURE_MASK_FPSTATE);
@@ -385,6 +411,36 @@ void fpu_copy_guest_fpstate_to_uabi(struct fpu_guest *gfpu, void *buf,
 	}
 }
 EXPORT_SYMBOL_GPL(fpu_copy_guest_fpstate_to_uabi);
+<<<<<<< HEAD
+
+int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
+				   u64 xcr0, u32 *vpkru)
+{
+	struct fpstate *kstate = gfpu->fpstate;
+	const union fpregs_state *ustate = buf;
+
+	if (!cpu_feature_enabled(X86_FEATURE_XSAVE)) {
+		if (ustate->xsave.header.xfeatures & ~XFEATURE_MASK_FPSSE)
+			return -EINVAL;
+		if (ustate->fxsave.mxcsr & ~mxcsr_feature_mask)
+			return -EINVAL;
+		memcpy(&kstate->regs.fxsave, &ustate->fxsave, sizeof(ustate->fxsave));
+		return 0;
+	}
+
+	if (ustate->xsave.header.xfeatures & ~xcr0)
+		return -EINVAL;
+
+	/*
+	 * Nullify @vpkru to preserve its current value if PKRU's bit isn't set
+	 * in the header.  KVM's odd ABI is to leave PKRU untouched in this
+	 * case (all other components are eventually re-initialized).
+	 */
+	if (!(ustate->xsave.header.xfeatures & XFEATURE_MASK_PKRU))
+		vpkru = NULL;
+
+	return copy_uabi_from_kernel_to_xstate(kstate, ustate, vpkru);
+=======
 
 int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
 				   u64 xcr0, u32 *vpkru)
@@ -416,6 +472,7 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
 		*vpkru = xpkru->pkru;
 	}
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
 #endif /* CONFIG_KVM */

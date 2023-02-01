@@ -1,0 +1,1 @@
+cmd_drivers/net/ieee802154/atusb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ieee802154/atusb.ko drivers/net/ieee802154/atusb.o drivers/net/ieee802154/atusb.mod.o;  true

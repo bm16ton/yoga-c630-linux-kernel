@@ -1,0 +1,1 @@
+cmd_drivers/usb/misc/onboard_usb_hub.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/misc/onboard_usb_hub.ko drivers/usb/misc/onboard_usb_hub.o drivers/usb/misc/onboard_usb_hub.mod.o;  true

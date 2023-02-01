@@ -116,18 +116,25 @@ static int atmel_sha204a_probe(struct i2c_client *client,
 	return ret;
 }
 
-static int atmel_sha204a_remove(struct i2c_client *client)
+static void atmel_sha204a_remove(struct i2c_client *client)
 {
 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
 
 	if (atomic_read(&i2c_priv->tfm_count)) {
 		dev_emerg(&client->dev, "Device is busy, will remove it anyhow\n");
+<<<<<<< HEAD
+		return;
+	}
+
+	kfree((void *)i2c_priv->hwrng.priv);
+=======
 		return 0;
 	}
 
 	kfree((void *)i2c_priv->hwrng.priv);
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id atmel_sha204a_dt_ids[] = {

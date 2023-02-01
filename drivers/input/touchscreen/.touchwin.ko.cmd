@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/touchwin.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/touchwin.ko drivers/input/touchscreen/touchwin.o drivers/input/touchscreen/touchwin.mod.o;  true

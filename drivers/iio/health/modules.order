@@ -1,0 +1,4 @@
+drivers/iio/health/afe4403.ko
+drivers/iio/health/afe4404.ko
+drivers/iio/health/max30100.ko
+drivers/iio/health/max30102.ko

@@ -532,7 +532,7 @@ err_poweroff:
 	return ret;
 }
 
-static int ccs811_remove(struct i2c_client *client)
+static void ccs811_remove(struct i2c_client *client)
 {
 	struct iio_dev *indio_dev = i2c_get_clientdata(client);
 	struct ccs811_data *data = iio_priv(indio_dev);
@@ -548,8 +548,11 @@ static int ccs811_remove(struct i2c_client *client)
 	if (ret)
 		dev_warn(&client->dev, "Failed to power down device (%pe)\n",
 			 ERR_PTR(ret));
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id ccs811_id[] = {

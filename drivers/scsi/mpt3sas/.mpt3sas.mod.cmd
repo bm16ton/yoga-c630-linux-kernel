@@ -1,0 +1,1 @@
+cmd_drivers/scsi/mpt3sas/mpt3sas.mod := printf '%s\n'   mpt3sas_base.o mpt3sas_config.o mpt3sas_scsih.o mpt3sas_transport.o mpt3sas_ctl.o mpt3sas_trigger_diag.o mpt3sas_warpdrive.o mpt3sas_debugfs.o | awk '!x[$$0]++ { print("drivers/scsi/mpt3sas/"$$0) }' > drivers/scsi/mpt3sas/mpt3sas.mod

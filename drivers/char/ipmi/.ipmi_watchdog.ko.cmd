@@ -1,0 +1,1 @@
+cmd_drivers/char/ipmi/ipmi_watchdog.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/char/ipmi/ipmi_watchdog.ko drivers/char/ipmi/ipmi_watchdog.o drivers/char/ipmi/ipmi_watchdog.mod.o;  true

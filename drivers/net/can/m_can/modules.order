@@ -1,0 +1,3 @@
+drivers/net/can/m_can/m_can.ko
+drivers/net/can/m_can/m_can_platform.ko
+drivers/net/can/m_can/tcan4x5x.ko

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-imon-pad.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-imon-pad.ko drivers/media/rc/keymaps/rc-imon-pad.o drivers/media/rc/keymaps/rc-imon-pad.mod.o;  true

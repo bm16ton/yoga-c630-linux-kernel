@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/snd-soc-max98927.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/codecs/snd-soc-max98927.ko sound/soc/codecs/snd-soc-max98927.o sound/soc/codecs/snd-soc-max98927.mod.o;  true

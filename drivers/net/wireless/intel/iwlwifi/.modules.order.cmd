@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/iwlwifi/modules.order := {   echo drivers/net/wireless/intel/iwlwifi/iwlwifi.ko;   cat drivers/net/wireless/intel/iwlwifi/dvm/modules.order;   cat drivers/net/wireless/intel/iwlwifi/mvm/modules.order; :; } > drivers/net/wireless/intel/iwlwifi/modules.order

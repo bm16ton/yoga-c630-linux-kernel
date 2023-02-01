@@ -1,7 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+<<<<<<< HEAD
+ * Copyright (C) 2018-2022 Linaro Ltd.
+=======
  * Copyright (C) 2018-2020 Linaro Ltd.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #ifndef _IPA_POWER_H_
 #define _IPA_POWER_H_

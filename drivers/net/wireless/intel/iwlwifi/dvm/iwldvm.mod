@@ -1,0 +1,15 @@
+drivers/net/wireless/intel/iwlwifi/dvm/main.o
+drivers/net/wireless/intel/iwlwifi/dvm/rs.o
+drivers/net/wireless/intel/iwlwifi/dvm/mac80211.o
+drivers/net/wireless/intel/iwlwifi/dvm/ucode.o
+drivers/net/wireless/intel/iwlwifi/dvm/tx.o
+drivers/net/wireless/intel/iwlwifi/dvm/lib.o
+drivers/net/wireless/intel/iwlwifi/dvm/calib.o
+drivers/net/wireless/intel/iwlwifi/dvm/tt.o
+drivers/net/wireless/intel/iwlwifi/dvm/sta.o
+drivers/net/wireless/intel/iwlwifi/dvm/rx.o
+drivers/net/wireless/intel/iwlwifi/dvm/power.o
+drivers/net/wireless/intel/iwlwifi/dvm/scan.o
+drivers/net/wireless/intel/iwlwifi/dvm/rxon.o
+drivers/net/wireless/intel/iwlwifi/dvm/devices.o
+drivers/net/wireless/intel/iwlwifi/dvm/led.o

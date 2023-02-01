@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ti/wlcore/wlcore_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/ti/wlcore/wlcore_spi.ko drivers/net/wireless/ti/wlcore/wlcore_spi.o drivers/net/wireless/ti/wlcore/wlcore_spi.mod.o;  true

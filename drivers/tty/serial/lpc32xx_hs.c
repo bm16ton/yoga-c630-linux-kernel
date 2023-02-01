@@ -274,6 +274,18 @@ static void __serial_lpc32xx_rx(struct uart_port *port)
 	}
 
 	tty_flip_buffer_push(tport);
+<<<<<<< HEAD
+}
+
+static void serial_lpc32xx_stop_tx(struct uart_port *port);
+
+static bool serial_lpc32xx_tx_ready(struct uart_port *port)
+{
+	u32 level = readl(LPC32XX_HSUART_LEVEL(port->membase));
+
+	return LPC32XX_HSU_TX_LEV(level) < 64;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void serial_lpc32xx_stop_tx(struct uart_port *port);
@@ -293,8 +305,7 @@ static void __serial_lpc32xx_tx(struct uart_port *port)
 		goto exit_tx;
 
 	/* Transfer data */
-	while (LPC32XX_HSU_TX_LEV(readl(
-		LPC32XX_HSUART_LEVEL(port->membase))) < 64) {
+	while (serial_lpc32xx_tx_ready(port)) {
 		writel((u32) xmit->buf[xmit->tail],
 		       LPC32XX_HSUART_FIFO(port->membase));
 		xmit->tail = (xmit->tail + 1) & (UART_XMIT_SIZE - 1);
@@ -493,7 +504,7 @@ static void serial_lpc32xx_shutdown(struct uart_port *port)
 /* port->lock is not held.  */
 static void serial_lpc32xx_set_termios(struct uart_port *port,
 				       struct ktermios *termios,
-				       struct ktermios *old)
+				       const struct ktermios *old)
 {
 	unsigned long flags;
 	unsigned int baud, quot;

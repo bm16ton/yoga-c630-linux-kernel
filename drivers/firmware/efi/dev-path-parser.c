@@ -15,9 +15,15 @@
 static long __init parse_acpi_path(const struct efi_dev_path *node,
 				   struct device *parent, struct device **child)
 {
+<<<<<<< HEAD
+=======
 	char hid[ACPI_ID_LEN], uid[11]; /* UINT_MAX + null byte */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct acpi_device *adev;
 	struct device *phys_dev;
+	char hid[ACPI_ID_LEN];
+	u64 uid;
+	int ret;
 
 	if (node->header.length != 12)
 		return -EINVAL;
@@ -27,12 +33,21 @@ static long __init parse_acpi_path(const struct efi_dev_path *node,
 		'A' + ((node->acpi.hid >>  5) & 0x1f) - 1,
 		'A' + ((node->acpi.hid >>  0) & 0x1f) - 1,
 			node->acpi.hid >> 16);
+<<<<<<< HEAD
+
+	for_each_acpi_dev_match(adev, hid, NULL, -1) {
+		ret = acpi_dev_uid_to_integer(adev, &uid);
+		if (ret == 0 && node->acpi.uid == uid)
+			break;
+		if (ret == -ENODATA && node->acpi.uid == 0)
+=======
 	sprintf(uid, "%u", node->acpi.uid);
 
 	for_each_acpi_dev_match(adev, hid, NULL, -1) {
 		if (adev->pnp.unique_id && !strcmp(adev->pnp.unique_id, uid))
 			break;
 		if (!adev->pnp.unique_id && node->acpi.uid == 0)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			break;
 	}
 	if (!adev)

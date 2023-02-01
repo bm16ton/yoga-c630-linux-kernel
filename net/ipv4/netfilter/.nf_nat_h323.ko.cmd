@@ -1,0 +1,1 @@
+cmd_net/ipv4/netfilter/nf_nat_h323.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/ipv4/netfilter/nf_nat_h323.ko net/ipv4/netfilter/nf_nat_h323.o net/ipv4/netfilter/nf_nat_h323.mod.o;  true

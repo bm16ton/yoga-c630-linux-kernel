@@ -166,6 +166,18 @@ static int run_test(struct intel_gt *gt, int test_type)
 		return -EIO;
 	}
 
+<<<<<<< HEAD
+	/*
+	 * FIXME: With efficient frequency enabled, GuC can request
+	 * frequencies higher than the SLPC max. While this is fixed
+	 * in GuC, we level set these tests with RPn as min.
+	 */
+	err = slpc_set_min_freq(slpc, slpc->min_freq);
+	if (err)
+		return err;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (slpc->min_freq == slpc->rp0_freq) {
 		pr_err("Min/Max are fused to the same value\n");
 		return -EINVAL;

@@ -167,7 +167,11 @@
         "UMask": "0x10"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "number of branch instructions retired that were mispredicted and taken.",
+=======
         "BriefDescription": "number of branch instructions retired that were mispredicted and taken. Non PEBS",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "CollectPEBSRecord": "2",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xc5",

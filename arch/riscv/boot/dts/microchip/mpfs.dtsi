@@ -330,7 +330,11 @@
 		};
 
 		qspi: spi@21000000 {
+<<<<<<< HEAD
+			compatible = "microchip,mpfs-qspi", "microchip,coreqspi-rtl-v2";
+=======
 			compatible = "microchip,mpfs-qspi";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0x0 0x21000000 0x0 0x1000>;
@@ -464,6 +468,8 @@
 			status = "disabled";
 		};
 
+<<<<<<< HEAD
+=======
 		pcie: pcie@2000000000 {
 			compatible = "microchip,pcie-host-1.0";
 			#address-cells = <0x3>;
@@ -493,6 +499,7 @@
 			};
 		};
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mbox: mailbox@37020000 {
 			compatible = "microchip,mpfs-mailbox";
 			reg = <0x0 0x37020000 0x0 0x1000>, <0x0 0x2000318C 0x0 0x40>;

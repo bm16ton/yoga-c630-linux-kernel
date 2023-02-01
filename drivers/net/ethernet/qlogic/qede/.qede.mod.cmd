@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qlogic/qede/qede.mod := printf '%s\n'   qede_main.o qede_fp.o qede_filter.o qede_ethtool.o qede_ptp.o qede_dcbnl.o qede_rdma.o | awk '!x[$$0]++ { print("drivers/net/ethernet/qlogic/qede/"$$0) }' > drivers/net/ethernet/qlogic/qede/qede.mod

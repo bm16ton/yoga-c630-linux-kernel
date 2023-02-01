@@ -1,0 +1,1 @@
+cmd_drivers/reset/built-in.a := rm -f drivers/reset/built-in.a;  printf "drivers/reset/%s " core.o hisilicon/built-in.a tegra/built-in.a reset-meson.o reset-qcom-aoss.o reset-qcom-pdc.o reset-simple.o reset-sunxi.o reset-zynqmp.o | xargs ar cDPrST drivers/reset/built-in.a

@@ -227,7 +227,11 @@ int main(int argc, char *argv[])
 	ucall_init(vm, NULL);
 
 	pthread_create(&migration_thread, NULL, migration_worker,
+<<<<<<< HEAD
+		       (void *)(unsigned long)syscall(SYS_gettid));
+=======
 		       (void *)(unsigned long)gettid());
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0; !done; i++) {
 		vcpu_run(vcpu);

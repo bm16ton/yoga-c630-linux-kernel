@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/pm3fb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/fbdev/pm3fb.ko drivers/video/fbdev/pm3fb.o drivers/video/fbdev/pm3fb.mod.o;  true

@@ -178,6 +178,8 @@ static inline unsigned long read_spurr(unsigned long tb)
 	return tb;
 }
 
+<<<<<<< HEAD
+=======
 #ifdef CONFIG_PPC_SPLPAR
 
 #include <asm/dtl.h>
@@ -264,6 +266,7 @@ static inline u64 calculate_stolen_time(u64 stop_tb)
 
 #endif /* CONFIG_PPC_SPLPAR */
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Account time for a transition between system, hard irq
  * or soft irq state.
@@ -322,7 +325,11 @@ static unsigned long vtime_delta(struct cpu_accounting_data *acct,
 
 	*stime_scaled = vtime_delta_scaled(acct, now, stime);
 
-	*steal_time = calculate_stolen_time(now);
+	if (IS_ENABLED(CONFIG_PPC_SPLPAR) &&
+			firmware_has_feature(FW_FEATURE_SPLPAR))
+		*steal_time = pseries_calculate_stolen_time(now);
+	else
+		*steal_time = 0;
 
 	return stime;
 }
@@ -614,6 +621,25 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
 		return;
 	}
 
+<<<<<<< HEAD
+	/* Conditionally hard-enable interrupts. */
+	if (should_hard_irq_enable()) {
+		/*
+		 * Ensure a positive value is written to the decrementer, or
+		 * else some CPUs will continue to take decrementer exceptions.
+		 * When the PPC_WATCHDOG (decrementer based) is configured,
+		 * keep this at most 31 bits, which is about 4 seconds on most
+		 * systems, which gives the watchdog a chance of catching timer
+		 * interrupt hard lockups.
+		 */
+		if (IS_ENABLED(CONFIG_PPC_WATCHDOG))
+			set_dec(0x7fffffff);
+		else
+			set_dec(decrementer_max);
+
+		do_hard_irq_enable();
+	}
+=======
 	/*
 	 * Ensure a positive value is written to the decrementer, or
 	 * else some CPUs will continue to take decrementer exceptions.
@@ -630,6 +656,7 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
 	/* Conditionally hard-enable interrupts. */
 	if (should_hard_irq_enable())
 		do_hard_irq_enable();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #if defined(CONFIG_PPC32) && defined(CONFIG_PPC_PMAC)
 	if (atomic_read(&ppc_n_lost_interrupts) != 0)

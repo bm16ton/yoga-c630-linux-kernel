@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/tehuti/tehuti.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/tehuti/tehuti.ko drivers/net/ethernet/tehuti/tehuti.o drivers/net/ethernet/tehuti/tehuti.mod.o;  true

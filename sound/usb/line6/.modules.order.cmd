@@ -1,0 +1,1 @@
+cmd_sound/usb/line6/modules.order := {   echo sound/usb/line6/snd-usb-line6.ko;   echo sound/usb/line6/snd-usb-pod.ko;   echo sound/usb/line6/snd-usb-podhd.ko;   echo sound/usb/line6/snd-usb-toneport.ko;   echo sound/usb/line6/snd-usb-variax.ko; :; } > sound/usb/line6/modules.order

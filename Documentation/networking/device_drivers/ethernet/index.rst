@@ -52,6 +52,10 @@ Contents:
    ti/tlan
    toshiba/spider_net
    wangxun/txgbe
+<<<<<<< HEAD
+   wangxun/ngbe
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 .. only::  subproject and html
 

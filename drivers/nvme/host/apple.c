@@ -1039,6 +1039,11 @@ static void apple_nvme_reset_work(struct work_struct *work)
 					 dma_max_mapping_size(anv->dev) >> 9);
 	anv->ctrl.max_segments = NVME_MAX_SEGS;
 
+<<<<<<< HEAD
+	dma_set_max_seg_size(anv->dev, 0xffffffff);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Enable NVMMU and linear submission queues.
 	 * While we could keep those disabled and pretend this is slightly

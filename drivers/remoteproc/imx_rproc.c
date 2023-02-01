@@ -113,8 +113,13 @@ static const struct imx_rproc_att imx_rproc_att_imx93[] = {
 	{ 0x80000000, 0x80000000, 0x10000000, 0 },
 	{ 0x90000000, 0x80000000, 0x10000000, 0 },
 
+<<<<<<< HEAD
+	{ 0xC0000000, 0xC0000000, 0x10000000, 0 },
+	{ 0xD0000000, 0xC0000000, 0x10000000, 0 },
+=======
 	{ 0xC0000000, 0xa0000000, 0x10000000, 0 },
 	{ 0xD0000000, 0xa0000000, 0x10000000, 0 },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct imx_rproc_att imx_rproc_att_imx8mn[] = {
@@ -646,7 +651,10 @@ static int imx_rproc_xtr_mbox_init(struct rproc *rproc)
 	struct imx_rproc *priv = rproc->priv;
 	struct device *dev = priv->dev;
 	struct mbox_client *cl;
+<<<<<<< HEAD
+=======
 	int ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!of_get_property(dev->of_node, "mbox-names", NULL))
 		return 0;
@@ -659,18 +667,29 @@ static int imx_rproc_xtr_mbox_init(struct rproc *rproc)
 	cl->rx_callback = imx_rproc_rx_callback;
 
 	priv->tx_ch = mbox_request_channel_byname(cl, "tx");
+<<<<<<< HEAD
+	if (IS_ERR(priv->tx_ch))
+		return dev_err_probe(cl->dev, PTR_ERR(priv->tx_ch),
+				     "failed to request tx mailbox channel\n");
+=======
 	if (IS_ERR(priv->tx_ch)) {
 		ret = PTR_ERR(priv->tx_ch);
 		return dev_err_probe(cl->dev, ret,
 				     "failed to request tx mailbox channel: %d\n", ret);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	priv->rx_ch = mbox_request_channel_byname(cl, "rx");
 	if (IS_ERR(priv->rx_ch)) {
 		mbox_free_channel(priv->tx_ch);
+<<<<<<< HEAD
+		return dev_err_probe(cl->dev, PTR_ERR(priv->rx_ch),
+				     "failed to request rx mailbox channel\n");
+=======
 		ret = PTR_ERR(priv->rx_ch);
 		return dev_err_probe(cl->dev, ret,
 				     "failed to request rx mailbox channel: %d\n", ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -693,6 +712,7 @@ static int imx_rproc_detect_mode(struct imx_rproc *priv)
 	struct arm_smccc_res res;
 	int ret;
 	u32 val;
+<<<<<<< HEAD
 
 	switch (dcfg->method) {
 	case IMX_RPROC_NONE:
@@ -707,6 +727,22 @@ static int imx_rproc_detect_mode(struct imx_rproc *priv)
 		break;
 	}
 
+=======
+
+	switch (dcfg->method) {
+	case IMX_RPROC_NONE:
+		priv->rproc->state = RPROC_DETACHED;
+		return 0;
+	case IMX_RPROC_SMC:
+		arm_smccc_smc(IMX_SIP_RPROC, IMX_SIP_RPROC_STARTED, 0, 0, 0, 0, 0, 0, &res);
+		if (res.a0)
+			priv->rproc->state = RPROC_DETACHED;
+		return 0;
+	default:
+		break;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	regmap = syscon_regmap_lookup_by_phandle(dev->of_node, "syscon");
 	if (IS_ERR(regmap)) {
 		dev_err(dev, "failed to find syscon\n");

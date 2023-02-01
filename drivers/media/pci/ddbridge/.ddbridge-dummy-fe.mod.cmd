@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ddbridge/ddbridge-dummy-fe.mod := printf '%s\n'   ddbridge-dummy-fe.o | awk '!x[$$0]++ { print("drivers/media/pci/ddbridge/"$$0) }' > drivers/media/pci/ddbridge/ddbridge-dummy-fe.mod

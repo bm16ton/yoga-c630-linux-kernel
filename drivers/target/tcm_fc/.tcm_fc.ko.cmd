@@ -1,0 +1,1 @@
+cmd_drivers/target/tcm_fc/tcm_fc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/target/tcm_fc/tcm_fc.ko drivers/target/tcm_fc/tcm_fc.o drivers/target/tcm_fc/tcm_fc.mod.o;  true

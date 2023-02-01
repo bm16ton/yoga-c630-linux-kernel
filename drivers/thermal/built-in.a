@@ -1,0 +1,32 @@
+!<thin>
+//                                              282       `
+thermal_core.o/
+thermal_sysfs.o/
+thermal_helpers.o/
+thermal_hwmon.o/
+thermal_of.o/
+gov_fair_share.o/
+gov_step_wise.o/
+cpufreq_cooling.o/
+devfreq_cooling.o/
+qcom/lmh.o/
+tegra/soctherm.o/
+tegra/soctherm-fuse.o/
+tegra/tegra132-soctherm.o/
+tegra/tegra210-soctherm.o/
+amlogic_thermal.o/
+/0              0           0     0     644     71776     `
+/16             0           0     0     644     24112     `
+/33             0           0     0     644     7952      `
+/52             0           0     0     644     9960      `
+/69             0           0     0     644     20688     `
+/83             0           0     0     644     3656      `
+/101            0           0     0     644     3880      `
+/118            0           0     0     644     7888      `
+/137            0           0     0     644     13040     `
+/156            0           0     0     644     11352     `
+/168            0           0     0     644     39032     `
+/186            0           0     0     644     2824      `
+/209            0           0     0     644     3680      `
+/236            0           0     0     644     3792      `
+/263            0           0     0     644     9992      `

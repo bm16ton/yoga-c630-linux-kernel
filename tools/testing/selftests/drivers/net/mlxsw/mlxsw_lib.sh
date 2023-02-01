@@ -61,3 +61,20 @@ mlxsw_only_on_spectrum()
 
 	return 1
 }
+<<<<<<< HEAD
+
+mlxsw_max_descriptors_get()
+{
+	local spectrum_rev=$MLXSW_SPECTRUM_REV
+
+	case $spectrum_rev in
+	1) echo 81920 ;;
+	2) echo 136960 ;;
+	3) echo 204800 ;;
+	4) echo 220000 ;;
+	*) echo "Unknown max descriptors for chip revision." > /dev/stderr
+	   return 1 ;;
+	esac
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

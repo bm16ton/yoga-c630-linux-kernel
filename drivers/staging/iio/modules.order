@@ -1,0 +1,13 @@
+drivers/staging/iio/accel/adis16203.ko
+drivers/staging/iio/accel/adis16240.ko
+drivers/staging/iio/adc/ad7816.ko
+drivers/staging/iio/addac/adt7316.ko
+drivers/staging/iio/addac/adt7316-spi.ko
+drivers/staging/iio/addac/adt7316-i2c.ko
+drivers/staging/iio/frequency/ad9832.ko
+drivers/staging/iio/frequency/ad9834.ko
+drivers/staging/iio/impedance-analyzer/ad5933.ko
+drivers/staging/iio/meter/ade7854.ko
+drivers/staging/iio/meter/ade7854-i2c.ko
+drivers/staging/iio/meter/ade7854-spi.ko
+drivers/staging/iio/resolver/ad2s1210.ko

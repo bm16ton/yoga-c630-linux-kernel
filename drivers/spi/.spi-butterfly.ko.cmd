@@ -1,0 +1,1 @@
+cmd_drivers/spi/spi-butterfly.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/spi/spi-butterfly.ko drivers/spi/spi-butterfly.o drivers/spi/spi-butterfly.mod.o;  true

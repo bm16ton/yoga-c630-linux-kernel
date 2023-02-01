@@ -1,0 +1,1 @@
+cmd_drivers/atm/modules.order := {   echo drivers/atm/nicstar.ko;   echo drivers/atm/iphase.ko;   echo drivers/atm/suni.ko;   echo drivers/atm/fore_200e.ko;   echo drivers/atm/solos-pci.ko;   echo drivers/atm/idt77105.ko;   echo drivers/atm/adummy.ko; :; } > drivers/atm/modules.order

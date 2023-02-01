@@ -1,0 +1,1 @@
+cmd_drivers/pwm/pwm-rockchip.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/pwm/pwm-rockchip.ko drivers/pwm/pwm-rockchip.o drivers/pwm/pwm-rockchip.mod.o;  true

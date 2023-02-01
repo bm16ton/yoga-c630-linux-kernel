@@ -185,6 +185,16 @@ static void handle_rx(struct uart_port *port)
 	}
 
 	tty_flip_buffer_push(tport);
+<<<<<<< HEAD
+}
+
+static unsigned int vt8500_tx_empty(struct uart_port *port)
+{
+	unsigned int idx = vt8500_read(port, VT8500_URFIDX) & 0x1f;
+
+	return idx < 16 ? TIOCSER_TEMT : 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void handle_tx(struct uart_port *port)
@@ -201,7 +211,7 @@ static void handle_tx(struct uart_port *port)
 		return;
 	}
 
-	while ((vt8500_read(port, VT8500_URFIDX) & 0x1f) < 16) {
+	while (vt8500_tx_empty(port)) {
 		if (uart_circ_empty(xmit))
 			break;
 
@@ -258,12 +268,6 @@ static irqreturn_t vt8500_irq(int irq, void *dev_id)
 	spin_unlock(&port->lock);
 
 	return IRQ_HANDLED;
-}
-
-static unsigned int vt8500_tx_empty(struct uart_port *port)
-{
-	return (vt8500_read(port, VT8500_URFIDX) & 0x1f) < 16 ?
-						TIOCSER_TEMT : 0;
 }
 
 static unsigned int vt8500_get_mctrl(struct uart_port *port)
@@ -355,7 +359,7 @@ static void vt8500_shutdown(struct uart_port *port)
 
 static void vt8500_set_termios(struct uart_port *port,
 			       struct ktermios *termios,
-			       struct ktermios *old)
+			       const struct ktermios *old)
 {
 	struct vt8500_port *vt8500_port =
 			container_of(port, struct vt8500_port, uart);

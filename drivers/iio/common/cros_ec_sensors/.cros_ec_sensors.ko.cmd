@@ -1,0 +1,1 @@
+cmd_drivers/iio/common/cros_ec_sensors/cros_ec_sensors.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/common/cros_ec_sensors/cros_ec_sensors.ko drivers/iio/common/cros_ec_sensors/cros_ec_sensors.o drivers/iio/common/cros_ec_sensors/cros_ec_sensors.mod.o;  true

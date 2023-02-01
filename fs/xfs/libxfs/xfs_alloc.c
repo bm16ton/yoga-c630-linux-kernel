@@ -263,11 +263,15 @@ xfs_alloc_get_rec(
 		goto out_bad_rec;
 
 	/* check for valid extent range, including overflow */
+<<<<<<< HEAD
+	if (!xfs_verify_agbext(pag, *bno, *len))
+=======
 	if (!xfs_verify_agbno(pag, *bno))
 		goto out_bad_rec;
 	if (*bno > *bno + *len)
 		goto out_bad_rec;
 	if (!xfs_verify_agbno(pag, *bno + *len - 1))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_bad_rec;
 
 	return 0;
@@ -1520,7 +1524,7 @@ xfs_alloc_ag_vextent_lastblock(
 
 #ifdef DEBUG
 	/* Randomly don't execute the first algorithm. */
-	if (prandom_u32() & 1)
+	if (prandom_u32_max(2))
 		return 0;
 #endif
 

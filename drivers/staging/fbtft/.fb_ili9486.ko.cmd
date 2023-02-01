@@ -1,0 +1,1 @@
+cmd_drivers/staging/fbtft/fb_ili9486.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/fbtft/fb_ili9486.ko drivers/staging/fbtft/fb_ili9486.o drivers/staging/fbtft/fb_ili9486.mod.o;  true

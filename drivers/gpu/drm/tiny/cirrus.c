@@ -316,16 +316,40 @@ static int cirrus_mode_set(struct cirrus_device *cirrus,
 }
 
 static int cirrus_fb_blit_rect(struct drm_framebuffer *fb,
+<<<<<<< HEAD
+			       const struct iosys_map *vmap,
+			       struct drm_rect *rect)
+{
+	struct cirrus_device *cirrus = to_cirrus(fb->dev);
+	struct iosys_map dst;
+=======
 			       const struct iosys_map *map,
 			       struct drm_rect *rect)
 {
 	struct cirrus_device *cirrus = to_cirrus(fb->dev);
 	void __iomem *dst = cirrus->vram;
 	void *vmap = map->vaddr; /* TODO: Use mapping abstraction properly */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int idx;
 
 	if (!drm_dev_enter(&cirrus->dev, &idx))
 		return -ENODEV;
+<<<<<<< HEAD
+
+	iosys_map_set_vaddr_iomem(&dst, cirrus->vram);
+
+	if (cirrus->cpp == fb->format->cpp[0]) {
+		iosys_map_incr(&dst, drm_fb_clip_offset(fb->pitches[0], fb->format, rect));
+		drm_fb_memcpy(&dst, fb->pitches, vmap, fb, rect);
+
+	} else if (fb->format->cpp[0] == 4 && cirrus->cpp == 2) {
+		iosys_map_incr(&dst, drm_fb_clip_offset(cirrus->pitch, fb->format, rect));
+		drm_fb_xrgb8888_to_rgb565(&dst, &cirrus->pitch, vmap, fb, rect, false);
+
+	} else if (fb->format->cpp[0] == 4 && cirrus->cpp == 3) {
+		iosys_map_incr(&dst, drm_fb_clip_offset(cirrus->pitch, fb->format, rect));
+		drm_fb_xrgb8888_to_rgb888(&dst, &cirrus->pitch, vmap, fb, rect);
+=======
 
 	if (cirrus->cpp == fb->format->cpp[0]) {
 		dst += drm_fb_clip_offset(fb->pitches[0], fb->format, rect);
@@ -338,6 +362,7 @@ static int cirrus_fb_blit_rect(struct drm_framebuffer *fb,
 	} else if (fb->format->cpp[0] == 4 && cirrus->cpp == 3) {
 		dst += drm_fb_clip_offset(cirrus->pitch, fb->format, rect);
 		drm_fb_xrgb8888_to_rgb888_toio(dst, cirrus->pitch, vmap, fb, rect);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	} else {
 		WARN_ON_ONCE("cpp mismatch");

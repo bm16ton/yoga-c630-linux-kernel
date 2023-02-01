@@ -1,0 +1,14 @@
+drivers/usb/storage/uas.ko
+drivers/usb/storage/ums-alauda.ko
+drivers/usb/storage/ums-cypress.ko
+drivers/usb/storage/ums-datafab.ko
+drivers/usb/storage/ums-eneub6250.ko
+drivers/usb/storage/ums-freecom.ko
+drivers/usb/storage/ums-isd200.ko
+drivers/usb/storage/ums-jumpshot.ko
+drivers/usb/storage/ums-karma.ko
+drivers/usb/storage/ums-onetouch.ko
+drivers/usb/storage/ums-realtek.ko
+drivers/usb/storage/ums-sddr09.ko
+drivers/usb/storage/ums-sddr55.ko
+drivers/usb/storage/ums-usbat.ko

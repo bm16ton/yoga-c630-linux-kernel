@@ -1,0 +1,1 @@
+cmd_drivers/media/cec/usb/rainshadow/rainshadow-cec.mod := printf '%s\n'   rainshadow-cec.o | awk '!x[$$0]++ { print("drivers/media/cec/usb/rainshadow/"$$0) }' > drivers/media/cec/usb/rainshadow/rainshadow-cec.mod

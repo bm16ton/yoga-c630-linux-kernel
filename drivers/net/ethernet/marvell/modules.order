@@ -1,0 +1,5 @@
+drivers/net/ethernet/marvell/mvmdio.ko
+drivers/net/ethernet/marvell/mvneta.ko
+drivers/net/ethernet/marvell/mvpp2/mvpp2.ko
+drivers/net/ethernet/marvell/skge.ko
+drivers/net/ethernet/marvell/sky2.ko

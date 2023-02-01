@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/packetengines/modules.order := {   echo drivers/net/ethernet/packetengines/hamachi.ko;   echo drivers/net/ethernet/packetengines/yellowfin.ko; :; } > drivers/net/ethernet/packetengines/modules.order

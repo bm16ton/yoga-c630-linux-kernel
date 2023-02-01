@@ -9,16 +9,16 @@ static const char * const dsi_v2_bus_clk_names[] = {
 	"core_mmss", "iface", "bus",
 };
 
+static const struct regulator_bulk_data apq8064_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 100000 },	/* 1.2 V */
+	{ .supply = "avdd", .init_load_uA = 10000 },	/* 3.0 V */
+	{ .supply = "vddio", .init_load_uA = 100000 },	/* 1.8 V */
+};
+
 static const struct msm_dsi_config apq8064_dsi_cfg = {
 	.io_offset = 0,
-	.reg_cfg = {
-		.num = 3,
-		.regs = {
-			{"vdda", 100000, 100},	/* 1.2 V */
-			{"avdd", 10000, 100},	/* 3.0 V */
-			{"vddio", 100000, 100},	/* 1.8 V */
-		},
-	},
+	.regulator_data = apq8064_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(apq8064_dsi_regulators),
 	.bus_clk_names = dsi_v2_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_v2_bus_clk_names),
 	.io_start = { 0x4700000, 0x5800000 },
@@ -29,8 +29,18 @@ static const char * const dsi_6g_bus_clk_names[] = {
 	"mdp_core", "iface", "bus", "core_mmss",
 };
 
+static const struct regulator_bulk_data msm8974_apq8084_regulators[] = {
+	{ .supply = "vdd", .init_load_uA = 150000 },	/* 3.0 V */
+	{ .supply = "vdda", .init_load_uA = 100000 },	/* 1.2 V */
+	{ .supply = "vddio", .init_load_uA = 100000 },	/* 1.8 V */
+};
+
 static const struct msm_dsi_config msm8974_apq8084_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
+<<<<<<< HEAD
+	.regulator_data = msm8974_apq8084_regulators,
+	.num_regulators = ARRAY_SIZE(msm8974_apq8084_regulators),
+=======
 	.reg_cfg = {
 		.num = 3,
 		.regs = {
@@ -39,6 +49,7 @@ static const struct msm_dsi_config msm8974_apq8084_dsi_cfg = {
 			{"vddio", 100000, 100},	/* 1.8 V */
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_6g_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_6g_bus_clk_names),
 	.io_start = { 0xfd922800, 0xfd922b00 },
@@ -49,8 +60,17 @@ static const char * const dsi_8916_bus_clk_names[] = {
 	"mdp_core", "iface", "bus",
 };
 
+static const struct regulator_bulk_data msm8916_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 100000 },	/* 1.2 V */
+	{ .supply = "vddio", .init_load_uA = 100000 },	/* 1.8 V */
+};
+
 static const struct msm_dsi_config msm8916_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
+<<<<<<< HEAD
+	.regulator_data = msm8916_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(msm8916_dsi_regulators),
+=======
 	.reg_cfg = {
 		.num = 2,
 		.regs = {
@@ -58,6 +78,7 @@ static const struct msm_dsi_config msm8916_dsi_cfg = {
 			{"vddio", 100000, 100},	/* 1.8 V */
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_8916_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_8916_bus_clk_names),
 	.io_start = { 0x1a98000 },
@@ -68,8 +89,17 @@ static const char * const dsi_8976_bus_clk_names[] = {
 	"mdp_core", "iface", "bus",
 };
 
+static const struct regulator_bulk_data msm8976_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 100000 },	/* 1.2 V */
+	{ .supply = "vddio", .init_load_uA = 100000 },	/* 1.8 V */
+};
+
 static const struct msm_dsi_config msm8976_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
+<<<<<<< HEAD
+	.regulator_data = msm8976_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(msm8976_dsi_regulators),
+=======
 	.reg_cfg = {
 		.num = 2,
 		.regs = {
@@ -77,14 +107,28 @@ static const struct msm_dsi_config msm8976_dsi_cfg = {
 			{"vddio", 100000, 100},	/* 1.8 V */
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_8976_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_8976_bus_clk_names),
 	.io_start = { 0x1a94000, 0x1a96000 },
 	.num_dsi = 2,
 };
 
+static const struct regulator_bulk_data msm8994_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 100000 },	/* 1.25 V */
+	{ .supply = "vddio", .init_load_uA = 100000 },	/* 1.8 V */
+	{ .supply = "vcca", .init_load_uA = 10000 },	/* 1.0 V */
+	{ .supply = "vdd", .init_load_uA = 100000 },	/* 1.8 V */
+	{ .supply = "lab_reg", .init_load_uA = -1 },
+	{ .supply = "ibb_reg", .init_load_uA = -1 },
+};
+
 static const struct msm_dsi_config msm8994_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
+<<<<<<< HEAD
+	.regulator_data = msm8994_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(msm8994_dsi_regulators),
+=======
 	.reg_cfg = {
 		.num = 6,
 		.regs = {
@@ -96,6 +140,7 @@ static const struct msm_dsi_config msm8994_dsi_cfg = {
 			{"ibb_reg", -1, -1},
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_6g_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_6g_bus_clk_names),
 	.io_start = { 0xfd998000, 0xfd9a0000 },
@@ -104,10 +149,23 @@ static const struct msm_dsi_config msm8994_dsi_cfg = {
 
 static const char * const dsi_8996_bus_clk_names[] = {
 	"mdp_core", "iface", "bus", "core_mmss",
+<<<<<<< HEAD
+};
+
+static const struct regulator_bulk_data msm8996_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 18160 },	/* 1.25 V */
+	{ .supply = "vcca", .init_load_uA = 17000 },	/* 0.925 V */
+	{ .supply = "vddio", .init_load_uA = 100000 },	/* 1.8 V */
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct msm_dsi_config msm8996_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
+<<<<<<< HEAD
+	.regulator_data = msm8996_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(msm8996_dsi_regulators),
+=======
 	.reg_cfg = {
 		.num = 3,
 		.regs = {
@@ -116,6 +174,7 @@ static const struct msm_dsi_config msm8996_dsi_cfg = {
 			{"vddio", 100000, 100 },/* 1.8 V */
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_8996_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_8996_bus_clk_names),
 	.io_start = { 0x994000, 0x996000 },
@@ -126,15 +185,15 @@ static const char * const dsi_msm8998_bus_clk_names[] = {
 	"iface", "bus", "core",
 };
 
+static const struct regulator_bulk_data msm8998_dsi_regulators[] = {
+	{ .supply = "vdd", .init_load_uA = 367000 },	/* 0.9 V */
+	{ .supply = "vdda", .init_load_uA = 62800 },	/* 1.2 V */
+};
+
 static const struct msm_dsi_config msm8998_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
-	.reg_cfg = {
-		.num = 2,
-		.regs = {
-			{"vdd", 367000, 16 },	/* 0.9 V */
-			{"vdda", 62800, 2 },	/* 1.2 V */
-		},
-	},
+	.regulator_data = msm8998_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(msm8998_dsi_regulators),
 	.bus_clk_names = dsi_msm8998_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_msm8998_bus_clk_names),
 	.io_start = { 0xc994000, 0xc996000 },
@@ -145,14 +204,23 @@ static const char * const dsi_sdm660_bus_clk_names[] = {
 	"iface", "bus", "core", "core_mmss",
 };
 
+static const struct regulator_bulk_data sdm660_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 12560 },	/* 1.2 V */
+};
+
 static const struct msm_dsi_config sdm660_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
+<<<<<<< HEAD
+	.regulator_data = sdm660_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(sdm660_dsi_regulators),
+=======
 	.reg_cfg = {
 		.num = 1,
 		.regs = {
 			{"vdda", 12560, 4 },	/* 1.2 V */
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_sdm660_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_sdm660_bus_clk_names),
 	.io_start = { 0xc994000, 0xc996000 },
@@ -167,28 +235,28 @@ static const char * const dsi_sc7180_bus_clk_names[] = {
 	"iface", "bus",
 };
 
+static const struct regulator_bulk_data sdm845_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 21800 },	/* 1.2 V */
+};
+
 static const struct msm_dsi_config sdm845_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
-	.reg_cfg = {
-		.num = 1,
-		.regs = {
-			{"vdda", 21800, 4 },	/* 1.2 V */
-		},
-	},
+	.regulator_data = sdm845_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(sdm845_dsi_regulators),
 	.bus_clk_names = dsi_sdm845_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_sdm845_bus_clk_names),
 	.io_start = { 0xae94000, 0xae96000 },
 	.num_dsi = 2,
 };
 
+static const struct regulator_bulk_data sc7180_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 21800 },	/* 1.2 V */
+};
+
 static const struct msm_dsi_config sc7180_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
-	.reg_cfg = {
-		.num = 1,
-		.regs = {
-			{"vdda", 21800, 4 },	/* 1.2 V */
-		},
-	},
+	.regulator_data = sc7180_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(sc7180_dsi_regulators),
 	.bus_clk_names = dsi_sc7180_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_sc7180_bus_clk_names),
 	.io_start = { 0xae94000 },
@@ -199,6 +267,16 @@ static const char * const dsi_sc7280_bus_clk_names[] = {
 	"iface", "bus",
 };
 
+<<<<<<< HEAD
+static const struct regulator_bulk_data sc7280_dsi_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 8350 },	/* 1.2 V */
+};
+
+static const struct msm_dsi_config sc7280_dsi_cfg = {
+	.io_offset = DSI_6G_REG_SHIFT,
+	.regulator_data = sc7280_dsi_regulators,
+	.num_regulators = ARRAY_SIZE(sc7280_dsi_regulators),
+=======
 static const struct msm_dsi_config sc7280_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
 	.reg_cfg = {
@@ -207,6 +285,7 @@ static const struct msm_dsi_config sc7280_dsi_cfg = {
 			{"vdda", 8350, 0 },	/* 1.2 V */
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_sc7280_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_sc7280_bus_clk_names),
 	.io_start = { 0xae94000 },
@@ -217,6 +296,16 @@ static const char * const dsi_qcm2290_bus_clk_names[] = {
 	"iface", "bus",
 };
 
+<<<<<<< HEAD
+static const struct regulator_bulk_data qcm2290_dsi_cfg_regulators[] = {
+	{ .supply = "vdda", .init_load_uA = 21800 },	/* 1.2 V */
+};
+
+static const struct msm_dsi_config qcm2290_dsi_cfg = {
+	.io_offset = DSI_6G_REG_SHIFT,
+	.regulator_data = qcm2290_dsi_cfg_regulators,
+	.num_regulators = ARRAY_SIZE(qcm2290_dsi_cfg_regulators),
+=======
 static const struct msm_dsi_config qcm2290_dsi_cfg = {
 	.io_offset = DSI_6G_REG_SHIFT,
 	.reg_cfg = {
@@ -225,6 +314,7 @@ static const struct msm_dsi_config qcm2290_dsi_cfg = {
 			{"vdda", 21800, 4 },	/* 1.2 V */
 		},
 	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.bus_clk_names = dsi_qcm2290_bus_clk_names,
 	.num_bus_clks = ARRAY_SIZE(dsi_qcm2290_bus_clk_names),
 	.io_start = { 0x5e94000 },

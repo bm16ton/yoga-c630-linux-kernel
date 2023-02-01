@@ -19,6 +19,30 @@
 #include "ops.h"
 #include "ipc3-ops.h"
 
+<<<<<<< HEAD
+/**
+ * sof_ipc_send_msg - generic function to prepare and send one IPC message
+ * @sdev:		pointer to SOF core device struct
+ * @msg_data:		pointer to a message to send
+ * @msg_bytes:		number of bytes in the message
+ * @reply_bytes:	number of bytes available for the reply.
+ *			The buffer for the reply data is not passed to this
+ *			function, the available size is an information for the
+ *			reply handling functions.
+ *
+ * On success the function returns 0, otherwise negative error number.
+ *
+ * Note: higher level sdev->ipc->tx_mutex must be held to make sure that
+ *	 transfers are synchronized.
+ */
+int sof_ipc_send_msg(struct snd_sof_dev *sdev, void *msg_data, size_t msg_bytes,
+		     size_t reply_bytes)
+{
+	struct snd_sof_ipc *ipc = sdev->ipc;
+	struct snd_sof_ipc_msg *msg;
+	int ret;
+
+=======
 typedef void (*ipc_rx_callback)(struct snd_sof_dev *sdev, void *msg_buf);
 
 static void ipc_trace_message(struct snd_sof_dev *sdev, void *msg_buf);
@@ -299,12 +323,13 @@ static int sof_ipc_tx_message_unlocked(struct snd_sof_ipc *ipc,
 		return -EINVAL;
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ipc->disable_ipc_tx || sdev->fw_state != SOF_FW_BOOT_COMPLETE)
 		return -ENODEV;
 
 	/*
-	 * The spin-lock is also still needed to protect message objects against
-	 * other atomic contexts.
+	 * The spin-lock is needed to protect message objects against other
+	 * atomic contexts.
 	 */
 	spin_lock_irq(&sdev->ipc_lock);
 
@@ -327,6 +352,9 @@ static int sof_ipc_tx_message_unlocked(struct snd_sof_ipc *ipc,
 
 	spin_unlock_irq(&sdev->ipc_lock);
 
+<<<<<<< HEAD
+	return ret;
+=======
 	if (ret) {
 		dev_err_ratelimited(sdev->dev,
 				    "error: ipc tx failed with error %d\n",
@@ -338,27 +366,19 @@ static int sof_ipc_tx_message_unlocked(struct snd_sof_ipc *ipc,
 
 	/* now wait for completion */
 	return tx_wait_done(ipc, msg, reply_data);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* send IPC message from host to DSP */
-int sof_ipc_tx_message(struct snd_sof_ipc *ipc, u32 header,
-		       void *msg_data, size_t msg_bytes, void *reply_data,
-		       size_t reply_bytes)
+int sof_ipc_tx_message(struct snd_sof_ipc *ipc, void *msg_data, size_t msg_bytes,
+		       void *reply_data, size_t reply_bytes)
 {
-	const struct sof_dsp_power_state target_state = {
-		.state = SOF_DSP_PM_D0,
-	};
-	int ret;
+	if (msg_bytes > ipc->max_payload_size ||
+	    reply_bytes > ipc->max_payload_size)
+		return -ENOBUFS;
 
-	/* ensure the DSP is in D0 before sending a new IPC */
-	ret = snd_sof_dsp_set_power_state(ipc->sdev, &target_state);
-	if (ret < 0) {
-		dev_err(ipc->sdev->dev, "error: resuming DSP %d\n", ret);
-		return ret;
-	}
-
-	return sof_ipc_tx_message_no_pm(ipc, header, msg_data, msg_bytes,
-					reply_data, reply_bytes);
+	return ipc->ops->tx_msg(ipc->sdev, msg_data, msg_bytes, reply_data,
+				reply_bytes, false);
 }
 EXPORT_SYMBOL(sof_ipc_tx_message);
 
@@ -367,27 +387,42 @@ EXPORT_SYMBOL(sof_ipc_tx_message);
  * This will be used for IPC's that can be handled by the DSP
  * even in a low-power D0 substate.
  */
-int sof_ipc_tx_message_no_pm(struct snd_sof_ipc *ipc, u32 header,
-			     void *msg_data, size_t msg_bytes,
+int sof_ipc_tx_message_no_pm(struct snd_sof_ipc *ipc, void *msg_data, size_t msg_bytes,
 			     void *reply_data, size_t reply_bytes)
 {
-	int ret;
-
-	if (msg_bytes > SOF_IPC_MSG_MAX_SIZE ||
-	    reply_bytes > SOF_IPC_MSG_MAX_SIZE)
+	if (msg_bytes > ipc->max_payload_size ||
+	    reply_bytes > ipc->max_payload_size)
 		return -ENOBUFS;
 
+<<<<<<< HEAD
+	return ipc->ops->tx_msg(ipc->sdev, msg_data, msg_bytes, reply_data,
+				reply_bytes, true);
+}
+EXPORT_SYMBOL(sof_ipc_tx_message_no_pm);
+=======
 	/* Serialise IPC TX */
 	mutex_lock(&ipc->tx_mutex);
 
 	ret = sof_ipc_tx_message_unlocked(ipc, msg_data, msg_bytes,
 					  reply_data, reply_bytes);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	mutex_unlock(&ipc->tx_mutex);
+/* Generic helper function to retrieve the reply */
+void snd_sof_ipc_get_reply(struct snd_sof_dev *sdev)
+{
+	/*
+	 * Sometimes, there is unexpected reply ipc arriving. The reply
+	 * ipc belongs to none of the ipcs sent from driver.
+	 * In this case, the driver must ignore the ipc.
+	 */
+	if (!sdev->msg) {
+		dev_warn(sdev->dev, "unexpected ipc interrupt raised!\n");
+		return;
+	}
 
-	return ret;
+	sdev->msg->reply_error = sdev->ipc->ops->get_reply(sdev);
 }
-EXPORT_SYMBOL(sof_ipc_tx_message_no_pm);
+EXPORT_SYMBOL(snd_sof_ipc_get_reply);
 
 /* Generic helper function to retrieve the reply */
 void snd_sof_ipc_get_reply(struct snd_sof_dev *sdev)
@@ -468,6 +503,21 @@ void snd_sof_ipc_reply(struct snd_sof_dev *sdev, u32 msg_id)
 }
 EXPORT_SYMBOL(snd_sof_ipc_reply);
 
+<<<<<<< HEAD
+struct snd_sof_ipc *snd_sof_ipc_init(struct snd_sof_dev *sdev)
+{
+	struct snd_sof_ipc *ipc;
+	struct snd_sof_ipc_msg *msg;
+	const struct sof_ipc_ops *ops;
+
+	ipc = devm_kzalloc(sdev->dev, sizeof(*ipc), GFP_KERNEL);
+	if (!ipc)
+		return NULL;
+
+	mutex_init(&ipc->tx_mutex);
+	ipc->sdev = sdev;
+	msg = &ipc->msg;
+=======
 static void ipc_comp_notification(struct snd_sof_dev *sdev, void *msg_buf)
 {
 	const struct sof_ipc_tplg_ops *tplg_ops = sdev->ipc->ops->tplg;
@@ -570,11 +620,24 @@ void snd_sof_ipc_msgs_rx(struct snd_sof_dev *sdev)
 	ipc_log_header(sdev->dev, "ipc rx done", hdr.cmd);
 }
 EXPORT_SYMBOL(snd_sof_ipc_msgs_rx);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-/*
- * IPC trace mechanism.
- */
+	/* indicate that we aren't sending a message ATM */
+	msg->ipc_complete = true;
 
+<<<<<<< HEAD
+	init_waitqueue_head(&msg->waitq);
+
+	switch (sdev->pdata->ipc_type) {
+#if defined(CONFIG_SND_SOC_SOF_IPC3)
+	case SOF_IPC:
+		ops = &ipc3_ops;
+		break;
+#endif
+#if defined(CONFIG_SND_SOC_SOF_INTEL_IPC4)
+	case SOF_INTEL_IPC4:
+		ops = &ipc4_ops;
+=======
 static void ipc_trace_message(struct snd_sof_dev *sdev, void *msg_buf)
 {
 	struct sof_ipc_cmd_hdr *hdr = msg_buf;
@@ -902,8 +965,21 @@ int snd_sof_ipc_set_get_comp_data(struct snd_sof_control *scontrol, bool set)
 		sparams.hdr_bytes = sizeof(struct sof_ipc_ctrl_data) +
 			sizeof(struct sof_abi_hdr);
 		sparams.elems = cdata->data->size;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
+#endif
 	default:
+<<<<<<< HEAD
+		dev_err(sdev->dev, "Not supported IPC version: %d\n",
+			sdev->pdata->ipc_type);
+		return NULL;
+	}
+
+	/* check for mandatory ops */
+	if (!ops->tx_msg || !ops->rx_msg || !ops->set_get_data || !ops->get_reply) {
+		dev_err(sdev->dev, "Missing IPC message handling ops\n");
+		return NULL;
+=======
 		return -EINVAL;
 	}
 
@@ -971,23 +1047,19 @@ int snd_sof_ipc_valid(struct snd_sof_dev *sdev)
 			dev_err(sdev->dev, "error: FW ABI is more recent than kernel\n");
 			return -EINVAL;
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
-	if (ready->flags & SOF_IPC_INFO_BUILD) {
-		dev_info(sdev->dev,
-			 "Firmware debug build %d on %s-%s - options:\n"
-			 " GDB: %s\n"
-			 " lock debug: %s\n"
-			 " lock vdebug: %s\n",
-			 v->build, v->date, v->time,
-			 (ready->flags & SOF_IPC_INFO_GDB) ?
-				"enabled" : "disabled",
-			 (ready->flags & SOF_IPC_INFO_LOCKS) ?
-				"enabled" : "disabled",
-			 (ready->flags & SOF_IPC_INFO_LOCKSV) ?
-				"enabled" : "disabled");
+	if (!ops->fw_loader || !ops->fw_loader->validate ||
+	    !ops->fw_loader->parse_ext_manifest) {
+		dev_err(sdev->dev, "Missing IPC firmware loading ops\n");
+		return NULL;
 	}
 
+<<<<<<< HEAD
+	if (!ops->pcm) {
+		dev_err(sdev->dev, "Missing IPC PCM ops\n");
+=======
 	/* copy the fw_version into debugfs at first boot */
 	memcpy(&sdev->fw_version, v, sizeof(*v));
 
@@ -1015,8 +1087,24 @@ struct snd_sof_ipc *snd_sof_ipc_init(struct snd_sof_dev *sdev)
 
 	ipc = devm_kzalloc(sdev->dev, sizeof(*ipc), GFP_KERNEL);
 	if (!ipc)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return NULL;
+	}
 
+<<<<<<< HEAD
+	if (!ops->tplg || !ops->tplg->widget || !ops->tplg->control) {
+		dev_err(sdev->dev, "Missing IPC topology ops\n");
+		return NULL;
+	}
+
+	if (ops->fw_tracing && (!ops->fw_tracing->init || !ops->fw_tracing->suspend ||
+				!ops->fw_tracing->resume)) {
+		dev_err(sdev->dev, "Missing firmware tracing ops\n");
+		return NULL;
+	}
+
+	ipc->ops = ops;
+=======
 	mutex_init(&ipc->tx_mutex);
 	ipc->sdev = sdev;
 	msg = &ipc->msg;
@@ -1038,6 +1126,7 @@ struct snd_sof_ipc *snd_sof_ipc_init(struct snd_sof_dev *sdev)
 		dev_err(sdev->dev, "Invalid IPC ops\n");
 		return NULL;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ipc;
 }

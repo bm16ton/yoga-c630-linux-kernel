@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/qcom/venus/venus-enc.mod := printf '%s\n'   venc.o venc_ctrls.o | awk '!x[$$0]++ { print("drivers/media/platform/qcom/venus/"$$0) }' > drivers/media/platform/qcom/venus/venus-enc.mod

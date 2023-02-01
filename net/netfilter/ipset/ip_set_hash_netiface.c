@@ -202,7 +202,11 @@ hash_netiface4_uadt(struct ip_set *set, struct nlattr *tb[],
 	ipset_adtfn adtfn = set->variant->adt[adt];
 	struct hash_netiface4_elem e = { .cidr = HOST_MASK, .elem = 1 };
 	struct ip_set_ext ext = IP_SET_INIT_UEXT(set);
+<<<<<<< HEAD
+	u32 ip = 0, ip_to = 0, i = 0;
+=======
 	u32 ip = 0, ip_to = 0, ipn, n = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (tb[IPSET_ATTR_LINENO])
@@ -268,7 +272,12 @@ hash_netiface4_uadt(struct ip_set *set, struct nlattr *tb[],
 	if (retried)
 		ip = ntohl(h->next.ip);
 	do {
+		i++;
 		e.ip = htonl(ip);
+		if (i > IPSET_MAX_RANGE) {
+			hash_netiface4_data_next(&h->next, &e);
+			return -ERANGE;
+		}
 		ip = ip_set_range_to_cidr(ip, ip_to, &e.cidr);
 		ret = adtfn(set, &e, &ext, &ext, flags);
 

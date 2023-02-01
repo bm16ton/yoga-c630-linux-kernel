@@ -1,0 +1,1 @@
+cmd_drivers/xen/xenbus/built-in.a := rm -f drivers/xen/xenbus/built-in.a;  printf "drivers/xen/xenbus/%s " xenbus_client.o xenbus_comms.o xenbus_xs.o xenbus_probe.o xenbus_probe_backend.o xenbus_dev_frontend.o xenbus_dev_backend.o xenbus_probe_frontend.o | xargs ar cDPrST drivers/xen/xenbus/built-in.a

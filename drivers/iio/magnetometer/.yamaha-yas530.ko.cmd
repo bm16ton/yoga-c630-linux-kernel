@@ -1,0 +1,1 @@
+cmd_drivers/iio/magnetometer/yamaha-yas530.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/magnetometer/yamaha-yas530.ko drivers/iio/magnetometer/yamaha-yas530.o drivers/iio/magnetometer/yamaha-yas530.mod.o;  true

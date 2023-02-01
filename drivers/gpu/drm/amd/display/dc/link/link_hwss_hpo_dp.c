@@ -111,7 +111,11 @@ static void setup_hpo_dp_stream_encoder(struct pipe_ctx *pipe_ctx)
 	enum phyd32clk_clock_source phyd32clk = get_phyd32clk_src(pipe_ctx->stream->link);
 
 	dto_params.otg_inst = tg->inst;
+<<<<<<< HEAD
+	dto_params.pixclk_khz = pipe_ctx->stream->timing.pix_clk_100hz / 10;
+=======
 	dto_params.pixclk_khz = pipe_ctx->stream->phy_pix_clk;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dto_params.num_odm_segments = get_odm_segment_count(pipe_ctx);
 	dto_params.timing = &pipe_ctx->stream->timing;
 	dto_params.ref_dtbclk_khz = dc->clk_mgr->funcs->get_dtb_ref_clk_frequency(dc->clk_mgr);
@@ -266,11 +270,18 @@ static const struct link_hwss hpo_dp_link_hwss = {
 	.setup_stream_encoder = setup_hpo_dp_stream_encoder,
 	.reset_stream_encoder = reset_hpo_dp_stream_encoder,
 	.setup_stream_attribute = setup_hpo_dp_stream_attribute,
+<<<<<<< HEAD
+	.disable_link_output = disable_hpo_dp_link_output,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ext = {
 		.set_throttled_vcp_size = set_hpo_dp_throttled_vcp_size,
 		.set_hblank_min_symbol_width = set_hpo_dp_hblank_min_symbol_width,
 		.enable_dp_link_output = enable_hpo_dp_link_output,
+<<<<<<< HEAD
+=======
 		.disable_dp_link_output = disable_hpo_dp_link_output,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.set_dp_link_test_pattern  = set_hpo_dp_link_test_pattern,
 		.set_dp_lane_settings = set_hpo_dp_lane_settings,
 		.update_stream_allocation_table = update_hpo_dp_stream_allocation_table,

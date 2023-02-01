@@ -1,0 +1,21 @@
+!<thin>
+//                                              176       `
+cpufreq.o/
+freq_table.o/
+cpufreq_stats.o/
+cpufreq_performance.o/
+cpufreq_governor.o/
+cpufreq_governor_attr_set.o/
+cpufreq-dt-platdev.o/
+qcom-cpufreq-hw.o/
+tegra124-cpufreq.o/
+
+/0              0           0     0     644     95032     `
+/11             0           0     0     644     11432     `
+/25             0           0     0     644     7184      `
+/42             0           0     0     644     4280      `
+/65             0           0     0     644     16744     `
+/85             0           0     0     644     6016      `
+/114            0           0     0     644     27200     `
+/136            0           0     0     644     21464     `
+/155            0           0     0     644     8096      `

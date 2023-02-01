@@ -1,0 +1,1 @@
+cmd_net/rds/rds_rdma.mod := printf '%s\n'   rdma_transport.o ib.o ib_cm.o ib_recv.o ib_ring.o ib_send.o ib_stats.o ib_sysctl.o ib_rdma.o ib_frmr.o | awk '!x[$$0]++ { print("net/rds/"$$0) }' > net/rds/rds_rdma.mod

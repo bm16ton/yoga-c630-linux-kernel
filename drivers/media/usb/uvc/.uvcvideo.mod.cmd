@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/uvc/uvcvideo.mod := printf '%s\n'   uvc_driver.o uvc_queue.o uvc_v4l2.o uvc_video.o uvc_ctrl.o uvc_status.o uvc_isight.o uvc_debugfs.o uvc_metadata.o uvc_entity.o | awk '!x[$$0]++ { print("drivers/media/usb/uvc/"$$0) }' > drivers/media/usb/uvc/uvcvideo.mod

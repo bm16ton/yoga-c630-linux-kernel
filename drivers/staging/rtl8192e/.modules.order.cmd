@@ -1,0 +1,1 @@
+cmd_drivers/staging/rtl8192e/modules.order := {   echo drivers/staging/rtl8192e/rtllib.ko;   echo drivers/staging/rtl8192e/rtllib_crypt_ccmp.ko;   echo drivers/staging/rtl8192e/rtllib_crypt_tkip.ko;   echo drivers/staging/rtl8192e/rtllib_crypt_wep.ko;   cat drivers/staging/rtl8192e/rtl8192e/modules.order; :; } > drivers/staging/rtl8192e/modules.order

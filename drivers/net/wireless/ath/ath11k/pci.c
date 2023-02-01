@@ -685,6 +685,10 @@ static const struct ath11k_hif_ops ath11k_pci_hif_ops = {
 	.stop = ath11k_pcic_stop,
 	.read32 = ath11k_pcic_read32,
 	.write32 = ath11k_pcic_write32,
+<<<<<<< HEAD
+	.read = ath11k_pcic_read,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.power_down = ath11k_pci_power_down,
 	.power_up = ath11k_pci_power_up,
 	.suspend = ath11k_pci_hif_suspend,

@@ -29,7 +29,11 @@
 static struct platform_device *dmic_dev;
 static struct platform_device *pdev;
 
+<<<<<<< HEAD
+static const struct resource acp_res[] = {
+=======
 static const struct resource acp3x_res[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{
 		.start = 0,
 		.end = ACP3x_REG_END - ACP3x_REG_START,
@@ -62,19 +66,48 @@ static int acp_pci_probe(struct pci_dev *pci, const struct pci_device_id *pci_id
 	if (!chip)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	if (pci_enable_device(pci))
+		return dev_err_probe(&pci->dev, -ENODEV,
+				     "pci_enable_device failed\n");
+=======
 	if (pci_enable_device(pci)) {
 		dev_err(&pci->dev, "pci_enable_device failed\n");
 		return -ENODEV;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = pci_request_regions(pci, "AMD ACP3x audio");
 	if (ret < 0) {
 		dev_err(&pci->dev, "pci_request_regions failed\n");
+<<<<<<< HEAD
+		ret = -ENOMEM;
+		goto disable_pci;
+=======
 		return -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	pci_set_master(pci);
 
+<<<<<<< HEAD
+	res_acp = acp_res;
+	num_res = ARRAY_SIZE(acp_res);
+
+	switch (pci->revision) {
+	case 0x01:
+		chip->name = "acp_asoc_renoir";
+		chip->acp_rev = ACP3X_DEV;
+		break;
+	case 0x6f:
+		chip->name = "acp_asoc_rembrandt";
+		chip->acp_rev = ACP6X_DEV;
+		break;
+	default:
+		dev_err(dev, "Unsupported device revision:0x%x\n", pci->revision);
+		ret = -EINVAL;
+		goto release_regions;
+=======
 	switch (pci->revision) {
 	case 0x01:
 		res_acp = acp3x_res;
@@ -85,21 +118,39 @@ static int acp_pci_probe(struct pci_dev *pci, const struct pci_device_id *pci_id
 	default:
 		dev_err(dev, "Unsupported device revision:0x%x\n", pci->revision);
 		return -EINVAL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	dmic_dev = platform_device_register_data(dev, "dmic-codec", PLATFORM_DEVID_NONE, NULL, 0);
 	if (IS_ERR(dmic_dev)) {
 		dev_err(dev, "failed to create DMIC device\n");
+<<<<<<< HEAD
+		ret = PTR_ERR(dmic_dev);
+		goto release_regions;
+=======
 		return PTR_ERR(dmic_dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	addr = pci_resource_start(pci, 0);
 	chip->base = devm_ioremap(&pci->dev, addr, pci_resource_len(pci, 0));
+<<<<<<< HEAD
+	if (!chip->base) {
+		ret = -ENOMEM;
+		goto unregister_dmic_dev;
+	}
+
+	res = devm_kcalloc(&pci->dev, num_res, sizeof(struct resource), GFP_KERNEL);
+	if (!res) {
+		ret = -ENOMEM;
+		goto unregister_dmic_dev;
+=======
 
 	res = devm_kzalloc(&pci->dev, sizeof(struct resource) * num_res, GFP_KERNEL);
 	if (!res) {
 		platform_device_unregister(dmic_dev);
 		return -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	for (i = 0; i < num_res; i++, res_acp++) {
@@ -126,11 +177,28 @@ static int acp_pci_probe(struct pci_dev *pci, const struct pci_device_id *pci_id
 	pdev = platform_device_register_full(&pdevinfo);
 	if (IS_ERR(pdev)) {
 		dev_err(&pci->dev, "cannot register %s device\n", pdevinfo.name);
+<<<<<<< HEAD
+		ret = PTR_ERR(pdev);
+		goto unregister_dmic_dev;
+	}
+
+	return ret;
+
+unregister_dmic_dev:
+	platform_device_unregister(dmic_dev);
+release_regions:
+	pci_release_regions(pci);
+disable_pci:
+	pci_disable_device(pci);
+
+	return ret;
+=======
 		platform_device_unregister(dmic_dev);
 		ret = PTR_ERR(pdev);
 	}
 
 	return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static void acp_pci_remove(struct pci_dev *pci)

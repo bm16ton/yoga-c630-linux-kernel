@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/igbvf/igbvf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/intel/igbvf/igbvf.ko drivers/net/ethernet/intel/igbvf/igbvf.o drivers/net/ethernet/intel/igbvf/igbvf.mod.o;  true

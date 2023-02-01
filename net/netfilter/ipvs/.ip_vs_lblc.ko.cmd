@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipvs/ip_vs_lblc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/ipvs/ip_vs_lblc.ko net/netfilter/ipvs/ip_vs_lblc.o net/netfilter/ipvs/ip_vs_lblc.mod.o;  true

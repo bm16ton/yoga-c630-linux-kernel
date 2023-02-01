@@ -296,7 +296,7 @@ EXPORT_SYMBOL_GPL(name_to_dev_t);
 
 static int __init root_dev_setup(char *line)
 {
-	strlcpy(saved_root_name, line, sizeof(saved_root_name));
+	strscpy(saved_root_name, line, sizeof(saved_root_name));
 	return 1;
 }
 
@@ -343,7 +343,11 @@ static int __init split_fs_names(char *page, size_t size, char *names)
 	int count = 1;
 	char *p = page;
 
+<<<<<<< HEAD
+	strscpy(p, root_fs_names, size);
+=======
 	strlcpy(p, root_fs_names, size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	while (*p++) {
 		if (p[-1] == ',') {
 			p[-1] = '\0';

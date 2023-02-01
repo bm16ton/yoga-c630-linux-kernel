@@ -1,0 +1,1 @@
+cmd_sound/firewire/motu/snd-firewire-motu.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/motu/snd-firewire-motu.ko sound/firewire/motu/snd-firewire-motu.o sound/firewire/motu/snd-firewire-motu.mod.o;  true

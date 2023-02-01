@@ -15,6 +15,10 @@ config SND_SOC_SOF_IMX_COMMON
 	tristate
 	select SND_SOC_SOF_OF_DEV
 	select SND_SOC_SOF
+<<<<<<< HEAD
+	select SND_SOC_SOF_IPC3
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select SND_SOC_SOF_XTENSA
 	select SND_SOC_SOF_COMPRESS
 	help
@@ -25,6 +29,7 @@ config SND_SOC_SOF_IMX8
 	tristate "SOF support for i.MX8"
 	depends on IMX_SCU
 	depends on IMX_DSP
+<<<<<<< HEAD
 	select SND_SOC_SOF_IMX_COMMON
 	help
 	  This adds support for Sound Open Firmware for NXP i.MX8 platforms.
@@ -37,6 +42,29 @@ config SND_SOC_SOF_IMX8M
 	select SND_SOC_SOF_IMX_COMMON
 	help
 	  This adds support for Sound Open Firmware for NXP i.MX8M platforms.
+	  Say Y if you have such a device.
+	  If unsure select "N".
+
+config SND_SOC_SOF_IMX8ULP
+	tristate "SOF support for i.MX8ULP"
+	depends on IMX_DSP
+	select SND_SOC_SOF_IMX_COMMON
+	help
+	  This adds support for Sound Open Firmware for NXP i.MX8ULP platforms.
+=======
+	select SND_SOC_SOF_IMX_COMMON
+	help
+	  This adds support for Sound Open Firmware for NXP i.MX8 platforms.
+	  Say Y if you have such a device.
+	  If unsure select "N".
+
+config SND_SOC_SOF_IMX8M
+	tristate "SOF support for i.MX8M"
+	depends on IMX_DSP
+	select SND_SOC_SOF_IMX_COMMON
+	help
+	  This adds support for Sound Open Firmware for NXP i.MX8M platforms.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	  Say Y if you have such a device.
 	  If unsure select "N".
 

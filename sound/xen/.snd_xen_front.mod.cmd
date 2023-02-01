@@ -1,0 +1,1 @@
+cmd_sound/xen/snd_xen_front.mod := printf '%s\n'   xen_snd_front.o xen_snd_front_cfg.o xen_snd_front_evtchnl.o xen_snd_front_alsa.o | awk '!x[$$0]++ { print("sound/xen/"$$0) }' > sound/xen/snd_xen_front.mod

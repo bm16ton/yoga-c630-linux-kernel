@@ -1592,6 +1592,36 @@ static void __rmap_add(struct kvm *kvm,
 	sp = sptep_to_sp(spte);
 	kvm_mmu_page_set_translation(sp, spte_index(spte), gfn, access);
 	kvm_update_page_stats(kvm, sp->role.level, 1);
+<<<<<<< HEAD
+
+	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
+	rmap_count = pte_list_add(cache, spte, rmap_head);
+
+	if (rmap_count > kvm->stat.max_mmu_rmap_size)
+		kvm->stat.max_mmu_rmap_size = rmap_count;
+	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
+		kvm_zap_all_rmap_sptes(kvm, rmap_head);
+		kvm_flush_remote_tlbs_with_address(
+				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+	}
+}
+
+static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+		     u64 *spte, gfn_t gfn, unsigned int access)
+{
+	struct kvm_mmu_memory_cache *cache = &vcpu->arch.mmu_pte_list_desc_cache;
+
+	__rmap_add(vcpu->kvm, cache, slot, spte, gfn, access);
+}
+
+bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+{
+	bool young = false;
+
+	if (kvm_memslots_have_rmaps(kvm))
+		young = kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
+
+=======
 
 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
 	rmap_count = pte_list_add(cache, spte, rmap_head);
@@ -1618,6 +1648,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
 	if (kvm_memslots_have_rmaps(kvm))
 		young = kvm_handle_gfn_range(kvm, range, kvm_age_rmap);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (is_tdp_mmu_enabled(kvm))
 		young |= kvm_tdp_mmu_age_gfn_range(kvm, range);
 
@@ -1665,6 +1696,21 @@ static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
 	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
 }
 
+<<<<<<< HEAD
+static void kvm_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+{
+	kvm_mod_used_mmu_pages(kvm, +1);
+	kvm_account_pgtable_pages((void *)sp->spt, +1);
+}
+
+static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+{
+	kvm_mod_used_mmu_pages(kvm, -1);
+	kvm_account_pgtable_pages((void *)sp->spt, -1);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
 {
 	MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
@@ -2112,9 +2158,15 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
 	sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
 	if (!role.direct)
 		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
+<<<<<<< HEAD
 
 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
 
+=======
+
+	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
 	 * depends on valid pages being added to the head of the list.  See
@@ -2122,7 +2174,11 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
 	 */
 	sp->mmu_valid_gen = kvm->arch.mmu_valid_gen;
 	list_add(&sp->link, &kvm->arch.active_mmu_pages);
+<<<<<<< HEAD
+	kvm_account_mmu_page(kvm, sp);
+=======
 	kvm_mod_used_mmu_pages(kvm, +1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	sp->gfn = gfn;
 	sp->role = role;
@@ -2132,6 +2188,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
 
 	return sp;
 }
+<<<<<<< HEAD
 
 /* Note, @vcpu may be NULL if @role.direct is true; see kvm_mmu_find_shadow_page. */
 static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
@@ -2144,6 +2201,20 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
 	struct kvm_mmu_page *sp;
 	bool created = false;
 
+=======
+
+/* Note, @vcpu may be NULL if @role.direct is true; see kvm_mmu_find_shadow_page. */
+static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
+						      struct kvm_vcpu *vcpu,
+						      struct shadow_page_caches *caches,
+						      gfn_t gfn,
+						      union kvm_mmu_page_role role)
+{
+	struct hlist_head *sp_list;
+	struct kvm_mmu_page *sp;
+	bool created = false;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
 
 	sp = kvm_mmu_find_shadow_page(kvm, vcpu, gfn, sp_list, role);
@@ -2457,7 +2528,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
 			list_add(&sp->link, invalid_list);
 		else
 			list_move(&sp->link, invalid_list);
-		kvm_mod_used_mmu_pages(kvm, -1);
+		kvm_unaccount_mmu_page(kvm, sp);
 	} else {
 		/*
 		 * Remove the active root from the active page list, the root
@@ -2984,6 +3055,7 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
 	pgd = READ_ONCE(*pgd_offset(kvm->mm, hva));
 	if (pgd_none(pgd))
 		goto out;
+<<<<<<< HEAD
 
 	p4d = READ_ONCE(*p4d_offset(&pgd, hva));
 	if (p4d_none(p4d) || !p4d_present(p4d))
@@ -3005,6 +3077,29 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
 	if (pmd_large(pmd))
 		level = PG_LEVEL_2M;
 
+=======
+
+	p4d = READ_ONCE(*p4d_offset(&pgd, hva));
+	if (p4d_none(p4d) || !p4d_present(p4d))
+		goto out;
+
+	pud = READ_ONCE(*pud_offset(&p4d, hva));
+	if (pud_none(pud) || !pud_present(pud))
+		goto out;
+
+	if (pud_large(pud)) {
+		level = PG_LEVEL_1G;
+		goto out;
+	}
+
+	pmd = READ_ONCE(*pmd_offset(&pud, hva));
+	if (pmd_none(pmd) || !pmd_present(pmd))
+		goto out;
+
+	if (pmd_large(pmd))
+		level = PG_LEVEL_2M;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	local_irq_restore(flags);
 	return level;
@@ -3570,6 +3665,7 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
 		r = -EIO;
 		goto out_unlock;
 	}
+<<<<<<< HEAD
 
 	/* root.pgd is ignored for direct MMUs. */
 	mmu->root.pgd = 0;
@@ -3584,6 +3680,22 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
 	struct kvm_memory_slot *slot;
 	int r = 0, i, bkt;
 
+=======
+
+	/* root.pgd is ignored for direct MMUs. */
+	mmu->root.pgd = 0;
+out_unlock:
+	write_unlock(&vcpu->kvm->mmu_lock);
+	return r;
+}
+
+static int mmu_first_shadow_root_alloc(struct kvm *kvm)
+{
+	struct kvm_memslots *slots;
+	struct kvm_memory_slot *slot;
+	int r = 0, i, bkt;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Check if this is the first shadow root being allocated before
 	 * taking the lock.
@@ -4107,6 +4219,29 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
 {
 	int r;
+<<<<<<< HEAD
+
+	if ((vcpu->arch.mmu->root_role.direct != work->arch.direct_map) ||
+	      work->wakeup_all)
+		return;
+
+	r = kvm_mmu_reload(vcpu);
+	if (unlikely(r))
+		return;
+
+	if (!vcpu->arch.mmu->root_role.direct &&
+	      work->arch.cr3 != vcpu->arch.mmu->get_guest_pgd(vcpu))
+		return;
+
+	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
+}
+
+static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+{
+	struct kvm_memory_slot *slot = fault->slot;
+	bool async;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if ((vcpu->arch.mmu->root_role.direct != work->arch.direct_map) ||
 	      work->wakeup_all)
@@ -4291,7 +4426,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
 
 	vcpu->arch.l1tf_flush_l1d = true;
 	if (!flags) {
-		trace_kvm_page_fault(fault_address, error_code);
+		trace_kvm_page_fault(vcpu, fault_address, error_code);
 
 		if (kvm_event_needs_reinjection(vcpu))
 			kvm_mmu_unprotect_page_virt(vcpu, fault_address);
@@ -4400,11 +4535,19 @@ static bool cached_root_find_without_current(struct kvm *kvm, struct kvm_mmu *mm
 					     union kvm_mmu_page_role new_role)
 {
 	uint i;
+<<<<<<< HEAD
 
 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
 		if (is_root_usable(&mmu->prev_roots[i], new_pgd, new_role))
 			goto hit;
 
+=======
+
+	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++)
+		if (is_root_usable(&mmu->prev_roots[i], new_pgd, new_role))
+			goto hit;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 
 hit:
@@ -4599,6 +4742,7 @@ __reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
 }
 
 static bool guest_can_use_gbpages(struct kvm_vcpu *vcpu)
+<<<<<<< HEAD
 {
 	/*
 	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
@@ -4616,6 +4760,25 @@ static bool guest_can_use_gbpages(struct kvm_vcpu *vcpu)
 static void reset_guest_rsvds_bits_mask(struct kvm_vcpu *vcpu,
 					struct kvm_mmu *context)
 {
+=======
+{
+	/*
+	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
+	 * hardware.  The hardware page walker doesn't let KVM disable GBPAGES,
+	 * i.e. won't treat them as reserved, and KVM doesn't redo the GVA->GPA
+	 * walk for performance and complexity reasons.  Not to mention KVM
+	 * _can't_ solve the problem because GVA->GPA walks aren't visible to
+	 * KVM once a TDP translation is installed.  Mimic hardware behavior so
+	 * that KVM's is at least consistent, i.e. doesn't randomly inject #PF.
+	 */
+	return tdp_enabled ? boot_cpu_has(X86_FEATURE_GBPAGES) :
+			     guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES);
+}
+
+static void reset_guest_rsvds_bits_mask(struct kvm_vcpu *vcpu,
+					struct kvm_mmu *context)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	__reset_rsvds_bits_mask(&context->guest_rsvd_check,
 				vcpu->arch.reserved_gpa_bits,
 				context->cpu_role.base.level, is_efer_nx(context),
@@ -5281,6 +5444,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
 	if (r)
 		goto out;
 	r = mmu_alloc_special_roots(vcpu);
+<<<<<<< HEAD
 	if (r)
 		goto out;
 	if (vcpu->arch.mmu->root_role.direct)
@@ -5289,6 +5453,16 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
 		r = mmu_alloc_shadow_roots(vcpu);
 	if (r)
 		goto out;
+=======
+	if (r)
+		goto out;
+	if (vcpu->arch.mmu->root_role.direct)
+		r = mmu_alloc_direct_roots(vcpu);
+	else
+		r = mmu_alloc_shadow_roots(vcpu);
+	if (r)
+		goto out;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	kvm_mmu_sync_roots(vcpu);
 
@@ -6703,10 +6877,12 @@ int kvm_mmu_vendor_module_init(void)
 
 	ret = register_shrinker(&mmu_shrinker, "x86-mmu");
 	if (ret)
-		goto out;
+		goto out_shrinker;
 
 	return 0;
 
+out_shrinker:
+	percpu_counter_destroy(&kvm_total_used_mmu_pages);
 out:
 	mmu_destroy_caches();
 	return ret;

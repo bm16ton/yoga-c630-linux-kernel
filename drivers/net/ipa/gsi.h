@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /* Copyright (c) 2015-2018, The Linux Foundation. All rights reserved.
- * Copyright (C) 2018-2021 Linaro Ltd.
+ * Copyright (C) 2018-2022 Linaro Ltd.
  */
 #ifndef _GSI_H_
 #define _GSI_H_
@@ -30,14 +30,6 @@ struct gsi;
 struct gsi_trans;
 struct gsi_channel_data;
 struct ipa_gsi_endpoint_data;
-
-/* Execution environment IDs */
-enum gsi_ee_id {
-	GSI_EE_AP				= 0x0,
-	GSI_EE_MODEM				= 0x1,
-	GSI_EE_UC				= 0x2,
-	GSI_EE_TZ				= 0x3,
-};
 
 struct gsi_ring {
 	void *virt;			/* ring array base address */
@@ -82,6 +74,20 @@ struct gsi_trans_pool {
 
 struct gsi_trans_info {
 	atomic_t tre_avail;		/* TREs available for allocation */
+<<<<<<< HEAD
+
+	u16 free_id;			/* first free trans in array */
+	u16 allocated_id;		/* first allocated transaction */
+	u16 committed_id;		/* first committed transaction */
+	u16 pending_id;			/* first pending transaction */
+	u16 completed_id;		/* first completed transaction */
+	u16 polled_id;			/* first polled transaction */
+	struct gsi_trans *trans;	/* transaction array */
+	struct gsi_trans **map;		/* TRE -> transaction map */
+
+	struct gsi_trans_pool sg_pool;	/* scatterlist pool */
+	struct gsi_trans_pool cmd_pool;	/* command payload DMA pool */
+=======
 	struct gsi_trans_pool pool;	/* transaction pool */
 	struct gsi_trans **map;		/* TRE -> transaction map */
 
@@ -94,6 +100,7 @@ struct gsi_trans_info {
 	struct list_head pending;	/* pending, awaiting completion */
 	struct list_head complete;	/* completed, awaiting poll */
 	struct list_head polled;	/* returned by gsi_channel_poll_one() */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Hardware values signifying the state of a channel */

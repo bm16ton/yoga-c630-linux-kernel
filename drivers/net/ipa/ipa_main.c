@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+<<<<<<< HEAD
+ * Copyright (C) 2018-2022 Linaro Ltd.
+=======
  * Copyright (C) 2018-2021 Linaro Ltd.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <linux/types.h>
@@ -183,31 +187,100 @@ static void ipa_teardown(struct ipa *ipa)
 	gsi_teardown(&ipa->gsi);
 }
 
+<<<<<<< HEAD
+static void
+ipa_hardware_config_bcr(struct ipa *ipa, const struct ipa_data *data)
+{
+	const struct ipa_reg *reg;
+	u32 val;
+
+	/* IPA v4.5+ has no backward compatibility register */
+	if (ipa->version >= IPA_VERSION_4_5)
+		return;
+
+	reg = ipa_reg(ipa, IPA_BCR);
+	val = data->backward_compat;
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
+}
+
+static void ipa_hardware_config_tx(struct ipa *ipa)
+{
+	enum ipa_version version = ipa->version;
+	const struct ipa_reg *reg;
+	u32 offset;
+	u32 val;
+
+	if (version <= IPA_VERSION_4_0 || version >= IPA_VERSION_4_5)
+		return;
+
+	/* Disable PA mask to allow HOLB drop */
+	reg = ipa_reg(ipa, IPA_TX_CFG);
+	offset = ipa_reg_offset(reg);
+
+	val = ioread32(ipa->reg_virt + offset);
+
+	val &= ~ipa_reg_bit(reg, PA_MASK_EN);
+
+	iowrite32(val, ipa->reg_virt + offset);
+}
+
+static void ipa_hardware_config_clkon(struct ipa *ipa)
+{
+	enum ipa_version version = ipa->version;
+	const struct ipa_reg *reg;
+	u32 val;
+
+	if (version >= IPA_VERSION_4_5)
+		return;
+
+	if (version < IPA_VERSION_4_0 && version != IPA_VERSION_3_1)
+		return;
+
+	/* Implement some hardware workarounds */
+	reg = ipa_reg(ipa, CLKON_CFG);
+	if (version == IPA_VERSION_3_1) {
+		/* Disable MISC clock gating */
+		val = ipa_reg_bit(reg, CLKON_MISC);
+	} else {	/* IPA v4.0+ */
+		/* Enable open global clocks in the CLKON configuration */
+		val = ipa_reg_bit(reg, CLKON_GLOBAL);
+		val |= ipa_reg_bit(reg, GLOBAL_2X_CLK);
+	}
+
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Configure bus access behavior for IPA components */
 static void ipa_hardware_config_comp(struct ipa *ipa)
 {
+	const struct ipa_reg *reg;
+	u32 offset;
 	u32 val;
 
 	/* Nothing to configure prior to IPA v4.0 */
 	if (ipa->version < IPA_VERSION_4_0)
 		return;
 
-	val = ioread32(ipa->reg_virt + IPA_REG_COMP_CFG_OFFSET);
+	reg = ipa_reg(ipa, COMP_CFG);
+	offset = ipa_reg_offset(reg);
+	val = ioread32(ipa->reg_virt + offset);
 
 	if (ipa->version == IPA_VERSION_4_0) {
-		val &= ~IPA_QMB_SELECT_CONS_EN_FMASK;
-		val &= ~IPA_QMB_SELECT_PROD_EN_FMASK;
-		val &= ~IPA_QMB_SELECT_GLOBAL_EN_FMASK;
+		val &= ~ipa_reg_bit(reg, IPA_QMB_SELECT_CONS_EN);
+		val &= ~ipa_reg_bit(reg, IPA_QMB_SELECT_PROD_EN);
+		val &= ~ipa_reg_bit(reg, IPA_QMB_SELECT_GLOBAL_EN);
 	} else if (ipa->version < IPA_VERSION_4_5) {
-		val |= GSI_MULTI_AXI_MASTERS_DIS_FMASK;
+		val |= ipa_reg_bit(reg, GSI_MULTI_AXI_MASTERS_DIS);
 	} else {
-		/* For IPA v4.5 IPA_FULL_FLUSH_WAIT_RSC_CLOSE_EN is 0 */
+		/* For IPA v4.5 FULL_FLUSH_WAIT_RS_CLOSURE_EN is 0 */
 	}
 
-	val |= GSI_MULTI_INORDER_RD_DIS_FMASK;
-	val |= GSI_MULTI_INORDER_WR_DIS_FMASK;
+	val |= ipa_reg_bit(reg, GSI_MULTI_INORDER_RD_DIS);
+	val |= ipa_reg_bit(reg, GSI_MULTI_INORDER_WR_DIS);
 
-	iowrite32(val, ipa->reg_virt + IPA_REG_COMP_CFG_OFFSET);
+	iowrite32(val, ipa->reg_virt + offset);
 }
 
 /* Configure DDR and (possibly) PCIe max read/write QSB values */
@@ -216,6 +289,10 @@ ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
 {
 	const struct ipa_qsb_data *data0;
 	const struct ipa_qsb_data *data1;
+<<<<<<< HEAD
+	const struct ipa_reg *reg;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val;
 
 	/* QMB 0 represents DDR; QMB 1 (if present) represents PCIe */
@@ -224,6 +301,47 @@ ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
 		data1 = &data->qsb_data[IPA_QSB_MASTER_PCIE];
 
 	/* Max outstanding write accesses for QSB masters */
+<<<<<<< HEAD
+	reg = ipa_reg(ipa, QSB_MAX_WRITES);
+
+	val = ipa_reg_encode(reg, GEN_QMB_0_MAX_WRITES, data0->max_writes);
+	if (data->qsb_count > 1)
+		val |= ipa_reg_encode(reg, GEN_QMB_1_MAX_WRITES,
+				      data1->max_writes);
+
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
+
+	/* Max outstanding read accesses for QSB masters */
+	reg = ipa_reg(ipa, QSB_MAX_READS);
+
+	val = ipa_reg_encode(reg, GEN_QMB_0_MAX_READS, data0->max_reads);
+	if (ipa->version >= IPA_VERSION_4_0)
+		val |= ipa_reg_encode(reg, GEN_QMB_0_MAX_READS_BEATS,
+				      data0->max_reads_beats);
+	if (data->qsb_count > 1) {
+		val = ipa_reg_encode(reg, GEN_QMB_1_MAX_READS,
+				     data1->max_reads);
+		if (ipa->version >= IPA_VERSION_4_0)
+			val |= ipa_reg_encode(reg, GEN_QMB_1_MAX_READS_BEATS,
+					      data1->max_reads_beats);
+	}
+
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
+}
+
+/* The internal inactivity timer clock is used for the aggregation timer */
+#define TIMER_FREQUENCY	32000		/* 32 KHz inactivity timer clock */
+
+/* Compute the value to use in the COUNTER_CFG register AGGR_GRANULARITY
+ * field to represent the given number of microseconds.  The value is one
+ * less than the number of timer ticks in the requested period.  0 is not
+ * a valid granularity value (so for example @usec must be at least 16 for
+ * a TIMER_FREQUENCY of 32000).
+ */
+static __always_inline u32 ipa_aggr_granularity_val(u32 usec)
+{
+	return DIV_ROUND_CLOSEST(usec * TIMER_FREQUENCY, USEC_PER_SEC) - 1;
+=======
 	val = u32_encode_bits(data0->max_writes, GEN_QMB_0_MAX_WRITES_FMASK);
 	if (data->qsb_count > 1)
 		val |= u32_encode_bits(data1->max_writes,
@@ -243,6 +361,7 @@ ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
 					       GEN_QMB_1_MAX_READS_BEATS_FMASK);
 	}
 	iowrite32(val, ipa->reg_virt + IPA_REG_QSB_MAX_READS_OFFSET);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* The internal inactivity timer clock is used for the aggregation timer */
@@ -278,48 +397,99 @@ static __always_inline u32 ipa_aggr_granularity_val(u32 usec)
  */
 static void ipa_qtime_config(struct ipa *ipa)
 {
+	const struct ipa_reg *reg;
+	u32 offset;
 	u32 val;
 
 	/* Timer clock divider must be disabled when we change the rate */
-	iowrite32(0, ipa->reg_virt + IPA_REG_TIMERS_XO_CLK_DIV_CFG_OFFSET);
+	reg = ipa_reg(ipa, TIMERS_XO_CLK_DIV_CFG);
+	iowrite32(0, ipa->reg_virt + ipa_reg_offset(reg));
 
+	reg = ipa_reg(ipa, QTIME_TIMESTAMP_CFG);
 	/* Set DPL time stamp resolution to use Qtime (instead of 1 msec) */
-	val = u32_encode_bits(DPL_TIMESTAMP_SHIFT, DPL_TIMESTAMP_LSB_FMASK);
-	val |= u32_encode_bits(1, DPL_TIMESTAMP_SEL_FMASK);
+	val = ipa_reg_encode(reg, DPL_TIMESTAMP_LSB, DPL_TIMESTAMP_SHIFT);
+	val |= ipa_reg_bit(reg, DPL_TIMESTAMP_SEL);
 	/* Configure tag and NAT Qtime timestamp resolution as well */
-	val |= u32_encode_bits(TAG_TIMESTAMP_SHIFT, TAG_TIMESTAMP_LSB_FMASK);
-	val |= u32_encode_bits(NAT_TIMESTAMP_SHIFT, NAT_TIMESTAMP_LSB_FMASK);
-	iowrite32(val, ipa->reg_virt + IPA_REG_QTIME_TIMESTAMP_CFG_OFFSET);
+	val = ipa_reg_encode(reg, TAG_TIMESTAMP_LSB, TAG_TIMESTAMP_SHIFT);
+	val = ipa_reg_encode(reg, NAT_TIMESTAMP_LSB, NAT_TIMESTAMP_SHIFT);
+
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
 
 	/* Set granularity of pulse generators used for other timers */
-	val = u32_encode_bits(IPA_GRAN_100_US, GRAN_0_FMASK);
-	val |= u32_encode_bits(IPA_GRAN_1_MS, GRAN_1_FMASK);
-	val |= u32_encode_bits(IPA_GRAN_1_MS, GRAN_2_FMASK);
-	iowrite32(val, ipa->reg_virt + IPA_REG_TIMERS_PULSE_GRAN_CFG_OFFSET);
+	reg = ipa_reg(ipa, TIMERS_PULSE_GRAN_CFG);
+	val = ipa_reg_encode(reg, PULSE_GRAN_0, IPA_GRAN_100_US);
+	val |= ipa_reg_encode(reg, PULSE_GRAN_1, IPA_GRAN_1_MS);
+	val |= ipa_reg_encode(reg, PULSE_GRAN_2, IPA_GRAN_1_MS);
+
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
 
 	/* Actual divider is 1 more than value supplied here */
-	val = u32_encode_bits(IPA_XO_CLOCK_DIVIDER - 1, DIV_VALUE_FMASK);
-	iowrite32(val, ipa->reg_virt + IPA_REG_TIMERS_XO_CLK_DIV_CFG_OFFSET);
+	reg = ipa_reg(ipa, TIMERS_XO_CLK_DIV_CFG);
+	offset = ipa_reg_offset(reg);
+	val = ipa_reg_encode(reg, DIV_VALUE, IPA_XO_CLOCK_DIVIDER - 1);
+
+	iowrite32(val, ipa->reg_virt + offset);
 
 	/* Divider value is set; re-enable the common timer clock divider */
-	val |= u32_encode_bits(1, DIV_ENABLE_FMASK);
-	iowrite32(val, ipa->reg_virt + IPA_REG_TIMERS_XO_CLK_DIV_CFG_OFFSET);
+	val |= ipa_reg_bit(reg, DIV_ENABLE);
+
+	iowrite32(val, ipa->reg_virt + offset);
+}
+
+/* Before IPA v4.5 timing is controlled by a counter register */
+static void ipa_hardware_config_counter(struct ipa *ipa)
+{
+	u32 granularity = ipa_aggr_granularity_val(IPA_AGGR_GRANULARITY);
+	const struct ipa_reg *reg;
+	u32 val;
+
+	reg = ipa_reg(ipa, COUNTER_CFG);
+	/* If defined, EOT_COAL_GRANULARITY is 0 */
+	val = ipa_reg_encode(reg, AGGR_GRANULARITY, granularity);
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
+}
+
+static void ipa_hardware_config_timing(struct ipa *ipa)
+{
+	if (ipa->version < IPA_VERSION_4_5)
+		ipa_hardware_config_counter(ipa);
+	else
+		ipa_qtime_config(ipa);
+}
+
+static void ipa_hardware_config_hashing(struct ipa *ipa)
+{
+	const struct ipa_reg *reg;
+
+	if (ipa->version != IPA_VERSION_4_2)
+		return;
+
+	/* IPA v4.2 does not support hashed tables, so disable them */
+	reg = ipa_reg(ipa, FILT_ROUT_HASH_EN);
+
+	/* IPV6_ROUTER_HASH, IPV6_FILTER_HASH, IPV4_ROUTER_HASH,
+	 * IPV4_FILTER_HASH are all zero.
+	 */
+	iowrite32(0, ipa->reg_virt + ipa_reg_offset(reg));
 }
 
 static void ipa_idle_indication_cfg(struct ipa *ipa,
 				    u32 enter_idle_debounce_thresh,
 				    bool const_non_idle_enable)
 {
-	u32 offset;
+	const struct ipa_reg *reg;
 	u32 val;
 
-	val = u32_encode_bits(enter_idle_debounce_thresh,
-			      ENTER_IDLE_DEBOUNCE_THRESH_FMASK);
-	if (const_non_idle_enable)
-		val |= CONST_NON_IDLE_ENABLE_FMASK;
+	if (ipa->version < IPA_VERSION_3_5_1)
+		return;
 
-	offset = ipa_reg_idle_indication_cfg_offset(ipa->version);
-	iowrite32(val, ipa->reg_virt + offset);
+	reg = ipa_reg(ipa, IDLE_INDICATION_CFG);
+	val = ipa_reg_encode(reg, ENTER_IDLE_DEBOUNCE_THRESH,
+			     enter_idle_debounce_thresh);
+	if (const_non_idle_enable)
+		val |= ipa_reg_bit(reg, CONST_NON_IDLE_ENABLE);
+
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
 }
 
 /**
@@ -349,6 +519,15 @@ static void ipa_hardware_dcd_deconfig(struct ipa *ipa)
  */
 static void ipa_hardware_config(struct ipa *ipa, const struct ipa_data *data)
 {
+<<<<<<< HEAD
+	ipa_hardware_config_bcr(ipa, data);
+	ipa_hardware_config_tx(ipa);
+	ipa_hardware_config_clkon(ipa);
+	ipa_hardware_config_comp(ipa);
+	ipa_hardware_config_qsb(ipa, data);
+	ipa_hardware_config_timing(ipa);
+	ipa_hardware_config_hashing(ipa);
+=======
 	enum ipa_version version = ipa->version;
 	u32 granularity;
 	u32 val;
@@ -398,6 +577,7 @@ static void ipa_hardware_config(struct ipa *ipa, const struct ipa_data *data)
 	}
 
 	/* Enable dynamic clock division */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ipa_hardware_dcd_config(ipa);
 }
 
@@ -512,6 +692,7 @@ static int ipa_firmware_load(struct device *dev)
 
 	/* Use name from DTB if specified; use default for *any* error */
 	ret = of_property_read_string(dev->of_node, "firmware-name", &path);
+<<<<<<< HEAD
 	if (ret) {
 		dev_dbg(dev, "error %d getting \"firmware-name\" resource\n",
 			ret);
@@ -520,6 +701,16 @@ static int ipa_firmware_load(struct device *dev)
 
 	ret = request_firmware(&fw, path, dev);
 	if (ret) {
+=======
+	if (ret) {
+		dev_dbg(dev, "error %d getting \"firmware-name\" resource\n",
+			ret);
+		path = IPA_FW_PATH_DEFAULT;
+	}
+
+	ret = request_firmware(&fw, path, dev);
+	if (ret) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(dev, "error %d requesting \"%s\"\n", ret, path);
 		return ret;
 	}
@@ -612,6 +803,8 @@ static void ipa_validate_build(void)
 
 	/* Aggregation granularity value can't be 0, and must fit */
 	BUILD_BUG_ON(!ipa_aggr_granularity_val(IPA_AGGR_GRANULARITY));
+<<<<<<< HEAD
+=======
 	BUILD_BUG_ON(ipa_aggr_granularity_val(IPA_AGGR_GRANULARITY) >
 			field_max(AGGR_GRANULARITY_FMASK));
 }
@@ -635,6 +828,7 @@ static bool ipa_version_valid(enum ipa_version version)
 	default:
 		return false;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -678,8 +872,13 @@ static int ipa_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
+<<<<<<< HEAD
+	if (!ipa_version_supported(data->version)) {
+		dev_err(dev, "unsupported IPA version %u\n", data->version);
+=======
 	if (!ipa_version_valid(data->version)) {
 		dev_err(dev, "invalid IPA version\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 	}
 

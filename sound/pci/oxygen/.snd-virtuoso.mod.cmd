@@ -1,0 +1,1 @@
+cmd_sound/pci/oxygen/snd-virtuoso.mod := printf '%s\n'   virtuoso.o xonar_lib.o xonar_pcm179x.o xonar_cs43xx.o xonar_wm87x6.o xonar_hdmi.o | awk '!x[$$0]++ { print("sound/pci/oxygen/"$$0) }' > sound/pci/oxygen/snd-virtuoso.mod

@@ -1,0 +1,1 @@
+cmd_drivers/usb/misc/legousbtower.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/misc/legousbtower.ko drivers/usb/misc/legousbtower.o drivers/usb/misc/legousbtower.mod.o;  true

@@ -978,7 +978,11 @@ static int __gic_update_rdist_properties(struct redist_region *region,
 	u64 typer = gic_read_typer(ptr + GICR_TYPER);
 	u32 ctlr = readl_relaxed(ptr + GICR_CTLR);
 
+<<<<<<< HEAD
+	/* Boot-time cleanup */
+=======
 	/* Boot-time cleanip */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if ((typer & GICR_TYPER_VLPIS) && (typer & GICR_TYPER_RVPEID)) {
 		u64 val;
 

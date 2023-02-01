@@ -58,9 +58,9 @@ struct db8500_thermal_zone {
 };
 
 /* Callback to get current temperature */
-static int db8500_thermal_get_temp(void *data, int *temp)
+static int db8500_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 {
-	struct db8500_thermal_zone *th = data;
+	struct db8500_thermal_zone *th = tz->devdata;
 
 	/*
 	 * TODO: There is no PRCMU interface to get temperature data currently,
@@ -72,7 +72,11 @@ static int db8500_thermal_get_temp(void *data, int *temp)
 	return 0;
 }
 
+<<<<<<< HEAD
+static const struct thermal_zone_device_ops thdev_ops = {
+=======
 static struct thermal_zone_of_device_ops thdev_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_temp = db8500_thermal_get_temp,
 };
 
@@ -182,7 +186,7 @@ static int db8500_thermal_probe(struct platform_device *pdev)
 	}
 
 	/* register of thermal sensor and get info from DT */
-	th->tz = devm_thermal_zone_of_sensor_register(dev, 0, th, &thdev_ops);
+	th->tz = devm_thermal_of_zone_register(dev, 0, th, &thdev_ops);
 	if (IS_ERR(th->tz)) {
 		dev_err(dev, "register thermal zone sensor failed\n");
 		return PTR_ERR(th->tz);

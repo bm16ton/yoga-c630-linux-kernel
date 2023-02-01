@@ -24,8 +24,11 @@ struct mlx5e_rx_res {
 	struct {
 		struct mlx5e_rqt direct_rqt;
 		struct mlx5e_tir direct_tir;
+<<<<<<< HEAD
+=======
 		struct mlx5e_rqt xsk_rqt;
 		struct mlx5e_tir xsk_tir;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} *channels;
 
 	struct {
@@ -320,6 +323,10 @@ static int mlx5e_rx_res_channels_init(struct mlx5e_rx_res *res)
 		mlx5e_tir_builder_clear(builder);
 	}
 
+<<<<<<< HEAD
+	goto out;
+
+=======
 	if (!(res->features & MLX5E_RX_RES_FEATURE_XSK))
 		goto out;
 
@@ -362,6 +369,7 @@ err_destroy_xsk_rqts:
 		mlx5e_rqt_destroy(&res->channels[ix].xsk_rqt);
 
 	ix = res->max_nch;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_destroy_direct_tirs:
 	while (--ix >= 0)
 		mlx5e_tir_destroy(&res->channels[ix].direct_tir);
@@ -420,12 +428,15 @@ static void mlx5e_rx_res_channels_destroy(struct mlx5e_rx_res *res)
 	for (ix = 0; ix < res->max_nch; ix++) {
 		mlx5e_tir_destroy(&res->channels[ix].direct_tir);
 		mlx5e_rqt_destroy(&res->channels[ix].direct_rqt);
+<<<<<<< HEAD
+=======
 
 		if (!(res->features & MLX5E_RX_RES_FEATURE_XSK))
 			continue;
 
 		mlx5e_tir_destroy(&res->channels[ix].xsk_tir);
 		mlx5e_rqt_destroy(&res->channels[ix].xsk_rqt);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	kvfree(res->channels);
@@ -491,6 +502,8 @@ u32 mlx5e_rx_res_get_tirn_direct(struct mlx5e_rx_res *res, unsigned int ix)
 	return mlx5e_tir_get_tirn(&res->channels[ix].direct_tir);
 }
 
+<<<<<<< HEAD
+=======
 u32 mlx5e_rx_res_get_tirn_xsk(struct mlx5e_rx_res *res, unsigned int ix)
 {
 	WARN_ON(!(res->features & MLX5E_RX_RES_FEATURE_XSK));
@@ -498,6 +511,7 @@ u32 mlx5e_rx_res_get_tirn_xsk(struct mlx5e_rx_res *res, unsigned int ix)
 	return mlx5e_tir_get_tirn(&res->channels[ix].xsk_tir);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 u32 mlx5e_rx_res_get_tirn_rss(struct mlx5e_rx_res *res, enum mlx5_traffic_types tt)
 {
 	struct mlx5e_rss *rss = res->rss[0];
@@ -523,6 +537,35 @@ static u32 mlx5e_rx_res_get_rqtn_direct(struct mlx5e_rx_res *res, unsigned int i
 	return mlx5e_rqt_get_rqtn(&res->channels[ix].direct_rqt);
 }
 
+<<<<<<< HEAD
+static void mlx5e_rx_res_channel_activate_direct(struct mlx5e_rx_res *res,
+						 struct mlx5e_channels *chs,
+						 unsigned int ix)
+{
+	u32 rqn = res->rss_rqns[ix];
+	int err;
+
+	err = mlx5e_rqt_redirect_direct(&res->channels[ix].direct_rqt, rqn);
+	if (err)
+		mlx5_core_warn(res->mdev, "Failed to redirect direct RQT %#x to RQ %#x (channel %u): err = %d\n",
+			       mlx5e_rqt_get_rqtn(&res->channels[ix].direct_rqt),
+			       rqn, ix, err);
+}
+
+static void mlx5e_rx_res_channel_deactivate_direct(struct mlx5e_rx_res *res,
+						   unsigned int ix)
+{
+	int err;
+
+	err = mlx5e_rqt_redirect_direct(&res->channels[ix].direct_rqt, res->drop_rqn);
+	if (err)
+		mlx5_core_warn(res->mdev, "Failed to redirect direct RQT %#x to drop RQ %#x (channel %u): err = %d\n",
+			       mlx5e_rqt_get_rqtn(&res->channels[ix].direct_rqt),
+			       res->drop_rqn, ix, err);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void mlx5e_rx_res_channels_activate(struct mlx5e_rx_res *res, struct mlx5e_channels *chs)
 {
 	unsigned int nch, ix;
@@ -530,12 +573,27 @@ void mlx5e_rx_res_channels_activate(struct mlx5e_rx_res *res, struct mlx5e_chann
 
 	nch = mlx5e_channels_get_num(chs);
 
+<<<<<<< HEAD
+	for (ix = 0; ix < chs->num; ix++) {
+		if (mlx5e_channels_is_xsk(chs, ix))
+			mlx5e_channels_get_xsk_rqn(chs, ix, &res->rss_rqns[ix]);
+		else
+			mlx5e_channels_get_regular_rqn(chs, ix, &res->rss_rqns[ix]);
+	}
+=======
 	for (ix = 0; ix < chs->num; ix++)
 		mlx5e_channels_get_regular_rqn(chs, ix, &res->rss_rqns[ix]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	res->rss_nch = chs->num;
 
 	mlx5e_rx_res_rss_enable(res);
 
+<<<<<<< HEAD
+	for (ix = 0; ix < nch; ix++)
+		mlx5e_rx_res_channel_activate_direct(res, chs, ix);
+	for (ix = nch; ix < res->max_nch; ix++)
+		mlx5e_rx_res_channel_deactivate_direct(res, ix);
+=======
 	for (ix = 0; ix < nch; ix++) {
 		u32 rqn;
 
@@ -573,6 +631,7 @@ void mlx5e_rx_res_channels_activate(struct mlx5e_rx_res *res, struct mlx5e_chann
 				       mlx5e_rqt_get_rqtn(&res->channels[ix].xsk_rqt),
 				       res->drop_rqn, ix, err);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (res->features & MLX5E_RX_RES_FEATURE_PTP) {
 		u32 rqn;
@@ -595,6 +654,10 @@ void mlx5e_rx_res_channels_deactivate(struct mlx5e_rx_res *res)
 
 	mlx5e_rx_res_rss_disable(res);
 
+<<<<<<< HEAD
+	for (ix = 0; ix < res->max_nch; ix++)
+		mlx5e_rx_res_channel_deactivate_direct(res, ix);
+=======
 	for (ix = 0; ix < res->max_nch; ix++) {
 		err = mlx5e_rqt_redirect_direct(&res->channels[ix].direct_rqt, res->drop_rqn);
 		if (err)
@@ -611,6 +674,7 @@ void mlx5e_rx_res_channels_deactivate(struct mlx5e_rx_res *res)
 				       mlx5e_rqt_get_rqtn(&res->channels[ix].xsk_rqt),
 				       res->drop_rqn, ix, err);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (res->features & MLX5E_RX_RES_FEATURE_PTP) {
 		err = mlx5e_rqt_redirect_direct(&res->ptp.rqt, res->drop_rqn);
@@ -621,6 +685,19 @@ void mlx5e_rx_res_channels_deactivate(struct mlx5e_rx_res *res)
 	}
 }
 
+<<<<<<< HEAD
+void mlx5e_rx_res_xsk_update(struct mlx5e_rx_res *res, struct mlx5e_channels *chs,
+			     unsigned int ix, bool xsk)
+{
+	if (xsk)
+		mlx5e_channels_get_xsk_rqn(chs, ix, &res->rss_rqns[ix]);
+	else
+		mlx5e_channels_get_regular_rqn(chs, ix, &res->rss_rqns[ix]);
+
+	mlx5e_rx_res_rss_enable(res);
+
+	mlx5e_rx_res_channel_activate_direct(res, chs, ix);
+=======
 int mlx5e_rx_res_xsk_activate(struct mlx5e_rx_res *res, struct mlx5e_channels *chs,
 			      unsigned int ix)
 {
@@ -648,6 +725,7 @@ int mlx5e_rx_res_xsk_deactivate(struct mlx5e_rx_res *res, unsigned int ix)
 			       mlx5e_rqt_get_rqtn(&res->channels[ix].xsk_rqt),
 			       res->drop_rqn, ix, err);
 	return err;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int mlx5e_rx_res_packet_merge_set_param(struct mlx5e_rx_res *res,

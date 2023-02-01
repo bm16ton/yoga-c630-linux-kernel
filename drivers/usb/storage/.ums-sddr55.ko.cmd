@@ -1,0 +1,1 @@
+cmd_drivers/usb/storage/ums-sddr55.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/storage/ums-sddr55.ko drivers/usb/storage/ums-sddr55.o drivers/usb/storage/ums-sddr55.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/e1000e/e1000e.mod := printf '%s\n'   82571.o ich8lan.o 80003es2lan.o mac.o manage.o nvm.o phy.o param.o ethtool.o netdev.o ptp.o | awk '!x[$$0]++ { print("drivers/net/ethernet/intel/e1000e/"$$0) }' > drivers/net/ethernet/intel/e1000e/e1000e.mod

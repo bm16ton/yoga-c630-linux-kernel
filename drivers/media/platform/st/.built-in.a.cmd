@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/st/built-in.a := rm -f drivers/media/platform/st/built-in.a;  printf "drivers/media/platform/st/%s " sti/bdisp/built-in.a sti/c8sectpfe/built-in.a sti/delta/built-in.a sti/hva/built-in.a stm32/built-in.a | xargs ar cDPrST drivers/media/platform/st/built-in.a

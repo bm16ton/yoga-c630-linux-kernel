@@ -1,0 +1,10 @@
+drivers/net/ethernet/stmicro/stmmac/stmmac.ko
+drivers/net/ethernet/stmicro/stmmac/stmmac-platform.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-meson.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-rk.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.ko
+drivers/net/ethernet/stmicro/stmmac/dwmac-generic.ko

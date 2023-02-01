@@ -111,6 +111,10 @@ struct mlx5e_rep_priv {
 	struct list_head       vport_sqs_list;
 	struct mlx5_rep_uplink_priv uplink_priv; /* valid for uplink rep */
 	struct rtnl_link_stats64 prev_vf_vport_stats;
+<<<<<<< HEAD
+	struct mlx5_flow_handle *send_to_vport_meta_rule;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rhashtable tc_ht;
 };
 
@@ -241,8 +245,8 @@ int mlx5e_rep_get_offload_stats(int attr_id, const struct net_device *dev,
 				void *sp);
 
 bool mlx5e_is_uplink_rep(struct mlx5e_priv *priv);
-int mlx5e_add_sqs_fwd_rules(struct mlx5e_priv *priv);
-void mlx5e_remove_sqs_fwd_rules(struct mlx5e_priv *priv);
+void mlx5e_rep_activate_channels(struct mlx5e_priv *priv);
+void mlx5e_rep_deactivate_channels(struct mlx5e_priv *priv);
 
 void mlx5e_rep_queue_neigh_stats_work(struct mlx5e_priv *priv);
 
@@ -256,8 +260,8 @@ static inline bool mlx5e_eswitch_rep(const struct net_device *netdev)
 
 #else /* CONFIG_MLX5_ESWITCH */
 static inline bool mlx5e_is_uplink_rep(struct mlx5e_priv *priv) { return false; }
-static inline int mlx5e_add_sqs_fwd_rules(struct mlx5e_priv *priv) { return 0; }
-static inline void mlx5e_remove_sqs_fwd_rules(struct mlx5e_priv *priv) {}
+static inline void mlx5e_rep_activate_channels(struct mlx5e_priv *priv) {}
+static inline void mlx5e_rep_deactivate_channels(struct mlx5e_priv *priv) {}
 static inline int mlx5e_rep_init(void) { return 0; };
 static inline void mlx5e_rep_cleanup(void) {};
 static inline bool mlx5e_rep_has_offload_stats(const struct net_device *dev,

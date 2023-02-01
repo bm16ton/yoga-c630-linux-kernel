@@ -1,0 +1,1 @@
+cmd_drivers/auxdisplay/lcd2s.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/auxdisplay/lcd2s.ko drivers/auxdisplay/lcd2s.o drivers/auxdisplay/lcd2s.mod.o;  true

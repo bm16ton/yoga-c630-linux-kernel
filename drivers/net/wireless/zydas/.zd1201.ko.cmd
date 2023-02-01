@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/zydas/zd1201.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/zydas/zd1201.ko drivers/net/wireless/zydas/zd1201.o drivers/net/wireless/zydas/zd1201.mod.o;  true

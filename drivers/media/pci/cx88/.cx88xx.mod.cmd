@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/cx88/cx88xx.mod := printf '%s\n'   cx88-cards.o cx88-core.o cx88-i2c.o cx88-tvaudio.o cx88-dsp.o cx88-input.o | awk '!x[$$0]++ { print("drivers/media/pci/cx88/"$$0) }' > drivers/media/pci/cx88/cx88xx.mod

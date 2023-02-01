@@ -66,7 +66,11 @@ static int test_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	unsigned int format = fmt & SND_SOC_DAIFMT_FORMAT_MASK;
 	unsigned int clock  = fmt & SND_SOC_DAIFMT_CLOCK_MASK;
 	unsigned int inv    = fmt & SND_SOC_DAIFMT_INV_MASK;
+<<<<<<< HEAD
+	unsigned int master = fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK;
+=======
 	unsigned int master = fmt & SND_SOC_DAIFMT_MASTER_MASK;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	char *str;
 
 	dev_info(dai->dev, "name   : %s", dai->name);
@@ -105,6 +109,18 @@ static int test_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 
 	str = "unknown";
 	switch (master) {
+<<<<<<< HEAD
+	case SND_SOC_DAIFMT_BP_FP:
+		str = "clk provider, frame provider";
+		break;
+	case SND_SOC_DAIFMT_BC_FP:
+		str = "clk consumer, frame provider";
+		break;
+	case SND_SOC_DAIFMT_BP_FC:
+		str = "clk provider, frame consumer";
+		break;
+	case SND_SOC_DAIFMT_BC_FC:
+=======
 	case SND_SOC_DAIFMT_CBP_CFP:
 		str = "clk provider, frame provider";
 		break;
@@ -115,6 +131,7 @@ static int test_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		str = "clk provider, frame consumer";
 		break;
 	case SND_SOC_DAIFMT_CBC_CFC:
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		str = "clk consumer, frame consumer";
 		break;
 	}
@@ -192,10 +209,17 @@ static int test_dai_bespoke_trigger(struct snd_pcm_substream *substream,
 static u64 test_dai_formats =
 	/*
 	 * Select below from Sound Card, not auto
+<<<<<<< HEAD
+	 *	SND_SOC_POSSIBLE_DAIFMT_BP_FP
+	 *	SND_SOC_POSSIBLE_DAIFMT_BC_FP
+	 *	SND_SOC_POSSIBLE_DAIFMT_BP_FC
+	 *	SND_SOC_POSSIBLE_DAIFMT_BC_FC
+=======
 	 *	SND_SOC_POSSIBLE_DAIFMT_CBP_CFP
 	 *	SND_SOC_POSSIBLE_DAIFMT_CBC_CFP
 	 *	SND_SOC_POSSIBLE_DAIFMT_CBP_CFC
 	 *	SND_SOC_POSSIBLE_DAIFMT_CBC_CFC
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
 	SND_SOC_POSSIBLE_DAIFMT_I2S	|
 	SND_SOC_POSSIBLE_DAIFMT_RIGHT_J	|
@@ -564,11 +588,18 @@ static int test_driver_probe(struct platform_device *pdev)
 		cdriv->pcm_construct		= test_component_pcm_construct;
 		cdriv->pointer			= test_component_pointer;
 		cdriv->trigger			= test_component_trigger;
+<<<<<<< HEAD
+		cdriv->legacy_dai_naming	= 1;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		cdriv->name			= "test_codec";
 		cdriv->idle_bias_on		= 1;
 		cdriv->endianness		= 1;
+<<<<<<< HEAD
+=======
 		cdriv->non_legacy_dai_naming	= 1;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	cdriv->open		= test_component_open;

@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/built-in.a := rm -f drivers/media/pci/built-in.a;  printf "drivers/media/pci/%s " b2c2/built-in.a pluto2/built-in.a dm1105/built-in.a pt1/built-in.a pt3/built-in.a mantis/built-in.a ngene/built-in.a ddbridge/built-in.a smipcie/built-in.a netup_unidvb/built-in.a intel/built-in.a | xargs ar cDPrST drivers/media/pci/built-in.a

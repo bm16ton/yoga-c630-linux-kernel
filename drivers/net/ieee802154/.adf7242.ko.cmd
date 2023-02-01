@@ -1,0 +1,1 @@
+cmd_drivers/net/ieee802154/adf7242.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ieee802154/adf7242.ko drivers/net/ieee802154/adf7242.o drivers/net/ieee802154/adf7242.mod.o;  true

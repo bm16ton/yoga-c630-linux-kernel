@@ -1,0 +1,17 @@
+drivers/net/fddi/skfp/skfddi.o
+drivers/net/fddi/skfp/hwmtm.o
+drivers/net/fddi/skfp/fplustm.o
+drivers/net/fddi/skfp/smt.o
+drivers/net/fddi/skfp/cfm.o
+drivers/net/fddi/skfp/ecm.o
+drivers/net/fddi/skfp/pcmplc.o
+drivers/net/fddi/skfp/pmf.o
+drivers/net/fddi/skfp/queue.o
+drivers/net/fddi/skfp/rmt.o
+drivers/net/fddi/skfp/smtdef.o
+drivers/net/fddi/skfp/smtinit.o
+drivers/net/fddi/skfp/smttimer.o
+drivers/net/fddi/skfp/srf.o
+drivers/net/fddi/skfp/hwt.o
+drivers/net/fddi/skfp/drvfbi.o
+drivers/net/fddi/skfp/ess.o

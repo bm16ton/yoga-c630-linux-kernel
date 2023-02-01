@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/mantis/mantis_core.mod := printf '%s\n'   mantis_ioc.o mantis_uart.o mantis_dma.o mantis_pci.o mantis_i2c.o mantis_dvb.o mantis_evm.o mantis_hif.o mantis_ca.o mantis_pcmcia.o mantis_input.o | awk '!x[$$0]++ { print("drivers/media/pci/mantis/"$$0) }' > drivers/media/pci/mantis/mantis_core.mod

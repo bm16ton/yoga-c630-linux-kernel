@@ -173,6 +173,24 @@ static void mt7915_eeprom_parse_band_config(struct mt7915_phy *phy)
 void mt7915_eeprom_parse_hw_cap(struct mt7915_dev *dev,
 				struct mt7915_phy *phy)
 {
+<<<<<<< HEAD
+	u8 path, nss, nss_max = 4, *eeprom = dev->mt76.eeprom.data;
+	struct mt76_phy *mphy = phy->mt76;
+
+	mt7915_eeprom_parse_band_config(phy);
+
+	/* read tx/rx path from eeprom */
+	if (is_mt7915(&dev->mt76)) {
+		path = FIELD_GET(MT_EE_WIFI_CONF0_TX_PATH,
+				 eeprom[MT_EE_WIFI_CONF]);
+	} else {
+		path = FIELD_GET(MT_EE_WIFI_CONF0_TX_PATH,
+				 eeprom[MT_EE_WIFI_CONF + phy->band_idx]);
+	}
+
+	if (!path || path > 4)
+		path = 4;
+=======
 	u8 nss, nss_band, nss_band_max, *eeprom = dev->mt76.eeprom.data;
 	struct mt76_phy *mphy = phy->mt76;
 	bool ext_phy = phy != &dev->phy;
@@ -193,9 +211,37 @@ void mt7915_eeprom_parse_hw_cap(struct mt7915_dev *dev,
 
 	/* read tx/rx stream */
 	nss_band = nss;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
+	/* read tx/rx stream */
+	nss = path;
 	if (dev->dbdc_support) {
 		if (is_mt7915(&dev->mt76)) {
+<<<<<<< HEAD
+			path = min_t(u8, path, 2);
+			nss = FIELD_GET(MT_EE_WIFI_CONF3_TX_PATH_B0,
+					eeprom[MT_EE_WIFI_CONF + 3]);
+			if (phy->band_idx)
+				nss = FIELD_GET(MT_EE_WIFI_CONF3_TX_PATH_B1,
+						eeprom[MT_EE_WIFI_CONF + 3]);
+		} else {
+			nss = FIELD_GET(MT_EE_WIFI_CONF_STREAM_NUM,
+					eeprom[MT_EE_WIFI_CONF + 2 + phy->band_idx]);
+		}
+
+		if (!is_mt7986(&dev->mt76))
+			nss_max = 2;
+	}
+
+	if (!nss)
+		nss = nss_max;
+	nss = min_t(u8, min_t(u8, nss_max, nss), path);
+
+	mphy->chainmask = BIT(path) - 1;
+	if (phy->band_idx)
+		mphy->chainmask <<= dev->chainshift;
+	mphy->antenna_mask = BIT(nss) - 1;
+=======
 			nss_band = FIELD_GET(MT_EE_WIFI_CONF3_TX_PATH_B0,
 					     eeprom[MT_EE_WIFI_CONF + 3]);
 			if (phy->band_idx)
@@ -227,6 +273,7 @@ void mt7915_eeprom_parse_hw_cap(struct mt7915_dev *dev,
 	if (ext_phy)
 		mphy->chainmask <<= dev->chainshift;
 	mphy->antenna_mask = BIT(nss_band) - 1;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev->chainmask |= mphy->chainmask;
 	dev->chainshift = hweight8(dev->mphy.chainmask);
 }

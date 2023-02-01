@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt7921/modules.order := {   echo drivers/net/wireless/mediatek/mt76/mt7921/mt7921-common.ko;   echo drivers/net/wireless/mediatek/mt76/mt7921/mt7921s.ko;   echo drivers/net/wireless/mediatek/mt76/mt7921/mt7921u.ko; :; } > drivers/net/wireless/mediatek/mt76/mt7921/modules.order

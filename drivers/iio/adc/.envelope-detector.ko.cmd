@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/envelope-detector.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/envelope-detector.ko drivers/iio/adc/envelope-detector.o drivers/iio/adc/envelope-detector.mod.o;  true

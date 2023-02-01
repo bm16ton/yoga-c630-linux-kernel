@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/dvb-usb-v2/dvb-usb-mxl111sf.mod := printf '%s\n'   mxl111sf.o mxl111sf-phy.o mxl111sf-i2c.o mxl111sf-gpio.o | awk '!x[$$0]++ { print("drivers/media/usb/dvb-usb-v2/"$$0) }' > drivers/media/usb/dvb-usb-v2/dvb-usb-mxl111sf.mod

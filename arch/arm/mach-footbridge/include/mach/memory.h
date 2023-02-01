@@ -16,6 +16,8 @@
 #ifndef __ASM_ARCH_MEMORY_H
 #define __ASM_ARCH_MEMORY_H
 
+<<<<<<< HEAD
+=======
 
 #if defined(CONFIG_FOOTBRIDGE_ADDIN)
 /*
@@ -47,6 +49,7 @@ extern unsigned long __bus_to_virt(unsigned long);
 
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Cache flushing area.
  */

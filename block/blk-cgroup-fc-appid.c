@@ -19,8 +19,13 @@ int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_len)
 		return -EINVAL;
 
 	cgrp = cgroup_get_from_id(cgrp_id);
+<<<<<<< HEAD
+	if (IS_ERR(cgrp))
+		return PTR_ERR(cgrp);
+=======
 	if (!cgrp)
 		return -ENOENT;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	css = cgroup_get_e_css(cgrp, &io_cgrp_subsys);
 	if (!css) {
 		ret = -ENOENT;

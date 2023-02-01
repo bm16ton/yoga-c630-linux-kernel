@@ -53,6 +53,10 @@
 #include <linux/bsearch.h>
 #include <linux/dynamic_debug.h>
 #include <linux/audit.h>
+<<<<<<< HEAD
+#include <linux/cfi.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <uapi/linux/module.h>
 #include "internal.h"
 
@@ -1144,8 +1148,11 @@ void __weak module_arch_freeing_init(struct module *mod)
 {
 }
 
+<<<<<<< HEAD
+=======
 static void cfi_cleanup(struct module *mod);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Free a module, remove from lists, etc. */
 static void free_module(struct module *mod)
 {
@@ -1190,9 +1197,12 @@ static void free_module(struct module *mod)
 		       mod->name);
 	mutex_unlock(&module_mutex);
 
+<<<<<<< HEAD
+=======
 	/* Clean up CFI for the module. */
 	cfi_cleanup(mod);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* This may be empty, but that's OK */
 	module_arch_freeing_init(mod);
 	module_memfree(mod->init_layout.base);
@@ -1598,6 +1608,18 @@ static void free_modinfo(struct module *mod)
 	}
 }
 
+<<<<<<< HEAD
+static void dynamic_debug_setup(struct module *mod, struct _ddebug_info *dyndbg)
+{
+	if (!dyndbg->num_descs)
+		return;
+	ddebug_add_module(dyndbg, mod->name);
+}
+
+static void dynamic_debug_remove(struct module *mod, struct _ddebug_info *dyndbg)
+{
+	if (dyndbg->num_descs)
+=======
 static void dynamic_debug_setup(struct module *mod, struct _ddebug *debug, unsigned int num)
 {
 	if (!debug)
@@ -1608,6 +1630,7 @@ static void dynamic_debug_setup(struct module *mod, struct _ddebug *debug, unsig
 static void dynamic_debug_remove(struct module *mod, struct _ddebug *debug)
 {
 	if (debug)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ddebug_remove_module(mod->name);
 }
 
@@ -2111,8 +2134,15 @@ static int find_module_sections(struct module *mod, struct load_info *info)
 	if (section_addr(info, "__obsparm"))
 		pr_warn("%s: Ignoring obsolete parameters\n", mod->name);
 
+<<<<<<< HEAD
+	info->dyndbg.descs = section_objs(info, "__dyndbg",
+					sizeof(*info->dyndbg.descs), &info->dyndbg.num_descs);
+	info->dyndbg.classes = section_objs(info, "__dyndbg_classes",
+					sizeof(*info->dyndbg.classes), &info->dyndbg.num_classes);
+=======
 	info->debug = section_objs(info, "__dyndbg",
 				   sizeof(*info->debug), &info->num_debug);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -2602,8 +2632,14 @@ static int complete_formation(struct module *mod, struct load_info *info)
 	if (err < 0)
 		goto out;
 
+<<<<<<< HEAD
+	/* These rely on module_mutex for list integrity. */
+	module_bug_finalize(info->hdr, info->sechdrs, mod);
+	module_cfi_finalize(info->hdr, info->sechdrs, mod);
+=======
 	/* This relies on module_mutex for list integrity. */
 	module_bug_finalize(info->hdr, info->sechdrs, mod);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (module_check_misalignment(mod))
 		goto out_misaligned;
@@ -2665,8 +2701,11 @@ static int unknown_module_param_cb(char *param, char *val, const char *modname,
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
 static void cfi_init(struct module *mod);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Allocate and load the module: note that size of section 0 is always
  * zero, and we rely on this for optional sections.
@@ -2796,9 +2835,12 @@ static int load_module(struct load_info *info, const char __user *uargs,
 
 	flush_module_icache(mod);
 
+<<<<<<< HEAD
+=======
 	/* Setup CFI for the module. */
 	cfi_init(mod);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Now copy in args */
 	mod->args = strndup_user(uargs, ~0UL >> 1);
 	if (IS_ERR(mod->args)) {
@@ -2807,7 +2849,11 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	}
 
 	init_build_id(mod, info);
+<<<<<<< HEAD
+	dynamic_debug_setup(mod, &info->dyndbg);
+=======
 	dynamic_debug_setup(mod, info->debug, info->num_debug);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Ftrace init must be called in the MODULE_STATE_UNFORMED state */
 	ftrace_module_init(mod);
@@ -2871,11 +2917,18 @@ static int load_module(struct load_info *info, const char __user *uargs,
 
  ddebug_cleanup:
 	ftrace_release_mod(mod);
+<<<<<<< HEAD
+	dynamic_debug_remove(mod, &info->dyndbg);
+	synchronize_rcu();
+	kfree(mod->args);
+ free_arch_cleanup:
+=======
 	dynamic_debug_remove(mod, info->debug);
 	synchronize_rcu();
 	kfree(mod->args);
  free_arch_cleanup:
 	cfi_cleanup(mod);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	module_arch_cleanup(mod);
  free_modinfo:
 	free_modinfo(mod);
@@ -2961,6 +3014,8 @@ static inline int within(unsigned long addr, void *start, unsigned long size)
 	return ((void *)addr >= start && (void *)addr < start + size);
 }
 
+<<<<<<< HEAD
+=======
 static void cfi_init(struct module *mod)
 {
 #ifdef CONFIG_CFI_CLANG
@@ -2996,6 +3051,7 @@ static void cfi_cleanup(struct module *mod)
 #endif
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Keep in sync with MODULE_FLAGS_BUF_SIZE !!! */
 char *module_flags(struct module *mod, char *buf, bool show_state)
 {

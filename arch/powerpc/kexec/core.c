@@ -136,7 +136,11 @@ void __init reserve_crashkernel(void)
 #ifdef CONFIG_PPC64
 		/*
 		 * On the LPAR platform place the crash kernel to mid of
+<<<<<<< HEAD
+		 * RMA size (max. of 512MB) to ensure the crash kernel
+=======
 		 * RMA size (512MB or more) to ensure the crash kernel
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * gets enough space to place itself and some stack to be
 		 * in the first segment. At the same time normal kernel
 		 * also get enough space to allocate memory for essential
@@ -144,9 +148,15 @@ void __init reserve_crashkernel(void)
 		 * kernel starts at 128MB offset on other platforms.
 		 */
 		if (firmware_has_feature(FW_FEATURE_LPAR))
+<<<<<<< HEAD
+			crashk_res.start = min_t(u64, ppc64_rma_size / 2, SZ_512M);
+		else
+			crashk_res.start = min_t(u64, ppc64_rma_size / 2, SZ_128M);
+=======
 			crashk_res.start = ppc64_rma_size / 2;
 		else
 			crashk_res.start = min(0x8000000ULL, (ppc64_rma_size / 2));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 		crashk_res.start = KDUMP_KERNELBASE;
 #endif

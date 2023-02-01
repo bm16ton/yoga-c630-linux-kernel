@@ -1,0 +1,1 @@
+cmd_drivers/platform/chrome/cros_ec_chardev.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/platform/chrome/cros_ec_chardev.ko drivers/platform/chrome/cros_ec_chardev.o drivers/platform/chrome/cros_ec_chardev.mod.o;  true

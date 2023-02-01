@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/solomon/ssd130x-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/solomon/ssd130x-i2c.ko drivers/gpu/drm/solomon/ssd130x-i2c.o drivers/gpu/drm/solomon/ssd130x-i2c.mod.o;  true

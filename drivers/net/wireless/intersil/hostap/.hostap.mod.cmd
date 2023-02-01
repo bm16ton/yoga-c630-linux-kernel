@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intersil/hostap/hostap.mod := printf '%s\n'   hostap_80211_rx.o hostap_80211_tx.o hostap_ap.o hostap_info.o hostap_ioctl.o hostap_main.o hostap_proc.o | awk '!x[$$0]++ { print("drivers/net/wireless/intersil/hostap/"$$0) }' > drivers/net/wireless/intersil/hostap/hostap.mod

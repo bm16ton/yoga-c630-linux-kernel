@@ -307,6 +307,8 @@ void ODM_Write_DIG(void *pDM_VOID, u8 CurrentIGI)
 		pDM_DigTable->CurIGValue = CurrentIGI;
 	}
 
+<<<<<<< HEAD
+=======
 }
 
 void odm_PauseDIG(
@@ -364,6 +366,7 @@ void odm_PauseDIG(
 	default:
 		break;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 bool odm_DigAbort(void *pDM_VOID)

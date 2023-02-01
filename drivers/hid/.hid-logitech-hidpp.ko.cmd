@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-logitech-hidpp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-logitech-hidpp.ko drivers/hid/hid-logitech-hidpp.o drivers/hid/hid-logitech-hidpp.mod.o;  true

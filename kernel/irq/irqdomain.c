@@ -715,6 +715,8 @@ static unsigned int __irq_create_mapping_affinity(struct irq_domain *domain,
 	return virq;
 }
 
+<<<<<<< HEAD
+=======
 /**
  * irq_create_mapping_affinity() - Map a hardware interrupt into linux irq space
  * @domain: domain owning this hardware interrupt or NULL for default domain
@@ -740,6 +742,7 @@ unsigned int irq_create_mapping_affinity(struct irq_domain *domain,
 }
 EXPORT_SYMBOL_GPL(irq_create_mapping_affinity);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int irq_domain_translate(struct irq_domain *d,
 				struct irq_fwspec *fwspec,
 				irq_hw_number_t *hwirq, unsigned int *type)

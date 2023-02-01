@@ -35,6 +35,14 @@ static long perf_event_open(struct perf_event_attr *pe, pid_t pid,
 	return syscall(__NR_perf_event_open, pe, pid, cpu, group_fd, flags);
 }
 
+<<<<<<< HEAD
+static inline int status_check(char *status_page, int status_bit)
+{
+	return status_page[status_bit >> 3] & (1 << (status_bit & 7));
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int get_id(void)
 {
 	FILE *fp = fopen(id_file, "r");
@@ -120,8 +128,13 @@ TEST_F(user, perf_write) {
 	/* Register should work */
 	ASSERT_EQ(0, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
 	ASSERT_EQ(0, reg.write_index);
+<<<<<<< HEAD
+	ASSERT_NE(0, reg.status_bit);
+	ASSERT_EQ(0, status_check(status_page, reg.status_bit));
+=======
 	ASSERT_NE(0, reg.status_index);
 	ASSERT_EQ(0, status_page[reg.status_index]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Id should be there */
 	id = get_id();
@@ -144,7 +157,11 @@ TEST_F(user, perf_write) {
 	ASSERT_NE(MAP_FAILED, perf_page);
 
 	/* Status should be updated */
+<<<<<<< HEAD
+	ASSERT_NE(0, status_check(status_page, reg.status_bit));
+=======
 	ASSERT_EQ(EVENT_STATUS_PERF, status_page[reg.status_index]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	event.index = reg.write_index;
 	event.field1 = 0xc001;

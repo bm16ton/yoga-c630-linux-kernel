@@ -1,0 +1,1 @@
+cmd_net/xfrm/built-in.a := rm -f net/xfrm/built-in.a;  printf "net/xfrm/%s " xfrm_policy.o xfrm_state.o xfrm_hash.o xfrm_input.o xfrm_output.o xfrm_sysctl.o xfrm_replay.o xfrm_device.o xfrm_proc.o | xargs ar cDPrST net/xfrm/built-in.a

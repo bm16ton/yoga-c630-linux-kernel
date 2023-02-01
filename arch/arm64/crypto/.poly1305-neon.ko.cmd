@@ -1,0 +1,1 @@
+cmd_arch/arm64/crypto/poly1305-neon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o arch/arm64/crypto/poly1305-neon.ko arch/arm64/crypto/poly1305-neon.o arch/arm64/crypto/poly1305-neon.mod.o;  true

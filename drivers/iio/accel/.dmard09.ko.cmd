@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/dmard09.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/dmard09.ko drivers/iio/accel/dmard09.o drivers/iio/accel/dmard09.mod.o;  true

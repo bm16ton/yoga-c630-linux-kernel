@@ -1,0 +1,3 @@
+drivers/net/wireless/microchip/wilc1000/wilc1000.ko
+drivers/net/wireless/microchip/wilc1000/wilc1000-sdio.ko
+drivers/net/wireless/microchip/wilc1000/wilc1000-spi.ko

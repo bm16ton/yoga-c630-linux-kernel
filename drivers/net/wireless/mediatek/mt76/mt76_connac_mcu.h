@@ -10,6 +10,10 @@
 #define FW_FEATURE_SET_KEY_IDX		GENMASK(2, 1)
 #define FW_FEATURE_ENCRY_MODE		BIT(4)
 #define FW_FEATURE_OVERRIDE_ADDR	BIT(5)
+<<<<<<< HEAD
+#define FW_FEATURE_NON_DL		BIT(6)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define DL_MODE_ENCRYPT			BIT(0)
 #define DL_MODE_KEY_IDX			GENMASK(2, 1)
@@ -33,6 +37,15 @@
 #define PATCH_SEC_ENC_SCRAMBLE_INFO_MASK	GENMASK(15, 0)
 #define PATCH_SEC_ENC_AES_KEY_MASK		GENMASK(7, 0)
 
+<<<<<<< HEAD
+enum {
+	FW_TYPE_DEFAULT = 0,
+	FW_TYPE_CLC = 2,
+	FW_TYPE_MAX_NUM = 255
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define MCU_PQ_ID(p, q)		(((p) << 15) | ((q) << 10))
 #define MCU_PKT_ID		0xa0
 
@@ -174,7 +187,12 @@ struct mt76_connac2_fw_region {
 	__le32 addr;
 	__le32 len;
 	u8 feature_set;
+<<<<<<< HEAD
+	u8 type;
+	u8 rsv1[14];
+=======
 	u8 rsv1[15];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed;
 
 struct tlv {
@@ -1172,6 +1190,10 @@ enum {
 	MCU_CE_CMD_SET_ROC = 0x1c,
 	MCU_CE_CMD_SET_EDCA_PARMS = 0x1d,
 	MCU_CE_CMD_SET_P2P_OPPPS = 0x33,
+<<<<<<< HEAD
+	MCU_CE_CMD_SET_CLC = 0x5c,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	MCU_CE_CMD_SET_RATE_TX_POWER = 0x5d,
 	MCU_CE_CMD_SCHED_SCAN_ENABLE = 0x61,
 	MCU_CE_CMD_SCHED_SCAN_REQ = 0x62,

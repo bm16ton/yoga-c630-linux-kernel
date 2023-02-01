@@ -1298,7 +1298,10 @@ static struct regmap_irq_chip wcd938x_regmap_irq_chip = {
 	.num_regs = 3,
 	.status_base = WCD938X_DIGITAL_INTR_STATUS_0,
 	.mask_base = WCD938X_DIGITAL_INTR_MASK_0,
+<<<<<<< HEAD
+=======
 	.type_base = WCD938X_DIGITAL_INTR_LEVEL_0,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ack_base = WCD938X_DIGITAL_INTR_CLEAR_0,
 	.use_ack = 1,
 	.runtime_pm = true,

@@ -279,6 +279,12 @@ acpi_numa_processor_affinity_init(struct acpi_srat_cpu_affinity *pa) { }
 
 void acpi_numa_x2apic_affinity_init(struct acpi_srat_x2apic_cpu_affinity *pa);
 
+#if defined(CONFIG_ARM64) || defined(CONFIG_LOONGARCH)
+void acpi_arch_dma_setup(struct device *dev);
+#else
+static inline void acpi_arch_dma_setup(struct device *dev) { }
+#endif
+
 #ifdef CONFIG_ARM64
 void acpi_numa_gicc_affinity_init(struct acpi_srat_gicc_affinity *pa);
 void acpi_arch_dma_setup(struct device *dev, u64 *dma_addr, u64 *dma_size);
@@ -495,7 +501,7 @@ bool acpi_dev_resource_address_space(struct acpi_resource *ares,
 				     struct resource_win *win);
 bool acpi_dev_resource_ext_address_space(struct acpi_resource *ares,
 					 struct resource_win *win);
-unsigned long acpi_dev_irq_flags(u8 triggering, u8 polarity, u8 shareable);
+unsigned long acpi_dev_irq_flags(u8 triggering, u8 polarity, u8 shareable, u8 wake_capable);
 unsigned int acpi_dev_get_irq_type(int triggering, int polarity);
 bool acpi_dev_resource_interrupt(struct acpi_resource *ares, int index,
 				 struct resource *res);
@@ -506,6 +512,7 @@ int acpi_dev_get_resources(struct acpi_device *adev, struct list_head *list,
 			   void *preproc_data);
 int acpi_dev_get_dma_resources(struct acpi_device *adev,
 			       struct list_head *list);
+int acpi_dev_get_memory_resources(struct acpi_device *adev, struct list_head *list);
 int acpi_dev_filter_resource_type(struct acpi_resource *ares,
 				  unsigned long types);
 
@@ -798,6 +805,11 @@ acpi_dev_hid_uid_match(struct acpi_device *adev, const char *hid2, const char *u
 	return false;
 }
 
+static inline int acpi_dev_uid_to_integer(struct acpi_device *adev, u64 *integer)
+{
+	return -ENODEV;
+}
+
 static inline struct acpi_device *
 acpi_dev_get_first_match_dev(const char *hid, const char *uid, s64 hrv)
 {
@@ -977,8 +989,7 @@ static inline enum dev_dma_attr acpi_get_dma_attr(struct acpi_device *adev)
 	return DEV_DMA_NOT_SUPPORTED;
 }
 
-static inline int acpi_dma_get_range(struct device *dev, u64 *dma_addr,
-				     u64 *offset, u64 *size)
+static inline int acpi_dma_get_range(struct device *dev, const struct bus_dma_region **map)
 {
 	return -ENODEV;
 }
@@ -1075,6 +1086,10 @@ acpi_status acpi_os_prepare_extended_sleep(u8 sleep_state,
 struct acpi_s2idle_dev_ops {
 	struct list_head list_node;
 	void (*prepare)(void);
+<<<<<<< HEAD
+	void (*check)(void);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void (*restore)(void);
 };
 int acpi_register_lps0_dev(struct acpi_s2idle_dev_ops *arg);
@@ -1202,7 +1217,12 @@ bool acpi_gpio_get_irq_resource(struct acpi_resource *ares,
 				struct acpi_resource_gpio **agpio);
 bool acpi_gpio_get_io_resource(struct acpi_resource *ares,
 			       struct acpi_resource_gpio **agpio);
+<<<<<<< HEAD
+int acpi_dev_gpio_irq_wake_get_by(struct acpi_device *adev, const char *name, int index,
+				  bool *wake_capable);
+=======
 int acpi_dev_gpio_irq_get_by(struct acpi_device *adev, const char *name, int index);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline bool acpi_gpio_get_irq_resource(struct acpi_resource *ares,
 					      struct acpi_resource_gpio **agpio)
@@ -1214,16 +1234,33 @@ static inline bool acpi_gpio_get_io_resource(struct acpi_resource *ares,
 {
 	return false;
 }
+<<<<<<< HEAD
+static inline int acpi_dev_gpio_irq_wake_get_by(struct acpi_device *adev, const char *name,
+						int index, bool *wake_capable)
+=======
 static inline int acpi_dev_gpio_irq_get_by(struct acpi_device *adev,
 					   const char *name, int index)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return -ENXIO;
 }
 #endif
 
+static inline int acpi_dev_gpio_irq_wake_get(struct acpi_device *adev, int index,
+					     bool *wake_capable)
+{
+	return acpi_dev_gpio_irq_wake_get_by(adev, NULL, index, wake_capable);
+}
+
+static inline int acpi_dev_gpio_irq_get_by(struct acpi_device *adev, const char *name,
+					   int index)
+{
+	return acpi_dev_gpio_irq_wake_get_by(adev, name, index, NULL);
+}
+
 static inline int acpi_dev_gpio_irq_get(struct acpi_device *adev, int index)
 {
-	return acpi_dev_gpio_irq_get_by(adev, NULL, index);
+	return acpi_dev_gpio_irq_wake_get_by(adev, NULL, index, NULL);
 }
 
 /* Device properties */

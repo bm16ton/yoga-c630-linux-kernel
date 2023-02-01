@@ -1,0 +1,1 @@
+cmd_net/llc/llc2.mod := printf '%s\n'   llc_if.o llc_c_ev.o llc_c_ac.o llc_conn.o llc_c_st.o llc_pdu.o llc_sap.o llc_s_ac.o llc_s_ev.o llc_s_st.o af_llc.o llc_station.o llc_proc.o sysctl_net_llc.o | awk '!x[$$0]++ { print("net/llc/"$$0) }' > net/llc/llc2.mod

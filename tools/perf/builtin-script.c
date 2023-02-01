@@ -882,7 +882,11 @@ static int print_bstack_flags(FILE *fp, struct branch_entry *br)
 		       br->flags.in_tx ? 'X' : '-',
 		       br->flags.abort ? 'A' : '-',
 		       br->flags.cycles,
+<<<<<<< HEAD
+		       get_branch_type(br));
+=======
 		       br->flags.type ? branch_type_name(br->flags.type) : "-");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int perf_sample__fprintf_brstack(struct perf_sample *sample,
@@ -1653,6 +1657,7 @@ int perf_sample__sprintf_flags(u32 flags, char *str, size_t sz)
 	}
 	if (pos < sz)
 		str[pos] = 0;
+<<<<<<< HEAD
 
 	return pos;
 }
@@ -1661,6 +1666,16 @@ static int perf_sample__fprintf_flags(u32 flags, FILE *fp)
 {
 	char str[SAMPLE_FLAGS_BUF_SIZE];
 
+=======
+
+	return pos;
+}
+
+static int perf_sample__fprintf_flags(u32 flags, FILE *fp)
+{
+	char str[SAMPLE_FLAGS_BUF_SIZE];
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	perf_sample__sprintf_flags(flags, str, sizeof(str));
 	return fprintf(fp, "  %-21s ", str);
 }
@@ -2242,9 +2257,6 @@ static void __process_stat(struct evsel *counter, u64 tstamp)
 	int idx, thread;
 	struct perf_cpu cpu;
 	static int header_printed;
-
-	if (counter->core.system_wide)
-		nthreads = 1;
 
 	if (!header_printed) {
 		printf("%3s %8s %15s %15s %15s %15s %s\n",
@@ -3849,9 +3861,16 @@ int cmd_script(int argc, const char **argv)
 		     "Valid types: hw,sw,trace,raw,synth. "
 		     "Fields: comm,tid,pid,time,cpu,event,trace,ip,sym,dso,"
 		     "addr,symoff,srcline,period,iregs,uregs,brstack,"
+<<<<<<< HEAD
+		     "brstacksym,flags,data_src,weight,bpf-output,brstackinsn,"
+		     "brstackinsnlen,brstackoff,callindent,insn,insnlen,synth,"
+		     "phys_addr,metric,misc,srccode,ipc,tod,data_page_size,"
+		     "code_page_size,ins_lat",
+=======
 		     "brstacksym,flags,bpf-output,brstackinsn,brstackinsnlen,brstackoff,"
 		     "callindent,insn,insnlen,synth,phys_addr,metric,misc,ipc,tod,"
 		     "data_page_size,code_page_size,ins_lat",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		     parse_output_fields),
 	OPT_BOOLEAN('a', "all-cpus", &system_wide,
 		    "system-wide collection from all CPUs"),

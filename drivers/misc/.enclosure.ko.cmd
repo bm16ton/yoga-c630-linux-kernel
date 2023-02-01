@@ -1,0 +1,1 @@
+cmd_drivers/misc/enclosure.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/enclosure.ko drivers/misc/enclosure.o drivers/misc/enclosure.mod.o;  true

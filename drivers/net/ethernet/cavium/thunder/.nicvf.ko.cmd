@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/thunder/nicvf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/cavium/thunder/nicvf.ko drivers/net/ethernet/cavium/thunder/nicvf.o drivers/net/ethernet/cavium/thunder/nicvf.mod.o;  true

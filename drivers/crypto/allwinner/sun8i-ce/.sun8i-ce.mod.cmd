@@ -1,0 +1,1 @@
+cmd_drivers/crypto/allwinner/sun8i-ce/sun8i-ce.mod := printf '%s\n'   sun8i-ce-core.o sun8i-ce-cipher.o | awk '!x[$$0]++ { print("drivers/crypto/allwinner/sun8i-ce/"$$0) }' > drivers/crypto/allwinner/sun8i-ce/sun8i-ce.mod

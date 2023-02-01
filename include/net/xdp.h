@@ -164,13 +164,16 @@ struct xdp_frame {
 	void *data;
 	u16 len;
 	u16 headroom;
-	u32 metasize:8;
-	u32 frame_sz:24;
+	u32 metasize; /* uses lower 8-bits */
 	/* Lifetime of xdp_rxq_info is limited to NAPI/enqueue time,
 	 * while mem info is valid on remote CPU.
 	 */
 	struct xdp_mem_info mem;
 	struct net_device *dev_rx; /* used by cpumap */
+<<<<<<< HEAD
+	u32 frame_sz;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 flags; /* supported values defined in xdp_buff_flags */
 };
 

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/igbvf/igbvf.mod := printf '%s\n'   vf.o mbx.o ethtool.o netdev.o | awk '!x[$$0]++ { print("drivers/net/ethernet/intel/igbvf/"$$0) }' > drivers/net/ethernet/intel/igbvf/igbvf.mod

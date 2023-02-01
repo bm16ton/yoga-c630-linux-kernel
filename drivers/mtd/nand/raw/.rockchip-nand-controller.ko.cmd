@@ -1,0 +1,1 @@
+cmd_drivers/mtd/nand/raw/rockchip-nand-controller.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/nand/raw/rockchip-nand-controller.ko drivers/mtd/nand/raw/rockchip-nand-controller.o drivers/mtd/nand/raw/rockchip-nand-controller.mod.o;  true

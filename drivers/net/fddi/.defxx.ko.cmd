@@ -1,0 +1,1 @@
+cmd_drivers/net/fddi/defxx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/fddi/defxx.ko drivers/net/fddi/defxx.o drivers/net/fddi/defxx.mod.o;  true

@@ -758,7 +758,10 @@ static void qeth_l2_br2dev_worker(struct work_struct *work)
 	struct list_head *iter;
 	int err = 0;
 
+<<<<<<< HEAD
+=======
 	kfree(br2dev_event_work);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	QETH_CARD_TEXT_(card, 4, "b2dw%04lx", event);
 	QETH_CARD_TEXT_(card, 4, "ma%012llx", ether_addr_to_u64(addr));
 
@@ -815,6 +818,10 @@ unlock:
 	dev_put(brdev);
 	dev_put(lsyncdev);
 	dev_put(dstdev);
+<<<<<<< HEAD
+	kfree(br2dev_event_work);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int qeth_l2_br2dev_queue_work(struct net_device *brdev,
@@ -1133,7 +1140,11 @@ static int qeth_l2_setup_netdev(struct qeth_card *card)
 				       PAGE_SIZE * (QDIO_MAX_ELEMENTS_PER_BUFFER - 1));
 	}
 
+<<<<<<< HEAD
+	netif_napi_add(card->dev, &card->napi, qeth_poll);
+=======
 	netif_napi_add(card->dev, &card->napi, qeth_poll, NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return register_netdev(card->dev);
 }
 
@@ -1530,8 +1541,8 @@ static void qeth_addr_change_event(struct qeth_card *card,
 	else
 		INIT_DELAYED_WORK(&data->dwork, qeth_l2_dev2br_worker);
 	data->card = card;
-	memcpy(&data->ac_event, hostevs,
-			sizeof(struct qeth_ipacmd_addr_change) + extrasize);
+	data->ac_event = *hostevs;
+	memcpy(data->ac_event.entry, hostevs->entry, extrasize);
 	queue_delayed_work(card->event_wq, &data->dwork, 0);
 }
 

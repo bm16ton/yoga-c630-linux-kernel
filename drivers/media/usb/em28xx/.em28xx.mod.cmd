@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/em28xx/em28xx.mod := printf '%s\n'   em28xx-core.o em28xx-i2c.o em28xx-cards.o em28xx-camera.o | awk '!x[$$0]++ { print("drivers/media/usb/em28xx/"$$0) }' > drivers/media/usb/em28xx/em28xx.mod

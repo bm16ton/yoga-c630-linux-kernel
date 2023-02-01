@@ -138,8 +138,14 @@ struct dp_parser {
 struct dp_parser *dp_parser_get(struct platform_device *pdev);
 
 /**
+<<<<<<< HEAD
+ * devm_dp_parser_find_next_bridge() - find an additional bridge to DP
+ *
+ * @dev: device to tie bridge lifetime to
+=======
  * dp_parser_find_next_bridge() - find an additional bridge to DP
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @parser: dp_parser data from client
  *
  * This function is used to find any additional bridge attached to
@@ -147,6 +153,10 @@ struct dp_parser *dp_parser_get(struct platform_device *pdev);
  *
  * Return: 0 if able to get the bridge, otherwise negative errno for failure.
  */
+<<<<<<< HEAD
+int devm_dp_parser_find_next_bridge(struct device *dev, struct dp_parser *parser);
+=======
 int dp_parser_find_next_bridge(struct dp_parser *parser);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

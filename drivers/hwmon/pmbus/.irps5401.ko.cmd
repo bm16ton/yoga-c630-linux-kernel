@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/irps5401.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/irps5401.ko drivers/hwmon/pmbus/irps5401.o drivers/hwmon/pmbus/irps5401.mod.o;  true

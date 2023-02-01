@@ -1,0 +1,1 @@
+cmd_drivers/phy/qualcomm/phy-qcom-ipq806x-sata.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/qualcomm/phy-qcom-ipq806x-sata.ko drivers/phy/qualcomm/phy-qcom-ipq806x-sata.o drivers/phy/qualcomm/phy-qcom-ipq806x-sata.mod.o;  true

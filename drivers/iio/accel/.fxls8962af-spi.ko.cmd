@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/fxls8962af-spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/fxls8962af-spi.ko drivers/iio/accel/fxls8962af-spi.o drivers/iio/accel/fxls8962af-spi.mod.o;  true

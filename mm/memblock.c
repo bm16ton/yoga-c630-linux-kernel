@@ -1640,7 +1640,13 @@ void __init memblock_free_late(phys_addr_t base, phys_addr_t size)
 	end = PFN_DOWN(base + size);
 
 	for (; cursor < end; cursor++) {
-		memblock_free_pages(pfn_to_page(cursor), cursor, 0);
+		/*
+		 * Reserved pages are always initialized by the end of
+		 * memblock_free_all() (by memmap_init() and, if deferred
+		 * initialization is enabled, memmap_init_reserved_pages()), so
+		 * these pages can be released directly to the buddy allocator.
+		 */
+		__free_pages_core(pfn_to_page(cursor), 0);
 		totalram_pages_inc();
 	}
 }
@@ -2000,7 +2006,11 @@ static void __init free_unused_memmap(void)
 		 * presume that there are no holes in the memory map inside
 		 * a pageblock
 		 */
+<<<<<<< HEAD
+		start = pageblock_start_pfn(start);
+=======
 		start = round_down(start, pageblock_nr_pages);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * If we had a previous bank, and there is a space
@@ -2014,12 +2024,20 @@ static void __init free_unused_memmap(void)
 		 * presume that there are no holes in the memory map inside
 		 * a pageblock
 		 */
+<<<<<<< HEAD
+		prev_end = pageblock_align(end);
+=======
 		prev_end = ALIGN(end, pageblock_nr_pages);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 #ifdef CONFIG_SPARSEMEM
 	if (!IS_ALIGNED(prev_end, PAGES_PER_SECTION)) {
+<<<<<<< HEAD
+		prev_end = pageblock_align(end);
+=======
 		prev_end = ALIGN(end, pageblock_nr_pages);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		free_memmap(prev_end, ALIGN(prev_end, PAGES_PER_SECTION));
 	}
 #endif

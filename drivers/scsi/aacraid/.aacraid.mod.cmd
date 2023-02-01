@@ -1,0 +1,1 @@
+cmd_drivers/scsi/aacraid/aacraid.mod := printf '%s\n'   linit.o aachba.o commctrl.o comminit.o commsup.o dpcsup.o rx.o sa.o rkt.o nark.o src.o | awk '!x[$$0]++ { print("drivers/scsi/aacraid/"$$0) }' > drivers/scsi/aacraid/aacraid.mod

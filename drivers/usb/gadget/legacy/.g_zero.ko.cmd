@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/legacy/g_zero.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/legacy/g_zero.ko drivers/usb/gadget/legacy/g_zero.o drivers/usb/gadget/legacy/g_zero.mod.o;  true

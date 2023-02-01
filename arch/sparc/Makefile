@@ -56,8 +56,11 @@ endif
 
 endif
 
+<<<<<<< HEAD
+=======
 head-y                 := arch/sparc/kernel/head_$(BITS).o
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 libs-y                 += arch/sparc/prom/
 libs-y                 += arch/sparc/lib/
 

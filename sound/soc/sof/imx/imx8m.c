@@ -412,7 +412,11 @@ static int imx8m_dsp_suspend(struct snd_sof_dev *sdev, unsigned int target_state
 }
 
 /* i.MX8 ops */
+<<<<<<< HEAD
+static struct snd_sof_dsp_ops sof_imx8m_ops = {
+=======
 static const struct snd_sof_dsp_ops sof_imx8m_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* probe and remove */
 	.probe		= imx8m_probe,
 	.remove		= imx8m_remove,
@@ -430,16 +434,14 @@ static const struct snd_sof_dsp_ops sof_imx8m_ops = {
 
 	/* ipc */
 	.send_msg	= imx8m_send_msg,
-	.fw_ready	= sof_fw_ready,
 	.get_mailbox_offset	= imx8m_get_mailbox_offset,
 	.get_window_offset	= imx8m_get_window_offset,
 
 	.ipc_msg_data	= sof_ipc_msg_data,
 	.set_stream_data_offset = sof_set_stream_data_offset,
 
-	/* module loading */
-	.load_module	= snd_sof_parse_module_memcpy,
 	.get_bar_index	= imx8m_get_bar_index,
+
 	/* firmware loading */
 	.load_firmware	= snd_sof_load_firmware_memcpy,
 
@@ -473,9 +475,23 @@ static const struct snd_sof_dsp_ops sof_imx8m_ops = {
 };
 
 static struct sof_dev_desc sof_of_imx8mp_desc = {
+<<<<<<< HEAD
+	.ipc_supported_mask	= BIT(SOF_IPC),
+	.ipc_default		= SOF_IPC,
+	.default_fw_path = {
+		[SOF_IPC] = "imx/sof",
+	},
+	.default_tplg_path = {
+		[SOF_IPC] = "imx/sof-tplg",
+	},
+	.default_fw_filename = {
+		[SOF_IPC] = "sof-imx8m.ri",
+	},
+=======
 	.default_fw_path = "imx/sof",
 	.default_tplg_path = "imx/sof-tplg",
 	.default_fw_filename = "sof-imx8m.ri",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.nocodec_tplg_filename = "sof-imx8-nocodec.tplg",
 	.ops = &sof_imx8m_ops,
 };

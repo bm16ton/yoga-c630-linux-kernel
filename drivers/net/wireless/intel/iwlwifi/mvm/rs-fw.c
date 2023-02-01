@@ -143,7 +143,7 @@ rs_fw_vht_set_enabled_rates(const struct ieee80211_sta *sta,
 	};
 
 	/* the station support only a single receive chain */
-	if (sta->smps_mode == IEEE80211_SMPS_STATIC)
+	if (sta->deflink.smps_mode == IEEE80211_SMPS_STATIC)
 		max_nss = 1;
 
 	for (i = 0; i < max_nss && i < IWL_TLC_NSS_MAX; i++) {
@@ -205,7 +205,7 @@ rs_fw_he_set_enabled_rates(const struct ieee80211_sta *sta,
 	u8 nss = sta->deflink.rx_nss;
 
 	/* the station support only a single receive chain */
-	if (sta->smps_mode == IEEE80211_SMPS_STATIC)
+	if (sta->deflink.smps_mode == IEEE80211_SMPS_STATIC)
 		nss = 1;
 
 	for (i = 0; i < nss && i < IWL_TLC_NSS_MAX; i++) {
@@ -270,7 +270,11 @@ static void rs_fw_set_supp_rates(struct ieee80211_sta *sta,
 			cpu_to_le16(ht_cap->mcs.rx_mask[0]);
 
 		/* the station support only a single receive chain */
+<<<<<<< HEAD
+		if (sta->deflink.smps_mode == IEEE80211_SMPS_STATIC)
+=======
 		if (sta->smps_mode == IEEE80211_SMPS_STATIC)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			cmd->ht_rates[IWL_TLC_NSS_2][IWL_TLC_MCS_PER_BW_80] =
 				0;
 		else
@@ -340,9 +344,9 @@ void iwl_mvm_tlc_update_notif(struct iwl_mvm *mvm,
 		u16 size = le32_to_cpu(notif->amsdu_size);
 		int i;
 
-		if (sta->max_amsdu_len < size) {
+		if (sta->deflink.agg.max_amsdu_len < size) {
 			/*
-			 * In debug sta->max_amsdu_len < size
+			 * In debug sta->deflink.agg.max_amsdu_len < size
 			 * so also check with orig_amsdu_len which holds the
 			 * original data before debugfs changed the value
 			 */
@@ -352,18 +356,18 @@ void iwl_mvm_tlc_update_notif(struct iwl_mvm *mvm,
 
 		mvmsta->amsdu_enabled = le32_to_cpu(notif->amsdu_enabled);
 		mvmsta->max_amsdu_len = size;
-		sta->max_rc_amsdu_len = mvmsta->max_amsdu_len;
+		sta->deflink.agg.max_rc_amsdu_len = mvmsta->max_amsdu_len;
 
 		for (i = 0; i < IWL_MAX_TID_COUNT; i++) {
 			if (mvmsta->amsdu_enabled & BIT(i))
-				sta->max_tid_amsdu_len[i] =
+				sta->deflink.agg.max_tid_amsdu_len[i] =
 					iwl_mvm_max_amsdu_size(mvm, sta, i);
 			else
 				/*
 				 * Not so elegant, but this will effectively
 				 * prevent AMSDU on this TID
 				 */
-				sta->max_tid_amsdu_len[i] = 1;
+				sta->deflink.agg.max_tid_amsdu_len[i] = 1;
 		}
 
 		IWL_DEBUG_RATE(mvm,
@@ -450,7 +454,7 @@ void rs_fw_rate_init(struct iwl_mvm *mvm, struct ieee80211_sta *sta,
 	 * since TLC offload works with one mode we can assume
 	 * that only vht/ht is used and also set it as station max amsdu
 	 */
-	sta->max_amsdu_len = max_amsdu_len;
+	sta->deflink.agg.max_amsdu_len = max_amsdu_len;
 
 	cmd_ver = iwl_fw_lookup_cmd_ver(mvm->fw,
 					WIDE_ID(DATA_PATH_GROUP,
@@ -502,6 +506,59 @@ void rs_fw_rate_init(struct iwl_mvm *mvm, struct ieee80211_sta *sta,
 		ret = -EINVAL;
 	}
 
+<<<<<<< HEAD
+=======
+	cmd_ver = iwl_fw_lookup_cmd_ver(mvm->fw,
+					WIDE_ID(DATA_PATH_GROUP,
+						TLC_MNG_CONFIG_CMD),
+					0);
+	IWL_DEBUG_RATE(mvm, "TLC CONFIG CMD, sta_id=%d, max_ch_width=%d, mode=%d\n",
+		       cfg_cmd.sta_id, cfg_cmd.max_ch_width, cfg_cmd.mode);
+	IWL_DEBUG_RATE(mvm, "TLC CONFIG CMD, chains=0x%X, ch_wid_supp=%d, flags=0x%X\n",
+		       cfg_cmd.chains, cfg_cmd.sgi_ch_width_supp, cfg_cmd.flags);
+	IWL_DEBUG_RATE(mvm, "TLC CONFIG CMD, mpdu_len=%d, no_ht_rate=0x%X, tx_op=%d\n",
+		       cfg_cmd.max_mpdu_len, cfg_cmd.non_ht_rates, cfg_cmd.max_tx_op);
+	IWL_DEBUG_RATE(mvm, "TLC CONFIG CMD, ht_rate[0][0]=0x%X, ht_rate[1][0]=0x%X\n",
+		       cfg_cmd.ht_rates[0][0], cfg_cmd.ht_rates[1][0]);
+	IWL_DEBUG_RATE(mvm, "TLC CONFIG CMD, ht_rate[0][1]=0x%X, ht_rate[1][1]=0x%X\n",
+		       cfg_cmd.ht_rates[0][1], cfg_cmd.ht_rates[1][1]);
+	IWL_DEBUG_RATE(mvm, "TLC CONFIG CMD, ht_rate[0][2]=0x%X, ht_rate[1][2]=0x%X\n",
+		       cfg_cmd.ht_rates[0][2], cfg_cmd.ht_rates[1][2]);
+	if (cmd_ver == 4) {
+		ret = iwl_mvm_send_cmd_pdu(mvm, cmd_id, CMD_ASYNC,
+					   sizeof(cfg_cmd), &cfg_cmd);
+	} else if (cmd_ver < 4) {
+		struct iwl_tlc_config_cmd_v3 cfg_cmd_v3 = {
+			.sta_id = cfg_cmd.sta_id,
+			.max_ch_width = cfg_cmd.max_ch_width,
+			.mode = cfg_cmd.mode,
+			.chains = cfg_cmd.chains,
+			.amsdu = !!cfg_cmd.max_mpdu_len,
+			.flags = cfg_cmd.flags,
+			.non_ht_rates = cfg_cmd.non_ht_rates,
+			.ht_rates[0][0] = cfg_cmd.ht_rates[0][0],
+			.ht_rates[0][1] = cfg_cmd.ht_rates[0][1],
+			.ht_rates[1][0] = cfg_cmd.ht_rates[1][0],
+			.ht_rates[1][1] = cfg_cmd.ht_rates[1][1],
+			.sgi_ch_width_supp = cfg_cmd.sgi_ch_width_supp,
+			.max_mpdu_len = cfg_cmd.max_mpdu_len,
+		};
+
+		u16 cmd_size = sizeof(cfg_cmd_v3);
+
+		/* In old versions of the API the struct is 4 bytes smaller */
+		if (iwl_fw_lookup_cmd_ver(mvm->fw,
+					  WIDE_ID(DATA_PATH_GROUP,
+						  TLC_MNG_CONFIG_CMD), 0) < 3)
+			cmd_size -= 4;
+
+		ret = iwl_mvm_send_cmd_pdu(mvm, cmd_id, CMD_ASYNC, cmd_size,
+					   &cfg_cmd_v3);
+	} else {
+		ret = -EINVAL;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		IWL_ERR(mvm, "Failed to send rate scale config (%d)\n", ret);
 }

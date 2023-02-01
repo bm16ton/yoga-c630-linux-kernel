@@ -27,6 +27,18 @@
         "Unit": "iMC"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "All DRAM Read CAS Commands issued (including underfills)",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x4",
+        "EventName": "UNC_M_CAS_COUNT.RD",
+        "PerPkg": "1",
+        "UMask": "0x3",
+        "Unit": "iMC"
+    },
+    {
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "read requests to memory controller. Derived from unc_m_cas_count.rd",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
@@ -37,6 +49,23 @@
         "Unit": "iMC"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "DRAM CAS (Column Address Strobe) Commands.; DRAM WR_CAS (w/ and w/out auto-pre) in Write Major Mode",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x4",
+        "EventName": "UNC_M_CAS_COUNT.WR_WMM",
+        "PerPkg": "1",
+        "UMask": "0x4",
+        "Unit": "iMC"
+    },
+    {
+        "BriefDescription": "All DRAM Write CAS commands issued",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x4",
+        "EventName": "UNC_M_CAS_COUNT.WR",
+        "PerPkg": "1",
+        "UMask": "0xC",
+=======
         "BriefDescription": "read requests to memory controller",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
@@ -53,6 +82,7 @@
         "EventName": "UNC_M_CAS_COUNT.WR_WMM",
         "PerPkg": "1",
         "UMask": "0x4",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Unit": "iMC"
     },
     {
@@ -66,6 +96,8 @@
         "Unit": "iMC"
     },
     {
+<<<<<<< HEAD
+=======
         "BriefDescription": "write requests to memory controller",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
@@ -76,6 +108,7 @@
         "Unit": "iMC"
     },
     {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "BriefDescription": "All DRAM CAS Commands issued",
         "Counter": "0,1,2,3",
         "EventCode": "0x4",
@@ -437,6 +470,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x7",
         "EventName": "UNC_M_MAJOR_MODES.ISOCH",
+<<<<<<< HEAD
         "PerPkg": "1",
         "UMask": "0x8",
         "Unit": "iMC"
@@ -452,6 +486,23 @@
     {
         "BriefDescription": "CKE_ON_CYCLES by Rank; DIMM ID",
         "Counter": "0,1,2,3",
+=======
+        "PerPkg": "1",
+        "UMask": "0x8",
+        "Unit": "iMC"
+    },
+    {
+        "BriefDescription": "Channel DLLOFF Cycles",
+        "Counter": "0,1,2,3",
+        "EventCode": "0x84",
+        "EventName": "UNC_M_POWER_CHANNEL_DLLOFF",
+        "PerPkg": "1",
+        "Unit": "iMC"
+    },
+    {
+        "BriefDescription": "CKE_ON_CYCLES by Rank; DIMM ID",
+        "Counter": "0,1,2,3",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "EventCode": "0x83",
         "EventName": "UNC_M_POWER_CKE_CYCLES.RANK0",
         "PerPkg": "1",

@@ -277,10 +277,13 @@ void flush_thread(void)
 	tls_thread_flush();
 	flush_ptrace_hw_breakpoint(current);
 	flush_tagged_addr_state();
+<<<<<<< HEAD
+=======
 }
 
 void release_thread(struct task_struct *dead_task)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void arch_release_task_struct(struct task_struct *tsk)
@@ -595,7 +598,7 @@ unsigned long __get_wchan(struct task_struct *p)
 unsigned long arch_align_stack(unsigned long sp)
 {
 	if (!(current->personality & ADDR_NO_RANDOMIZE) && randomize_va_space)
-		sp -= get_random_int() & ~PAGE_MASK;
+		sp -= prandom_u32_max(PAGE_SIZE);
 	return sp & ~0xf;
 }
 
@@ -627,10 +630,17 @@ int compat_elf_check_arch(const struct elf32_hdr *hdr)
 void arch_setup_new_exec(void)
 {
 	unsigned long mmflags = 0;
+<<<<<<< HEAD
 
 	if (is_compat_task()) {
 		mmflags = MMCF_AARCH32;
 
+=======
+
+	if (is_compat_task()) {
+		mmflags = MMCF_AARCH32;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Restrict the CPU affinity mask for a 32-bit task so that
 		 * it contains only 32-bit-capable CPUs.

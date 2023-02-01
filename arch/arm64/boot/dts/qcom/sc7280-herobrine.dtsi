@@ -144,8 +144,13 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 
+<<<<<<< HEAD
+		/* The BIOS leaves this regulator on */
+		regulator-boot-on;
+=======
 		regulator-boot-on;
 		regulator-always-on;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		gpio = <&tlmm 157 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
@@ -296,6 +301,17 @@
 
 	/* BOARD-SPECIFIC TOP LEVEL NODES */
 
+<<<<<<< HEAD
+	max98360a: audio-codec-0 {
+		compatible = "maxim,max98360a";
+		pinctrl-names = "default";
+		pinctrl-0 = <&amp_en>;
+		sdmode-gpios = <&tlmm 63 GPIO_ACTIVE_HIGH>;
+		#sound-dai-cells = <0>;
+	};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pwmleds: pwmleds {
 		compatible = "pwm-leds";
 		status = "disabled";
@@ -446,7 +462,11 @@ ap_i2c_tpm: &i2c14 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie1_clkreq_n>, <&ssd_rst_l>, <&pe_wake_odl>;
 
+<<<<<<< HEAD
+	perst-gpios = <&tlmm 2 GPIO_ACTIVE_LOW>;
+=======
 	perst-gpio = <&tlmm 2 GPIO_ACTIVE_LOW>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vddpe-3v3-supply = <&pp3300_ssd>;
 };
 
@@ -596,6 +616,28 @@ ap_ec_spi: &spi10 {
 
 &usb_1_dwc3 {
 	dr_mode = "host";
+<<<<<<< HEAD
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	/* 2.x hub on port 1 */
+	usb_hub_2_x: hub@1 {
+		compatible = "usbbda,5411";
+		reg = <1>;
+		vdd-supply = <&pp3300_hub>;
+		peer-hub = <&usb_hub_3_x>;
+	};
+
+	/* 3.x hub on port 2 */
+	usb_hub_3_x: hub@2 {
+		compatible = "usbbda,411";
+		reg = <2>;
+		vdd-supply = <&pp3300_hub>;
+		peer-hub = <&usb_hub_2_x>;
+	};
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &usb_1_hsphy {
@@ -606,6 +648,8 @@ ap_ec_spi: &spi10 {
 	status = "okay";
 };
 
+<<<<<<< HEAD
+=======
 &usb_2 {
 	status = "okay";
 };
@@ -618,6 +662,7 @@ ap_ec_spi: &spi10 {
 	status = "okay";
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* PINCTRL - ADDITIONS TO NODES IN PARENT DEVICE TREE FILES */
 
 &dp_hot_plug_det {
@@ -729,27 +774,43 @@ ap_ec_spi: &spi10 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&bios_flash_wp_od>;
 
+<<<<<<< HEAD
+	amp_en: amp-en-pins {
+=======
 	amp_en: amp-en {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio63";
 		function = "gpio";
 		bias-disable;
 		drive-strength = <2>;
 	};
 
+<<<<<<< HEAD
+	ap_ec_int_l: ap-ec-int-l-pins {
+=======
 	ap_ec_int_l: ap-ec-int-l {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio18";
 		function = "gpio";
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	bios_flash_wp_od: bios-flash-wp-od-pins {
+=======
 	bios_flash_wp_od: bios-flash-wp-od {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio16";
 		function = "gpio";
 		/* Has external pull */
 		bias-disable;
 	};
 
+<<<<<<< HEAD
+	en_fp_rails: en-fp-rails-pins {
+=======
 	en_fp_rails: en-fp-rails {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio77";
 		function = "gpio";
 		bias-disable;
@@ -757,60 +818,96 @@ ap_ec_spi: &spi10 {
 		output-high;
 	};
 
+<<<<<<< HEAD
+	en_pp3300_codec: en-pp3300-codec-pins {
+=======
 	en_pp3300_codec: en-pp3300-codec {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio105";
 		function = "gpio";
 		bias-disable;
 		drive-strength = <2>;
 	};
 
+<<<<<<< HEAD
+	en_pp3300_dx_edp: en-pp3300-dx-edp-pins {
+=======
 	en_pp3300_dx_edp: en-pp3300-dx-edp {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio80";
 		function = "gpio";
 		bias-disable;
 		drive-strength = <2>;
 	};
 
+<<<<<<< HEAD
+	fp_rst_l: fp-rst-l-pins {
+=======
 	fp_rst_l: fp-rst-l {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio78";
 		function = "gpio";
 		bias-disable;
 		drive-strength = <2>;
 	};
 
+<<<<<<< HEAD
+	fp_to_ap_irq_l: fp-to-ap-irq-l-pins {
+=======
 	fp_to_ap_irq_l: fp-to-ap-irq-l {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio61";
 		function = "gpio";
 		/* Has external pullup */
 		bias-disable;
 	};
 
+<<<<<<< HEAD
+	fpmcu_boot0: fpmcu-boot0-pins {
+=======
 	fpmcu_boot0: fpmcu-boot0 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio68";
 		function = "gpio";
 		bias-disable;
 	};
 
+<<<<<<< HEAD
+	gsc_ap_int_odl: gsc-ap-int-odl-pins {
+=======
 	gsc_ap_int_odl: gsc-ap-int-odl {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio104";
 		function = "gpio";
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	hp_irq: hp-irq-pins {
+=======
 	hp_irq: hp-irq {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio101";
 		function = "gpio";
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	hub_en: hub-en-pins {
+=======
 	hub_en: hub-en {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio157";
 		function = "gpio";
 		bias-disable;
 		drive-strength = <2>;
 	};
 
+<<<<<<< HEAD
+	pe_wake_odl: pe-wake-odl-pins {
+=======
 	pe_wake_odl: pe-wake-odl {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio3";
 		function = "gpio";
 		/* Has external pull */
@@ -819,45 +916,73 @@ ap_ec_spi: &spi10 {
 	};
 
 	/* For ap_spi_fp */
+<<<<<<< HEAD
+	qup_spi9_cs_gpio_init_high: qup-spi9-cs-gpio-init-high-pins {
+=======
 	qup_spi9_cs_gpio_init_high: qup-spi9-cs-gpio-init-high {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio39";
 		function = "gpio";
 		output-high;
 	};
 
 	/* For ap_ec_spi */
+<<<<<<< HEAD
+	qup_spi10_cs_gpio_init_high: qup-spi10-cs-gpio-init-high-pins {
+=======
 	qup_spi10_cs_gpio_init_high: qup-spi10-cs-gpio-init-high {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio43";
 		function = "gpio";
 		output-high;
 	};
 
+<<<<<<< HEAD
+	sar0_irq_odl: sar0-irq-odl-pins {
+=======
 	sar0_irq_odl: sar0-irq-odl {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio141";
 		function = "gpio";
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	sar1_irq_odl: sar1-irq-odl-pins {
+=======
 	sar1_irq_odl: sar1-irq-odl {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio140";
 		function = "gpio";
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	sd_cd_odl: sd-cd-odl-pins {
+=======
 	sd_cd_odl: sd-cd-odl {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio91";
 		function = "gpio";
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	ssd_en: ssd-en-pins {
+=======
 	ssd_en: ssd-en {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio51";
 		function = "gpio";
 		bias-disable;
 		drive-strength = <2>;
 	};
 
+<<<<<<< HEAD
+	ssd_rst_l: ssd-rst-l-pins {
+=======
 	ssd_rst_l: ssd-rst-l {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio2";
 		function = "gpio";
 		bias-disable;
@@ -865,14 +990,22 @@ ap_ec_spi: &spi10 {
 		output-low;
 	};
 
+<<<<<<< HEAD
+	tp_int_odl: tp-int-odl-pins {
+=======
 	tp_int_odl: tp-int-odl {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio7";
 		function = "gpio";
 		/* Has external pullup */
 		bias-disable;
 	};
 
+<<<<<<< HEAD
+	wf_cam_en: wf-cam-en-pins {
+=======
 	wf_cam_en: wf-cam-en {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio119";
 		function = "gpio";
 		/* Has external pulldown */

@@ -141,8 +141,11 @@ void odm_Adaptivity(void *pDM_VOID, u8 IGI);
 
 void ODM_Write_DIG(void *pDM_VOID, u8 CurrentIGI);
 
+<<<<<<< HEAD
+=======
 void odm_PauseDIG(void *pDM_VOID, enum ODM_Pause_DIG_TYPE PauseType, u8 IGIValue);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void odm_DIGInit(void *pDM_VOID);
 
 void odm_DIG(void *pDM_VOID);

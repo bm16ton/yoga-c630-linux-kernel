@@ -14,3 +14,7 @@ obj-$(CONFIG_TI_EQEP)		+= ti-eqep.o
 obj-$(CONFIG_FTM_QUADDEC)	+= ftm-quaddec.o
 obj-$(CONFIG_MICROCHIP_TCB_CAPTURE)	+= microchip-tcb-capture.o
 obj-$(CONFIG_INTEL_QEP)		+= intel-qep.o
+<<<<<<< HEAD
+obj-$(CONFIG_TI_ECAP_CAPTURE)	+= ti-ecap-capture.o
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

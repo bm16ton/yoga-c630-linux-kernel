@@ -1,0 +1,3 @@
+drivers/media/pci/ivtv/ivtv.ko
+drivers/media/pci/ivtv/ivtv-alsa.ko
+drivers/media/pci/ivtv/ivtvfb.ko

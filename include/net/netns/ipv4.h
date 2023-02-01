@@ -34,6 +34,7 @@ struct inet_hashinfo;
 struct inet_timewait_death_row {
 	refcount_t		tw_refcount;
 
+	/* Padding to avoid false sharing, tw_refcount can be often written */
 	struct inet_hashinfo 	*hashinfo ____cacheline_aligned_in_smp;
 	int			sysctl_max_tw_buckets;
 };
@@ -41,7 +42,11 @@ struct inet_timewait_death_row {
 struct tcp_fastopen_context;
 
 struct netns_ipv4 {
+<<<<<<< HEAD
+	struct inet_timewait_death_row tcp_death_row;
+=======
 	struct inet_timewait_death_row *tcp_death_row;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_SYSCTL
 	struct ctl_table_header	*forw_hdr;
@@ -170,6 +175,10 @@ struct netns_ipv4 {
 	int sysctl_tcp_pacing_ca_ratio;
 	int sysctl_tcp_wmem[3];
 	int sysctl_tcp_rmem[3];
+<<<<<<< HEAD
+	unsigned int sysctl_tcp_child_ehash_entries;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long sysctl_tcp_comp_sack_delay_ns;
 	unsigned long sysctl_tcp_comp_sack_slack_ns;
 	int sysctl_max_syn_backlog;

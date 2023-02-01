@@ -1,0 +1,1 @@
+cmd_drivers/mtd/parsers/qcomsmempart.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/parsers/qcomsmempart.ko drivers/mtd/parsers/qcomsmempart.o drivers/mtd/parsers/qcomsmempart.mod.o;  true

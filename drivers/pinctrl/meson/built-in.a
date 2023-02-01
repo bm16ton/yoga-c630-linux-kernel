@@ -1,0 +1,20 @@
+!<thin>
+//                                              190       `
+pinctrl-meson.o/
+pinctrl-meson8-pmx.o/
+pinctrl-meson-gxbb.o/
+pinctrl-meson-gxl.o/
+pinctrl-meson-axg-pmx.o/
+pinctrl-meson-axg.o/
+pinctrl-meson-g12a.o/
+pinctrl-meson-a1.o/
+pinctrl-meson-s4.o/
+/0              0           0     0     644     18088     `
+/17             0           0     0     644     4152      `
+/39             0           0     0     644     84336     `
+/61             0           0     0     644     79368     `
+/82             0           0     0     644     3960      `
+/107            0           0     0     644     92896     `
+/128            0           0     0     644     119008    `
+/150            0           0     0     644     75432     `
+/170            0           0     0     644     99528     `

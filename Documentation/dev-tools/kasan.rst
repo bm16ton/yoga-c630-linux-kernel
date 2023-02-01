@@ -110,10 +110,25 @@ parameter can be used to control panic and reporting behaviour:
 - ``kasan.fault=report`` or ``=panic`` controls whether to only print a KASAN
   report or also panic the kernel (default: ``report``). The panic happens even
   if ``kasan_multi_shot`` is enabled.
+<<<<<<< HEAD
+
+Software and Hardware Tag-Based KASAN modes (see the section about various
+modes below) support altering stack trace collection behavior:
+
+- ``kasan.stacktrace=off`` or ``=on`` disables or enables alloc and free stack
+  traces collection (default: ``on``).
+- ``kasan.stack_ring_size=<number of entries>`` specifies the number of entries
+  in the stack ring (default: ``32768``).
+
+Hardware Tag-Based KASAN mode is intended for use in production as a security
+mitigation. Therefore, it supports additional boot parameters that allow
+disabling KASAN altogether or controlling its features:
+=======
 
 Hardware Tag-Based KASAN mode (see the section about various modes below) is
 intended for use in production as a security mitigation. Therefore, it supports
 additional boot parameters that allow disabling KASAN or controlling features:
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 - ``kasan=off`` or ``=on`` controls whether KASAN is enabled (default: ``on``).
 
@@ -131,9 +146,12 @@ additional boot parameters that allow disabling KASAN or controlling features:
 
 - ``kasan.vmalloc=off`` or ``=on`` disables or enables tagging of vmalloc
   allocations (default: ``on``).
+<<<<<<< HEAD
+=======
 
 - ``kasan.stacktrace=off`` or ``=on`` disables or enables alloc and free stack
   traces collection (default: ``on``).
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Error reports
 ~~~~~~~~~~~~~
@@ -292,12 +310,21 @@ Software Tag-Based KASAN
 
 Software Tag-Based KASAN uses a software memory tagging approach to checking
 access validity. It is currently only implemented for the arm64 architecture.
+<<<<<<< HEAD
 
 Software Tag-Based KASAN uses the Top Byte Ignore (TBI) feature of arm64 CPUs
 to store a pointer tag in the top byte of kernel pointers. It uses shadow memory
 to store memory tags associated with each 16-byte memory cell (therefore, it
 dedicates 1/16th of the kernel memory for shadow memory).
 
+=======
+
+Software Tag-Based KASAN uses the Top Byte Ignore (TBI) feature of arm64 CPUs
+to store a pointer tag in the top byte of kernel pointers. It uses shadow memory
+to store memory tags associated with each 16-byte memory cell (therefore, it
+dedicates 1/16th of the kernel memory for shadow memory).
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 On each memory allocation, Software Tag-Based KASAN generates a random tag, tags
 the allocated memory with this tag, and embeds the same tag into the returned
 pointer.
@@ -414,6 +441,7 @@ architectures that do not have a fixed module region.
 
 For developers
 --------------
+<<<<<<< HEAD
 
 Ignoring accesses
 ~~~~~~~~~~~~~~~~~
@@ -448,6 +476,42 @@ that code for software KASAN modes. It does not help when the accesses happen
 indirectly (through calls to instrumented functions) or with Hardware
 Tag-Based KASAN, which does not use compiler instrumentation.
 
+=======
+
+Ignoring accesses
+~~~~~~~~~~~~~~~~~
+
+Software KASAN modes use compiler instrumentation to insert validity checks.
+Such instrumentation might be incompatible with some parts of the kernel, and
+therefore needs to be disabled.
+
+Other parts of the kernel might access metadata for allocated objects.
+Normally, KASAN detects and reports such accesses, but in some cases (e.g.,
+in memory allocators), these accesses are valid.
+
+For software KASAN modes, to disable instrumentation for a specific file or
+directory, add a ``KASAN_SANITIZE`` annotation to the respective kernel
+Makefile:
+
+- For a single file (e.g., main.o)::
+
+    KASAN_SANITIZE_main.o := n
+
+- For all files in one directory::
+
+    KASAN_SANITIZE := n
+
+For software KASAN modes, to disable instrumentation on a per-function basis,
+use the KASAN-specific ``__no_sanitize_address`` function attribute or the
+generic ``noinstr`` one.
+
+Note that disabling compiler instrumentation (either on a per-file or a
+per-function basis) makes KASAN ignore the accesses that happen directly in
+that code for software KASAN modes. It does not help when the accesses happen
+indirectly (through calls to instrumented functions) or with Hardware
+Tag-Based KASAN, which does not use compiler instrumentation.
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 For software KASAN modes, to disable KASAN reports in a part of the kernel code
 for the current task, annotate this part of the code with a
 ``kasan_disable_current()``/``kasan_enable_current()`` section. This also

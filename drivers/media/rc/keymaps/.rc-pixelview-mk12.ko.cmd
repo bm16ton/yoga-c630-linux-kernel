@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-pixelview-mk12.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-pixelview-mk12.ko drivers/media/rc/keymaps/rc-pixelview-mk12.o drivers/media/rc/keymaps/rc-pixelview-mk12.mod.o;  true

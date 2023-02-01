@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/max5821.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/max5821.ko drivers/iio/dac/max5821.o drivers/iio/dac/max5821.mod.o;  true

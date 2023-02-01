@@ -174,7 +174,12 @@ static int cxl_region_decode_commit(struct cxl_region *cxlr)
 		     iter = to_cxl_port(iter->dev.parent)) {
 			cxl_rr = cxl_rr_load(iter, cxlr);
 			cxld = cxl_rr->decoder;
+<<<<<<< HEAD
+			if (cxld->commit)
+				rc = cxld->commit(cxld);
+=======
 			rc = cxld->commit(cxld);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (rc)
 				break;
 		}
@@ -1225,7 +1230,11 @@ static int cxl_region_attach(struct cxl_region *cxlr,
 		struct cxl_endpoint_decoder *cxled_target;
 		struct cxl_memdev *cxlmd_target;
 
+<<<<<<< HEAD
+		cxled_target = p->targets[i];
+=======
 		cxled_target = p->targets[pos];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!cxled_target)
 			continue;
 
@@ -1922,6 +1931,12 @@ static int cxl_region_probe(struct device *dev)
 	 */
 	up_read(&cxl_region_rwsem);
 
+<<<<<<< HEAD
+	if (rc)
+		return rc;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (cxlr->mode) {
 	case CXL_DECODER_PMEM:
 		return devm_cxl_add_pmem_region(cxlr);

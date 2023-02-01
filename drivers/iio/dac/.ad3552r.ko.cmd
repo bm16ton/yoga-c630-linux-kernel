@@ -1,0 +1,1 @@
+cmd_drivers/iio/dac/ad3552r.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/dac/ad3552r.ko drivers/iio/dac/ad3552r.o drivers/iio/dac/ad3552r.mod.o;  true

@@ -323,7 +323,11 @@ u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid)
 	u32 q_pair_id;
 
 	ifcvf_lm = (struct ifcvf_lm_cfg __iomem *)hw->lm_cfg;
+<<<<<<< HEAD
+	q_pair_id = qid / 2;
+=======
 	q_pair_id = qid / hw->nr_vring;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	avail_idx_addr = &ifcvf_lm->vring_lm_cfg[q_pair_id].idx_addr[qid % 2];
 	last_avail_idx = vp_ioread16(avail_idx_addr);
 
@@ -337,7 +341,11 @@ int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num)
 	u32 q_pair_id;
 
 	ifcvf_lm = (struct ifcvf_lm_cfg __iomem *)hw->lm_cfg;
+<<<<<<< HEAD
+	q_pair_id = qid / 2;
+=======
 	q_pair_id = qid / hw->nr_vring;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	avail_idx_addr = &ifcvf_lm->vring_lm_cfg[q_pair_id].idx_addr[qid % 2];
 	hw->vring[qid].last_avail_idx = num;
 	vp_iowrite16(num, avail_idx_addr);

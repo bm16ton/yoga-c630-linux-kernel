@@ -19,7 +19,11 @@ struct {
 int count = 0;
 int noise = 0;
 
+<<<<<<< HEAD
+static __always_inline int subprog_noise(void)
+=======
 __always_inline int subprog_noise(void)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	__u32 key = 0;
 

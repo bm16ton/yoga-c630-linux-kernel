@@ -1,0 +1,1 @@
+cmd_drivers/iio/potentiometer/tpl0102.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/potentiometer/tpl0102.ko drivers/iio/potentiometer/tpl0102.o drivers/iio/potentiometer/tpl0102.mod.o;  true

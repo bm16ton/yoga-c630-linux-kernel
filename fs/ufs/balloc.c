@@ -295,6 +295,12 @@ static void ufs_change_blocknr(struct inode *inode, sector_t beg,
 
 			if (!buffer_mapped(bh))
 					map_bh(bh, inode->i_sb, oldb + pos);
+<<<<<<< HEAD
+			if (bh_read(bh, 0) < 0) {
+				ufs_error(inode->i_sb, __func__,
+					  "read of block failed\n");
+				break;
+=======
 			if (!buffer_uptodate(bh)) {
 				ll_rw_block(REQ_OP_READ, 1, &bh);
 				wait_on_buffer(bh);
@@ -303,6 +309,7 @@ static void ufs_change_blocknr(struct inode *inode, sector_t beg,
 						  "read of block failed\n");
 					break;
 				}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 
 			UFSD(" change from %llu to %llu, pos %u\n",

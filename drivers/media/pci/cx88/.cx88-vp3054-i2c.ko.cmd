@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/cx88/cx88-vp3054-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/cx88/cx88-vp3054-i2c.ko drivers/media/pci/cx88/cx88-vp3054-i2c.o drivers/media/pci/cx88/cx88-vp3054-i2c.mod.o;  true

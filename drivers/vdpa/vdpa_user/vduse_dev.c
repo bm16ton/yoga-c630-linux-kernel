@@ -673,10 +673,22 @@ static void vduse_vdpa_get_config(struct vdpa_device *vdpa, unsigned int offset,
 {
 	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
 
+<<<<<<< HEAD
+	/* Initialize the buffer in case of partial copy. */
+	memset(buf, 0, len);
+
+	if (offset > dev->config_size)
+		return;
+
+	if (len > dev->config_size - offset)
+		len = dev->config_size - offset;
+
+=======
 	if (offset > dev->config_size ||
 	    len > dev->config_size - offset)
 		return;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memcpy(buf, dev->config + offset, len);
 }
 
@@ -1435,6 +1447,12 @@ static bool vduse_validate_config(struct vduse_dev_config *config)
 	if (config->config_size > PAGE_SIZE)
 		return false;
 
+<<<<<<< HEAD
+	if (config->vq_num > 0xffff)
+		return false;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!device_is_allowed(config->device_id))
 		return false;
 

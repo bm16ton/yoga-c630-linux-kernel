@@ -1,0 +1,1 @@
+cmd_drivers/platform/chrome/cros_typec_switch.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/platform/chrome/cros_typec_switch.ko drivers/platform/chrome/cros_typec_switch.o drivers/platform/chrome/cros_typec_switch.mod.o;  true

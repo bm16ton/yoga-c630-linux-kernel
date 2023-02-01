@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/xgene-hwmon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/xgene-hwmon.ko drivers/hwmon/xgene-hwmon.o drivers/hwmon/xgene-hwmon.mod.o;  true

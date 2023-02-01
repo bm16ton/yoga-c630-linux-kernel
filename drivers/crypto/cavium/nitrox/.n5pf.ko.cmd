@@ -1,0 +1,1 @@
+cmd_drivers/crypto/cavium/nitrox/n5pf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/crypto/cavium/nitrox/n5pf.ko drivers/crypto/cavium/nitrox/n5pf.o drivers/crypto/cavium/nitrox/n5pf.mod.o;  true

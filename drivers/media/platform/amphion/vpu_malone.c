@@ -692,6 +692,10 @@ int vpu_malone_set_decode_params(struct vpu_shared_addr *shared,
 }
 
 static struct vpu_pair malone_cmds[] = {
+<<<<<<< HEAD
+	{VPU_CMD_ID_NOOP, VID_API_CMD_NULL},
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{VPU_CMD_ID_START, VID_API_CMD_START},
 	{VPU_CMD_ID_STOP, VID_API_CMD_STOP},
 	{VPU_CMD_ID_ABORT, VID_API_CMD_ABORT},

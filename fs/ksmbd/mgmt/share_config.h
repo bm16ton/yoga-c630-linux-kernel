@@ -9,6 +9,10 @@
 #include <linux/workqueue.h>
 #include <linux/hashtable.h>
 #include <linux/path.h>
+<<<<<<< HEAD
+#include <linux/unicode.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct ksmbd_share_config {
 	char			*name;
@@ -74,7 +78,12 @@ static inline void ksmbd_share_config_put(struct ksmbd_share_config *share)
 	__ksmbd_share_config_put(share);
 }
 
+<<<<<<< HEAD
+struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
+						  const char *name);
+=======
 struct ksmbd_share_config *ksmbd_share_config_get(char *name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,
 			       const char *filename);
 #endif /* __SHARE_CONFIG_MANAGEMENT_H__ */

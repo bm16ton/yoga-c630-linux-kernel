@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/em28xx/modules.order := {   echo drivers/media/usb/em28xx/em28xx.ko;   echo drivers/media/usb/em28xx/em28xx-v4l.ko;   echo drivers/media/usb/em28xx/em28xx-alsa.ko;   echo drivers/media/usb/em28xx/em28xx-dvb.ko;   echo drivers/media/usb/em28xx/em28xx-rc.ko; :; } > drivers/media/usb/em28xx/modules.order

@@ -784,6 +784,12 @@ struct fuse_conn {
 	/* Does the filesystem support per inode DAX? */
 	unsigned int inode_dax:1;
 
+<<<<<<< HEAD
+	/* Is tmpfile not implemented by fs? */
+	unsigned int no_tmpfile:1;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/** The number of requests waiting for completion */
 	atomic_t num_waiting;
 

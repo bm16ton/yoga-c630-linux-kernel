@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/ltc3815.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/ltc3815.ko drivers/hwmon/pmbus/ltc3815.o drivers/hwmon/pmbus/ltc3815.mod.o;  true

@@ -63,6 +63,10 @@ const struct io_op_def io_op_defs[] = {
 		.audit_skip		= 1,
 		.ioprio			= 1,
 		.iopoll			= 1,
+<<<<<<< HEAD
+		.iopoll_queue		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.async_size		= sizeof(struct io_async_rw),
 		.name			= "READV",
 		.prep			= io_prep_rw,
@@ -80,6 +84,10 @@ const struct io_op_def io_op_defs[] = {
 		.audit_skip		= 1,
 		.ioprio			= 1,
 		.iopoll			= 1,
+<<<<<<< HEAD
+		.iopoll_queue		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.async_size		= sizeof(struct io_async_rw),
 		.name			= "WRITEV",
 		.prep			= io_prep_rw,
@@ -103,6 +111,10 @@ const struct io_op_def io_op_defs[] = {
 		.audit_skip		= 1,
 		.ioprio			= 1,
 		.iopoll			= 1,
+<<<<<<< HEAD
+		.iopoll_queue		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.async_size		= sizeof(struct io_async_rw),
 		.name			= "READ_FIXED",
 		.prep			= io_prep_rw,
@@ -118,6 +130,10 @@ const struct io_op_def io_op_defs[] = {
 		.audit_skip		= 1,
 		.ioprio			= 1,
 		.iopoll			= 1,
+<<<<<<< HEAD
+		.iopoll_queue		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.async_size		= sizeof(struct io_async_rw),
 		.name			= "WRITE_FIXED",
 		.prep			= io_prep_rw,
@@ -150,6 +166,10 @@ const struct io_op_def io_op_defs[] = {
 		.unbound_nonreg_file	= 1,
 		.pollout		= 1,
 		.ioprio			= 1,
+<<<<<<< HEAD
+		.manual_alloc		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.name			= "SENDMSG",
 #if defined(CONFIG_NET)
 		.async_size		= sizeof(struct io_async_msghdr),
@@ -168,6 +188,10 @@ const struct io_op_def io_op_defs[] = {
 		.pollin			= 1,
 		.buffer_select		= 1,
 		.ioprio			= 1,
+<<<<<<< HEAD
+		.manual_alloc		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.name			= "RECVMSG",
 #if defined(CONFIG_NET)
 		.async_size		= sizeof(struct io_async_msghdr),
@@ -275,6 +299,10 @@ const struct io_op_def io_op_defs[] = {
 		.audit_skip		= 1,
 		.ioprio			= 1,
 		.iopoll			= 1,
+<<<<<<< HEAD
+		.iopoll_queue		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.async_size		= sizeof(struct io_async_rw),
 		.name			= "READ",
 		.prep			= io_prep_rw,
@@ -290,6 +318,10 @@ const struct io_op_def io_op_defs[] = {
 		.audit_skip		= 1,
 		.ioprio			= 1,
 		.iopoll			= 1,
+<<<<<<< HEAD
+		.iopoll_queue		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.async_size		= sizeof(struct io_async_rw),
 		.name			= "WRITE",
 		.prep			= io_prep_rw,
@@ -314,11 +346,22 @@ const struct io_op_def io_op_defs[] = {
 		.pollout		= 1,
 		.audit_skip		= 1,
 		.ioprio			= 1,
+<<<<<<< HEAD
+		.manual_alloc		= 1,
+		.name			= "SEND",
+#if defined(CONFIG_NET)
+		.async_size		= sizeof(struct io_async_msghdr),
+		.prep			= io_sendmsg_prep,
+		.issue			= io_send,
+		.fail			= io_sendrecv_fail,
+		.prep_async		= io_send_prep_async,
+=======
 		.name			= "SEND",
 #if defined(CONFIG_NET)
 		.prep			= io_sendmsg_prep,
 		.issue			= io_send,
 		.fail			= io_sendrecv_fail,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 		.prep			= io_eopnotsupp_prep,
 #endif
@@ -475,6 +518,11 @@ const struct io_op_def io_op_defs[] = {
 		.needs_file		= 1,
 		.plug			= 1,
 		.name			= "URING_CMD",
+<<<<<<< HEAD
+		.iopoll			= 1,
+		.iopoll_queue		= 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.async_size		= uring_cmd_pdu_size(1),
 		.prep			= io_uring_cmd_prep,
 		.issue			= io_uring_cmd,
@@ -492,9 +540,33 @@ const struct io_op_def io_op_defs[] = {
 		.async_size		= sizeof(struct io_async_msghdr),
 		.prep			= io_send_zc_prep,
 		.issue			= io_send_zc,
+<<<<<<< HEAD
+		.prep_async		= io_send_prep_async,
+		.cleanup		= io_send_zc_cleanup,
+		.fail			= io_sendrecv_fail,
+#else
+		.prep			= io_eopnotsupp_prep,
+#endif
+	},
+	[IORING_OP_SENDMSG_ZC] = {
+		.name			= "SENDMSG_ZC",
+		.needs_file		= 1,
+		.unbound_nonreg_file	= 1,
+		.pollout		= 1,
+		.ioprio			= 1,
+		.manual_alloc		= 1,
+#if defined(CONFIG_NET)
+		.async_size		= sizeof(struct io_async_msghdr),
+		.prep			= io_send_zc_prep,
+		.issue			= io_sendmsg_zc,
+		.prep_async		= io_sendmsg_prep_async,
+		.cleanup		= io_send_zc_cleanup,
+		.fail			= io_sendrecv_fail,
+=======
 		.prep_async		= io_sendzc_prep_async,
 		.cleanup		= io_send_zc_cleanup,
 		.fail			= io_send_zc_fail,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 		.prep			= io_eopnotsupp_prep,
 #endif

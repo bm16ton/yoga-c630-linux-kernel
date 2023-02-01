@@ -228,7 +228,11 @@ static irqreturn_t gma_irq_handler(int irq, void *arg)
 	vdc_stat &= dev_priv->vdc_irq_mask;
 	spin_unlock(&dev_priv->irqmask_lock);
 
+<<<<<<< HEAD
+	if (dsp_int) {
+=======
 	if (dsp_int && gma_power_is_on(dev)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gma_vdc_interrupt(dev, vdc_stat);
 		handled = 1;
 	}
@@ -264,13 +268,12 @@ void gma_irq_preinstall(struct drm_device *dev)
 
 	spin_lock_irqsave(&dev_priv->irqmask_lock, irqflags);
 
-	if (gma_power_is_on(dev)) {
-		PSB_WVDC32(0xFFFFFFFF, PSB_HWSTAM);
-		PSB_WVDC32(0x00000000, PSB_INT_MASK_R);
-		PSB_WVDC32(0x00000000, PSB_INT_ENABLE_R);
-		PSB_WSGX32(0x00000000, PSB_CR_EVENT_HOST_ENABLE);
-		PSB_RSGX32(PSB_CR_EVENT_HOST_ENABLE);
-	}
+	PSB_WVDC32(0xFFFFFFFF, PSB_HWSTAM);
+	PSB_WVDC32(0x00000000, PSB_INT_MASK_R);
+	PSB_WVDC32(0x00000000, PSB_INT_ENABLE_R);
+	PSB_WSGX32(0x00000000, PSB_CR_EVENT_HOST_ENABLE);
+	PSB_RSGX32(PSB_CR_EVENT_HOST_ENABLE);
+
 	if (dev->vblank[0].enabled)
 		dev_priv->vdc_irq_mask |= _PSB_VSYNC_PIPEA_FLAG;
 	if (dev->vblank[1].enabled)

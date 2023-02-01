@@ -1,0 +1,1 @@
+cmd_drivers/accessibility/speakup/speakup_acntsa.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/accessibility/speakup/speakup_acntsa.ko drivers/accessibility/speakup/speakup_acntsa.o drivers/accessibility/speakup/speakup_acntsa.mod.o;  true

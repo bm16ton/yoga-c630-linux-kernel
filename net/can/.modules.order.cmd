@@ -1,0 +1,1 @@
+cmd_net/can/modules.order := {   echo net/can/can.ko;   echo net/can/can-raw.ko;   echo net/can/can-bcm.ko;   echo net/can/can-gw.ko;   cat net/can/j1939/modules.order;   echo net/can/can-isotp.ko; :; } > net/can/modules.order

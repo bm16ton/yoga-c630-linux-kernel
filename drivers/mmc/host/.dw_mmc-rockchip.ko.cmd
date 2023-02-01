@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/dw_mmc-rockchip.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/dw_mmc-rockchip.ko drivers/mmc/host/dw_mmc-rockchip.o drivers/mmc/host/dw_mmc-rockchip.mod.o;  true

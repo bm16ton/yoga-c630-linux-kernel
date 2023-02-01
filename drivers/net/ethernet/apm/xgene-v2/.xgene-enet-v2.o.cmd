@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.o @drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.mod 

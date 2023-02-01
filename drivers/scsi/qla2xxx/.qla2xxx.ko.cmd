@@ -1,0 +1,1 @@
+cmd_drivers/scsi/qla2xxx/qla2xxx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/qla2xxx/qla2xxx.ko drivers/scsi/qla2xxx/qla2xxx.o drivers/scsi/qla2xxx/qla2xxx.mod.o;  true

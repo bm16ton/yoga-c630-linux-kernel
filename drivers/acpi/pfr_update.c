@@ -178,7 +178,11 @@ static int query_capability(struct pfru_update_cap_info *cap_hdr,
 	ret = 0;
 
 free_acpi_buffer:
+<<<<<<< HEAD
+	ACPI_FREE(out_obj);
+=======
 	kfree(out_obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -224,7 +228,11 @@ static int query_buffer(struct pfru_com_buf_info *info,
 	ret = 0;
 
 free_acpi_buffer:
+<<<<<<< HEAD
+	ACPI_FREE(out_obj);
+=======
 	kfree(out_obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -385,7 +393,11 @@ static int start_update(int action, struct pfru_device *pfru_dev)
 	ret = 0;
 
 free_acpi_buffer:
+<<<<<<< HEAD
+	ACPI_FREE(out_obj);
+=======
 	kfree(out_obj);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }

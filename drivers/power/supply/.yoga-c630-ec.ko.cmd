@@ -1,0 +1,1 @@
+cmd_drivers/power/supply/yoga-c630-ec.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/power/supply/yoga-c630-ec.ko drivers/power/supply/yoga-c630-ec.o drivers/power/supply/yoga-c630-ec.mod.o;  true

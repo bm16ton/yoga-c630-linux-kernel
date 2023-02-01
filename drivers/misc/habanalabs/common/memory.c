@@ -457,7 +457,7 @@ static void merge_va_blocks_locked(struct hl_device *hdev,
 	prev = list_prev_entry(va_block, node);
 	if (&prev->node != va_list && prev->end + 1 == va_block->start) {
 		prev->end = va_block->end;
-		prev->size = prev->end - prev->start;
+		prev->size = prev->end - prev->start + 1;
 		list_del(&va_block->node);
 		kfree(va_block);
 		va_block = prev;
@@ -466,7 +466,7 @@ static void merge_va_blocks_locked(struct hl_device *hdev,
 	next = list_next_entry(va_block, node);
 	if (&next->node != va_list && va_block->end + 1 == next->start) {
 		next->start = va_block->start;
-		next->size = next->end - next->start;
+		next->size = next->end - next->start + 1;
 		list_del(&va_block->node);
 		kfree(va_block);
 	}
@@ -755,7 +755,7 @@ out:
  * - Return the start address of the virtual block.
  */
 u64 hl_reserve_va_block(struct hl_device *hdev, struct hl_ctx *ctx,
-		enum hl_va_range_type type, u32 size, u32 alignment)
+		enum hl_va_range_type type, u64 size, u32 alignment)
 {
 	return get_va_block(hdev, ctx->va_range[type], size, 0,
 			max(alignment, ctx->va_range[type]->page_size),
@@ -1210,18 +1210,26 @@ static int map_device_va(struct hl_ctx *ctx, struct hl_mem_in *args, u64 *device
 		goto va_block_err;
 	}
 
-	mutex_lock(&ctx->mmu_lock);
+	mutex_lock(&hdev->mmu_lock);
 
 	rc = map_phys_pg_pack(ctx, ret_vaddr, phys_pg_pack);
 	if (rc) {
 		dev_err(hdev->dev, "mapping page pack failed for handle %u\n", handle);
+<<<<<<< HEAD
+		mutex_unlock(&hdev->mmu_lock);
+=======
 		mutex_unlock(&ctx->mmu_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto map_err;
 	}
 
 	rc = hl_mmu_invalidate_cache_range(hdev, false, *vm_type | MMU_OP_SKIP_LOW_CACHE_INV,
 				ctx->asid, ret_vaddr, phys_pg_pack->total_size);
+<<<<<<< HEAD
+	mutex_unlock(&hdev->mmu_lock);
+=======
 	mutex_unlock(&ctx->mmu_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (rc)
 		goto map_err;
 
@@ -1362,7 +1370,7 @@ static int unmap_device_va(struct hl_ctx *ctx, struct hl_mem_in *args,
 	else
 		vaddr &= ~(((u64) phys_pg_pack->page_size) - 1);
 
-	mutex_lock(&ctx->mmu_lock);
+	mutex_lock(&hdev->mmu_lock);
 
 	unmap_phys_pg_pack(ctx, vaddr, phys_pg_pack);
 
@@ -1375,7 +1383,7 @@ static int unmap_device_va(struct hl_ctx *ctx, struct hl_mem_in *args,
 		rc = hl_mmu_invalidate_cache_range(hdev, true, *vm_type, ctx->asid, vaddr,
 							phys_pg_pack->total_size);
 
-	mutex_unlock(&ctx->mmu_lock);
+	mutex_unlock(&hdev->mmu_lock);
 
 	/*
 	 * If the context is closing we don't need to check for the MMU cache
@@ -1418,18 +1426,23 @@ vm_type_err:
 	return rc;
 }
 
-static int map_block(struct hl_device *hdev, u64 address, u64 *handle,
-			u32 *size)
+static int map_block(struct hl_device *hdev, u64 address, u64 *handle, u32 *size)
 {
-	u32 block_id = 0;
+	u32 block_id;
 	int rc;
 
+	*handle = 0;
+	if (size)
+		*size = 0;
+
 	rc = hdev->asic_funcs->get_hw_block_id(hdev, address, size, &block_id);
+	if (rc)
+		return rc;
 
 	*handle = block_id | HL_MMAP_TYPE_BLOCK;
 	*handle <<= PAGE_SHIFT;
 
-	return rc;
+	return 0;
 }
 
 static void hw_block_vm_close(struct vm_area_struct *vma)
@@ -1437,6 +1450,16 @@ static void hw_block_vm_close(struct vm_area_struct *vma)
 	struct hl_vm_hw_block_list_node *lnode =
 		(struct hl_vm_hw_block_list_node *) vma->vm_private_data;
 	struct hl_ctx *ctx = lnode->ctx;
+<<<<<<< HEAD
+	long new_mmap_size;
+
+	new_mmap_size = lnode->mapped_size - (vma->vm_end - vma->vm_start);
+	if (new_mmap_size > 0) {
+		lnode->mapped_size = new_mmap_size;
+		return;
+	}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_lock(&ctx->hw_block_list_lock);
 	list_del(&lnode->node);
@@ -1486,6 +1509,11 @@ int hl_hw_block_mmap(struct hl_fpriv *hpriv, struct vm_area_struct *vma)
 	lnode = kzalloc(sizeof(*lnode), GFP_KERNEL);
 	if (!lnode)
 		return -ENOMEM;
+<<<<<<< HEAD
+
+	rc = hdev->asic_funcs->hw_block_mmap(hdev, vma, block_id, block_size);
+	if (rc) {
+=======
 
 	vma->vm_ops = &hw_block_vm_ops;
 	vma->vm_private_data = lnode;
@@ -1495,15 +1523,30 @@ int hl_hw_block_mmap(struct hl_fpriv *hpriv, struct vm_area_struct *vma)
 	rc = hdev->asic_funcs->hw_block_mmap(hdev, vma, block_id, block_size);
 	if (rc) {
 		hl_ctx_put(ctx);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(lnode);
 		return rc;
 	}
 
+<<<<<<< HEAD
+	hl_ctx_get(ctx);
+
+	lnode->ctx = ctx;
+	lnode->vaddr = vma->vm_start;
+	lnode->block_size = block_size;
+	lnode->mapped_size = lnode->block_size;
+	lnode->id = block_id;
+
+	vma->vm_private_data = lnode;
+	vma->vm_ops = &hw_block_vm_ops;
+
+=======
 	lnode->ctx = ctx;
 	lnode->vaddr = vma->vm_start;
 	lnode->size = block_size;
 	lnode->id = block_id;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&ctx->hw_block_list_lock);
 	list_add_tail(&lnode->node, &ctx->hw_block_mem_list);
 	mutex_unlock(&ctx->hw_block_list_lock);
@@ -2296,8 +2339,7 @@ static int get_user_memory(struct hl_device *hdev, u64 addr, u64 size,
 		return -EFAULT;
 	}
 
-	userptr->pages = kvmalloc_array(npages, sizeof(*userptr->pages),
-					GFP_KERNEL);
+	userptr->pages = kvmalloc_array(npages, sizeof(struct page *), GFP_KERNEL);
 	if (!userptr->pages)
 		return -ENOMEM;
 
@@ -2759,13 +2801,18 @@ void hl_vm_ctx_fini(struct hl_ctx *ctx)
 		unmap_device_va(ctx, &args, true);
 	}
 
-	mutex_lock(&ctx->mmu_lock);
+	mutex_lock(&hdev->mmu_lock);
 
 	/* invalidate the cache once after the unmapping loop */
 	hl_mmu_invalidate_cache(hdev, true, MMU_OP_USERPTR);
 	hl_mmu_invalidate_cache(hdev, true, MMU_OP_PHYS_PACK);
+<<<<<<< HEAD
 
-	mutex_unlock(&ctx->mmu_lock);
+	mutex_unlock(&hdev->mmu_lock);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	INIT_LIST_HEAD(&free_list);
 
 	INIT_LIST_HEAD(&free_list);
 

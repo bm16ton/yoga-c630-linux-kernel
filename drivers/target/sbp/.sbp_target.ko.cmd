@@ -1,0 +1,1 @@
+cmd_drivers/target/sbp/sbp_target.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/target/sbp/sbp_target.ko drivers/target/sbp/sbp_target.o drivers/target/sbp/sbp_target.mod.o;  true

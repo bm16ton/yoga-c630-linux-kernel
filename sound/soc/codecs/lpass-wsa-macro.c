@@ -338,7 +338,10 @@ struct wsa_macro {
 	int ec_hq[WSA_MACRO_RX1 + 1];
 	u16 prim_int_users[WSA_MACRO_RX1 + 1];
 	u16 wsa_mclk_users;
+<<<<<<< HEAD
+=======
 	bool reset_swr;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long active_ch_mask[WSA_MACRO_MAX_DAIS];
 	unsigned long active_ch_cnt[WSA_MACRO_MAX_DAIS];
 	int rx_port_value[WSA_MACRO_RX_MAX];
@@ -2271,23 +2274,33 @@ static int wsa_swrm_clock(struct wsa_macro *wsa, bool enable)
 		wsa_macro_mclk_enable(wsa, true);
 
 		/* reset swr ip */
+<<<<<<< HEAD
+		regmap_update_bits(regmap, CDC_WSA_CLK_RST_CTRL_SWR_CONTROL,
+				   CDC_WSA_SWR_RST_EN_MASK, CDC_WSA_SWR_RST_ENABLE);
+=======
 		if (wsa->reset_swr)
 			regmap_update_bits(regmap,
 					   CDC_WSA_CLK_RST_CTRL_SWR_CONTROL,
 					   CDC_WSA_SWR_RST_EN_MASK,
 					   CDC_WSA_SWR_RST_ENABLE);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		regmap_update_bits(regmap, CDC_WSA_CLK_RST_CTRL_SWR_CONTROL,
 				   CDC_WSA_SWR_CLK_EN_MASK,
 				   CDC_WSA_SWR_CLK_ENABLE);
 
 		/* Bring out of reset */
+<<<<<<< HEAD
+		regmap_update_bits(regmap, CDC_WSA_CLK_RST_CTRL_SWR_CONTROL,
+				   CDC_WSA_SWR_RST_EN_MASK, CDC_WSA_SWR_RST_DISABLE);
+=======
 		if (wsa->reset_swr)
 			regmap_update_bits(regmap,
 					   CDC_WSA_CLK_RST_CTRL_SWR_CONTROL,
 					   CDC_WSA_SWR_RST_EN_MASK,
 					   CDC_WSA_SWR_RST_DISABLE);
 		wsa->reset_swr = false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		regmap_update_bits(regmap, CDC_WSA_CLK_RST_CTRL_SWR_CONTROL,
 				   CDC_WSA_SWR_CLK_EN_MASK, 0);
@@ -2431,7 +2444,10 @@ static int wsa_macro_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(dev, wsa);
 
+<<<<<<< HEAD
+=======
 	wsa->reset_swr = true;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wsa->dev = dev;
 
 	/* set MCLK and NPL rates */
@@ -2561,6 +2577,11 @@ static const struct dev_pm_ops wsa_macro_pm_ops = {
 static const struct of_device_id wsa_macro_dt_match[] = {
 	{.compatible = "qcom,sc7280-lpass-wsa-macro"},
 	{.compatible = "qcom,sm8250-lpass-wsa-macro"},
+<<<<<<< HEAD
+	{.compatible = "qcom,sm8450-lpass-wsa-macro"},
+	{.compatible = "qcom,sc8280xp-lpass-wsa-macro" },
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{}
 };
 MODULE_DEVICE_TABLE(of, wsa_macro_dt_match);

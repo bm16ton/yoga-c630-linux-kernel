@@ -1,0 +1,4 @@
+net/dccp/dccp.ko
+net/dccp/dccp_ipv4.ko
+net/dccp/dccp_ipv6.ko
+net/dccp/dccp_diag.ko

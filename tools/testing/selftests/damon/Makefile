@@ -6,6 +6,10 @@ TEST_GEN_FILES += huge_count_read_write
 TEST_FILES = _chk_dependency.sh _debugfs_common.sh
 TEST_PROGS = debugfs_attrs.sh debugfs_schemes.sh debugfs_target_ids.sh
 TEST_PROGS += debugfs_empty_targets.sh debugfs_huge_count_read_write.sh
+<<<<<<< HEAD
+TEST_PROGS += debugfs_duplicate_context_creation.sh
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 TEST_PROGS += sysfs.sh
 
 include ../lib.mk

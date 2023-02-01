@@ -1069,6 +1069,18 @@ static u32 nvme_known_admin_effects(u8 opcode)
 	return 0;
 }
 
+static u32 nvme_known_nvm_effects(u8 opcode)
+{
+	switch (opcode) {
+	case nvme_cmd_write:
+	case nvme_cmd_write_zeroes:
+	case nvme_cmd_write_uncor:
+		 return NVME_CMD_EFFECTS_LBCC;
+	default:
+		return 0;
+	}
+}
+
 u32 nvme_command_effects(struct nvme_ctrl *ctrl, struct nvme_ns *ns, u8 opcode)
 {
 	u32 effects = 0;
@@ -1076,16 +1088,31 @@ u32 nvme_command_effects(struct nvme_ctrl *ctrl, struct nvme_ns *ns, u8 opcode)
 	if (ns) {
 		if (ns->head->effects)
 			effects = le32_to_cpu(ns->head->effects->iocs[opcode]);
+		if (ns->head->ids.csi == NVME_CAP_CSS_NVM)
+			effects |= nvme_known_nvm_effects(opcode);
 		if (effects & ~(NVME_CMD_EFFECTS_CSUPP | NVME_CMD_EFFECTS_LBCC))
 			dev_warn_once(ctrl->device,
+<<<<<<< HEAD
+				"IO command:%02x has unusual effects:%08x\n",
+				opcode, effects);
+=======
 				"IO command:%02x has unhandled effects:%08x\n",
 				opcode, effects);
 		return 0;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	if (ctrl->effects)
-		effects = le32_to_cpu(ctrl->effects->acs[opcode]);
-	effects |= nvme_known_admin_effects(opcode);
+		/*
+		 * NVME_CMD_EFFECTS_CSE_MASK causes a freeze all I/O queues,
+		 * which would deadlock when done on an I/O command.  Note that
+		 * We already warn about an unusual effect above.
+		 */
+		effects &= ~NVME_CMD_EFFECTS_CSE_MASK;
+	} else {
+		if (ctrl->effects)
+			effects = le32_to_cpu(ctrl->effects->acs[opcode]);
+		effects |= nvme_known_admin_effects(opcode);
+	}
 
 	return effects;
 }
@@ -1172,7 +1199,8 @@ static void nvme_queue_keep_alive_work(struct nvme_ctrl *ctrl)
 	queue_delayed_work(nvme_wq, &ctrl->ka_work, ctrl->kato * HZ / 2);
 }
 
-static void nvme_keep_alive_end_io(struct request *rq, blk_status_t status)
+static enum rq_end_io_ret nvme_keep_alive_end_io(struct request *rq,
+						 blk_status_t status)
 {
 	struct nvme_ctrl *ctrl = rq->end_io_data;
 	unsigned long flags;
@@ -1184,7 +1212,7 @@ static void nvme_keep_alive_end_io(struct request *rq, blk_status_t status)
 		dev_err(ctrl->device,
 			"failed nvme_keep_alive_end_io error=%d\n",
 				status);
-		return;
+		return RQ_END_IO_NONE;
 	}
 
 	ctrl->comp_seen = false;
@@ -1195,6 +1223,10 @@ static void nvme_keep_alive_end_io(struct request *rq, blk_status_t status)
 	spin_unlock_irqrestore(&ctrl->lock, flags);
 	if (startka)
 		nvme_queue_keep_alive_work(ctrl);
+<<<<<<< HEAD
+	return RQ_END_IO_NONE;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void nvme_keep_alive_work(struct work_struct *work)
@@ -1432,6 +1464,7 @@ out_free_id:
 
 static int nvme_ns_info_from_identify(struct nvme_ctrl *ctrl,
 		struct nvme_ns_info *info)
+<<<<<<< HEAD
 {
 	struct nvme_ns_ids *ids = &info->ids;
 	struct nvme_id_ns *id;
@@ -1492,6 +1525,68 @@ static int nvme_features(struct nvme_ctrl *dev, u8 op, unsigned int fid,
 	struct nvme_command c = { };
 	int ret;
 
+=======
+{
+	struct nvme_ns_ids *ids = &info->ids;
+	struct nvme_id_ns *id;
+	int ret;
+
+	ret = nvme_identify_ns(ctrl, info->nsid, &id);
+	if (ret)
+		return ret;
+	info->anagrpid = id->anagrpid;
+	info->is_shared = id->nmic & NVME_NS_NMIC_SHARED;
+	info->is_readonly = id->nsattr & NVME_NS_ATTR_RO;
+	info->is_ready = true;
+	if (ctrl->quirks & NVME_QUIRK_BOGUS_NID) {
+		dev_info(ctrl->device,
+			 "Ignoring bogus Namespace Identifiers\n");
+	} else {
+		if (ctrl->vs >= NVME_VS(1, 1, 0) &&
+		    !memchr_inv(ids->eui64, 0, sizeof(ids->eui64)))
+			memcpy(ids->eui64, id->eui64, sizeof(ids->eui64));
+		if (ctrl->vs >= NVME_VS(1, 2, 0) &&
+		    !memchr_inv(ids->nguid, 0, sizeof(ids->nguid)))
+			memcpy(ids->nguid, id->nguid, sizeof(ids->nguid));
+	}
+	kfree(id);
+	return 0;
+}
+
+static int nvme_ns_info_from_id_cs_indep(struct nvme_ctrl *ctrl,
+		struct nvme_ns_info *info)
+{
+	struct nvme_id_ns_cs_indep *id;
+	struct nvme_command c = {
+		.identify.opcode	= nvme_admin_identify,
+		.identify.nsid		= cpu_to_le32(info->nsid),
+		.identify.cns		= NVME_ID_CNS_NS_CS_INDEP,
+	};
+	int ret;
+
+	id = kmalloc(sizeof(*id), GFP_KERNEL);
+	if (!id)
+		return -ENOMEM;
+
+	ret = nvme_submit_sync_cmd(ctrl->admin_q, &c, id, sizeof(*id));
+	if (!ret) {
+		info->anagrpid = id->anagrpid;
+		info->is_shared = id->nmic & NVME_NS_NMIC_SHARED;
+		info->is_readonly = id->nsattr & NVME_NS_ATTR_RO;
+		info->is_ready = id->nstat & NVME_NSTAT_NRDY;
+	}
+	kfree(id);
+	return ret;
+}
+
+static int nvme_features(struct nvme_ctrl *dev, u8 op, unsigned int fid,
+		unsigned int dword11, void *buffer, size_t buflen, u32 *result)
+{
+	union nvme_result res = { 0 };
+	struct nvme_command c = { };
+	int ret;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	c.features.opcode = op;
 	c.features.fid = cpu_to_le32(fid);
 	c.features.dword11 = cpu_to_le32(dword11);
@@ -1732,6 +1827,7 @@ static int nvme_init_ms(struct nvme_ns *ns, struct nvme_id_ns *id)
 	nvm = kzalloc(sizeof(*nvm), GFP_KERNEL);
 	if (!nvm)
 		return -ENOMEM;
+<<<<<<< HEAD
 
 	c.identify.opcode = nvme_admin_identify;
 	c.identify.nsid = cpu_to_le32(ns->head->ns_id);
@@ -1748,6 +1844,24 @@ static int nvme_init_ms(struct nvme_ns *ns, struct nvme_id_ns *id)
 	if (nvme_elbaf_sts(elbaf))
 		goto free_data;
 
+=======
+
+	c.identify.opcode = nvme_admin_identify;
+	c.identify.nsid = cpu_to_le32(ns->head->ns_id);
+	c.identify.cns = NVME_ID_CNS_CS_NS;
+	c.identify.csi = NVME_CSI_NVM;
+
+	ret = nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, nvm, sizeof(*nvm));
+	if (ret)
+		goto free_data;
+
+	elbaf = le32_to_cpu(nvm->elbaf[lbaf]);
+
+	/* no support for storage tag formats right now */
+	if (nvme_elbaf_sts(elbaf))
+		goto free_data;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ns->guard_type = nvme_elbaf_guard_type(elbaf);
 	switch (ns->guard_type) {
 	case NVME_NVM_NS_64B_GUARD:
@@ -1950,6 +2064,7 @@ static void nvme_set_chunk_sectors(struct nvme_ns *ns, struct nvme_id_ns *id)
 
 static int nvme_update_ns_info_generic(struct nvme_ns *ns,
 		struct nvme_ns_info *info)
+<<<<<<< HEAD
 {
 	blk_mq_freeze_queue(ns->disk->queue);
 	nvme_set_queue_limits(ns->ctrl, ns->queue);
@@ -1976,6 +2091,34 @@ static int nvme_update_ns_info_generic(struct nvme_ns *ns,
 static int nvme_update_ns_info_block(struct nvme_ns *ns,
 		struct nvme_ns_info *info)
 {
+=======
+{
+	blk_mq_freeze_queue(ns->disk->queue);
+	nvme_set_queue_limits(ns->ctrl, ns->queue);
+	set_disk_ro(ns->disk, nvme_ns_is_readonly(ns, info));
+	blk_mq_unfreeze_queue(ns->disk->queue);
+
+	if (nvme_ns_head_multipath(ns->head)) {
+		blk_mq_freeze_queue(ns->head->disk->queue);
+		set_disk_ro(ns->head->disk, nvme_ns_is_readonly(ns, info));
+		nvme_mpath_revalidate_paths(ns);
+		blk_stack_limits(&ns->head->disk->queue->limits,
+				 &ns->queue->limits, 0);
+		ns->head->disk->flags |= GENHD_FL_HIDDEN;
+		blk_mq_unfreeze_queue(ns->head->disk->queue);
+	}
+
+	/* Hide the block-interface for these devices */
+	ns->disk->flags |= GENHD_FL_HIDDEN;
+	set_bit(NVME_NS_READY, &ns->flags);
+
+	return 0;
+}
+
+static int nvme_update_ns_info_block(struct nvme_ns *ns,
+		struct nvme_ns_info *info)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct nvme_id_ns *id;
 	unsigned lbaf;
 	int ret;
@@ -2156,14 +2299,24 @@ static int nvme_pr_preempt(struct block_device *bdev, u64 old, u64 new,
 
 static int nvme_pr_clear(struct block_device *bdev, u64 key)
 {
+<<<<<<< HEAD
+	u32 cdw10 = 1 | (key ? 0 : 1 << 3);
+
+	return nvme_pr_command(bdev, cdw10, key, 0, nvme_cmd_resv_release);
+=======
 	u32 cdw10 = 1 | (key ? 1 << 3 : 0);
 
 	return nvme_pr_command(bdev, cdw10, key, 0, nvme_cmd_resv_register);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int nvme_pr_release(struct block_device *bdev, u64 key, enum pr_type type)
 {
+<<<<<<< HEAD
+	u32 cdw10 = nvme_pr_type(type) << 8 | (key ? 0 : 1 << 3);
+=======
 	u32 cdw10 = nvme_pr_type(type) << 8 | (key ? 1 << 3 : 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return nvme_pr_command(bdev, cdw10, key, 0, nvme_cmd_resv_release);
 }
@@ -2320,12 +2473,21 @@ int nvme_enable_ctrl(struct nvme_ctrl *ctrl)
 	ret = ctrl->ops->reg_write32(ctrl, NVME_REG_CC, ctrl->ctrl_config);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
 
 	/* Flush write to device (required if transport is PCI) */
 	ret = ctrl->ops->reg_read32(ctrl, NVME_REG_CC, &ctrl->ctrl_config);
 	if (ret)
 		return ret;
 
+=======
+
+	/* Flush write to device (required if transport is PCI) */
+	ret = ctrl->ops->reg_read32(ctrl, NVME_REG_CC, &ctrl->ctrl_config);
+	if (ret)
+		return ret;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ctrl->ctrl_config |= NVME_CC_ENABLE;
 	ret = ctrl->ops->reg_write32(ctrl, NVME_REG_CC, ctrl->ctrl_config);
 	if (ret)
@@ -2495,6 +2657,7 @@ static int nvme_configure_apst(struct nvme_ctrl *ctrl)
 		dev_dbg(ctrl->device, "APST disabled\n");
 		goto done;
 	}
+<<<<<<< HEAD
 
 	/*
 	 * Walk through all states from lowest- to highest-power.
@@ -2531,6 +2694,44 @@ static int nvme_configure_apst(struct nvme_ctrl *ctrl)
 			le32_to_cpu(ctrl->psd[state].entry_lat);
 
 		/*
+=======
+
+	/*
+	 * Walk through all states from lowest- to highest-power.
+	 * According to the spec, lower-numbered states use more power.  NPSS,
+	 * despite the name, is the index of the lowest-power state, not the
+	 * number of states.
+	 */
+	for (state = (int)ctrl->npss; state >= 0; state--) {
+		u64 total_latency_us, exit_latency_us, transition_ms;
+
+		if (target)
+			table->entries[state] = target;
+
+		/*
+		 * Don't allow transitions to the deepest state if it's quirked
+		 * off.
+		 */
+		if (state == ctrl->npss &&
+		    (ctrl->quirks & NVME_QUIRK_NO_DEEPEST_PS))
+			continue;
+
+		/*
+		 * Is this state a useful non-operational state for higher-power
+		 * states to autonomously transition to?
+		 */
+		if (!(ctrl->psd[state].flags & NVME_PS_FLAGS_NON_OP_STATE))
+			continue;
+
+		exit_latency_us = (u64)le32_to_cpu(ctrl->psd[state].exit_lat);
+		if (exit_latency_us > ctrl->ps_max_latency_us)
+			continue;
+
+		total_latency_us = exit_latency_us +
+			le32_to_cpu(ctrl->psd[state].entry_lat);
+
+		/*
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * This state is good. It can be used as the APST idle target
 		 * for higher power states.
 		 */
@@ -2690,7 +2891,7 @@ static void nvme_init_subnqn(struct nvme_subsystem *subsys, struct nvme_ctrl *ct
 	if(!(ctrl->quirks & NVME_QUIRK_IGNORE_DEV_SUBNQN)) {
 		nqnlen = strnlen(id->subnqn, NVMF_NQN_SIZE);
 		if (nqnlen > 0 && nqnlen < NVMF_NQN_SIZE) {
-			strlcpy(subsys->subnqn, id->subnqn, NVMF_NQN_SIZE);
+			strscpy(subsys->subnqn, id->subnqn, NVMF_NQN_SIZE);
 			return;
 		}
 
@@ -2698,7 +2899,11 @@ static void nvme_init_subnqn(struct nvme_subsystem *subsys, struct nvme_ctrl *ct
 			dev_warn(ctrl->device, "missing or invalid SUBNQN field.\n");
 	}
 
-	/* Generate a "fake" NQN per Figure 254 in NVMe 1.3 + ECN 001 */
+	/*
+	 * Generate a "fake" NQN similar to the one in Section 4.5 of the NVMe
+	 * Base Specification 2.0.  It is slightly different from the format
+	 * specified there due to historic reasons, and we can't change it now.
+	 */
 	off = snprintf(subsys->subnqn, NVMF_NQN_SIZE,
 			"nqn.2014.08.org.nvmexpress:%04x%04x",
 			le16_to_cpu(id->vid), le16_to_cpu(id->ssvid));
@@ -3043,6 +3248,71 @@ static int nvme_init_non_mdts_limits(struct nvme_ctrl *ctrl)
 
 	id = kzalloc(sizeof(*id), GFP_KERNEL);
 	if (!id)
+		return -ENOMEM;
+
+	c.identify.opcode = nvme_admin_identify;
+	c.identify.cns = NVME_ID_CNS_CS_CTRL;
+	c.identify.csi = NVME_CSI_NVM;
+
+	ret = nvme_submit_sync_cmd(ctrl->admin_q, &c, id, sizeof(*id));
+	if (ret)
+		goto free_data;
+
+	if (id->dmrl)
+		ctrl->max_discard_segments = id->dmrl;
+	ctrl->dmrsl = le32_to_cpu(id->dmrsl);
+	if (id->wzsl)
+		ctrl->max_zeroes_sectors = nvme_mps_to_sectors(ctrl, id->wzsl);
+
+free_data:
+	kfree(id);
+	return ret;
+}
+
+<<<<<<< HEAD
+static int nvme_init_identify(struct nvme_ctrl *ctrl)
+{
+=======
+static inline u32 nvme_mps_to_sectors(struct nvme_ctrl *ctrl, u32 units)
+{
+	u32 page_shift = NVME_CAP_MPSMIN(ctrl->cap) + 12, val;
+
+	if (check_shl_overflow(1U, units + page_shift - 9, &val))
+		return UINT_MAX;
+	return val;
+}
+
+static int nvme_init_non_mdts_limits(struct nvme_ctrl *ctrl)
+{
+	struct nvme_command c = { };
+	struct nvme_id_ctrl_nvm *id;
+	int ret;
+
+	if (ctrl->oncs & NVME_CTRL_ONCS_DSM) {
+		ctrl->max_discard_sectors = UINT_MAX;
+		ctrl->max_discard_segments = NVME_DSM_MAX_RANGES;
+	} else {
+		ctrl->max_discard_sectors = 0;
+		ctrl->max_discard_segments = 0;
+	}
+
+	/*
+	 * Even though NVMe spec explicitly states that MDTS is not applicable
+	 * to the write-zeroes, we are cautious and limit the size to the
+	 * controllers max_hw_sectors value, which is based on the MDTS field
+	 * and possibly other limiting factors.
+	 */
+	if ((ctrl->oncs & NVME_CTRL_ONCS_WRITE_ZEROES) &&
+	    !(ctrl->quirks & NVME_QUIRK_DISABLE_WRITE_ZEROES))
+		ctrl->max_zeroes_sectors = ctrl->max_hw_sectors;
+	else
+		ctrl->max_zeroes_sectors = 0;
+
+	if (nvme_ctrl_limited_cns(ctrl))
+		return 0;
+
+	id = kzalloc(sizeof(*id), GFP_KERNEL);
+	if (!id)
 		return 0;
 
 	c.identify.opcode = nvme_admin_identify;
@@ -3066,6 +3336,7 @@ free_data:
 
 static int nvme_init_identify(struct nvme_ctrl *ctrl)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct nvme_id_ctrl *id;
 	u32 max_hw_sectors;
 	bool prev_apst_enabled;
@@ -3088,10 +3359,13 @@ static int nvme_init_identify(struct nvme_ctrl *ctrl)
 
 	if (!ctrl->identified) {
 		unsigned int i;
+<<<<<<< HEAD
+=======
 
 		ret = nvme_init_subsystem(ctrl, id);
 		if (ret)
 			goto out_free;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * Check for quirks.  Quirk can depend on firmware version,
@@ -3105,6 +3379,10 @@ static int nvme_init_identify(struct nvme_ctrl *ctrl)
 			if (quirk_matches(id, &core_quirks[i]))
 				ctrl->quirks |= core_quirks[i].quirks;
 		}
+
+		ret = nvme_init_subsystem(ctrl, id);
+		if (ret)
+			goto out_free;
 	}
 	memcpy(ctrl->subsys->firmware_rev, id->fr,
 	       sizeof(ctrl->subsys->firmware_rev));
@@ -3739,13 +4017,26 @@ static ssize_t nvme_ctrl_dhchap_secret_store(struct device *dev,
 	memcpy(dhchap_secret, buf, count);
 	nvme_auth_stop(ctrl);
 	if (strcmp(dhchap_secret, opts->dhchap_secret)) {
+<<<<<<< HEAD
+		struct nvme_dhchap_key *key, *host_key;
+		int ret;
+
+		ret = nvme_auth_generate_key(dhchap_secret, &key);
+=======
 		int ret;
 
 		ret = nvme_auth_generate_key(dhchap_secret, &ctrl->host_key);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret)
 			return ret;
 		kfree(opts->dhchap_secret);
 		opts->dhchap_secret = dhchap_secret;
+<<<<<<< HEAD
+		host_key = ctrl->host_key;
+		ctrl->host_key = key;
+		nvme_auth_free_key(host_key);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Key has changed; re-authentication with new key */
 		nvme_auth_reset(ctrl);
 	}
@@ -3789,13 +4080,26 @@ static ssize_t nvme_ctrl_dhchap_ctrl_secret_store(struct device *dev,
 	memcpy(dhchap_secret, buf, count);
 	nvme_auth_stop(ctrl);
 	if (strcmp(dhchap_secret, opts->dhchap_ctrl_secret)) {
+<<<<<<< HEAD
+		struct nvme_dhchap_key *key, *ctrl_key;
+		int ret;
+
+		ret = nvme_auth_generate_key(dhchap_secret, &key);
+=======
 		int ret;
 
 		ret = nvme_auth_generate_key(dhchap_secret, &ctrl->ctrl_key);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret)
 			return ret;
 		kfree(opts->dhchap_ctrl_secret);
 		opts->dhchap_ctrl_secret = dhchap_secret;
+<<<<<<< HEAD
+		ctrl_key = ctrl->ctrl_key;
+		ctrl->ctrl_key = key;
+		nvme_auth_free_key(ctrl_key);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Key has changed; re-authentication with new key */
 		nvme_auth_reset(ctrl);
 	}
@@ -3864,6 +4168,16 @@ static umode_t nvme_dev_attrs_are_visible(struct kobject *kobj,
 		return 0;
 	if (a == &dev_attr_dhchap_ctrl_secret.attr && !ctrl->opts)
 		return 0;
+<<<<<<< HEAD
+	if (a == &dev_attr_fast_io_fail_tmo.attr && !ctrl->opts)
+		return 0;
+#ifdef CONFIG_NVME_AUTH
+	if (a == &dev_attr_dhchap_secret.attr && !ctrl->opts)
+		return 0;
+	if (a == &dev_attr_dhchap_ctrl_secret.attr && !ctrl->opts)
+		return 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 	return a->mode;
@@ -3923,6 +4237,73 @@ static int nvme_subsys_check_duplicate_ids(struct nvme_subsystem *subsys,
 	}
 
 	return 0;
+}
+
+static void nvme_cdev_rel(struct device *dev)
+{
+	ida_free(&nvme_ns_chr_minor_ida, MINOR(dev->devt));
+}
+
+void nvme_cdev_del(struct cdev *cdev, struct device *cdev_device)
+{
+	cdev_device_del(cdev, cdev_device);
+	put_device(cdev_device);
+}
+
+int nvme_cdev_add(struct cdev *cdev, struct device *cdev_device,
+		const struct file_operations *fops, struct module *owner)
+{
+	int minor, ret;
+
+	minor = ida_alloc(&nvme_ns_chr_minor_ida, GFP_KERNEL);
+	if (minor < 0)
+		return minor;
+	cdev_device->devt = MKDEV(MAJOR(nvme_ns_chr_devt), minor);
+	cdev_device->class = nvme_ns_chr_class;
+	cdev_device->release = nvme_cdev_rel;
+	device_initialize(cdev_device);
+	cdev_init(cdev, fops);
+	cdev->owner = owner;
+	ret = cdev_device_add(cdev, cdev_device);
+	if (ret)
+		put_device(cdev_device);
+
+	return ret;
+}
+
+static int nvme_ns_chr_open(struct inode *inode, struct file *file)
+{
+	return nvme_ns_open(container_of(inode->i_cdev, struct nvme_ns, cdev));
+}
+
+static int nvme_ns_chr_release(struct inode *inode, struct file *file)
+{
+	nvme_ns_release(container_of(inode->i_cdev, struct nvme_ns, cdev));
+	return 0;
+}
+
+static const struct file_operations nvme_ns_chr_fops = {
+	.owner		= THIS_MODULE,
+	.open		= nvme_ns_chr_open,
+	.release	= nvme_ns_chr_release,
+	.unlocked_ioctl	= nvme_ns_chr_ioctl,
+	.compat_ioctl	= compat_ptr_ioctl,
+	.uring_cmd	= nvme_ns_chr_uring_cmd,
+	.uring_cmd_iopoll = nvme_ns_chr_uring_cmd_iopoll,
+};
+
+static int nvme_add_ns_cdev(struct nvme_ns *ns)
+{
+	int ret;
+
+	ns->cdev_device.parent = ns->ctrl->device;
+	ret = dev_set_name(&ns->cdev_device, "ng%dn%d",
+			   ns->ctrl->instance, ns->head->instance);
+	if (ret)
+		return ret;
+
+	return nvme_cdev_add(&ns->cdev, &ns->cdev_device, &nvme_ns_chr_fops,
+			     ns->ctrl->ops->module);
 }
 
 static void nvme_cdev_rel(struct device *dev)
@@ -4240,10 +4621,17 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, struct nvme_ns_info *info)
 
 	if (device_add_disk(ctrl->device, ns->disk, nvme_ns_id_attr_groups))
 		goto out_cleanup_ns_from_list;
+<<<<<<< HEAD
 
 	if (!nvme_ns_head_multipath(ns->head))
 		nvme_add_ns_cdev(ns);
 
+=======
+
+	if (!nvme_ns_head_multipath(ns->head))
+		nvme_add_ns_cdev(ns);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	nvme_mpath_add_disk(ns, info->anagrpid);
 	nvme_fault_inject_init(&ns->fault_inject, ns->disk->disk_name);
 
@@ -4803,6 +5191,107 @@ void nvme_complete_async_event(struct nvme_ctrl *ctrl, __le16 status,
 }
 EXPORT_SYMBOL_GPL(nvme_complete_async_event);
 
+int nvme_alloc_admin_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+		const struct blk_mq_ops *ops, unsigned int flags,
+		unsigned int cmd_size)
+{
+	int ret;
+
+	memset(set, 0, sizeof(*set));
+	set->ops = ops;
+	set->queue_depth = NVME_AQ_MQ_TAG_DEPTH;
+	if (ctrl->ops->flags & NVME_F_FABRICS)
+		set->reserved_tags = NVMF_RESERVED_TAGS;
+	set->numa_node = ctrl->numa_node;
+	set->flags = flags;
+	set->cmd_size = cmd_size;
+	set->driver_data = ctrl;
+	set->nr_hw_queues = 1;
+	set->timeout = NVME_ADMIN_TIMEOUT;
+	ret = blk_mq_alloc_tag_set(set);
+	if (ret)
+		return ret;
+
+	ctrl->admin_q = blk_mq_init_queue(set);
+	if (IS_ERR(ctrl->admin_q)) {
+		ret = PTR_ERR(ctrl->admin_q);
+		goto out_free_tagset;
+	}
+
+	if (ctrl->ops->flags & NVME_F_FABRICS) {
+		ctrl->fabrics_q = blk_mq_init_queue(set);
+		if (IS_ERR(ctrl->fabrics_q)) {
+			ret = PTR_ERR(ctrl->fabrics_q);
+			goto out_cleanup_admin_q;
+		}
+	}
+
+	ctrl->admin_tagset = set;
+	return 0;
+
+out_cleanup_admin_q:
+	blk_mq_destroy_queue(ctrl->admin_q);
+out_free_tagset:
+	blk_mq_free_tag_set(ctrl->admin_tagset);
+	return ret;
+}
+EXPORT_SYMBOL_GPL(nvme_alloc_admin_tag_set);
+
+void nvme_remove_admin_tag_set(struct nvme_ctrl *ctrl)
+{
+	blk_mq_destroy_queue(ctrl->admin_q);
+	if (ctrl->ops->flags & NVME_F_FABRICS)
+		blk_mq_destroy_queue(ctrl->fabrics_q);
+	blk_mq_free_tag_set(ctrl->admin_tagset);
+}
+EXPORT_SYMBOL_GPL(nvme_remove_admin_tag_set);
+
+int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+		const struct blk_mq_ops *ops, unsigned int flags,
+		unsigned int nr_maps, unsigned int cmd_size)
+{
+	int ret;
+
+	memset(set, 0, sizeof(*set));
+	set->ops = ops;
+	set->queue_depth = ctrl->sqsize + 1;
+	set->reserved_tags = NVMF_RESERVED_TAGS;
+	set->numa_node = ctrl->numa_node;
+	set->flags = flags;
+	set->cmd_size = cmd_size,
+	set->driver_data = ctrl;
+	set->nr_hw_queues = ctrl->queue_count - 1;
+	set->timeout = NVME_IO_TIMEOUT;
+	set->nr_maps = nr_maps;
+	ret = blk_mq_alloc_tag_set(set);
+	if (ret)
+		return ret;
+
+	if (ctrl->ops->flags & NVME_F_FABRICS) {
+		ctrl->connect_q = blk_mq_init_queue(set);
+        	if (IS_ERR(ctrl->connect_q)) {
+			ret = PTR_ERR(ctrl->connect_q);
+			goto out_free_tag_set;
+		}
+	}
+
+	ctrl->tagset = set;
+	return 0;
+
+out_free_tag_set:
+	blk_mq_free_tag_set(set);
+	return ret;
+}
+EXPORT_SYMBOL_GPL(nvme_alloc_io_tag_set);
+
+void nvme_remove_io_tag_set(struct nvme_ctrl *ctrl)
+{
+	if (ctrl->ops->flags & NVME_F_FABRICS)
+		blk_mq_destroy_queue(ctrl->connect_q);
+	blk_mq_free_tag_set(ctrl->tagset);
+}
+EXPORT_SYMBOL_GPL(nvme_remove_io_tag_set);
+
 void nvme_stop_ctrl(struct nvme_ctrl *ctrl)
 {
 	nvme_mpath_stop(ctrl);
@@ -4821,6 +5310,16 @@ void nvme_start_ctrl(struct nvme_ctrl *ctrl)
 	nvme_start_keep_alive(ctrl);
 
 	nvme_enable_aen(ctrl);
+
+	/*
+	 * persistent discovery controllers need to send indication to userspace
+	 * to re-read the discovery log page to learn about possible changes
+	 * that were missed. We identify persistent discovery controllers by
+	 * checking that they started once before, hence are reconnecting back.
+	 */
+	if (test_and_set_bit(NVME_CTRL_STARTED_ONCE, &ctrl->flags) &&
+	    nvme_discovery_ctrl(ctrl))
+		nvme_change_uevent(ctrl, "NVME_EVENT=rediscover");
 
 	if (ctrl->queue_count > 1) {
 		nvme_queue_scan(ctrl);

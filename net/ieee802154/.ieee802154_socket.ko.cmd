@@ -1,0 +1,1 @@
+cmd_net/ieee802154/ieee802154_socket.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/ieee802154/ieee802154_socket.ko net/ieee802154/ieee802154_socket.o net/ieee802154/ieee802154_socket.mod.o;  true

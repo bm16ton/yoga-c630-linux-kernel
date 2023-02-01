@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/hdpvr/hdpvr.mod := printf '%s\n'   hdpvr-control.o hdpvr-core.o hdpvr-video.o hdpvr-i2c.o | awk '!x[$$0]++ { print("drivers/media/usb/hdpvr/"$$0) }' > drivers/media/usb/hdpvr/hdpvr.mod

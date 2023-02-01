@@ -157,8 +157,13 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
 			if ((i + 1) < in->len && in->data[i + 1] == '\n')
 				i++;
 			n = i - s + 1;
+<<<<<<< HEAD
+			skb_put_data(out, &in->data[s], n);/* Echo */
+			skb_put_data(out, "\r\nOK\r\n", 6);
+=======
 			memcpy(skb_put(out, n), &in->data[s], n);/* Echo */
 			memcpy(skb_put(out, 6), "\r\nOK\r\n", 6);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			s = i + 1;
 			port->pstate = AT_PARSER_WAIT_A;
 		} else if (port->pstate == AT_PARSER_SKIP_LINE) {
@@ -171,7 +176,11 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
 	if (i > s) {
 		/* Echo the processed portion of a not yet completed command */
 		n = i - s;
+<<<<<<< HEAD
+		skb_put_data(out, &in->data[s], n);
+=======
 		memcpy(skb_put(out, n), &in->data[s], n);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	consume_skb(in);

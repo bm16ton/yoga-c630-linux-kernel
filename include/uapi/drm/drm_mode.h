@@ -675,11 +675,19 @@ struct drm_mode_fb_cmd {
  *   fetch metadata about an existing frame-buffer.
  *
  * In case of planar formats, this struct allows up to 4 buffer objects with
+<<<<<<< HEAD
+ * offsets and pitches per plane. The pitch and offset order are dictated by
+ * the format FourCC as defined by ``drm_fourcc.h``, e.g. NV12 is described as:
+ *
+ *     YUV 4:2:0 image with a plane of 8-bit Y samples followed by an
+ *     interleaved U/V plane containing 8-bit 2x2 subsampled colour difference
+=======
  * offsets and pitches per plane. The pitch and offset order is dictated by the
  * format FourCC as defined by ``drm_fourcc.h``, e.g. NV12 is described as:
  *
  *     YUV 4:2:0 image with a plane of 8 bit Y samples followed by an
  *     interleaved U/V plane containing 8 bit 2x2 subsampled colour difference
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *     samples.
  *
  * So it would consist of a Y plane at ``offsets[0]`` and a UV plane at

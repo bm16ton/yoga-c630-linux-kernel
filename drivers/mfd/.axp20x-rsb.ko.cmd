@@ -1,0 +1,1 @@
+cmd_drivers/mfd/axp20x-rsb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mfd/axp20x-rsb.ko drivers/mfd/axp20x-rsb.o drivers/mfd/axp20x-rsb.mod.o;  true

@@ -49,8 +49,11 @@ extern __visible kprobe_opcode_t optprobe_template_end[];
 extern const int kretprobe_blacklist_size;
 
 void arch_remove_kprobe(struct kprobe *p);
+<<<<<<< HEAD
+=======
 
 extern void arch_kprobe_override_function(struct pt_regs *regs);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Architecture specific copy of original instruction*/
 struct arch_specific_insn {

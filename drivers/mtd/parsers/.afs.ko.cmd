@@ -1,0 +1,1 @@
+cmd_drivers/mtd/parsers/afs.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/parsers/afs.ko drivers/mtd/parsers/afs.o drivers/mtd/parsers/afs.mod.o;  true

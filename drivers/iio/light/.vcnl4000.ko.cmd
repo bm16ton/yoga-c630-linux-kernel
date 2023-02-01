@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/vcnl4000.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/vcnl4000.ko drivers/iio/light/vcnl4000.o drivers/iio/light/vcnl4000.mod.o;  true

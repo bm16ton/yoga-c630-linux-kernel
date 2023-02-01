@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/huawei/hinic/hinic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/huawei/hinic/hinic.ko drivers/net/ethernet/huawei/hinic/hinic.o drivers/net/ethernet/huawei/hinic/hinic.mod.o;  true

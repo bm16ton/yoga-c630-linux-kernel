@@ -1,0 +1,10 @@
+drivers/net/wireless/marvell/libertas/libertas.ko
+drivers/net/wireless/marvell/libertas/usb8xxx.ko
+drivers/net/wireless/marvell/libertas/libertas_sdio.ko
+drivers/net/wireless/marvell/libertas_tf/libertas_tf.ko
+drivers/net/wireless/marvell/libertas_tf/libertas_tf_usb.ko
+drivers/net/wireless/marvell/mwifiex/mwifiex.ko
+drivers/net/wireless/marvell/mwifiex/mwifiex_sdio.ko
+drivers/net/wireless/marvell/mwifiex/mwifiex_pcie.ko
+drivers/net/wireless/marvell/mwifiex/mwifiex_usb.ko
+drivers/net/wireless/marvell/mwl8k.ko

@@ -307,6 +307,20 @@ update_kconfig()
 	fi
 }
 
+catch()
+{
+	local exit_code=$1
+	local exit_status_file="${OUTPUT_DIR}/${EXIT_STATUS_FILE}"
+	# This is just a cleanup and the directory may
+	# have already been unmounted. So, don't let this
+	# clobber the error code we intend to return.
+	unmount_image || true
+	if [[ -f "${exit_status_file}" ]]; then
+		exit_code="$(cat ${exit_status_file})"
+	fi
+	exit ${exit_code}
+}
+
 main()
 {
 	local script_dir="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -319,7 +333,11 @@ main()
 	local exit_command="poweroff -f"
 	local debug_shell="no"
 
+<<<<<<< HEAD
+	while getopts ':hskid:j:' opt; do
+=======
 	while getopts 'hskid:j:' opt; do
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		case ${opt} in
 		i)
 			update_image="yes"
@@ -353,6 +371,11 @@ main()
 	done
 	shift $((OPTIND -1))
 
+<<<<<<< HEAD
+	trap 'catch "$?"' EXIT
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if [[ $# -eq 0  && "${debug_shell}" == "no" ]]; then
 		echo "No command specified, will run ${DEFAULT_COMMAND} in the vm"
 	else
@@ -407,6 +430,8 @@ main()
 		copy_logs
 		echo "Logs saved in ${OUTPUT_DIR}/${LOG_FILE}"
 	fi
+<<<<<<< HEAD
+=======
 }
 
 catch()
@@ -421,8 +446,7 @@ catch()
 		exit_code="$(cat ${exit_status_file})"
 	fi
 	exit ${exit_code}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
-
-trap 'catch "$?"' EXIT
 
 main "$@"

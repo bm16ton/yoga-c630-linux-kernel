@@ -72,12 +72,11 @@ static int vfio_platform_acpi_call_reset(struct vfio_platform_device *vdev,
 				  const char **extra_dbg)
 {
 #ifdef CONFIG_ACPI
-	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
 	struct device *dev = vdev->device;
 	acpi_handle handle = ACPI_HANDLE(dev);
 	acpi_status acpi_ret;
 
-	acpi_ret = acpi_evaluate_object(handle, "_RST", NULL, &buffer);
+	acpi_ret = acpi_evaluate_object(handle, "_RST", NULL, NULL);
 	if (ACPI_FAILURE(acpi_ret)) {
 		if (extra_dbg)
 			*extra_dbg = acpi_format_exception(acpi_ret);
@@ -218,7 +217,11 @@ static int vfio_platform_call_reset(struct vfio_platform_device *vdev,
 	return -EINVAL;
 }
 
+<<<<<<< HEAD
+void vfio_platform_close_device(struct vfio_device *core_vdev)
+=======
 static void vfio_platform_close_device(struct vfio_device *core_vdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vfio_platform_device *vdev =
 		container_of(core_vdev, struct vfio_platform_device, vdev);
@@ -236,8 +239,13 @@ static void vfio_platform_close_device(struct vfio_device *core_vdev)
 	vfio_platform_regions_cleanup(vdev);
 	vfio_platform_irq_cleanup(vdev);
 }
+EXPORT_SYMBOL_GPL(vfio_platform_close_device);
 
+<<<<<<< HEAD
+int vfio_platform_open_device(struct vfio_device *core_vdev)
+=======
 static int vfio_platform_open_device(struct vfio_device *core_vdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vfio_platform_device *vdev =
 		container_of(core_vdev, struct vfio_platform_device, vdev);
@@ -273,9 +281,15 @@ err_irq:
 	vfio_platform_regions_cleanup(vdev);
 	return ret;
 }
+EXPORT_SYMBOL_GPL(vfio_platform_open_device);
 
+<<<<<<< HEAD
+long vfio_platform_ioctl(struct vfio_device *core_vdev,
+			 unsigned int cmd, unsigned long arg)
+=======
 static long vfio_platform_ioctl(struct vfio_device *core_vdev,
 				unsigned int cmd, unsigned long arg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vfio_platform_device *vdev =
 		container_of(core_vdev, struct vfio_platform_device, vdev);
@@ -382,6 +396,7 @@ static long vfio_platform_ioctl(struct vfio_device *core_vdev,
 
 	return -ENOTTY;
 }
+EXPORT_SYMBOL_GPL(vfio_platform_ioctl);
 
 static ssize_t vfio_platform_read_mmio(struct vfio_platform_region *reg,
 				       char __user *buf, size_t count,
@@ -438,8 +453,13 @@ err:
 	return -EFAULT;
 }
 
+<<<<<<< HEAD
+ssize_t vfio_platform_read(struct vfio_device *core_vdev,
+			   char __user *buf, size_t count, loff_t *ppos)
+=======
 static ssize_t vfio_platform_read(struct vfio_device *core_vdev,
 				  char __user *buf, size_t count, loff_t *ppos)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vfio_platform_device *vdev =
 		container_of(core_vdev, struct vfio_platform_device, vdev);
@@ -460,6 +480,7 @@ static ssize_t vfio_platform_read(struct vfio_device *core_vdev,
 
 	return -EINVAL;
 }
+EXPORT_SYMBOL_GPL(vfio_platform_read);
 
 static ssize_t vfio_platform_write_mmio(struct vfio_platform_region *reg,
 					const char __user *buf, size_t count,
@@ -515,8 +536,13 @@ err:
 	return -EFAULT;
 }
 
+<<<<<<< HEAD
+ssize_t vfio_platform_write(struct vfio_device *core_vdev, const char __user *buf,
+			    size_t count, loff_t *ppos)
+=======
 static ssize_t vfio_platform_write(struct vfio_device *core_vdev, const char __user *buf,
 				   size_t count, loff_t *ppos)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vfio_platform_device *vdev =
 		container_of(core_vdev, struct vfio_platform_device, vdev);
@@ -537,6 +563,7 @@ static ssize_t vfio_platform_write(struct vfio_device *core_vdev, const char __u
 
 	return -EINVAL;
 }
+EXPORT_SYMBOL_GPL(vfio_platform_write);
 
 static int vfio_platform_mmap_mmio(struct vfio_platform_region region,
 				   struct vm_area_struct *vma)
@@ -558,7 +585,11 @@ static int vfio_platform_mmap_mmio(struct vfio_platform_region region,
 			       req_len, vma->vm_page_prot);
 }
 
+<<<<<<< HEAD
+int vfio_platform_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
+=======
 static int vfio_platform_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vfio_platform_device *vdev =
 		container_of(core_vdev, struct vfio_platform_device, vdev);
@@ -598,6 +629,9 @@ static int vfio_platform_mmap(struct vfio_device *core_vdev, struct vm_area_stru
 
 	return -EINVAL;
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL_GPL(vfio_platform_mmap);
+=======
 
 static const struct vfio_device_ops vfio_platform_ops = {
 	.name		= "vfio-platform",
@@ -608,6 +642,7 @@ static const struct vfio_device_ops vfio_platform_ops = {
 	.write		= vfio_platform_write,
 	.mmap		= vfio_platform_mmap,
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int vfio_platform_of_probe(struct vfio_platform_device *vdev,
 			   struct device *dev)
@@ -639,12 +674,15 @@ static int vfio_platform_of_probe(struct vfio_platform_device *vdev,
  * If the firmware is ACPI type, then acpi_disabled is 0. All other checks are
  * valid checks. We cannot claim that this system is DT.
  */
-int vfio_platform_probe_common(struct vfio_platform_device *vdev,
-			       struct device *dev)
+int vfio_platform_init_common(struct vfio_platform_device *vdev)
 {
 	int ret;
+<<<<<<< HEAD
+	struct device *dev = vdev->vdev.dev;
+=======
 
 	vfio_init_group_dev(&vdev->vdev, dev, &vfio_platform_ops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = vfio_platform_acpi_probe(vdev, dev);
 	if (ret)
@@ -654,11 +692,14 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
 		goto out_uninit;
 
 	vdev->device = dev;
+	mutex_init(&vdev->igate);
 
 	ret = vfio_platform_get_reset(vdev);
-	if (ret && vdev->reset_required) {
+	if (ret && vdev->reset_required)
 		dev_err(dev, "No reset function found for device %s\n",
 			vdev->name);
+<<<<<<< HEAD
+=======
 		goto out_uninit;
 	}
 
@@ -675,10 +716,16 @@ put_reset:
 	vfio_platform_put_reset(vdev);
 out_uninit:
 	vfio_uninit_group_dev(&vdev->vdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
-EXPORT_SYMBOL_GPL(vfio_platform_probe_common);
+EXPORT_SYMBOL_GPL(vfio_platform_init_common);
 
+<<<<<<< HEAD
+void vfio_platform_release_common(struct vfio_platform_device *vdev)
+{
+	vfio_platform_put_reset(vdev);
+=======
 void vfio_platform_remove_common(struct vfio_platform_device *vdev)
 {
 	vfio_unregister_group_dev(&vdev->vdev);
@@ -686,8 +733,9 @@ void vfio_platform_remove_common(struct vfio_platform_device *vdev)
 	pm_runtime_disable(vdev->device);
 	vfio_platform_put_reset(vdev);
 	vfio_uninit_group_dev(&vdev->vdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
-EXPORT_SYMBOL_GPL(vfio_platform_remove_common);
+EXPORT_SYMBOL_GPL(vfio_platform_release_common);
 
 void __vfio_platform_register_reset(struct vfio_platform_reset_node *node)
 {

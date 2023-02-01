@@ -1,0 +1,1 @@
+cmd_drivers/iio/humidity/am2315.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/humidity/am2315.ko drivers/iio/humidity/am2315.o drivers/iio/humidity/am2315.mod.o;  true

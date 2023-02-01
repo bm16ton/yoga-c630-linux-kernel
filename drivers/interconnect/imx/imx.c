@@ -324,13 +324,17 @@ provider_del:
 }
 EXPORT_SYMBOL_GPL(imx_icc_register);
 
-int imx_icc_unregister(struct platform_device *pdev)
+void imx_icc_unregister(struct platform_device *pdev)
 {
 	struct imx_icc_provider *imx_provider = platform_get_drvdata(pdev);
 
 	imx_icc_unregister_nodes(&imx_provider->provider);
 
+<<<<<<< HEAD
+	icc_provider_del(&imx_provider->provider);
+=======
 	return icc_provider_del(&imx_provider->provider);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_GPL(imx_icc_unregister);
 

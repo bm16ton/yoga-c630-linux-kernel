@@ -39,6 +39,10 @@ crash_setup_regs(struct pt_regs *newregs,
 #define ARCH_HAS_KIMAGE_ARCH
 
 struct kimage_arch {
+<<<<<<< HEAD
+	void *fdt; /* For CONFIG_KEXEC_FILE */
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned long fdt_addr;
 };
 
@@ -62,6 +66,13 @@ int arch_kexec_apply_relocations_add(struct purgatory_info *pi,
 				     const Elf_Shdr *relsec,
 				     const Elf_Shdr *symtab);
 #define arch_kexec_apply_relocations_add arch_kexec_apply_relocations_add
+<<<<<<< HEAD
+
+struct kimage;
+int arch_kimage_file_post_load_cleanup(struct kimage *image);
+#define arch_kimage_file_post_load_cleanup arch_kimage_file_post_load_cleanup
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #endif

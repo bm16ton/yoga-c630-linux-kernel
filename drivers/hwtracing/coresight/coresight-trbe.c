@@ -1434,6 +1434,10 @@ static int arm_trbe_probe_cpuhp(struct trbe_drvdata *drvdata)
 
 static void arm_trbe_remove_cpuhp(struct trbe_drvdata *drvdata)
 {
+<<<<<<< HEAD
+	cpuhp_state_remove_instance(drvdata->trbe_online, &drvdata->hotplug_node);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cpuhp_remove_multi_state(drvdata->trbe_online);
 }
 

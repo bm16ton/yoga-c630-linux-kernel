@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/adjd_s311.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/adjd_s311.ko drivers/iio/light/adjd_s311.o drivers/iio/light/adjd_s311.mod.o;  true

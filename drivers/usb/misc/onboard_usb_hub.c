@@ -27,7 +27,14 @@
 
 #include "onboard_usb_hub.h"
 
+<<<<<<< HEAD
+static void onboard_hub_attach_usb_driver(struct work_struct *work);
+
 static struct usb_device_driver onboard_hub_usbdev_driver;
+static DECLARE_WORK(attach_usb_driver_work, onboard_hub_attach_usb_driver);
+=======
+static struct usb_device_driver onboard_hub_usbdev_driver;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /************************** Platform driver **************************/
 
@@ -45,7 +52,10 @@ struct onboard_hub {
 	bool is_powered_on;
 	bool going_away;
 	struct list_head udev_list;
+<<<<<<< HEAD
+=======
 	struct work_struct attach_usb_driver_work;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct mutex lock;
 };
 
@@ -271,8 +281,12 @@ static int onboard_hub_probe(struct platform_device *pdev)
 	 * This needs to be done deferred to avoid self-deadlocks on systems
 	 * with nested onboard hubs.
 	 */
+<<<<<<< HEAD
+	schedule_work(&attach_usb_driver_work);
+=======
 	INIT_WORK(&hub->attach_usb_driver_work, onboard_hub_attach_usb_driver);
 	schedule_work(&hub->attach_usb_driver_work);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -285,9 +299,12 @@ static int onboard_hub_remove(struct platform_device *pdev)
 
 	hub->going_away = true;
 
+<<<<<<< HEAD
+=======
 	if (&hub->attach_usb_driver_work != current_work())
 		cancel_work_sync(&hub->attach_usb_driver_work);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&hub->lock);
 
 	/* unbind the USB devices to avoid dangling references to this device */
@@ -431,6 +448,15 @@ static int __init onboard_hub_init(void)
 {
 	int ret;
 
+<<<<<<< HEAD
+	ret = usb_register_device_driver(&onboard_hub_usbdev_driver, THIS_MODULE);
+	if (ret)
+		return ret;
+
+	ret = platform_driver_register(&onboard_hub_driver);
+	if (ret)
+		usb_deregister_device_driver(&onboard_hub_usbdev_driver);
+=======
 	ret = platform_driver_register(&onboard_hub_driver);
 	if (ret)
 		return ret;
@@ -438,6 +464,7 @@ static int __init onboard_hub_init(void)
 	ret = usb_register_device_driver(&onboard_hub_usbdev_driver, THIS_MODULE);
 	if (ret)
 		platform_driver_unregister(&onboard_hub_driver);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -447,6 +474,11 @@ static void __exit onboard_hub_exit(void)
 {
 	usb_deregister_device_driver(&onboard_hub_usbdev_driver);
 	platform_driver_unregister(&onboard_hub_driver);
+<<<<<<< HEAD
+
+	cancel_work_sync(&attach_usb_driver_work);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 module_exit(onboard_hub_exit);
 

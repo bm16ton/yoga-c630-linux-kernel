@@ -1,0 +1,41 @@
+!<thin>
+//                                              592       `
+phy-core.o/
+phy-core-mipi-dphy.o/
+amlogic/phy-meson-gxl-usb2.o/
+amlogic/phy-meson-g12a-usb2.o/
+amlogic/phy-meson-g12a-usb3-pcie.o/
+amlogic/phy-meson-g12a-mipi-dphy-analog.o/
+amlogic/phy-meson-axg-pcie.o/
+amlogic/phy-meson-axg-mipi-pcie-analog.o/
+amlogic/phy-meson-axg-mipi-dphy.o/
+marvell/phy-mvebu-a3700-comphy.o/
+marvell/phy-mvebu-a3700-utmi.o/
+qualcomm/phy-qcom-edp.o/
+qualcomm/phy-qcom-qmp-combo.o/
+qualcomm/phy-qcom-qmp-pcie.o/
+qualcomm/phy-qcom-qmp-pcie-msm8996.o/
+qualcomm/phy-qcom-qmp-ufs.o/
+qualcomm/phy-qcom-qmp-usb.o/
+qualcomm/phy-qcom-qusb2.o/
+qualcomm/phy-qcom-snps-femto-v2.o/
+
+/0              0           0     0     644     45632     `
+/12             0           0     0     644     3904      `
+/34             0           0     0     644     9144      `
+/64             0           0     0     644     8440      `
+/95             0           0     0     644     13336     `
+/131            0           0     0     644     7400      `
+/174            0           0     0     644     8328      `
+/204            0           0     0     644     8368      `
+/246            0           0     0     644     10248     `
+/281            0           0     0     644     18840     `
+/315            0           0     0     644     10000     `
+/347            0           0     0     644     16064     `
+/372            0           0     0     644     50864     `
+/403            0           0     0     644     41208     `
+/433            0           0     0     644     19352     `
+/471            0           0     0     644     22336     `
+/500            0           0     0     644     47656     `
+/529            0           0     0     644     22616     `
+/556            0           0     0     644     15752     `

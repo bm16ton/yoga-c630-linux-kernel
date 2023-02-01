@@ -38,6 +38,12 @@ not affect to allocation performance, especially if the static keys jump
 label patching functionality is available. Following is the kernel's code
 size change due to this facility.
 
+<<<<<<< HEAD
+Although enabling page owner increases kernel size by several kilobytes,
+most of this code is outside page allocator and its hot path. Building
+the kernel with page owner and turning it on if needed would be great
+option to debug kernel memory problem.
+=======
 - Without page owner::
 
    text    data     bss     dec     hex filename
@@ -54,6 +60,7 @@ Although, roughly, 8 KB code is added in total, page_alloc.o increase by
 520 bytes and less than half of it is in hotpath. Building the kernel with
 page owner and turning it on if needed would be great option to debug
 kernel memory problem.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 There is one notice that is caused by implementation detail. page owner
 stores information into the memory from struct page extension. This memory
@@ -94,6 +101,14 @@ Usage
 	Page allocated via order XXX, ...
 	PFN XXX ...
 	// Detailed stack
+<<<<<<< HEAD
+    By default, it will do full pfn dump, to start with a given pfn,
+    page_owner supports fseek.
+
+    FILE *fp = fopen("/sys/kernel/debug/page_owner", "r");
+    fseek(fp, pfn_start, SEEK_SET);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
    The ``page_owner_sort`` tool ignores ``PFN`` rows, puts the remaining rows
    in buf, uses regexp to extract the page order value, counts the times

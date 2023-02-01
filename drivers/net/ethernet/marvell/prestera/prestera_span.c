@@ -107,7 +107,11 @@ static int prestera_span_put(struct prestera_switch *sw, u8 span_id)
 
 	entry = prestera_span_entry_find_by_id(sw->span, span_id);
 	if (!entry)
+<<<<<<< HEAD
+		return -ENOENT;
+=======
 		return false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!refcount_dec_and_test(&entry->ref_count))
 		return 0;
@@ -120,8 +124,14 @@ static int prestera_span_put(struct prestera_switch *sw, u8 span_id)
 	return 0;
 }
 
+<<<<<<< HEAD
+int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
+			   struct prestera_port *to_port,
+			   bool ingress)
+=======
 static int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
 				  struct prestera_port *to_port)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct prestera_switch *sw = binding->port->sw;
 	u8 span_id;
@@ -135,7 +145,11 @@ static int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
 	if (err)
 		return err;
 
+<<<<<<< HEAD
+	err = prestera_hw_span_bind(binding->port, span_id, ingress);
+=======
 	err = prestera_hw_span_bind(binding->port, span_id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err) {
 		prestera_span_put(sw, span_id);
 		return err;
@@ -145,11 +159,23 @@ static int prestera_span_rule_add(struct prestera_flow_block_binding *binding,
 	return 0;
 }
 
+<<<<<<< HEAD
+int prestera_span_rule_del(struct prestera_flow_block_binding *binding,
+			   bool ingress)
+{
+	int err;
+
+	if (binding->span_id == PRESTERA_SPAN_INVALID_ID)
+		return -ENOENT;
+
+	err = prestera_hw_span_unbind(binding->port, ingress);
+=======
 static int prestera_span_rule_del(struct prestera_flow_block_binding *binding)
 {
 	int err;
 
 	err = prestera_hw_span_unbind(binding->port);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -161,6 +187,8 @@ static int prestera_span_rule_del(struct prestera_flow_block_binding *binding)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
 int prestera_span_replace(struct prestera_flow_block *block,
 			  struct tc_cls_matchall_offload *f)
 {
@@ -215,6 +243,7 @@ void prestera_span_destroy(struct prestera_flow_block *block)
 		prestera_span_rule_del(binding);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int prestera_span_init(struct prestera_switch *sw)
 {
 	struct prestera_span *span;

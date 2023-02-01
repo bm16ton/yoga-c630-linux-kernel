@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_conntrack_sip.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/nf_conntrack_sip.ko net/netfilter/nf_conntrack_sip.o net/netfilter/nf_conntrack_sip.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/inv_icm42600/inv-icm42600-i2c.mod := printf '%s\n'   inv_icm42600_i2c.o | awk '!x[$$0]++ { print("drivers/iio/imu/inv_icm42600/"$$0) }' > drivers/iio/imu/inv_icm42600/inv-icm42600-i2c.mod

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/dec/tulip/tulip.mod := printf '%s\n'   eeprom.o interrupt.o media.o timer.o tulip_core.o 21142.o pnic.o pnic2.o | awk '!x[$$0]++ { print("drivers/net/ethernet/dec/tulip/"$$0) }' > drivers/net/ethernet/dec/tulip/tulip.mod

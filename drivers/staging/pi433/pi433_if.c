@@ -1149,6 +1149,9 @@ out_unlock:
 
 	return ret;
 }
+<<<<<<< HEAD
+DEFINE_SHOW_ATTRIBUTE(pi433_debugfs_regs);
+=======
 
 static int pi433_debugfs_regs_open(struct inode *inode, struct file *filp)
 {
@@ -1162,6 +1165,7 @@ static const struct file_operations debugfs_fops = {
 	.read =		seq_read,
 	.release =	single_release
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*-------------------------------------------------------------------------*/
 
@@ -1320,7 +1324,11 @@ static int pi433_probe(struct spi_device *spi)
 
 	entry = debugfs_create_dir(dev_name(device->dev),
 				   debugfs_lookup(KBUILD_MODNAME, NULL));
+<<<<<<< HEAD
+	debugfs_create_file("regs", 0400, entry, device, &pi433_debugfs_regs_fops);
+=======
 	debugfs_create_file("regs", 0400, entry, device, &debugfs_fops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 

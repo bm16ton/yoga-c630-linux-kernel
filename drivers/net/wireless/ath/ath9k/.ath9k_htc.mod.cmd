@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath9k/ath9k_htc.mod := printf '%s\n'   htc_hst.o hif_usb.o wmi.o htc_drv_txrx.o htc_drv_main.o htc_drv_beacon.o htc_drv_init.o htc_drv_gpio.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath9k/"$$0) }' > drivers/net/wireless/ath/ath9k/ath9k_htc.mod

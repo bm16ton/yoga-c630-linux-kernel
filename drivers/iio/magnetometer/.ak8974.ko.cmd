@@ -1,0 +1,1 @@
+cmd_drivers/iio/magnetometer/ak8974.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/magnetometer/ak8974.ko drivers/iio/magnetometer/ak8974.o drivers/iio/magnetometer/ak8974.mod.o;  true

@@ -224,10 +224,17 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
 			     struct erofs_device_info *dif, erofs_off_t *pos)
 {
 	struct erofs_sb_info *sbi = EROFS_SB(sb);
+<<<<<<< HEAD
+	struct erofs_fscache *fscache;
+	struct erofs_deviceslot *dis;
+	struct block_device *bdev;
+	void *ptr;
+=======
 	struct erofs_deviceslot *dis;
 	struct block_device *bdev;
 	void *ptr;
 	int ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ptr = erofs_read_metabuf(buf, sb, erofs_blknr(*pos), EROFS_KMAP);
 	if (IS_ERR(ptr))
@@ -245,10 +252,17 @@ static int erofs_init_device(struct erofs_buf *buf, struct super_block *sb,
 	}
 
 	if (erofs_is_fscache_mode(sb)) {
+<<<<<<< HEAD
+		fscache = erofs_fscache_register_cookie(sb, dif->path, 0);
+		if (IS_ERR(fscache))
+			return PTR_ERR(fscache);
+		dif->fscache = fscache;
+=======
 		ret = erofs_fscache_register_cookie(sb, &dif->fscache,
 				dif->path, false);
 		if (ret)
 			return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		bdev = blkdev_get_by_path(dif->path, FMODE_READ | FMODE_EXCL,
 					  sb->s_type);
@@ -381,6 +395,17 @@ static int erofs_read_superblock(struct super_block *sb)
 #endif
 	sbi->islotbits = ilog2(sizeof(struct erofs_inode_compact));
 	sbi->root_nid = le16_to_cpu(dsb->root_nid);
+#ifdef CONFIG_EROFS_FS_ZIP
+	sbi->packed_inode = NULL;
+	if (erofs_sb_has_fragments(sbi) && dsb->packed_nid) {
+		sbi->packed_inode =
+			erofs_iget(sb, le64_to_cpu(dsb->packed_nid));
+		if (IS_ERR(sbi->packed_inode)) {
+			ret = PTR_ERR(sbi->packed_inode);
+			goto out;
+		}
+	}
+#endif
 	sbi->inos = le64_to_cpu(dsb->inos);
 
 	sbi->build_time = le64_to_cpu(dsb->build_time);
@@ -411,6 +436,13 @@ static int erofs_read_superblock(struct super_block *sb)
 		erofs_info(sb, "EXPERIMENTAL compressed inline data feature in use. Use at your own risk!");
 	if (erofs_is_fscache_mode(sb))
 		erofs_info(sb, "EXPERIMENTAL fscache-based on-demand read feature in use. Use at your own risk!");
+<<<<<<< HEAD
+	if (erofs_sb_has_fragments(sbi))
+		erofs_info(sb, "EXPERIMENTAL compressed fragments feature in use. Use at your own risk!");
+	if (erofs_sb_has_dedupe(sbi))
+		erofs_info(sb, "EXPERIMENTAL global deduplication feature in use. Use at your own risk!");
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	erofs_put_metabuf(&buf);
 	return ret;
@@ -440,6 +472,10 @@ enum {
 	Opt_dax_enum,
 	Opt_device,
 	Opt_fsid,
+<<<<<<< HEAD
+	Opt_domain_id,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	Opt_err
 };
 
@@ -465,6 +501,10 @@ static const struct fs_parameter_spec erofs_fs_parameters[] = {
 	fsparam_enum("dax",		Opt_dax_enum, erofs_dax_param_enums),
 	fsparam_string("device",	Opt_device),
 	fsparam_string("fsid",		Opt_fsid),
+<<<<<<< HEAD
+	fsparam_string("domain_id",	Opt_domain_id),
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{}
 };
 
@@ -562,14 +602,33 @@ static int erofs_fc_parse_param(struct fs_context *fc,
 		break;
 	case Opt_fsid:
 #ifdef CONFIG_EROFS_FS_ONDEMAND
+<<<<<<< HEAD
+		kfree(ctx->fsid);
+		ctx->fsid = kstrdup(param->string, GFP_KERNEL);
+		if (!ctx->fsid)
+=======
 		kfree(ctx->opt.fsid);
 		ctx->opt.fsid = kstrdup(param->string, GFP_KERNEL);
 		if (!ctx->opt.fsid)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return -ENOMEM;
 #else
 		errorfc(fc, "fsid option not supported");
 #endif
 		break;
+<<<<<<< HEAD
+	case Opt_domain_id:
+#ifdef CONFIG_EROFS_FS_ONDEMAND
+		kfree(ctx->domain_id);
+		ctx->domain_id = kstrdup(param->string, GFP_KERNEL);
+		if (!ctx->domain_id)
+			return -ENOMEM;
+#else
+		errorfc(fc, "domain_id option not supported");
+#endif
+		break;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return -ENOPARAM;
 	}
@@ -641,7 +700,11 @@ static int erofs_init_managed_cache(struct super_block *sb) { return 0; }
 static struct inode *erofs_nfs_get_inode(struct super_block *sb,
 					 u64 ino, u32 generation)
 {
+<<<<<<< HEAD
+	return erofs_iget(sb, ino);
+=======
 	return erofs_iget(sb, ino, false);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct dentry *erofs_fh_to_dentry(struct super_block *sb,
@@ -667,7 +730,11 @@ static struct dentry *erofs_get_parent(struct dentry *child)
 	err = erofs_namei(d_inode(child), &dotdot_name, &nid, &d_type);
 	if (err)
 		return ERR_PTR(err);
+<<<<<<< HEAD
+	return d_obtain_alias(erofs_iget(child->d_sb, nid));
+=======
 	return d_obtain_alias(erofs_iget(child->d_sb, nid, d_type == FT_DIR));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct export_operations erofs_export_ops = {
@@ -676,6 +743,16 @@ static const struct export_operations erofs_export_ops = {
 	.get_parent = erofs_get_parent,
 };
 
+<<<<<<< HEAD
+static int erofs_fc_fill_pseudo_super(struct super_block *sb, struct fs_context *fc)
+{
+	static const struct tree_descr empty_descr = {""};
+
+	return simple_fill_super(sb, EROFS_SUPER_MAGIC, &empty_descr);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int erofs_fc_fill_super(struct super_block *sb, struct fs_context *fc)
 {
 	struct inode *inode;
@@ -694,9 +771,18 @@ static int erofs_fc_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	sb->s_fs_info = sbi;
 	sbi->opt = ctx->opt;
+<<<<<<< HEAD
+	sbi->devs = ctx->devs;
+	ctx->devs = NULL;
+	sbi->fsid = ctx->fsid;
+	ctx->fsid = NULL;
+	sbi->domain_id = ctx->domain_id;
+	ctx->domain_id = NULL;
+=======
 	ctx->opt.fsid = NULL;
 	sbi->devs = ctx->devs;
 	ctx->devs = NULL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (erofs_is_fscache_mode(sb)) {
 		sb->s_blocksize = EROFS_BLKSIZ;
@@ -706,11 +792,14 @@ static int erofs_fc_fill_super(struct super_block *sb, struct fs_context *fc)
 		if (err)
 			return err;
 
+<<<<<<< HEAD
+=======
 		err = erofs_fscache_register_cookie(sb, &sbi->s_fscache,
 						    sbi->opt.fsid, true);
 		if (err)
 			return err;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = super_setup_bdi(sb);
 		if (err)
 			return err;
@@ -752,7 +841,7 @@ static int erofs_fc_fill_super(struct super_block *sb, struct fs_context *fc)
 #endif
 
 	/* get the root inode */
-	inode = erofs_iget(sb, ROOT_NID(sbi), true);
+	inode = erofs_iget(sb, ROOT_NID(sbi));
 	if (IS_ERR(inode))
 		return PTR_ERR(inode);
 
@@ -781,11 +870,20 @@ static int erofs_fc_fill_super(struct super_block *sb, struct fs_context *fc)
 	return 0;
 }
 
+static int erofs_fc_anon_get_tree(struct fs_context *fc)
+{
+	return get_tree_nodev(fc, erofs_fc_fill_pseudo_super);
+}
+
 static int erofs_fc_get_tree(struct fs_context *fc)
 {
 	struct erofs_fs_context *ctx = fc->fs_private;
 
+<<<<<<< HEAD
+	if (IS_ENABLED(CONFIG_EROFS_FS_ONDEMAND) && ctx->fsid)
+=======
 	if (IS_ENABLED(CONFIG_EROFS_FS_ONDEMAND) && ctx->opt.fsid)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return get_tree_nodev(fc, erofs_fc_fill_super);
 
 	return get_tree_bdev(fc, erofs_fc_fill_super);
@@ -799,6 +897,12 @@ static int erofs_fc_reconfigure(struct fs_context *fc)
 
 	DBG_BUGON(!sb_rdonly(sb));
 
+<<<<<<< HEAD
+	if (ctx->fsid || ctx->domain_id)
+		erofs_info(sb, "ignoring reconfiguration for fsid|domain_id.");
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (test_opt(&ctx->opt, POSIX_ACL))
 		fc->sb_flags |= SB_POSIXACL;
 	else
@@ -817,7 +921,12 @@ static int erofs_release_device_info(int id, void *ptr, void *data)
 	fs_put_dax(dif->dax_dev, NULL);
 	if (dif->bdev)
 		blkdev_put(dif->bdev, FMODE_READ | FMODE_EXCL);
+<<<<<<< HEAD
+	erofs_fscache_unregister_cookie(dif->fscache);
+	dif->fscache = NULL;
+=======
 	erofs_fscache_unregister_cookie(&dif->fscache);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(dif->path);
 	kfree(dif);
 	return 0;
@@ -837,7 +946,12 @@ static void erofs_fc_free(struct fs_context *fc)
 	struct erofs_fs_context *ctx = fc->fs_private;
 
 	erofs_free_dev_context(ctx->devs);
+<<<<<<< HEAD
+	kfree(ctx->fsid);
+	kfree(ctx->domain_id);
+=======
 	kfree(ctx->opt.fsid);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(ctx);
 }
 
@@ -848,8 +962,32 @@ static const struct fs_context_operations erofs_context_ops = {
 	.free		= erofs_fc_free,
 };
 
+static const struct fs_context_operations erofs_anon_context_ops = {
+	.get_tree       = erofs_fc_anon_get_tree,
+};
+
 static int erofs_init_fs_context(struct fs_context *fc)
 {
+<<<<<<< HEAD
+	struct erofs_fs_context *ctx;
+
+	/* pseudo mount for anon inodes */
+	if (fc->sb_flags & SB_KERNMOUNT) {
+		fc->ops = &erofs_anon_context_ops;
+		return 0;
+	}
+
+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+	if (!ctx)
+		return -ENOMEM;
+	ctx->devs = kzalloc(sizeof(struct erofs_dev_context), GFP_KERNEL);
+	if (!ctx->devs) {
+		kfree(ctx);
+		return -ENOMEM;
+	}
+	fc->fs_private = ctx;
+
+=======
 	struct erofs_fs_context *ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
 
 	if (!ctx)
@@ -861,6 +999,7 @@ static int erofs_init_fs_context(struct fs_context *fc)
 	}
 	fc->fs_private = ctx;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	idr_init(&ctx->devs->tree);
 	init_rwsem(&ctx->devs->rwsem);
 	erofs_default_options(ctx);
@@ -878,6 +1017,15 @@ static void erofs_kill_sb(struct super_block *sb)
 
 	WARN_ON(sb->s_magic != EROFS_SUPER_MAGIC);
 
+<<<<<<< HEAD
+	/* pseudo mount for anon inodes */
+	if (sb->s_flags & SB_KERNMOUNT) {
+		kill_anon_super(sb);
+		return;
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (erofs_is_fscache_mode(sb))
 		kill_anon_super(sb);
 	else
@@ -889,9 +1037,15 @@ static void erofs_kill_sb(struct super_block *sb)
 
 	erofs_free_dev_context(sbi->devs);
 	fs_put_dax(sbi->dax_dev, NULL);
+<<<<<<< HEAD
+	erofs_fscache_unregister_fs(sb);
+	kfree(sbi->fsid);
+	kfree(sbi->domain_id);
+=======
 	erofs_fscache_unregister_cookie(&sbi->s_fscache);
 	erofs_fscache_unregister_fs(sb);
 	kfree(sbi->opt.fsid);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(sbi);
 	sb->s_fs_info = NULL;
 }
@@ -908,11 +1062,17 @@ static void erofs_put_super(struct super_block *sb)
 #ifdef CONFIG_EROFS_FS_ZIP
 	iput(sbi->managed_cache);
 	sbi->managed_cache = NULL;
+	iput(sbi->packed_inode);
+	sbi->packed_inode = NULL;
 #endif
+<<<<<<< HEAD
+	erofs_fscache_unregister_fs(sb);
+=======
 	erofs_fscache_unregister_cookie(&sbi->s_fscache);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
-static struct file_system_type erofs_fs_type = {
+struct file_system_type erofs_fs_type = {
 	.owner          = THIS_MODULE,
 	.name           = "erofs",
 	.init_fs_context = erofs_init_fs_context,
@@ -1042,8 +1202,15 @@ static int erofs_show_options(struct seq_file *seq, struct dentry *root)
 	if (test_opt(opt, DAX_NEVER))
 		seq_puts(seq, ",dax=never");
 #ifdef CONFIG_EROFS_FS_ONDEMAND
+<<<<<<< HEAD
+	if (sbi->fsid)
+		seq_printf(seq, ",fsid=%s", sbi->fsid);
+	if (sbi->domain_id)
+		seq_printf(seq, ",domain_id=%s", sbi->domain_id);
+=======
 	if (opt->fsid)
 		seq_printf(seq, ",fsid=%s", opt->fsid);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 	return 0;
 }

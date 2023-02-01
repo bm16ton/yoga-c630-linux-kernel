@@ -16,6 +16,7 @@
 #include <generated/utsrelease.h>
 #include <linux/string_helpers.h>
 #include <linux/devcoredump.h>
+#include <linux/reset.h>
 #include <linux/sched/task.h>
 
 /*
@@ -394,7 +395,6 @@ static void recover_worker(struct kthread_work *work)
 	/* Record the crash state */
 	pm_runtime_get_sync(&gpu->pdev->dev);
 	msm_gpu_crashstate_capture(gpu, submit, comm, cmd);
-	pm_runtime_put_sync(&gpu->pdev->dev);
 
 	kfree(cmd);
 	kfree(comm);
@@ -423,9 +423,7 @@ static void recover_worker(struct kthread_work *work)
 		/* retire completed submits, plus the one that hung: */
 		retire_submits(gpu);
 
-		pm_runtime_get_sync(&gpu->pdev->dev);
 		gpu->funcs->recover(gpu);
-		pm_runtime_put_sync(&gpu->pdev->dev);
 
 		/*
 		 * Replay all remaining submits starting with highest priority
@@ -442,6 +440,11 @@ static void recover_worker(struct kthread_work *work)
 		}
 	}
 
+<<<<<<< HEAD
+	pm_runtime_put(&gpu->pdev->dev);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&gpu->lock);
 
 	msm_gpu_retire(gpu);
@@ -664,11 +667,20 @@ static void retire_submit(struct msm_gpu *gpu, struct msm_ringbuffer *ring,
 	mutex_lock(&gpu->active_lock);
 	gpu->active_submits--;
 	WARN_ON(gpu->active_submits < 0);
+<<<<<<< HEAD
+	if (!gpu->active_submits) {
+		msm_devfreq_idle(gpu);
+		pm_runtime_put_autosuspend(&gpu->pdev->dev);
+	}
+
+	mutex_unlock(&gpu->active_lock);
+=======
 	if (!gpu->active_submits)
 		msm_devfreq_idle(gpu);
 	mutex_unlock(&gpu->active_lock);
 
 	pm_runtime_put_autosuspend(&gpu->pdev->dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	msm_gem_submit_put(submit);
 }
@@ -757,14 +769,22 @@ void msm_gpu_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 
 	/* Update devfreq on transition from idle->active: */
 	mutex_lock(&gpu->active_lock);
+<<<<<<< HEAD
+	if (!gpu->active_submits) {
+		pm_runtime_get(&gpu->pdev->dev);
+		msm_devfreq_active(gpu);
+	}
+=======
 	if (!gpu->active_submits)
 		msm_devfreq_active(gpu);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpu->active_submits++;
 	mutex_unlock(&gpu->active_lock);
 
 	gpu->funcs->submit(gpu, submit);
 	gpu->cur_ctx_seqno = submit->queue->ctx->seqno;
 
+	pm_runtime_put(&gpu->pdev->dev);
 	hangcheck_timer_reset(gpu);
 }
 
@@ -846,7 +866,10 @@ int msm_gpu_init(struct drm_device *drm, struct platform_device *pdev,
 
 	sched_set_fifo_low(gpu->worker->task);
 
+<<<<<<< HEAD
+=======
 	INIT_LIST_HEAD(&gpu->active_list);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&gpu->active_lock);
 	mutex_init(&gpu->lock);
 	init_waitqueue_head(&gpu->retire_event);
@@ -900,6 +923,9 @@ int msm_gpu_init(struct drm_device *drm, struct platform_device *pdev,
 	DBG("gpu_cx: %p", gpu->gpu_cx);
 	if (IS_ERR(gpu->gpu_cx))
 		gpu->gpu_cx = NULL;
+
+	gpu->cx_collapse = devm_reset_control_get_optional_exclusive(&pdev->dev,
+			"cx_collapse");
 
 	gpu->pdev = pdev;
 	platform_set_drvdata(pdev, &gpu->adreno_smmu);
@@ -973,8 +999,6 @@ void msm_gpu_cleanup(struct msm_gpu *gpu)
 	int i;
 
 	DBG("%s", gpu->name);
-
-	WARN_ON(!list_empty(&gpu->active_list));
 
 	for (i = 0; i < ARRAY_SIZE(gpu->rb); i++) {
 		msm_ringbuffer_destroy(gpu->rb[i]);

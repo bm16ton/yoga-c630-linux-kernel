@@ -1,0 +1,1 @@
+cmd_net/dns_resolver/dns_resolver.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/dns_resolver/dns_resolver.ko net/dns_resolver/dns_resolver.o net/dns_resolver/dns_resolver.mod.o;  true

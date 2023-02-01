@@ -114,8 +114,11 @@ endif
 
 export ld-bfd
 
+<<<<<<< HEAD
+=======
 head-y	:= arch/sh/kernel/head_32.o
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # Mach groups
 machdir-$(CONFIG_SOLUTION_ENGINE)		+= mach-se
 machdir-$(CONFIG_SH_HP6XX)			+= mach-hp6xx

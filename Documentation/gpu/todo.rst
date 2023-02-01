@@ -322,6 +322,8 @@ Contact: Daniel Vetter, Noralf Tronnes
 
 Level: Advanced
 
+<<<<<<< HEAD
+=======
 idr_init_base()
 ---------------
 
@@ -334,6 +336,7 @@ Contact: Daniel Vetter
 
 Level: Starter
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct drm_gem_object_funcs
 ---------------------------
 
@@ -343,6 +346,8 @@ converted, except for struct drm_driver.gem_prime_mmap.
 
 Level: Intermediate
 
+<<<<<<< HEAD
+=======
 Rename CMA helpers to DMA helpers
 ---------------------------------
 
@@ -356,6 +361,7 @@ Contact: Laurent Pinchart, Daniel Vetter
 Level: Intermediate (mostly because it is a huge tasks without good partial
 milestones, not technically itself that challenging)
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 connector register/unregister fixes
 -----------------------------------
 
@@ -560,6 +566,7 @@ Level: Intermediate
 
 Object lifetime fixes
 ---------------------
+<<<<<<< HEAD
 
 There's two related issues here
 
@@ -571,6 +578,19 @@ There's two related issues here
   trouble even for drivers for hardware integrated on the SoC due to
   EPROBE_DEFERRED backoff.
 
+=======
+
+There's two related issues here
+
+- Cleanup up the various ->destroy callbacks, which often are all the same
+  simple code.
+
+- Lots of drivers erroneously allocate DRM modeset objects using devm_kzalloc,
+  which results in use-after free issues on driver unload. This can be serious
+  trouble even for drivers for hardware integrated on the SoC due to
+  EPROBE_DEFERRED backoff.
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Both these problems can be solved by switching over to drmm_kzalloc(), and the
 various convenience wrappers provided, e.g. drmm_crtc_alloc_with_planes(),
 drmm_universal_plane_alloc(), ... and so on.
@@ -617,6 +637,8 @@ Contact: Javier Martinez Canillas <javierm@redhat.com>
 
 Level: Intermediate
 
+<<<<<<< HEAD
+=======
 Convert Kernel Selftests (kselftest) to KUnit tests when appropriate
 --------------------------------------------------------------------
 
@@ -628,6 +650,7 @@ Contact: Javier Martinez Canillas <javierm@redhat.com>
 
 Level: Starter
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Enable trinity for DRM
 ----------------------
 
@@ -712,6 +735,74 @@ for fbdev.
   https://lore.kernel.org/r/20171213194755.3409-1-mstaudt@suse.de
 
 Contact: Sam Ravnborg
+
+Level: Advanced
+
+Brightness handling on devices with multiple internal panels
+============================================================
+
+On x86/ACPI devices there can be multiple backlight firmware interfaces:
+(ACPI) video, vendor specific and others. As well as direct/native (PWM)
+register programming by the KMS driver.
+
+To deal with this backlight drivers used on x86/ACPI call
+acpi_video_get_backlight_type() which has heuristics (+quirks) to select
+which backlight interface to use; and backlight drivers which do not match
+the returned type will not register themselves, so that only one backlight
+device gets registered (in a single GPU setup, see below).
+
+At the moment this more or less assumes that there will only
+be 1 (internal) panel on a system.
+
+On systems with 2 panels this may be a problem, depending on
+what interface acpi_video_get_backlight_type() selects:
+
+1. native: in this case the KMS driver is expected to know which backlight
+   device belongs to which output so everything should just work.
+2. video: this does support controlling multiple backlights, but some work
+   will need to be done to get the output <-> backlight device mapping
+
+The above assumes both panels will require the same backlight interface type.
+Things will break on systems with multiple panels where the 2 panels need
+a different type of control. E.g. one panel needs ACPI video backlight control,
+where as the other is using native backlight control. Currently in this case
+only one of the 2 required backlight devices will get registered, based on
+the acpi_video_get_backlight_type() return value.
+
+If this (theoretical) case ever shows up, then supporting this will need some
+work. A possible solution here would be to pass a device and connector-name
+to acpi_video_get_backlight_type() so that it can deal with this.
+
+Note in a way we already have a case where userspace sees 2 panels,
+in dual GPU laptop setups with a mux. On those systems we may see
+either 2 native backlight devices; or 2 native backlight devices.
+
+Userspace already has code to deal with this by detecting if the related
+panel is active (iow which way the mux between the GPU and the panels
+points) and then uses that backlight device. Userspace here very much
+assumes a single panel though. It picks only 1 of the 2 backlight devices
+and then only uses that one.
+
+Note that all userspace code (that I know off) is currently hardcoded
+to assume a single panel.
+
+Before the recent changes to not register multiple (e.g. video + native)
+/sys/class/backlight devices for a single panel (on a single GPU laptop),
+userspace would see multiple backlight devices all controlling the same
+backlight.
+
+To deal with this userspace had to always picks one preferred device under
+/sys/class/backlight and will ignore the others. So to support brightness
+control on multiple panels userspace will need to be updated too.
+
+There are plans to allow brightness control through the KMS API by adding
+a "display brightness" property to drm_connector objects for panels. This
+solves a number of issues with the /sys/class/backlight API, including not
+being able to map a sysfs backlight device to a specific connector. Any
+userspace changes to add support for brightness control on devices with
+multiple panels really should build on top of this new KMS property.
+
+Contact: Hans de Goede
 
 Level: Advanced
 

@@ -24,14 +24,24 @@ enum intel_gt_sysfs_op {
 };
 
 static int
+<<<<<<< HEAD
+sysfs_gt_attribute_w_func(struct kobject *kobj, struct attribute *attr,
+=======
 sysfs_gt_attribute_w_func(struct device *dev, struct device_attribute *attr,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			  int (func)(struct intel_gt *gt, u32 val), u32 val)
 {
 	struct intel_gt *gt;
 	int ret;
 
+<<<<<<< HEAD
+	if (!is_object_gt(kobj)) {
+		int i;
+		struct device *dev = kobj_to_dev(kobj);
+=======
 	if (!is_object_gt(&dev->kobj)) {
 		int i;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct drm_i915_private *i915 = kdev_minor_to_i915(dev);
 
 		for_each_gt(gt, i915, i) {
@@ -40,7 +50,11 @@ sysfs_gt_attribute_w_func(struct device *dev, struct device_attribute *attr,
 				break;
 		}
 	} else {
+<<<<<<< HEAD
+		gt = intel_gt_sysfs_get_drvdata(kobj, attr->name);
+=======
 		gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = func(gt, val);
 	}
 
@@ -48,7 +62,11 @@ sysfs_gt_attribute_w_func(struct device *dev, struct device_attribute *attr,
 }
 
 static u32
+<<<<<<< HEAD
+sysfs_gt_attribute_r_func(struct kobject *kobj, struct attribute *attr,
+=======
 sysfs_gt_attribute_r_func(struct device *dev, struct device_attribute *attr,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			  u32 (func)(struct intel_gt *gt),
 			  enum intel_gt_sysfs_op op)
 {
@@ -57,8 +75,14 @@ sysfs_gt_attribute_r_func(struct device *dev, struct device_attribute *attr,
 
 	ret = (op == INTEL_GT_SYSFS_MAX) ? 0 : (u32) -1;
 
+<<<<<<< HEAD
+	if (!is_object_gt(kobj)) {
+		int i;
+		struct device *dev = kobj_to_dev(kobj);
+=======
 	if (!is_object_gt(&dev->kobj)) {
 		int i;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct drm_i915_private *i915 = kdev_minor_to_i915(dev);
 
 		for_each_gt(gt, i915, i) {
@@ -77,7 +101,11 @@ sysfs_gt_attribute_r_func(struct device *dev, struct device_attribute *attr,
 			}
 		}
 	} else {
+<<<<<<< HEAD
+		gt = intel_gt_sysfs_get_drvdata(kobj, attr->name);
+=======
 		gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = func(gt);
 	}
 
@@ -92,6 +120,79 @@ sysfs_gt_attribute_r_func(struct device *dev, struct device_attribute *attr,
 #define sysfs_gt_attribute_r_max_func(d, a, f) \
 		sysfs_gt_attribute_r_func(d, a, f, INTEL_GT_SYSFS_MAX)
 
+<<<<<<< HEAD
+#define INTEL_GT_SYSFS_SHOW(_name, _attr_type)							\
+	static ssize_t _name##_show_common(struct kobject *kobj,				\
+					   struct attribute *attr, char *buff)			\
+	{											\
+		u32 val = sysfs_gt_attribute_r_##_attr_type##_func(kobj, attr,			\
+								   __##_name##_show);		\
+												\
+		return sysfs_emit(buff, "%u\n", val);						\
+	}											\
+	static ssize_t _name##_show(struct kobject *kobj,					\
+				    struct kobj_attribute *attr, char *buff)			\
+	{											\
+		return _name ##_show_common(kobj, &attr->attr, buff);				\
+	}											\
+	static ssize_t _name##_dev_show(struct device *dev,					\
+					struct device_attribute *attr, char *buff)		\
+	{											\
+		return _name##_show_common(&dev->kobj, &attr->attr, buff);			\
+	}
+
+#define INTEL_GT_SYSFS_STORE(_name, _func)						\
+	static ssize_t _name##_store_common(struct kobject *kobj,			\
+					    struct attribute *attr,			\
+					    const char *buff, size_t count)		\
+	{										\
+		int ret;								\
+		u32 val;								\
+											\
+		ret = kstrtou32(buff, 0, &val);						\
+		if (ret)								\
+			return ret;							\
+											\
+		ret = sysfs_gt_attribute_w_func(kobj, attr, _func, val);		\
+											\
+		return ret ?: count;							\
+	}										\
+	static ssize_t _name##_store(struct kobject *kobj,				\
+				     struct kobj_attribute *attr, const char *buff,	\
+				     size_t count)					\
+	{										\
+		return _name##_store_common(kobj, &attr->attr, buff, count);		\
+	}										\
+	static ssize_t _name##_dev_store(struct device *dev,				\
+					 struct device_attribute *attr,			\
+					 const char *buff, size_t count)		\
+	{										\
+		return _name##_store_common(&dev->kobj, &attr->attr, buff, count);	\
+	}
+
+#define INTEL_GT_SYSFS_SHOW_MAX(_name) INTEL_GT_SYSFS_SHOW(_name, max)
+#define INTEL_GT_SYSFS_SHOW_MIN(_name) INTEL_GT_SYSFS_SHOW(_name, min)
+
+#define INTEL_GT_ATTR_RW(_name) \
+	static struct kobj_attribute attr_##_name = __ATTR_RW(_name)
+
+#define INTEL_GT_ATTR_RO(_name) \
+	static struct kobj_attribute attr_##_name = __ATTR_RO(_name)
+
+#define INTEL_GT_DUAL_ATTR_RW(_name) \
+	static struct device_attribute dev_attr_##_name = __ATTR(_name, 0644,		\
+								 _name##_dev_show,	\
+								 _name##_dev_store);	\
+	INTEL_GT_ATTR_RW(_name)
+
+#define INTEL_GT_DUAL_ATTR_RO(_name) \
+	static struct device_attribute dev_attr_##_name = __ATTR(_name, 0444,		\
+								 _name##_dev_show,	\
+								 NULL);			\
+	INTEL_GT_ATTR_RO(_name)
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_PM
 static u32 get_residency(struct intel_gt *gt, i915_reg_t reg)
 {
@@ -104,11 +205,16 @@ static u32 get_residency(struct intel_gt *gt, i915_reg_t reg)
 	return DIV_ROUND_CLOSEST_ULL(res, 1000);
 }
 
+<<<<<<< HEAD
+static u8 get_rc6_mask(struct intel_gt *gt)
+{
+=======
 static ssize_t rc6_enable_show(struct device *dev,
 			       struct device_attribute *attr,
 			       char *buff)
 {
 	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 mask = 0;
 
 	if (HAS_RC6(gt->i915))
@@ -118,6 +224,37 @@ static ssize_t rc6_enable_show(struct device *dev,
 	if (HAS_RC6pp(gt->i915))
 		mask |= BIT(2);
 
+<<<<<<< HEAD
+	return mask;
+}
+
+static ssize_t rc6_enable_show(struct kobject *kobj,
+			       struct kobj_attribute *attr,
+			       char *buff)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+
+	return sysfs_emit(buff, "%x\n", get_rc6_mask(gt));
+}
+
+static ssize_t rc6_enable_dev_show(struct device *dev,
+				   struct device_attribute *attr,
+				   char *buff)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(&dev->kobj, attr->attr.name);
+
+	return sysfs_emit(buff, "%x\n", get_rc6_mask(gt));
+}
+
+static u32 __rc6_residency_ms_show(struct intel_gt *gt)
+{
+	return get_residency(gt, GEN6_GT_GFX_RC6);
+}
+
+static u32 __rc6p_residency_ms_show(struct intel_gt *gt)
+{
+	return get_residency(gt, GEN6_GT_GFX_RC6p);
+=======
 	return sysfs_emit(buff, "%x\n", mask);
 }
 
@@ -149,6 +286,7 @@ static ssize_t rc6p_residency_ms_show(struct device *dev,
 						__rc6p_residency_ms_show);
 
 	return sysfs_emit(buff, "%u\n", rc6p_residency);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static u32 __rc6pp_residency_ms_show(struct intel_gt *gt)
@@ -156,6 +294,8 @@ static u32 __rc6pp_residency_ms_show(struct intel_gt *gt)
 	return get_residency(gt, GEN6_GT_GFX_RC6pp);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t rc6pp_residency_ms_show(struct device *dev,
 				       struct device_attribute *attr,
 				       char *buff)
@@ -166,11 +306,43 @@ static ssize_t rc6pp_residency_ms_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", rc6pp_residency);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static u32 __media_rc6_residency_ms_show(struct intel_gt *gt)
 {
 	return get_residency(gt, VLV_GT_MEDIA_RC6);
 }
 
+<<<<<<< HEAD
+INTEL_GT_SYSFS_SHOW_MIN(rc6_residency_ms);
+INTEL_GT_SYSFS_SHOW_MIN(rc6p_residency_ms);
+INTEL_GT_SYSFS_SHOW_MIN(rc6pp_residency_ms);
+INTEL_GT_SYSFS_SHOW_MIN(media_rc6_residency_ms);
+
+INTEL_GT_DUAL_ATTR_RO(rc6_enable);
+INTEL_GT_DUAL_ATTR_RO(rc6_residency_ms);
+INTEL_GT_DUAL_ATTR_RO(rc6p_residency_ms);
+INTEL_GT_DUAL_ATTR_RO(rc6pp_residency_ms);
+INTEL_GT_DUAL_ATTR_RO(media_rc6_residency_ms);
+
+static struct attribute *rc6_attrs[] = {
+	&attr_rc6_enable.attr,
+	&attr_rc6_residency_ms.attr,
+	NULL
+};
+
+static struct attribute *rc6p_attrs[] = {
+	&attr_rc6p_residency_ms.attr,
+	&attr_rc6pp_residency_ms.attr,
+	NULL
+};
+
+static struct attribute *media_rc6_attrs[] = {
+	&attr_media_rc6_residency_ms.attr,
+	NULL
+};
+
+static struct attribute *rc6_dev_attrs[] = {
+=======
 static ssize_t media_rc6_residency_ms_show(struct device *dev,
 					   struct device_attribute *attr,
 					   char *buff)
@@ -188,35 +360,56 @@ static DEVICE_ATTR_RO(rc6pp_residency_ms);
 static DEVICE_ATTR_RO(media_rc6_residency_ms);
 
 static struct attribute *rc6_attrs[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&dev_attr_rc6_enable.attr,
 	&dev_attr_rc6_residency_ms.attr,
 	NULL
 };
 
+<<<<<<< HEAD
+static struct attribute *rc6p_dev_attrs[] = {
+=======
 static struct attribute *rc6p_attrs[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&dev_attr_rc6p_residency_ms.attr,
 	&dev_attr_rc6pp_residency_ms.attr,
 	NULL
 };
 
+<<<<<<< HEAD
+static struct attribute *media_rc6_dev_attrs[] = {
+=======
 static struct attribute *media_rc6_attrs[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&dev_attr_media_rc6_residency_ms.attr,
 	NULL
 };
 
 static const struct attribute_group rc6_attr_group[] = {
 	{ .attrs = rc6_attrs, },
+<<<<<<< HEAD
+	{ .name = power_group_name, .attrs = rc6_dev_attrs, },
+=======
 	{ .name = power_group_name, .attrs = rc6_attrs, },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct attribute_group rc6p_attr_group[] = {
 	{ .attrs = rc6p_attrs, },
+<<<<<<< HEAD
+	{ .name = power_group_name, .attrs = rc6p_dev_attrs, },
+=======
 	{ .name = power_group_name, .attrs = rc6p_attrs, },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct attribute_group media_rc6_attr_group[] = {
 	{ .attrs = media_rc6_attrs, },
+<<<<<<< HEAD
+	{ .name = power_group_name, .attrs = media_rc6_dev_attrs, },
+=======
 	{ .name = power_group_name, .attrs = media_rc6_attrs, },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int __intel_gt_sysfs_create_group(struct kobject *kobj,
@@ -271,6 +464,8 @@ static u32 __act_freq_mhz_show(struct intel_gt *gt)
 	return intel_rps_read_actual_frequency(&gt->rps);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t act_freq_mhz_show(struct device *dev,
 				 struct device_attribute *attr, char *buff)
 {
@@ -280,11 +475,14 @@ static ssize_t act_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", actual_freq);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static u32 __cur_freq_mhz_show(struct intel_gt *gt)
 {
 	return intel_rps_get_requested_frequency(&gt->rps);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t cur_freq_mhz_show(struct device *dev,
 				 struct device_attribute *attr, char *buff)
 {
@@ -294,11 +492,14 @@ static ssize_t cur_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", cur_freq);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static u32 __boost_freq_mhz_show(struct intel_gt *gt)
 {
 	return intel_rps_get_boost_frequency(&gt->rps);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t boost_freq_mhz_show(struct device *dev,
 				   struct device_attribute *attr,
 				   char *buff)
@@ -309,11 +510,15 @@ static ssize_t boost_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", boost_freq);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int __boost_freq_mhz_store(struct intel_gt *gt, u32 val)
 {
 	return intel_rps_set_boost_frequency(&gt->rps, val);
 }
 
+<<<<<<< HEAD
+static u32 __RP0_freq_mhz_show(struct intel_gt *gt)
+=======
 static ssize_t boost_freq_mhz_store(struct device *dev,
 				    struct device_attribute *attr,
 				    const char *buff, size_t count)
@@ -330,10 +535,19 @@ static ssize_t boost_freq_mhz_store(struct device *dev,
 }
 
 static u32 __rp0_freq_mhz_show(struct intel_gt *gt)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return intel_rps_get_rp0_frequency(&gt->rps);
 }
 
+<<<<<<< HEAD
+static u32 __RPn_freq_mhz_show(struct intel_gt *gt)
+{
+	return intel_rps_get_rpn_frequency(&gt->rps);
+}
+
+static u32 __RP1_freq_mhz_show(struct intel_gt *gt)
+=======
 static ssize_t RP0_freq_mhz_show(struct device *dev,
 				 struct device_attribute *attr, char *buff)
 {
@@ -344,10 +558,13 @@ static ssize_t RP0_freq_mhz_show(struct device *dev,
 }
 
 static u32 __rp1_freq_mhz_show(struct intel_gt *gt)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return intel_rps_get_rp1_frequency(&gt->rps);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t RP1_freq_mhz_show(struct device *dev,
 				 struct device_attribute *attr, char *buff)
 {
@@ -371,11 +588,14 @@ static ssize_t RPn_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", rpn_freq);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static u32 __max_freq_mhz_show(struct intel_gt *gt)
 {
 	return intel_rps_get_max_frequency(&gt->rps);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t max_freq_mhz_show(struct device *dev,
 				 struct device_attribute *attr, char *buff)
 {
@@ -385,11 +605,14 @@ static ssize_t max_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", max_freq);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int __set_max_freq(struct intel_gt *gt, u32 val)
 {
 	return intel_rps_set_max_frequency(&gt->rps, val);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t max_freq_mhz_store(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buff, size_t count)
@@ -406,11 +629,14 @@ static ssize_t max_freq_mhz_store(struct device *dev,
 	return ret ?: count;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static u32 __min_freq_mhz_show(struct intel_gt *gt)
 {
 	return intel_rps_get_min_frequency(&gt->rps);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t min_freq_mhz_show(struct device *dev,
 				 struct device_attribute *attr, char *buff)
 {
@@ -420,11 +646,14 @@ static ssize_t min_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", min_freq);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int __set_min_freq(struct intel_gt *gt, u32 val)
 {
 	return intel_rps_set_min_frequency(&gt->rps, val);
 }
 
+<<<<<<< HEAD
+=======
 static ssize_t min_freq_mhz_store(struct device *dev,
 				  struct device_attribute *attr,
 				  const char *buff, size_t count)
@@ -441,6 +670,7 @@ static ssize_t min_freq_mhz_store(struct device *dev,
 	return ret ?: count;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static u32 __vlv_rpe_freq_mhz_show(struct intel_gt *gt)
 {
 	struct intel_rps *rps = &gt->rps;
@@ -448,6 +678,33 @@ static u32 __vlv_rpe_freq_mhz_show(struct intel_gt *gt)
 	return intel_gpu_freq(rps, rps->efficient_freq);
 }
 
+<<<<<<< HEAD
+INTEL_GT_SYSFS_SHOW_MAX(act_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MAX(boost_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MAX(cur_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MAX(RP0_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MAX(RP1_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MAX(RPn_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MAX(max_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MIN(min_freq_mhz);
+INTEL_GT_SYSFS_SHOW_MAX(vlv_rpe_freq_mhz);
+INTEL_GT_SYSFS_STORE(boost_freq_mhz, __boost_freq_mhz_store);
+INTEL_GT_SYSFS_STORE(max_freq_mhz, __set_max_freq);
+INTEL_GT_SYSFS_STORE(min_freq_mhz, __set_min_freq);
+
+#define INTEL_GT_RPS_SYSFS_ATTR(_name, _mode, _show, _store, _show_dev, _store_dev)		\
+	static struct device_attribute dev_attr_gt_##_name = __ATTR(gt_##_name, _mode,		\
+								    _show_dev, _store_dev);	\
+	static struct kobj_attribute attr_rps_##_name = __ATTR(rps_##_name, _mode,		\
+							       _show, _store)
+
+#define INTEL_GT_RPS_SYSFS_ATTR_RO(_name)						\
+		INTEL_GT_RPS_SYSFS_ATTR(_name, 0444, _name##_show, NULL,		\
+					_name##_dev_show, NULL)
+#define INTEL_GT_RPS_SYSFS_ATTR_RW(_name)						\
+		INTEL_GT_RPS_SYSFS_ATTR(_name, 0644, _name##_show, _name##_store,	\
+					_name##_dev_show, _name##_dev_store)
+=======
 static ssize_t vlv_rpe_freq_mhz_show(struct device *dev,
 				     struct device_attribute *attr, char *buff)
 {
@@ -465,6 +722,7 @@ static ssize_t vlv_rpe_freq_mhz_show(struct device *dev,
 		INTEL_GT_RPS_SYSFS_ATTR(_name, 0444, _name##_show, NULL)
 #define INTEL_GT_RPS_SYSFS_ATTR_RW(_name)				\
 		INTEL_GT_RPS_SYSFS_ATTR(_name, 0644, _name##_show, _name##_store)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* The below macros generate static structures */
 INTEL_GT_RPS_SYSFS_ATTR_RO(act_freq_mhz);
@@ -475,6 +733,24 @@ INTEL_GT_RPS_SYSFS_ATTR_RO(RP1_freq_mhz);
 INTEL_GT_RPS_SYSFS_ATTR_RO(RPn_freq_mhz);
 INTEL_GT_RPS_SYSFS_ATTR_RW(max_freq_mhz);
 INTEL_GT_RPS_SYSFS_ATTR_RW(min_freq_mhz);
+<<<<<<< HEAD
+INTEL_GT_RPS_SYSFS_ATTR_RO(vlv_rpe_freq_mhz);
+
+#define GEN6_ATTR(p, s) { \
+		&p##attr_##s##_act_freq_mhz.attr, \
+		&p##attr_##s##_cur_freq_mhz.attr, \
+		&p##attr_##s##_boost_freq_mhz.attr, \
+		&p##attr_##s##_max_freq_mhz.attr, \
+		&p##attr_##s##_min_freq_mhz.attr, \
+		&p##attr_##s##_RP0_freq_mhz.attr, \
+		&p##attr_##s##_RP1_freq_mhz.attr, \
+		&p##attr_##s##_RPn_freq_mhz.attr, \
+		NULL, \
+	}
+
+#define GEN6_RPS_ATTR GEN6_ATTR(, rps)
+#define GEN6_GT_ATTR  GEN6_ATTR(dev_, gt)
+=======
 
 static DEVICE_ATTR_RO(vlv_rpe_freq_mhz);
 
@@ -492,15 +768,24 @@ static DEVICE_ATTR_RO(vlv_rpe_freq_mhz);
 
 #define GEN6_RPS_ATTR GEN6_ATTR(rps)
 #define GEN6_GT_ATTR  GEN6_ATTR(gt)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct attribute * const gen6_rps_attrs[] = GEN6_RPS_ATTR;
 static const struct attribute * const gen6_gt_attrs[]  = GEN6_GT_ATTR;
 
+<<<<<<< HEAD
+static ssize_t punit_req_freq_mhz_show(struct kobject *kobj,
+				       struct kobj_attribute *attr,
+				       char *buff)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+=======
 static ssize_t punit_req_freq_mhz_show(struct device *dev,
 				       struct device_attribute *attr,
 				       char *buff)
 {
 	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 preq = intel_rps_read_punit_req_frequency(&gt->rps);
 
 	return sysfs_emit(buff, "%u\n", preq);
@@ -508,17 +793,29 @@ static ssize_t punit_req_freq_mhz_show(struct device *dev,
 
 struct intel_gt_bool_throttle_attr {
 	struct attribute attr;
+<<<<<<< HEAD
+	ssize_t (*show)(struct kobject *kobj, struct kobj_attribute *attr,
+=======
 	ssize_t (*show)(struct device *dev, struct device_attribute *attr,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			char *buf);
 	i915_reg_t reg32;
 	u32 mask;
 };
 
+<<<<<<< HEAD
+static ssize_t throttle_reason_bool_show(struct kobject *kobj,
+					 struct kobj_attribute *attr,
+					 char *buff)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+=======
 static ssize_t throttle_reason_bool_show(struct device *dev,
 					 struct device_attribute *attr,
 					 char *buff)
 {
 	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct intel_gt_bool_throttle_attr *t_attr =
 				(struct intel_gt_bool_throttle_attr *) attr;
 	bool val = rps_read_mask_mmio(&gt->rps, t_attr->reg32, t_attr->mask);
@@ -534,7 +831,11 @@ struct intel_gt_bool_throttle_attr attr_##sysfs_func__ = { \
 	.mask = mask__, \
 }
 
+<<<<<<< HEAD
+INTEL_GT_ATTR_RO(punit_req_freq_mhz);
+=======
 static DEVICE_ATTR_RO(punit_req_freq_mhz);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_status, GT0_PERF_LIMIT_REASONS_MASK);
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_pl1, POWER_LIMIT_1_MASK);
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_pl2, POWER_LIMIT_2_MASK);
@@ -545,8 +846,12 @@ static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_ratl, RATL_MASK);
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_vr_thermalert, VR_THERMALERT_MASK);
 static INTEL_GT_RPS_BOOL_ATTR_RO(throttle_reason_vr_tdc, VR_TDC_MASK);
 
+<<<<<<< HEAD
+static const struct attribute *throttle_reason_attrs[] = {
+=======
 static const struct attribute *freq_attrs[] = {
 	&dev_attr_punit_req_freq_mhz.attr,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	&attr_throttle_reason_status.attr,
 	&attr_throttle_reason_pl1.attr,
 	&attr_throttle_reason_pl2.attr,
@@ -598,8 +903,13 @@ static const struct attribute *freq_attrs[] = {
 #define U8_8_VAL_MASK           0xffff
 #define U8_8_SCALE_TO_VALUE     "0.00390625"
 
+<<<<<<< HEAD
+static ssize_t freq_factor_scale_show(struct kobject *kobj,
+				      struct kobj_attribute *attr,
+=======
 static ssize_t freq_factor_scale_show(struct device *dev,
 				      struct device_attribute *attr,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				      char *buff)
 {
 	return sysfs_emit(buff, "%s\n", U8_8_SCALE_TO_VALUE);
@@ -611,11 +921,19 @@ static u32 media_ratio_mode_to_factor(u32 mode)
 	return !mode ? mode : 256 / mode;
 }
 
+<<<<<<< HEAD
+static ssize_t media_freq_factor_show(struct kobject *kobj,
+				      struct kobj_attribute *attr,
+				      char *buff)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+=======
 static ssize_t media_freq_factor_show(struct device *dev,
 				      struct device_attribute *attr,
 				      char *buff)
 {
 	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct intel_guc_slpc *slpc = &gt->uc.guc.slpc;
 	intel_wakeref_t wakeref;
 	u32 mode;
@@ -642,11 +960,19 @@ static ssize_t media_freq_factor_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", media_ratio_mode_to_factor(mode));
 }
 
+<<<<<<< HEAD
+static ssize_t media_freq_factor_store(struct kobject *kobj,
+				       struct kobj_attribute *attr,
+				       const char *buff, size_t count)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+=======
 static ssize_t media_freq_factor_store(struct device *dev,
 				       struct device_attribute *attr,
 				       const char *buff, size_t count)
 {
 	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct intel_guc_slpc *slpc = &gt->uc.guc.slpc;
 	u32 factor, mode;
 	int err;
@@ -671,11 +997,19 @@ static ssize_t media_freq_factor_store(struct device *dev,
 	return err ?: count;
 }
 
+<<<<<<< HEAD
+static ssize_t media_RP0_freq_mhz_show(struct kobject *kobj,
+				       struct kobj_attribute *attr,
+				       char *buff)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+=======
 static ssize_t media_RP0_freq_mhz_show(struct device *dev,
 				       struct device_attribute *attr,
 				       char *buff)
 {
 	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val;
 	int err;
 
@@ -692,11 +1026,19 @@ static ssize_t media_RP0_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", val);
 }
 
+<<<<<<< HEAD
+static ssize_t media_RPn_freq_mhz_show(struct kobject *kobj,
+				       struct kobj_attribute *attr,
+				       char *buff)
+{
+	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(kobj, attr->attr.name);
+=======
 static ssize_t media_RPn_freq_mhz_show(struct device *dev,
 				       struct device_attribute *attr,
 				       char *buff)
 {
 	struct intel_gt *gt = intel_gt_sysfs_get_drvdata(dev, attr->attr.name);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 val;
 	int err;
 
@@ -713,6 +1055,54 @@ static ssize_t media_RPn_freq_mhz_show(struct device *dev,
 	return sysfs_emit(buff, "%u\n", val);
 }
 
+<<<<<<< HEAD
+INTEL_GT_ATTR_RW(media_freq_factor);
+static struct kobj_attribute attr_media_freq_factor_scale =
+	__ATTR(media_freq_factor.scale, 0444, freq_factor_scale_show, NULL);
+INTEL_GT_ATTR_RO(media_RP0_freq_mhz);
+INTEL_GT_ATTR_RO(media_RPn_freq_mhz);
+
+static const struct attribute *media_perf_power_attrs[] = {
+	&attr_media_freq_factor.attr,
+	&attr_media_freq_factor_scale.attr,
+	&attr_media_RP0_freq_mhz.attr,
+	&attr_media_RPn_freq_mhz.attr,
+	NULL
+};
+
+static ssize_t
+default_min_freq_mhz_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	struct intel_gt *gt = kobj_to_gt(kobj->parent);
+
+	return sysfs_emit(buf, "%u\n", gt->defaults.min_freq);
+}
+
+static struct kobj_attribute default_min_freq_mhz =
+__ATTR(rps_min_freq_mhz, 0444, default_min_freq_mhz_show, NULL);
+
+static ssize_t
+default_max_freq_mhz_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	struct intel_gt *gt = kobj_to_gt(kobj->parent);
+
+	return sysfs_emit(buf, "%u\n", gt->defaults.max_freq);
+}
+
+static struct kobj_attribute default_max_freq_mhz =
+__ATTR(rps_max_freq_mhz, 0444, default_max_freq_mhz_show, NULL);
+
+static const struct attribute * const rps_defaults_attrs[] = {
+	&default_min_freq_mhz.attr,
+	&default_max_freq_mhz.attr,
+	NULL
+};
+
+static int intel_sysfs_rps_init(struct intel_gt *gt, struct kobject *kobj)
+{
+	const struct attribute * const *attrs;
+	struct attribute *vlv_attr;
+=======
 static DEVICE_ATTR_RW(media_freq_factor);
 static struct device_attribute dev_attr_media_freq_factor_scale =
 	__ATTR(media_freq_factor.scale, 0444, freq_factor_scale_show, NULL);
@@ -730,17 +1120,33 @@ static const struct attribute *media_perf_power_attrs[] = {
 static int intel_sysfs_rps_init(struct intel_gt *gt, struct kobject *kobj,
 				const struct attribute * const *attrs)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	if (GRAPHICS_VER(gt->i915) < 6)
 		return 0;
 
+<<<<<<< HEAD
+	if (is_object_gt(kobj)) {
+		attrs = gen6_rps_attrs;
+		vlv_attr = &attr_rps_vlv_rpe_freq_mhz.attr;
+	} else {
+		attrs = gen6_gt_attrs;
+		vlv_attr = &dev_attr_gt_vlv_rpe_freq_mhz.attr;
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = sysfs_create_files(kobj, attrs);
 	if (ret)
 		return ret;
 
 	if (IS_VALLEYVIEW(gt->i915) || IS_CHERRYVIEW(gt->i915))
+<<<<<<< HEAD
+		ret = sysfs_create_file(kobj, vlv_attr);
+=======
 		ret = sysfs_create_file(kobj, &dev_attr_vlv_rpe_freq_mhz.attr);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -751,9 +1157,13 @@ void intel_gt_sysfs_pm_init(struct intel_gt *gt, struct kobject *kobj)
 
 	intel_sysfs_rc6_init(gt, kobj);
 
+<<<<<<< HEAD
+	ret = intel_sysfs_rps_init(gt, kobj);
+=======
 	ret = is_object_gt(kobj) ?
 	      intel_sysfs_rps_init(gt, kobj, gen6_rps_attrs) :
 	      intel_sysfs_rps_init(gt, kobj, gen6_gt_attrs);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		drm_warn(&gt->i915->drm,
 			 "failed to create gt%u RPS sysfs files (%pe)",
@@ -763,12 +1173,29 @@ void intel_gt_sysfs_pm_init(struct intel_gt *gt, struct kobject *kobj)
 	if (!is_object_gt(kobj))
 		return;
 
+<<<<<<< HEAD
+	ret = sysfs_create_file(kobj, &attr_punit_req_freq_mhz.attr);
+	if (ret)
+		drm_warn(&gt->i915->drm,
+			 "failed to create gt%u punit_req_freq_mhz sysfs (%pe)",
+			 gt->info.id, ERR_PTR(ret));
+
+	if (GRAPHICS_VER(gt->i915) >= 11) {
+		ret = sysfs_create_files(kobj, throttle_reason_attrs);
+		if (ret)
+			drm_warn(&gt->i915->drm,
+				 "failed to create gt%u throttle sysfs files (%pe)",
+				 gt->info.id, ERR_PTR(ret));
+	}
+
+=======
 	ret = sysfs_create_files(kobj, freq_attrs);
 	if (ret)
 		drm_warn(&gt->i915->drm,
 			 "failed to create gt%u throttle sysfs files (%pe)",
 			 gt->info.id, ERR_PTR(ret));
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (HAS_MEDIA_RATIO_MODE(gt->i915) && intel_uc_uses_guc_slpc(&gt->uc)) {
 		ret = sysfs_create_files(kobj, media_perf_power_attrs);
 		if (ret)
@@ -776,4 +1203,13 @@ void intel_gt_sysfs_pm_init(struct intel_gt *gt, struct kobject *kobj)
 				 "failed to create gt%u media_perf_power_attrs sysfs (%pe)\n",
 				 gt->info.id, ERR_PTR(ret));
 	}
+<<<<<<< HEAD
+
+	ret = sysfs_create_files(gt->sysfs_defaults, rps_defaults_attrs);
+	if (ret)
+		drm_warn(&gt->i915->drm,
+			 "failed to add gt%u rps defaults (%pe)\n",
+			 gt->info.id, ERR_PTR(ret));
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

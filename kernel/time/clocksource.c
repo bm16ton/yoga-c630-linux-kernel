@@ -310,7 +310,11 @@ static void clocksource_verify_choose_cpus(void)
 	 * CPUs that are currently online.
 	 */
 	for (i = 1; i < n; i++) {
+<<<<<<< HEAD
+		cpu = prandom_u32_max(nr_cpu_ids);
+=======
 		cpu = prandom_u32() % nr_cpu_ids;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		cpu = cpumask_next(cpu - 1, cpu_online_mask);
 		if (cpu >= nr_cpu_ids)
 			cpu = cpumask_first(cpu_online_mask);

@@ -28,7 +28,7 @@
 #include <linux/delayacct.h>
 #include "swap.h"
 
-void end_swap_bio_write(struct bio *bio)
+static void end_swap_bio_write(struct bio *bio)
 {
 	struct page *page = bio_first_page_all(bio);
 
@@ -180,29 +180,30 @@ bad_bmap:
  */
 int swap_writepage(struct page *page, struct writeback_control *wbc)
 {
+	struct folio *folio = page_folio(page);
 	int ret = 0;
 
-	if (try_to_free_swap(page)) {
-		unlock_page(page);
+	if (folio_free_swap(folio)) {
+		folio_unlock(folio);
 		goto out;
 	}
 	/*
 	 * Arch code may have to preserve more data than just the page
 	 * contents, e.g. memory tags.
 	 */
-	ret = arch_prepare_to_swap(page);
+	ret = arch_prepare_to_swap(&folio->page);
 	if (ret) {
-		set_page_dirty(page);
-		unlock_page(page);
+		folio_mark_dirty(folio);
+		folio_unlock(folio);
 		goto out;
 	}
-	if (frontswap_store(page) == 0) {
-		set_page_writeback(page);
-		unlock_page(page);
-		end_page_writeback(page);
+	if (frontswap_store(&folio->page) == 0) {
+		folio_start_writeback(folio);
+		folio_unlock(folio);
+		folio_end_writeback(folio);
 		goto out;
 	}
-	ret = __swap_writepage(page, wbc, end_swap_bio_write);
+	ret = __swap_writepage(&folio->page, wbc);
 out:
 	return ret;
 }
@@ -283,7 +284,72 @@ static void sio_write_complete(struct kiocb *iocb, long ret)
 	} else {
 		for (p = 0; p < sio->pages; p++)
 			count_swpout_vm_event(sio->bvec[p].bv_page);
+<<<<<<< HEAD
 	}
+
+	for (p = 0; p < sio->pages; p++)
+		end_page_writeback(sio->bvec[p].bv_page);
+
+	mempool_free(sio, sio_pool);
+}
+
+static int swap_writepage_fs(struct page *page, struct writeback_control *wbc)
+{
+	struct swap_iocb *sio = NULL;
+	struct swap_info_struct *sis = page_swap_info(page);
+	struct file *swap_file = sis->swap_file;
+	loff_t pos = page_file_offset(page);
+
+	set_page_writeback(page);
+	unlock_page(page);
+	if (wbc->swap_plug)
+		sio = *wbc->swap_plug;
+	if (sio) {
+		if (sio->iocb.ki_filp != swap_file ||
+		    sio->iocb.ki_pos + sio->len != pos) {
+			swap_write_unplug(sio);
+			sio = NULL;
+		}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	}
+	if (!sio) {
+		sio = mempool_alloc(sio_pool, GFP_NOIO);
+		init_sync_kiocb(&sio->iocb, swap_file);
+		sio->iocb.ki_complete = sio_write_complete;
+		sio->iocb.ki_pos = pos;
+		sio->pages = 0;
+		sio->len = 0;
+	}
+	sio->bvec[sio->pages].bv_page = page;
+	sio->bvec[sio->pages].bv_len = thp_size(page);
+	sio->bvec[sio->pages].bv_offset = 0;
+	sio->len += thp_size(page);
+	sio->pages += 1;
+	if (sio->pages == ARRAY_SIZE(sio->bvec) || !wbc->swap_plug) {
+		swap_write_unplug(sio);
+		sio = NULL;
+	}
+	if (wbc->swap_plug)
+		*wbc->swap_plug = sio;
+
+	return 0;
+}
+
+int __swap_writepage(struct page *page, struct writeback_control *wbc)
+{
+	struct bio *bio;
+	int ret;
+	struct swap_info_struct *sis = page_swap_info(page);
+
+	VM_BUG_ON_PAGE(!PageSwapCache(page), page);
+	/*
+	 * ->flags can be updated non-atomicially (scan_swap_map_slots),
+	 * but that will never affect SWP_FS_OPS, so the data_race
+	 * is safe.
+	 */
+	if (data_race(sis->flags & SWP_FS_OPS))
+		return swap_writepage_fs(page, wbc);
 
 	for (p = 0; p < sio->pages; p++)
 		end_page_writeback(sio->bvec[p].bv_page);
@@ -358,7 +424,11 @@ int __swap_writepage(struct page *page, struct writeback_control *wbc,
 			REQ_OP_WRITE | REQ_SWAP | wbc_to_write_flags(wbc),
 			GFP_NOIO);
 	bio->bi_iter.bi_sector = swap_page_sector(page);
+<<<<<<< HEAD
+	bio->bi_end_io = end_swap_bio_write;
+=======
 	bio->bi_end_io = end_write_func;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bio_add_page(bio, page, thp_size(page), 0);
 
 	bio_associate_blkg_from_page(bio, page);
@@ -453,18 +523,26 @@ int swap_readpage(struct page *page, bool synchronous,
 	struct swap_info_struct *sis = page_swap_info(page);
 	bool workingset = PageWorkingset(page);
 	unsigned long pflags;
+	bool in_thrashing;
 
 	VM_BUG_ON_PAGE(!PageSwapCache(page) && !synchronous, page);
 	VM_BUG_ON_PAGE(!PageLocked(page), page);
 	VM_BUG_ON_PAGE(PageUptodate(page), page);
 
 	/*
-	 * Count submission time as memory stall. When the device is congested,
-	 * or the submitting cgroup IO-throttled, submission can be a
-	 * significant part of overall IO time.
+	 * Count submission time as memory stall and delay. When the device
+	 * is congested, or the submitting cgroup IO-throttled, submission
+	 * can be a significant part of overall IO time.
 	 */
+<<<<<<< HEAD
+	if (workingset) {
+		delayacct_thrashing_start(&in_thrashing);
+		psi_memstall_enter(&pflags);
+	}
+=======
 	if (workingset)
 		psi_memstall_enter(&pflags);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	delayacct_swapin_start();
 
 	if (frontswap_load(page) == 0) {
@@ -513,8 +591,15 @@ int swap_readpage(struct page *page, bool synchronous,
 	bio_put(bio);
 
 out:
+<<<<<<< HEAD
+	if (workingset) {
+		delayacct_thrashing_end(&in_thrashing);
+		psi_memstall_leave(&pflags);
+	}
+=======
 	if (workingset)
 		psi_memstall_leave(&pflags);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	delayacct_swapin_end();
 	return ret;
 }

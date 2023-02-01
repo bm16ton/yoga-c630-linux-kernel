@@ -27,12 +27,18 @@
 
 #include <drm/drm_atomic.h>
 #include <drm/drm_atomic_helper.h>
-#include <drm/drm_plane_helper.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/display/drm_dsc.h>
 #include <drm/msm_drm.h>
 #include <drm/drm_gem.h>
+
+#ifdef CONFIG_FAULT_INJECTION
+extern struct fault_attr fail_gem_alloc;
+extern struct fault_attr fail_gem_iova;
+#else
+#  define should_fail(attr, size) 0
+#endif
 
 struct msm_kms;
 struct msm_gpu;
@@ -142,6 +148,17 @@ struct msm_drm_private {
 	struct mutex obj_lock;
 
 	/**
+<<<<<<< HEAD
+	 * lru:
+	 *
+	 * The various LRU's that a GEM object is in at various stages of
+	 * it's lifetime.  Objects start out in the unbacked LRU.  When
+	 * pinned (for scannout or permanently mapped GPU buffers, like
+	 * ringbuffer, memptr, fw, etc) it moves to the pinned LRU.  When
+	 * unpinned, it moves into willneed or dontneed LRU depending on
+	 * madvise state.  When backing pages are evicted (willneed) or
+	 * purged (dontneed) it moves back into the unbacked LRU.
+=======
 	 * LRUs of inactive GEM objects.  Every bo is either in one of the
 	 * inactive lists (depending on whether or not it is shrinkable) or
 	 * gpu->active_list (for the gpu it is active on[1]), or transiently
@@ -154,19 +171,67 @@ struct msm_drm_private {
 	 * These lists are protected by mm_lock (which should be acquired
 	 * before per GEM object lock).  One should *not* hold mm_lock in
 	 * get_pages()/vmap()/etc paths, as they can trigger the shrinker.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 *
-	 * [1] if someone ever added support for the old 2d cores, there could be
-	 *     more than one gpu object
+	 * The dontneed LRU is considered by the shrinker for objects
+	 * that are candidate for purging, and the willneed LRU is
+	 * considered for objects that could be evicted.
 	 */
+<<<<<<< HEAD
+	struct {
+		/**
+		 * unbacked:
+		 *
+		 * The LRU for GEM objects without backing pages allocated.
+		 * This mostly exists so that objects are always is one
+		 * LRU.
+		 */
+		struct drm_gem_lru unbacked;
+=======
 	struct list_head inactive_willneed;  /* inactive + potentially unpin/evictable */
 	struct list_head inactive_dontneed;  /* inactive + shrinkable */
 	struct list_head inactive_unpinned;  /* inactive + purged or unpinned */
 	long shrinkable_count;               /* write access under mm_lock */
 	long evictable_count;                /* write access under mm_lock */
 	struct mutex mm_lock;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+		/**
+		 * pinned:
+		 *
+		 * The LRU for pinned GEM objects
+		 */
+		struct drm_gem_lru pinned;
+
+<<<<<<< HEAD
+		/**
+		 * willneed:
+		 *
+		 * The LRU for unpinned GEM objects which are in madvise
+		 * WILLNEED state (ie. can be evicted)
+		 */
+		struct drm_gem_lru willneed;
+
+		/**
+		 * dontneed:
+		 *
+		 * The LRU for unpinned GEM objects which are in madvise
+		 * DONTNEED state (ie. can be purged)
+		 */
+		struct drm_gem_lru dontneed;
+
+		/**
+		 * lock:
+		 *
+		 * Protects manipulation of all of the LRUs.
+		 */
+		struct mutex lock;
+	} lru;
 
 	struct workqueue_struct *wq;
 
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int num_crtcs;
 	struct drm_crtc *crtcs[MAX_CRTCS];
 
@@ -290,7 +355,11 @@ void msm_dsi_snapshot(struct msm_disp_state *disp_state, struct msm_dsi *msm_dsi
 bool msm_dsi_is_cmd_mode(struct msm_dsi *msm_dsi);
 bool msm_dsi_is_bonded_dsi(struct msm_dsi *msm_dsi);
 bool msm_dsi_is_master_dsi(struct msm_dsi *msm_dsi);
+<<<<<<< HEAD
+struct drm_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi);
+=======
 struct msm_display_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline void __init msm_dsi_register(void)
 {
@@ -320,7 +389,11 @@ static inline bool msm_dsi_is_master_dsi(struct msm_dsi *msm_dsi)
 	return false;
 }
 
+<<<<<<< HEAD
+static inline struct drm_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi)
+=======
 static inline struct msm_display_dsc_config *msm_dsi_get_dsc_config(struct msm_dsi *msm_dsi)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	return NULL;
 }
@@ -370,6 +443,7 @@ static inline bool msm_dp_wide_bus_available(const struct msm_dp *dp_display)
 	return false;
 }
 
+<<<<<<< HEAD
 #endif
 
 #ifdef CONFIG_DRM_MSM_MDP4
@@ -396,6 +470,34 @@ static inline void msm_dpu_register(void) {}
 static inline void msm_dpu_unregister(void) {}
 #endif
 
+=======
+#endif
+
+#ifdef CONFIG_DRM_MSM_MDP4
+void msm_mdp4_register(void);
+void msm_mdp4_unregister(void);
+#else
+static inline void msm_mdp4_register(void) {}
+static inline void msm_mdp4_unregister(void) {}
+#endif
+
+#ifdef CONFIG_DRM_MSM_MDP5
+void msm_mdp_register(void);
+void msm_mdp_unregister(void);
+#else
+static inline void msm_mdp_register(void) {}
+static inline void msm_mdp_unregister(void) {}
+#endif
+
+#ifdef CONFIG_DRM_MSM_DPU
+void msm_dpu_register(void);
+void msm_dpu_unregister(void);
+#else
+static inline void msm_dpu_register(void) {}
+static inline void msm_dpu_unregister(void) {}
+#endif
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_DRM_MSM_MDSS
 void msm_mdss_register(void);
 void msm_mdss_unregister(void);

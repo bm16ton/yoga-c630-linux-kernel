@@ -636,7 +636,11 @@ int ocfs2_map_page_blocks(struct page *page, u64 *p_blkno,
 			   !buffer_new(bh) &&
 			   ocfs2_should_read_blk(inode, page, block_start) &&
 			   (block_start < from || block_end > to)) {
+<<<<<<< HEAD
+			bh_read_nowait(bh, 0);
+=======
 			ll_rw_block(REQ_OP_READ, 1, &bh);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			*wait_bh++=bh;
 		}
 

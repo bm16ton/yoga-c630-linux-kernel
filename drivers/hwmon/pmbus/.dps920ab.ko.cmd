@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/dps920ab.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/dps920ab.ko drivers/hwmon/pmbus/dps920ab.o drivers/hwmon/pmbus/dps920ab.mod.o;  true

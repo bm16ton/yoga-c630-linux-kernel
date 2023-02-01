@@ -1,0 +1,1 @@
+cmd_drivers/staging/media/modules.order := {   cat drivers/staging/media/sunxi/modules.order;   cat drivers/staging/media/deprecated/vpfe_capture/modules.order;   cat drivers/staging/media/deprecated/saa7146/modules.order; :; } > drivers/staging/media/modules.order

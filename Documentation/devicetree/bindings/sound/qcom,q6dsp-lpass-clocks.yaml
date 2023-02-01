@@ -18,9 +18,12 @@ properties:
       - qcom,q6afe-clocks
       - qcom,q6prm-lpass-clocks
 
+<<<<<<< HEAD
+=======
   reg:
     maxItems: 1
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#clock-cells':
     const: 2
     description:
@@ -32,7 +35,10 @@ properties:
 
 required:
   - compatible
+<<<<<<< HEAD
+=======
   - reg
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - "#clock-cells"
 
 additionalProperties: false
@@ -42,6 +48,24 @@ examples:
     #include <dt-bindings/soc/qcom,apr.h>
     #include <dt-bindings/sound/qcom,q6afe.h>
     apr {
+<<<<<<< HEAD
+        compatible = "qcom,apr-v2";
+        qcom,domain = <APR_DOMAIN_ADSP>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        service@4 {
+            compatible = "qcom,q6afe";
+            reg = <APR_SVC_AFE>;
+            qcom,protection-domain = "avs/audio", "msm/adsp/audio_pd";
+
+            clock-controller {
+                compatible = "qcom,q6afe-clocks";
+                #clock-cells = <2>;
+            };
+        };
+    };
+=======
         #address-cells = <1>;
         #size-cells = <0>;
         apr-service@4 {
@@ -55,6 +79,7 @@ examples:
             };
         };
       };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   - |
     #include <dt-bindings/soc/qcom,gpr.h>
@@ -63,6 +88,19 @@ examples:
         qcom,domain = <GPR_DOMAIN_ID_ADSP>;
         #address-cells = <1>;
         #size-cells = <0>;
+<<<<<<< HEAD
+
+        service@2 {
+            reg = <GPR_PRM_MODULE_IID>;
+            compatible = "qcom,q6prm";
+
+            clock-controller {
+                compatible = "qcom,q6prm-lpass-clocks";
+                #clock-cells = <2>;
+            };
+        };
+    };
+=======
         service@2 {
             reg = <GPR_PRM_MODULE_IID>;
             compatible = "qcom,q6prm";
@@ -75,3 +113,4 @@ examples:
             };
         };
       };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

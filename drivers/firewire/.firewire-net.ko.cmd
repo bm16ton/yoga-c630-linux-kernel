@@ -1,0 +1,1 @@
+cmd_drivers/firewire/firewire-net.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/firewire/firewire-net.ko drivers/firewire/firewire-net.o drivers/firewire/firewire-net.mod.o;  true

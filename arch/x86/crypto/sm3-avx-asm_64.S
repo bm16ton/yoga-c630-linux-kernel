@@ -12,6 +12,10 @@
  */
 
 #include <linux/linkage.h>
+<<<<<<< HEAD
+#include <linux/cfi_types.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/frame.h>
 
 /* Context structure */
@@ -328,7 +332,11 @@
  *                        const u8 *data, int nblocks);
  */
 .align 16
+<<<<<<< HEAD
+SYM_TYPED_FUNC_START(sm3_transform_avx)
+=======
 SYM_FUNC_START(sm3_transform_avx)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* input:
 	 *	%rdi: ctx, CTX
 	 *	%rsi: data (64*nblks bytes)

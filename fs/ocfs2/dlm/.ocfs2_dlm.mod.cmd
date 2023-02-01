@@ -1,0 +1,1 @@
+cmd_fs/ocfs2/dlm/ocfs2_dlm.mod := printf '%s\n'   dlmdomain.o dlmdebug.o dlmthread.o dlmrecovery.o dlmmaster.o dlmast.o dlmconvert.o dlmlock.o dlmunlock.o | awk '!x[$$0]++ { print("fs/ocfs2/dlm/"$$0) }' > fs/ocfs2/dlm/ocfs2_dlm.mod

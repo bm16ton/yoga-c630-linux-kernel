@@ -6,12 +6,16 @@
 #ifndef __FSL_SAI_H
 #define __FSL_SAI_H
 
+#include <linux/dma/imx-dma.h>
 #include <sound/dmaengine_pcm.h>
 
 #define FSL_SAI_FORMATS (SNDRV_PCM_FMTBIT_S16_LE |\
 			 SNDRV_PCM_FMTBIT_S20_3LE |\
 			 SNDRV_PCM_FMTBIT_S24_LE |\
-			 SNDRV_PCM_FMTBIT_S32_LE)
+			 SNDRV_PCM_FMTBIT_S32_LE |\
+			 SNDRV_PCM_FMTBIT_DSD_U8 |\
+			 SNDRV_PCM_FMTBIT_DSD_U16_LE |\
+			 SNDRV_PCM_FMTBIT_DSD_U32_LE)
 
 /* SAI Register Map Register */
 #define FSL_SAI_VERID	0x00 /* SAI Version ID Register */
@@ -215,6 +219,16 @@
 
 #define PMQOS_CPU_LATENCY   BIT(0)
 
+<<<<<<< HEAD
+/* Max number of dataline */
+#define FSL_SAI_DL_NUM		(8)
+/* default dataline type is zero */
+#define FSL_SAI_DL_DEFAULT	(0)
+#define FSL_SAI_DL_I2S		BIT(0)
+#define FSL_SAI_DL_PDM		BIT(1)
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct fsl_sai_soc_data {
 	bool use_imx_pcm;
 	bool use_edma;
@@ -223,6 +237,10 @@ struct fsl_sai_soc_data {
 	unsigned int pins;
 	unsigned int reg_offset;
 	unsigned int flags;
+<<<<<<< HEAD
+	unsigned int max_register;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -249,16 +267,31 @@ struct fsl_sai_param {
 	u32 dataline;
 };
 
+struct fsl_sai_dl_cfg {
+	unsigned int type;
+	unsigned int pins[2];
+	unsigned int mask[2];
+	unsigned int start_off[2];
+	unsigned int next_off[2];
+};
+
 struct fsl_sai {
 	struct platform_device *pdev;
 	struct regmap *regmap;
 	struct clk *bus_clk;
 	struct clk *mclk_clk[FSL_SAI_MCLK_MAX];
+	struct clk *pll8k_clk;
+	struct clk *pll11k_clk;
+	struct resource *res;
 
 	bool is_consumer_mode;
 	bool is_lsb_first;
 	bool is_dsp_mode;
+	bool is_pdm_mode;
+	bool is_multi_fifo_dma;
 	bool synchronous[2];
+	struct fsl_sai_dl_cfg *dl_cfg;
+	unsigned int dl_cfg_cnt;
 
 	unsigned int mclk_id[2];
 	unsigned int mclk_streams;
@@ -273,6 +306,12 @@ struct fsl_sai {
 	struct fsl_sai_verid verid;
 	struct fsl_sai_param param;
 	struct pm_qos_request pm_qos_req;
+<<<<<<< HEAD
+	struct pinctrl *pinctrl;
+	struct pinctrl_state *pins_state;
+	struct sdma_peripheral_config audio_config[2];
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define TX 1

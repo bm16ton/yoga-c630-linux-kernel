@@ -1,0 +1,1 @@
+cmd_drivers/net/mdio/mdio-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/mdio/mdio-i2c.ko drivers/net/mdio/mdio-i2c.o drivers/net/mdio/mdio-i2c.mod.o;  true

@@ -512,7 +512,11 @@ xfs_readdir(
 {
 	struct xfs_da_args	args = { NULL };
 	unsigned int		lock_mode;
+<<<<<<< HEAD
+	bool			isblock;
+=======
 	int			isblock;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int			error;
 
 	trace_xfs_readdir(dp);

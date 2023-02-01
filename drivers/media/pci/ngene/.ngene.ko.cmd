@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ngene/ngene.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/ngene/ngene.ko drivers/media/pci/ngene/ngene.o drivers/media/pci/ngene/ngene.mod.o;  true

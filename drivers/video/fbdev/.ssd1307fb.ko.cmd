@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/ssd1307fb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/fbdev/ssd1307fb.ko drivers/video/fbdev/ssd1307fb.o drivers/video/fbdev/ssd1307fb.mod.o;  true

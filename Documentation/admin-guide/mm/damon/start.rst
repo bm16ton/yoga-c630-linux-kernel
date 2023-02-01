@@ -29,6 +29,11 @@ called DAMON Operator (DAMO).  It is available at
 https://github.com/awslabs/damo.  The examples below assume that ``damo`` is on
 your ``$PATH``.  It's not mandatory, though.
 
+<<<<<<< HEAD
+Because DAMO is using the sysfs interface (refer to :doc:`usage` for the
+detail) of DAMON, you should ensure :doc:`sysfs </filesystems/sysfs>` is
+mounted.
+=======
 Because DAMO is using the debugfs interface (refer to :doc:`usage` for the
 detail) of DAMON, you should ensure debugfs is mounted.  Mount it manually as
 below::
@@ -39,6 +44,7 @@ or append the following line to your ``/etc/fstab`` file so that your system
 can automatically mount debugfs upon booting::
 
     debugfs /sys/kernel/debug debugfs defaults 0 0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 
 Recording Data Access Patterns

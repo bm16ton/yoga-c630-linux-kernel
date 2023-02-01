@@ -3,7 +3,11 @@
  * Copyright (C) 2012-2014 Intel Corporation
  * Copyright (C) 2013-2015 Intel Mobile Communications GmbH
  * Copyright (C) 2016-2017 Intel Deutschland GmbH
+<<<<<<< HEAD
+ * Copyright (C) 2021-2022 Intel Corporation
+=======
  * Copyright (C) 2021 Intel Corporation
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #ifndef __iwl_fw_api_offload_h__
 #define __iwl_fw_api_offload_h__
@@ -12,6 +16,21 @@
  * enum iwl_prot_offload_subcmd_ids - protocol offload commands
  */
 enum iwl_prot_offload_subcmd_ids {
+	/**
+	 * @WOWLAN_WAKE_PKT_NOTIFICATION: Notification in &struct iwl_wowlan_wake_pkt_notif
+	 */
+	WOWLAN_WAKE_PKT_NOTIFICATION = 0xFC,
+
+	/**
+	 * @WOWLAN_INFO_NOTIFICATION: Notification in &struct iwl_wowlan_info_notif
+	 */
+	WOWLAN_INFO_NOTIFICATION = 0xFD,
+
+	/**
+	 * @D3_END_NOTIFICATION: End D3 state notification
+	 */
+	D3_END_NOTIFICATION = 0xFE,
+
 	/**
 	 * @STORED_BEACON_NTF: &struct iwl_stored_beacon_notif
 	 */

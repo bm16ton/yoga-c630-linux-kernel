@@ -1,0 +1,4 @@
+drivers/net/ethernet/hisilicon/hns3/hnae3.ko
+drivers/net/ethernet/hisilicon/hns3/hns3.ko
+drivers/net/ethernet/hisilicon/hns3/hclgevf.ko
+drivers/net/ethernet/hisilicon/hns3/hclge.ko

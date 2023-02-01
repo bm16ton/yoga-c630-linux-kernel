@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/apm/xgene/xgene-enet.mod := printf '%s\n'   xgene_enet_hw.o xgene_enet_sgmac.o xgene_enet_xgmac.o xgene_enet_main.o xgene_enet_ring2.o xgene_enet_ethtool.o xgene_enet_cle.o | awk '!x[$$0]++ { print("drivers/net/ethernet/apm/xgene/"$$0) }' > drivers/net/ethernet/apm/xgene/xgene-enet.mod

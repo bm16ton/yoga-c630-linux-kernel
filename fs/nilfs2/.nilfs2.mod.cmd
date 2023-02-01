@@ -1,0 +1,1 @@
+cmd_fs/nilfs2/nilfs2.mod := printf '%s\n'   inode.o file.o dir.o super.o namei.o page.o mdt.o btnode.o bmap.o btree.o direct.o dat.o recovery.o the_nilfs.o segbuf.o segment.o cpfile.o sufile.o ifile.o alloc.o gcinode.o ioctl.o sysfs.o | awk '!x[$$0]++ { print("fs/nilfs2/"$$0) }' > fs/nilfs2/nilfs2.mod

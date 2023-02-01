@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns/hns_dsaf.mod := printf '%s\n'   hns_ae_adapt.o hns_dsaf_gmac.o hns_dsaf_mac.o hns_dsaf_misc.o hns_dsaf_main.o hns_dsaf_ppe.o hns_dsaf_rcb.o hns_dsaf_xgmac.o | awk '!x[$$0]++ { print("drivers/net/ethernet/hisilicon/hns/"$$0) }' > drivers/net/ethernet/hisilicon/hns/hns_dsaf.mod

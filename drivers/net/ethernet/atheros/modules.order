@@ -1,0 +1,5 @@
+drivers/net/ethernet/atheros/atlx/atl1.ko
+drivers/net/ethernet/atheros/atlx/atl2.ko
+drivers/net/ethernet/atheros/atl1e/atl1e.ko
+drivers/net/ethernet/atheros/atl1c/atl1c.ko
+drivers/net/ethernet/atheros/alx/alx.ko

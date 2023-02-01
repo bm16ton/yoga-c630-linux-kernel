@@ -273,6 +273,11 @@ void create_kmalloc_caches(slab_flags_t);
 
 /* Find the kmalloc slab corresponding for a certain size */
 struct kmem_cache *kmalloc_slab(size_t, gfp_t);
+
+void *__kmem_cache_alloc_node(struct kmem_cache *s, gfp_t gfpflags,
+			      int node, size_t orig_size,
+			      unsigned long caller);
+void __kmem_cache_free(struct kmem_cache *s, void *x, unsigned long caller);
 #endif
 
 gfp_t kmalloc_fix_flags(gfp_t flags);
@@ -440,12 +445,21 @@ static inline struct obj_cgroup **slab_objcgs(struct slab *slab)
 
 	return (struct obj_cgroup **)(memcg_data & ~MEMCG_DATA_FLAGS_MASK);
 }
+<<<<<<< HEAD
 
 int memcg_alloc_slab_cgroups(struct slab *slab, struct kmem_cache *s,
 				 gfp_t gfp, bool new_slab);
 void mod_objcg_state(struct obj_cgroup *objcg, struct pglist_data *pgdat,
 		     enum node_stat_item idx, int nr);
 
+=======
+
+int memcg_alloc_slab_cgroups(struct slab *slab, struct kmem_cache *s,
+				 gfp_t gfp, bool new_slab);
+void mod_objcg_state(struct obj_cgroup *objcg, struct pglist_data *pgdat,
+		     enum node_stat_item idx, int nr);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void memcg_free_slab_cgroups(struct slab *slab)
 {
 	kfree(slab_objcgs(slab));
@@ -660,6 +674,12 @@ static inline struct kmem_cache *cache_from_obj(struct kmem_cache *s, void *x)
 }
 #endif /* CONFIG_SLOB */
 
+void free_large_kmalloc(struct folio *folio, void *object);
+
+#endif /* CONFIG_SLOB */
+
+size_t __ksize(const void *objp);
+
 static inline size_t slab_ksize(const struct kmem_cache *s)
 {
 #ifndef CONFIG_SLUB
@@ -729,6 +749,7 @@ static inline void slab_post_alloc_hook(struct kmem_cache *s,
 			memset(p[i], 0, s->object_size);
 		kmemleak_alloc_recursive(p[i], s->object_size, 1,
 					 s->flags, flags);
+		kmsan_slab_alloc(s, p[i], flags);
 	}
 
 	memcg_slab_post_alloc_hook(s, objcg, flags, size, p);

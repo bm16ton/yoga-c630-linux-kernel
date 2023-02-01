@@ -1,0 +1,1 @@
+cmd_drivers/scsi/device_handler/modules.order := {   echo drivers/scsi/device_handler/scsi_dh_rdac.ko;   echo drivers/scsi/device_handler/scsi_dh_hp_sw.ko;   echo drivers/scsi/device_handler/scsi_dh_emc.ko;   echo drivers/scsi/device_handler/scsi_dh_alua.ko; :; } > drivers/scsi/device_handler/modules.order

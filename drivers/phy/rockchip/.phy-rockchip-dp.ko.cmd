@@ -1,0 +1,1 @@
+cmd_drivers/phy/rockchip/phy-rockchip-dp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/rockchip/phy-rockchip-dp.ko drivers/phy/rockchip/phy-rockchip-dp.o drivers/phy/rockchip/phy-rockchip-dp.mod.o;  true

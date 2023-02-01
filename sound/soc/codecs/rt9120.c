@@ -177,8 +177,25 @@ static int rt9120_codec_probe(struct snd_soc_component *comp)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int rt9120_codec_suspend(struct snd_soc_component *comp)
+{
+	return pm_runtime_force_suspend(comp->dev);
+}
+
+static int rt9120_codec_resume(struct snd_soc_component *comp)
+{
+	return pm_runtime_force_resume(comp->dev);
+}
+
 static const struct snd_soc_component_driver rt9120_component_driver = {
 	.probe = rt9120_codec_probe,
+	.suspend = rt9120_codec_suspend,
+	.resume = rt9120_codec_resume,
+=======
+static const struct snd_soc_component_driver rt9120_component_driver = {
+	.probe = rt9120_codec_probe,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.controls = rt9120_snd_controls,
 	.num_controls = ARRAY_SIZE(rt9120_snd_controls),
 	.dapm_widgets = rt9120_dapm_widgets,
@@ -572,11 +589,18 @@ static int rt9120_probe(struct i2c_client *i2c)
 					       &rt9120_dai, 1);
 }
 
+<<<<<<< HEAD
+static void rt9120_remove(struct i2c_client *i2c)
+{
+	pm_runtime_disable(&i2c->dev);
+	pm_runtime_set_suspended(&i2c->dev);
+=======
 static int rt9120_remove(struct i2c_client *i2c)
 {
 	pm_runtime_disable(&i2c->dev);
 	pm_runtime_set_suspended(&i2c->dev);
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __maybe_unused rt9120_runtime_suspend(struct device *dev)

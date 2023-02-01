@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-wcd934x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-wcd934x.ko drivers/gpio/gpio-wcd934x.o drivers/gpio/gpio-wcd934x.mod.o;  true

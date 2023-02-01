@@ -2,7 +2,7 @@
 /*
 * Copyright (C) 2012 Invensense, Inc.
 */
-extern int inv_mpu6050_noirq;
+
 #ifndef INV_MPU_IIO_H_
 #define INV_MPU_IIO_H_
 

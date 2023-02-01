@@ -27,9 +27,21 @@ struct tps68470_regulator_platform_data {
 	const struct regulator_init_data *reg_init_data[TPS68470_NUM_REGULATORS];
 };
 
+<<<<<<< HEAD
+struct tps68470_clk_consumer {
+=======
 struct tps68470_clk_platform_data {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const char *consumer_dev_name;
 	const char *consumer_con_id;
 };
 
+<<<<<<< HEAD
+struct tps68470_clk_platform_data {
+	unsigned int n_consumers;
+	struct tps68470_clk_consumer consumers[];
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

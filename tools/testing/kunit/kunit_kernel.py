@@ -25,7 +25,11 @@ KCONFIG_PATH = '.config'
 KUNITCONFIG_PATH = '.kunitconfig'
 OLD_KUNITCONFIG_PATH = 'last_used_kunitconfig'
 DEFAULT_KUNITCONFIG_PATH = 'tools/testing/kunit/configs/default.config'
+<<<<<<< HEAD
+ALL_TESTS_CONFIG_PATH = 'tools/testing/kunit/configs/all_tests.config'
+=======
 BROKEN_ALLCONFIG_PATH = 'tools/testing/kunit/configs/broken_on_uml.config'
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 UML_KCONFIG_PATH = 'tools/testing/kunit/configs/arch_uml.config'
 OUTFILE_PATH = 'test.log'
 ABS_TOOL_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -57,9 +61,12 @@ class LinuxSourceTreeOperations:
 	def make_arch_config(self, base_kunitconfig: kunit_config.Kconfig) -> kunit_config.Kconfig:
 		return base_kunitconfig
 
+<<<<<<< HEAD
+=======
 	def make_allyesconfig(self, build_dir: str, make_options) -> None:
 		raise ConfigError('Only the "um" arch is supported for alltests')
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	def make_olddefconfig(self, build_dir: str, make_options) -> None:
 		command = ['make', 'ARCH=' + self._linux_arch, 'O=' + build_dir, 'olddefconfig']
 		if self._cross_compile:
@@ -144,6 +151,8 @@ class LinuxSourceTreeOperationsUml(LinuxSourceTreeOperations):
 		kconfig.merge_in_entries(base_kunitconfig)
 		return kconfig
 
+<<<<<<< HEAD
+=======
 	def make_allyesconfig(self, build_dir: str, make_options) -> None:
 		stdout.print_with_timestamp(
 			'Enabling all CONFIGs for UML...')
@@ -164,6 +173,7 @@ class LinuxSourceTreeOperationsUml(LinuxSourceTreeOperations):
 		stdout.print_with_timestamp(
 			'Starting Kernel with all configs takes a few minutes...')
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	def start(self, params: List[str], build_dir: str) -> subprocess.Popen:
 		"""Runs the Linux UML binary. Must be named 'linux'."""
 		linux_bin = os.path.join(build_dir, 'linux')
@@ -209,6 +219,7 @@ def get_parsed_kunitconfig(build_dir: str,
 
 def get_outfile_path(build_dir: str) -> str:
 	return os.path.join(build_dir, OUTFILE_PATH)
+<<<<<<< HEAD
 
 def _default_qemu_config_path(arch: str) -> str:
 	config_path = os.path.join(QEMU_CONFIGS_DIR, arch + '.py')
@@ -245,6 +256,44 @@ def _get_qemu_ops(config_path: str,
 	return params.linux_arch, LinuxSourceTreeOperationsQemu(
 			params, cross_compile=cross_compile)
 
+=======
+
+def _default_qemu_config_path(arch: str) -> str:
+	config_path = os.path.join(QEMU_CONFIGS_DIR, arch + '.py')
+	if os.path.isfile(config_path):
+		return config_path
+
+	options = [f[:-3] for f in os.listdir(QEMU_CONFIGS_DIR) if f.endswith('.py')]
+	raise ConfigError(arch + ' is not a valid arch, options are ' + str(sorted(options)))
+
+def _get_qemu_ops(config_path: str,
+		  extra_qemu_args: Optional[List[str]],
+		  cross_compile: Optional[str]) -> Tuple[str, LinuxSourceTreeOperations]:
+	# The module name/path has very little to do with where the actual file
+	# exists (I learned this through experimentation and could not find it
+	# anywhere in the Python documentation).
+	#
+	# Bascially, we completely ignore the actual file location of the config
+	# we are loading and just tell Python that the module lives in the
+	# QEMU_CONFIGS_DIR for import purposes regardless of where it actually
+	# exists as a file.
+	module_path = '.' + os.path.join(os.path.basename(QEMU_CONFIGS_DIR), os.path.basename(config_path))
+	spec = importlib.util.spec_from_file_location(module_path, config_path)
+	assert spec is not None
+	config = importlib.util.module_from_spec(spec)
+	# See https://github.com/python/typeshed/pull/2626 for context.
+	assert isinstance(spec.loader, importlib.abc.Loader)
+	spec.loader.exec_module(config)
+
+	if not hasattr(config, 'QEMU_ARCH'):
+		raise ValueError('qemu_config module missing "QEMU_ARCH": ' + config_path)
+	params: qemu_config.QemuArchParams = config.QEMU_ARCH  # type: ignore
+	if extra_qemu_args:
+		params.extra_qemu_params.extend(extra_qemu_args)
+	return params.linux_arch, LinuxSourceTreeOperationsQemu(
+			params, cross_compile=cross_compile)
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 class LinuxSourceTree:
 	"""Represents a Linux kernel source tree with KUnit tests."""
 
@@ -267,12 +316,21 @@ class LinuxSourceTree:
 			else:
 				qemu_config_path = _default_qemu_config_path(self._arch)
 				_, self._ops = _get_qemu_ops(qemu_config_path, extra_qemu_args, cross_compile)
+<<<<<<< HEAD
 
 		self._kconfig = get_parsed_kunitconfig(build_dir, kunitconfig_paths)
 		if kconfig_add:
 			kconfig = kunit_config.parse_from_string('\n'.join(kconfig_add))
 			self._kconfig.merge_in_entries(kconfig)
 
+=======
+
+		self._kconfig = get_parsed_kunitconfig(build_dir, kunitconfig_paths)
+		if kconfig_add:
+			kconfig = kunit_config.parse_from_string('\n'.join(kconfig_add))
+			self._kconfig.merge_in_entries(kconfig)
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	def arch(self) -> str:
 		return self._arch
 
@@ -318,12 +376,21 @@ class LinuxSourceTree:
 			os.remove(old_path)  # write_to_file appends to the file
 		self._kconfig.write_to_file(old_path)
 		return True
+<<<<<<< HEAD
 
 	def _kunitconfig_changed(self, build_dir: str) -> bool:
 		old_path = get_old_kunitconfig_path(build_dir)
 		if not os.path.exists(old_path):
 			return True
 
+=======
+
+	def _kunitconfig_changed(self, build_dir: str) -> bool:
+		old_path = get_old_kunitconfig_path(build_dir)
+		if not os.path.exists(old_path):
+			return True
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		old_kconfig = kunit_config.parse_file(old_path)
 		return old_kconfig != self._kconfig
 
@@ -343,10 +410,12 @@ class LinuxSourceTree:
 		os.remove(kconfig_path)
 		return self.build_config(build_dir, make_options)
 
+<<<<<<< HEAD
+	def build_kernel(self, jobs, build_dir: str, make_options) -> bool:
+=======
 	def build_kernel(self, alltests, jobs, build_dir: str, make_options) -> bool:
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		try:
-			if alltests:
-				self._ops.make_allyesconfig(build_dir, make_options)
 			self._ops.make_olddefconfig(build_dir, make_options)
 			self._ops.make(jobs, build_dir, make_options)
 		except (ConfigError, BuildError) as e:
@@ -359,6 +428,10 @@ class LinuxSourceTree:
 			args = []
 		if filter_glob:
 			args.append('kunit.filter_glob='+filter_glob)
+<<<<<<< HEAD
+		args.append('kunit.enable=1')
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		process = self._ops.start(args, build_dir)
 		assert process.stdout is not None  # tell mypy it's set

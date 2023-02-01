@@ -1,0 +1,4 @@
+hip06-d03.o: arch/arm64/boot/dts/hisilicon/hip06-d03.dts \
+ arch/arm64/boot/dts/hisilicon/hip06.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

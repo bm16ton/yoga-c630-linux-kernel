@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/saa7134/saa7134.mod := printf '%s\n'   saa7134-cards.o saa7134-core.o saa7134-i2c.o saa7134-ts.o saa7134-tvaudio.o saa7134-vbi.o saa7134-video.o saa7134-input.o | awk '!x[$$0]++ { print("drivers/media/pci/saa7134/"$$0) }' > drivers/media/pci/saa7134/saa7134.mod

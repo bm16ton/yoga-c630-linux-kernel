@@ -100,7 +100,11 @@ static int do_readahead(journal_t *journal, unsigned int start)
 		if (!buffer_uptodate(bh) && !buffer_locked(bh)) {
 			bufs[nbufs++] = bh;
 			if (nbufs == MAXBUF) {
+<<<<<<< HEAD
+				bh_readahead_batch(nbufs, bufs, 0);
+=======
 				ll_rw_block(REQ_OP_READ, nbufs, bufs);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				journal_brelse_array(bufs, nbufs);
 				nbufs = 0;
 			}
@@ -109,7 +113,11 @@ static int do_readahead(journal_t *journal, unsigned int start)
 	}
 
 	if (nbufs)
+<<<<<<< HEAD
+		bh_readahead_batch(nbufs, bufs, 0);
+=======
 		ll_rw_block(REQ_OP_READ, nbufs, bufs);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = 0;
 
 failed:
@@ -152,9 +160,14 @@ static int jread(struct buffer_head **bhp, journal_t *journal,
 		return -ENOMEM;
 
 	if (!buffer_uptodate(bh)) {
-		/* If this is a brand new buffer, start readahead.
-                   Otherwise, we assume we are already reading it.  */
-		if (!buffer_req(bh))
+		/*
+		 * If this is a brand new buffer, start readahead.
+		 * Otherwise, we assume we are already reading it.
+		 */
+		bool need_readahead = !buffer_req(bh);
+
+		bh_read_nowait(bh, 0);
+		if (need_readahead)
 			do_readahead(journal, offset);
 		wait_on_buffer(bh);
 	}
@@ -688,7 +701,6 @@ static int do_one_pass(journal_t *journal,
 					mark_buffer_dirty(nbh);
 					BUFFER_TRACE(nbh, "marking uptodate");
 					++info->nr_replays;
-					/* ll_rw_block(WRITE, 1, &nbh); */
 					unlock_buffer(nbh);
 					brelse(obh);
 					brelse(nbh);

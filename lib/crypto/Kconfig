@@ -1,6 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 
 menu "Crypto library routines"
+<<<<<<< HEAD
+
+config CRYPTO_LIB_UTILS
+	tristate
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config CRYPTO_LIB_AES
 	tristate
@@ -33,6 +39,10 @@ config CRYPTO_ARCH_HAVE_LIB_CHACHA
 
 config CRYPTO_LIB_CHACHA_GENERIC
 	tristate
+<<<<<<< HEAD
+	select CRYPTO_LIB_UTILS
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  This symbol can be depended upon by arch implementations of the
 	  ChaCha library interface that require the generic code as a
@@ -70,7 +80,11 @@ config CRYPTO_LIB_CURVE25519
 	tristate "Curve25519 scalar multiplication library"
 	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
+<<<<<<< HEAD
+	select CRYPTO_LIB_UTILS
+=======
 	select LIB_MEMNEQ
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Enable the Curve25519 library interface. This interface may be
 	  fulfilled by either the generic implementation or an arch-specific

@@ -1,0 +1,1 @@
+cmd_drivers/misc/lis3lv02d/lis3lv02d.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/lis3lv02d/lis3lv02d.ko drivers/misc/lis3lv02d/lis3lv02d.o drivers/misc/lis3lv02d/lis3lv02d.mod.o;  true

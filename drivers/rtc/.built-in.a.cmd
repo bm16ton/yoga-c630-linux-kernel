@@ -1,0 +1,1 @@
+cmd_drivers/rtc/built-in.a := rm -f drivers/rtc/built-in.a;  printf "drivers/rtc/%s " lib.o class.o interface.o nvmem.o dev.o proc.o sysfs.o rtc-ds1307.o rtc-efi.o rtc-max77686.o rtc-pcf8563.o rtc-pl031.o rtc-sun6i.o rtc-tegra.o rtc-xgene.o | xargs ar cDPrST drivers/rtc/built-in.a

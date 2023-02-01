@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/common/cavium_ptp.mod := printf '%s\n'   cavium_ptp.o | awk '!x[$$0]++ { print("drivers/net/ethernet/cavium/common/"$$0) }' > drivers/net/ethernet/cavium/common/cavium_ptp.mod

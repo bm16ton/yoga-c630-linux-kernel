@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/panel/panel-raspberrypi-touchscreen.mod := printf '%s\n'   panel-raspberrypi-touchscreen.o | awk '!x[$$0]++ { print("drivers/gpu/drm/panel/"$$0) }' > drivers/gpu/drm/panel/panel-raspberrypi-touchscreen.mod

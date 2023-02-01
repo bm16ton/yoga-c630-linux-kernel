@@ -200,7 +200,11 @@ static struct kpp_alg ecdh_nist_p384 = {
 
 static bool ecdh_nist_p192_registered;
 
+<<<<<<< HEAD
+static int __init ecdh_init(void)
+=======
 static int ecdh_init(void)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int ret;
 
@@ -227,7 +231,7 @@ nist_p256_error:
 	return ret;
 }
 
-static void ecdh_exit(void)
+static void __exit ecdh_exit(void)
 {
 	if (ecdh_nist_p192_registered)
 		crypto_unregister_kpp(&ecdh_nist_p192);

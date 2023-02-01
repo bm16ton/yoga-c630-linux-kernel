@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/dvb-usb/dvb-usb-vp702x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/dvb-usb/dvb-usb-vp702x.ko drivers/media/usb/dvb-usb/dvb-usb-vp702x.o drivers/media/usb/dvb-usb/dvb-usb-vp702x.mod.o;  true

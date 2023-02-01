@@ -1,0 +1,1 @@
+cmd_drivers/leds/leds-dac124s085.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/leds-dac124s085.ko drivers/leds/leds-dac124s085.o drivers/leds/leds-dac124s085.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/libfc/libfc.mod := printf '%s\n'   fc_libfc.o fc_disc.o fc_exch.o fc_elsct.o fc_frame.o fc_lport.o fc_rport.o fc_fcp.o fc_npiv.o | awk '!x[$$0]++ { print("drivers/scsi/libfc/"$$0) }' > drivers/scsi/libfc/libfc.mod

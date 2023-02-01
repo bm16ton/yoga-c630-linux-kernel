@@ -1,0 +1,1 @@
+cmd_drivers/media/tuners/tda8290.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/tuners/tda8290.ko drivers/media/tuners/tda8290.o drivers/media/tuners/tda8290.mod.o;  true

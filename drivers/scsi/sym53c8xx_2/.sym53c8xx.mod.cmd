@@ -1,0 +1,1 @@
+cmd_drivers/scsi/sym53c8xx_2/sym53c8xx.mod := printf '%s\n'   sym_fw.o sym_glue.o sym_hipd.o sym_malloc.o sym_nvram.o | awk '!x[$$0]++ { print("drivers/scsi/sym53c8xx_2/"$$0) }' > drivers/scsi/sym53c8xx_2/sym53c8xx.mod

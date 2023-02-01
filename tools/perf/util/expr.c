@@ -182,7 +182,7 @@ int expr__add_ref(struct expr_parse_ctx *ctx, struct metric_ref *ref)
 {
 	struct expr_id_data *data_ptr = NULL, *old_data = NULL;
 	char *old_key = NULL;
-	char *name, *p;
+	char *name;
 	int ret;
 
 	data_ptr = zalloc(sizeof(*data_ptr));
@@ -194,15 +194,6 @@ int expr__add_ref(struct expr_parse_ctx *ctx, struct metric_ref *ref)
 		free(data_ptr);
 		return -ENOMEM;
 	}
-
-	/*
-	 * The jevents tool converts all metric expressions
-	 * to lowercase, including metric references, hence
-	 * we need to add lowercase name for metric, so it's
-	 * properly found.
-	 */
-	for (p = name; *p; p++)
-		*p = tolower(*p);
 
 	/*
 	 * Intentionally passing just const char pointers,
@@ -231,6 +222,7 @@ int expr__get_id(struct expr_parse_ctx *ctx, const char *id,
 		 struct expr_id_data **data)
 {
 	return hashmap__find(ctx->ids, id, (void **)data) ? 0 : -1;
+<<<<<<< HEAD
 }
 
 bool expr__subset_of_ids(struct expr_parse_ctx *haystack,
@@ -247,6 +239,24 @@ bool expr__subset_of_ids(struct expr_parse_ctx *haystack,
 	return true;
 }
 
+=======
+}
+
+bool expr__subset_of_ids(struct expr_parse_ctx *haystack,
+			 struct expr_parse_ctx *needles)
+{
+	struct hashmap_entry *cur;
+	size_t bkt;
+	struct expr_id_data *data;
+
+	hashmap__for_each_entry(needles->ids, cur, bkt) {
+		if (expr__get_id(haystack, cur->key, &data))
+			return false;
+	}
+	return true;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int expr__resolve_id(struct expr_parse_ctx *ctx, const char *id,
 		     struct expr_id_data **datap)
@@ -310,7 +320,13 @@ struct expr_parse_ctx *expr__ctx_new(void)
 		free(ctx);
 		return NULL;
 	}
+<<<<<<< HEAD
+	ctx->sctx.user_requested_cpu_list = NULL;
+	ctx->sctx.runtime = 0;
+	ctx->sctx.system_wide = false;
+=======
 	ctx->runtime = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ctx;
 }
@@ -321,6 +337,27 @@ void expr__ctx_clear(struct expr_parse_ctx *ctx)
 	size_t bkt;
 
 	hashmap__for_each_entry(ctx->ids, cur, bkt) {
+<<<<<<< HEAD
+		free((char *)cur->key);
+		free(cur->value);
+	}
+	hashmap__clear(ctx->ids);
+}
+
+void expr__ctx_free(struct expr_parse_ctx *ctx)
+{
+	struct hashmap_entry *cur;
+	size_t bkt;
+
+	if (!ctx)
+		return;
+
+	free(ctx->sctx.user_requested_cpu_list);
+	hashmap__for_each_entry(ctx->ids, cur, bkt) {
+		free((char *)cur->key);
+		free(cur->value);
+	}
+=======
 		free((char *)cur->key);
 		free(cur->value);
 	}
@@ -336,6 +373,7 @@ void expr__ctx_free(struct expr_parse_ctx *ctx)
 		free((char *)cur->key);
 		free(cur->value);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hashmap__free(ctx->ids);
 	free(ctx);
 }
@@ -344,16 +382,19 @@ static int
 __expr__parse(double *val, struct expr_parse_ctx *ctx, const char *expr,
 	      bool compute_ids)
 {
+<<<<<<< HEAD
+=======
 	struct expr_scanner_ctx scanner_ctx = {
 		.runtime = ctx->runtime,
 	};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	YY_BUFFER_STATE buffer;
 	void *scanner;
 	int ret;
 
 	pr_debug2("parsing metric: %s\n", expr);
 
-	ret = expr_lex_init_extra(&scanner_ctx, &scanner);
+	ret = expr_lex_init_extra(&ctx->sctx, &scanner);
 	if (ret)
 		return ret;
 
@@ -410,16 +451,23 @@ double arch_get_tsc_freq(void)
 }
 #endif
 
+<<<<<<< HEAD
+double expr__get_literal(const char *literal, const struct expr_scanner_ctx *ctx)
+=======
 double expr__get_literal(const char *literal)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	static struct cpu_topology *topology;
 	double result = NAN;
 
+<<<<<<< HEAD
+=======
 	if (!strcasecmp("#smt_on", literal)) {
 		result = smt_on() > 0 ? 1.0 : 0.0;
 		goto out;
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!strcmp("#num_cpus", literal)) {
 		result = cpu__max_present_cpu().cpu;
 		goto out;
@@ -443,6 +491,18 @@ double expr__get_literal(const char *literal)
 			goto out;
 		}
 	}
+<<<<<<< HEAD
+	if (!strcasecmp("#smt_on", literal)) {
+		result = smt_on(topology) ? 1.0 : 0.0;
+		goto out;
+	}
+	if (!strcmp("#core_wide", literal)) {
+		result = core_wide(ctx->system_wide, ctx->user_requested_cpu_list, topology)
+			? 1.0 : 0.0;
+		goto out;
+	}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!strcmp("#num_packages", literal)) {
 		result = topology->package_cpus_lists;
 		goto out;

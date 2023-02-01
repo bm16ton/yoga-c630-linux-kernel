@@ -1,0 +1,1 @@
+cmd_drivers/nvmem/nvmem_sunxi_sid.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nvmem/nvmem_sunxi_sid.ko drivers/nvmem/nvmem_sunxi_sid.o drivers/nvmem/nvmem_sunxi_sid.mod.o;  true

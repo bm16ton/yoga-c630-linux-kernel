@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns3/hclgevf.mod := printf '%s\n'   hns3vf/hclgevf_main.o hns3vf/hclgevf_mbx.o hns3vf/hclgevf_devlink.o hns3_common/hclge_comm_cmd.o hns3_common/hclge_comm_rss.o hns3_common/hclge_comm_tqp_stats.o | awk '!x[$$0]++ { print("drivers/net/ethernet/hisilicon/hns3/"$$0) }' > drivers/net/ethernet/hisilicon/hns3/hclgevf.mod

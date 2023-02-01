@@ -105,7 +105,11 @@ struct intel_fb_view {
 	 * In the normal view the FB object's backing store sg list is used
 	 * directly and hence the remap information here is not used.
 	 */
+<<<<<<< HEAD
+	struct i915_gtt_view gtt;
+=======
 	struct i915_ggtt_view gtt;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The GTT view (gtt.type) specific information for each FB color
@@ -1130,6 +1134,7 @@ struct intel_crtc_state {
 	/* m2_n2 for eDP downclock */
 	struct intel_link_m_n dp_m2_n2;
 	bool has_drrs;
+	bool seamless_m_n;
 
 	/* PSR is supported but might not be enabled due the lack of enabled planes */
 	bool has_psr;
@@ -1712,7 +1717,11 @@ struct intel_dp {
 
 	/* Display stream compression testing */
 	bool force_dsc_en;
+<<<<<<< HEAD
+	int force_dsc_bpc;
+=======
 	int force_dsc_bpp;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bool hobl_failed;
 	bool hobl_active;

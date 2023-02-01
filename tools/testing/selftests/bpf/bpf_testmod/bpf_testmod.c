@@ -18,6 +18,115 @@ typedef int (*func_proto_typedef_nested1)(func_proto_typedef);
 typedef int (*func_proto_typedef_nested2)(func_proto_typedef_nested1);
 
 DEFINE_PER_CPU(int, bpf_testmod_ksym_percpu) = 123;
+long bpf_testmod_test_struct_arg_result;
+
+struct bpf_testmod_struct_arg_1 {
+	int a;
+};
+struct bpf_testmod_struct_arg_2 {
+	long a;
+	long b;
+};
+
+noinline int
+bpf_testmod_test_struct_arg_1(struct bpf_testmod_struct_arg_2 a, int b, int c) {
+	bpf_testmod_test_struct_arg_result = a.a + a.b  + b + c;
+	return bpf_testmod_test_struct_arg_result;
+}
+
+noinline int
+bpf_testmod_test_struct_arg_2(int a, struct bpf_testmod_struct_arg_2 b, int c) {
+	bpf_testmod_test_struct_arg_result = a + b.a + b.b + c;
+	return bpf_testmod_test_struct_arg_result;
+}
+
+noinline int
+bpf_testmod_test_struct_arg_3(int a, int b, struct bpf_testmod_struct_arg_2 c) {
+	bpf_testmod_test_struct_arg_result = a + b + c.a + c.b;
+	return bpf_testmod_test_struct_arg_result;
+}
+
+noinline int
+bpf_testmod_test_struct_arg_4(struct bpf_testmod_struct_arg_1 a, int b,
+			      int c, int d, struct bpf_testmod_struct_arg_2 e) {
+	bpf_testmod_test_struct_arg_result = a.a + b + c + d + e.a + e.b;
+	return bpf_testmod_test_struct_arg_result;
+}
+
+noinline int
+bpf_testmod_test_struct_arg_5(void) {
+	bpf_testmod_test_struct_arg_result = 1;
+	return bpf_testmod_test_struct_arg_result;
+}
+
+noinline void
+bpf_testmod_test_mod_kfunc(int i)
+{
+	*(int *)this_cpu_ptr(&bpf_testmod_ksym_percpu) = i;
+}
+
+struct bpf_testmod_btf_type_tag_1 {
+	int a;
+};
+
+struct bpf_testmod_btf_type_tag_2 {
+	struct bpf_testmod_btf_type_tag_1 __user *p;
+};
+
+struct bpf_testmod_btf_type_tag_3 {
+	struct bpf_testmod_btf_type_tag_1 __percpu *p;
+};
+
+noinline int
+bpf_testmod_test_btf_type_tag_user_1(struct bpf_testmod_btf_type_tag_1 __user *arg) {
+	BTF_TYPE_EMIT(func_proto_typedef);
+	BTF_TYPE_EMIT(func_proto_typedef_nested1);
+	BTF_TYPE_EMIT(func_proto_typedef_nested2);
+	return arg->a;
+}
+
+noinline int
+bpf_testmod_test_btf_type_tag_user_2(struct bpf_testmod_btf_type_tag_2 *arg) {
+	return arg->p->a;
+}
+
+noinline int
+bpf_testmod_test_btf_type_tag_percpu_1(struct bpf_testmod_btf_type_tag_1 __percpu *arg) {
+	return arg->a;
+}
+
+noinline int
+bpf_testmod_test_btf_type_tag_percpu_2(struct bpf_testmod_btf_type_tag_3 *arg) {
+	return arg->p->a;
+}
+
+noinline int bpf_testmod_loop_test(int n)
+{
+	int i, sum = 0;
+
+	/* the primary goal of this test is to test LBR. Create a lot of
+	 * branches in the function, so we can catch it easily.
+	 */
+	for (i = 0; i < n; i++)
+		sum += i;
+	return sum;
+}
+
+__weak noinline struct file *bpf_testmod_return_ptr(int arg)
+{
+	static struct file f = {};
+
+	switch (arg) {
+	case 1: return (void *)EINVAL;		/* user addr */
+	case 2: return (void *)0xcafe4a11;	/* user addr */
+	case 3: return (void *)-EINVAL;		/* canonical, but invalid */
+	case 4: return (void *)(1ull << 60);	/* non-canonical and invalid */
+	case 5: return (void *)~(1ull << 30);	/* trigger extable */
+	case 6: return &f;			/* valid addr */
+	case 7: return (void *)((long)&f | 1);	/* kernel tricks */
+	default: return NULL;
+	}
+}
 
 noinline void
 bpf_testmod_test_mod_kfunc(int i)
@@ -98,6 +207,27 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
 		.off = off,
 		.len = len,
 	};
+<<<<<<< HEAD
+	struct bpf_testmod_struct_arg_1 struct_arg1 = {10};
+	struct bpf_testmod_struct_arg_2 struct_arg2 = {2, 3};
+	int i = 1;
+
+	while (bpf_testmod_return_ptr(i))
+		i++;
+
+	(void)bpf_testmod_test_struct_arg_1(struct_arg2, 1, 4);
+	(void)bpf_testmod_test_struct_arg_2(1, struct_arg2, 4);
+	(void)bpf_testmod_test_struct_arg_3(1, 4, struct_arg2);
+	(void)bpf_testmod_test_struct_arg_4(struct_arg1, 1, 2, 3, struct_arg2);
+	(void)bpf_testmod_test_struct_arg_5();
+
+	/* This is always true. Use the check to make sure the compiler
+	 * doesn't remove bpf_testmod_loop_test.
+	 */
+	if (bpf_testmod_loop_test(101) > 100)
+		trace_bpf_testmod_test_read(current, &ctx);
+
+=======
 	int i = 1;
 
 	while (bpf_testmod_return_ptr(i))
@@ -109,6 +239,7 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
 	if (bpf_testmod_loop_test(101) > 100)
 		trace_bpf_testmod_test_read(current, &ctx);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Magic number to enable writable tp */
 	if (len == 64) {
 		struct bpf_testmod_test_writable_ctx writable = {

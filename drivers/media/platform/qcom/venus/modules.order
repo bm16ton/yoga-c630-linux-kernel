@@ -1,0 +1,3 @@
+drivers/media/platform/qcom/venus/venus-core.ko
+drivers/media/platform/qcom/venus/venus-dec.ko
+drivers/media/platform/qcom/venus/venus-enc.ko

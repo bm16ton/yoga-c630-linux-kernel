@@ -1,0 +1,1 @@
+cmd_drivers/i2c/busses/i2c-meson.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/busses/i2c-meson.ko drivers/i2c/busses/i2c-meson.o drivers/i2c/busses/i2c-meson.mod.o;  true

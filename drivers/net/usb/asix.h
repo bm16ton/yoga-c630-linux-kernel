@@ -27,6 +27,10 @@
 #include <linux/if_vlan.h>
 #include <linux/phy.h>
 #include <net/selftests.h>
+<<<<<<< HEAD
+#include <linux/phylink.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define DRIVER_VERSION "22-Dec-2011"
 #define DRIVER_NAME "asix"
@@ -185,6 +189,11 @@ struct asix_common_private {
 	struct mii_bus *mdio;
 	struct phy_device *phydev;
 	struct phy_device *phydev_int;
+<<<<<<< HEAD
+	struct phylink *phylink;
+	struct phylink_config phylink_config;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 phy_addr;
 	bool embd_phy;
 	u8 chipcode;

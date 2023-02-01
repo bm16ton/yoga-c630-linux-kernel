@@ -10,6 +10,12 @@ from __future__ import print_function
 import argparse
 import re
 import sys, os
+<<<<<<< HEAD
+import subprocess
+
+helpersDocStart = 'Start of BPF helper function descriptions:'
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 class NoHelperFound(BaseException):
     pass
@@ -47,6 +53,13 @@ class Helper(APIElement):
     @desc: textual description of the helper function
     @ret: description of the return value of the helper function
     """
+<<<<<<< HEAD
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.enum_val = None
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     def proto_break_down(self):
         """
         Break down helper function protocol into smaller chunks: return type,
@@ -89,6 +102,10 @@ class HeaderParser(object):
         self.commands = []
         self.desc_unique_helpers = set()
         self.define_unique_helpers = []
+<<<<<<< HEAD
+        self.helper_enum_vals = {}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         self.desc_syscalls = []
         self.enum_syscalls = []
 
@@ -233,7 +250,11 @@ class HeaderParser(object):
         self.enum_syscalls = re.findall('(BPF\w+)+', bpf_cmd_str)
 
     def parse_desc_helpers(self):
+<<<<<<< HEAD
+        self.seek_to(helpersDocStart,
+=======
         self.seek_to('* Start of BPF helper function descriptions:',
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
                      'Could not find start of eBPF helper descriptions list')
         while True:
             try:
@@ -245,30 +266,74 @@ class HeaderParser(object):
                 break
 
     def parse_define_helpers(self):
+<<<<<<< HEAD
+        # Parse FN(...) in #define __BPF_FUNC_MAPPER to compare later with the
+        # number of unique function names present in description and use the
+        # correct enumeration value.
+=======
         # Parse the number of FN(...) in #define __BPF_FUNC_MAPPER to compare
         # later with the number of unique function names present in description.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         # Note: seek_to(..) discards the first line below the target search text,
         # resulting in FN(unspec) being skipped and not added to self.define_unique_helpers.
         self.seek_to('#define __BPF_FUNC_MAPPER(FN)',
                      'Could not find start of eBPF helper definition list')
+<<<<<<< HEAD
+        # Searches for one FN(\w+) define or a backslash for newline
+        p = re.compile('\s*FN\((\w+)\)|\\\\')
+        fn_defines_str = ''
+        i = 1  # 'unspec' is skipped as mentioned above
+=======
         # Searches for either one or more FN(\w+) defines or a backslash for newline
         p = re.compile('\s*(FN\(\w+\))+|\\\\')
         fn_defines_str = ''
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         while True:
             capture = p.match(self.line)
             if capture:
                 fn_defines_str += self.line
+<<<<<<< HEAD
+                self.helper_enum_vals[capture.expand(r'bpf_\1')] = i
+                i += 1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
             else:
                 break
             self.line = self.reader.readline()
         # Find the number of occurences of FN(\w+)
         self.define_unique_helpers = re.findall('FN\(\w+\)', fn_defines_str)
 
+<<<<<<< HEAD
+    def assign_helper_values(self):
+        seen_helpers = set()
+        for helper in self.helpers:
+            proto = helper.proto_break_down()
+            name = proto['name']
+            try:
+                enum_val = self.helper_enum_vals[name]
+            except KeyError:
+                raise Exception("Helper %s is missing from enum bpf_func_id" % name)
+
+            # Enforce current practice of having the descriptions ordered
+            # by enum value.
+            seen_helpers.add(name)
+            desc_val = len(seen_helpers)
+            if desc_val != enum_val:
+                raise Exception("Helper %s comment order (#%d) must be aligned with its position (#%d) in enum bpf_func_id" % (name, desc_val, enum_val))
+
+            helper.enum_val = enum_val
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     def run(self):
         self.parse_desc_syscall()
         self.parse_enum_syscall()
         self.parse_desc_helpers()
         self.parse_define_helpers()
+<<<<<<< HEAD
+        self.assign_helper_values()
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         self.reader.close()
 
 ###############################################################################
@@ -357,6 +422,34 @@ class PrinterRST(Printer):
 
         print('')
 
+<<<<<<< HEAD
+    def get_kernel_version(self):
+        try:
+            version = subprocess.run(['git', 'describe'], cwd=linuxRoot,
+                                     capture_output=True, check=True)
+            version = version.stdout.decode().rstrip()
+        except:
+            try:
+                version = subprocess.run(['make', 'kernelversion'], cwd=linuxRoot,
+                                         capture_output=True, check=True)
+                version = version.stdout.decode().rstrip()
+            except:
+                return 'Linux'
+        return 'Linux {version}'.format(version=version)
+
+    def get_last_doc_update(self, delimiter):
+        try:
+            cmd = ['git', 'log', '-1', '--pretty=format:%cs', '--no-patch',
+                   '-L',
+                   '/{}/,/\*\//:include/uapi/linux/bpf.h'.format(delimiter)]
+            date = subprocess.run(cmd, cwd=linuxRoot,
+                                  capture_output=True, check=True)
+            return date.stdout.decode().rstrip()
+        except:
+            return ''
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 class PrinterHelpersRST(PrinterRST):
     """
     A printer for dumping collected information about helpers as a ReStructured
@@ -378,6 +471,11 @@ list of eBPF helper functions
 -------------------------------------------------------------------------------
 
 :Manual section: 7
+<<<<<<< HEAD
+:Version: {version}
+{date_field}{date}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 DESCRIPTION
 ===========
@@ -410,8 +508,18 @@ kernel at the top).
 HELPERS
 =======
 '''
+<<<<<<< HEAD
+        kernelVersion = self.get_kernel_version()
+        lastUpdate = self.get_last_doc_update(helpersDocStart)
+
+        PrinterRST.print_license(self)
+        print(header.format(version=kernelVersion,
+                            date_field = ':Date: ' if lastUpdate else '',
+                            date=lastUpdate))
+=======
         PrinterRST.print_license(self)
         print(header)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     def print_footer(self):
         footer = '''
@@ -761,7 +869,11 @@ class PrinterHelpers(Printer):
             comma = ', '
             print(one_arg, end='')
 
+<<<<<<< HEAD
+        print(') = (void *) %d;' % helper.enum_val)
+=======
         print(') = (void *) %d;' % len(self.seen_helpers))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         print('')
 
 ###############################################################################

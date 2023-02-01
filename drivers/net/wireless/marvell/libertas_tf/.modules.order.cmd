@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/libertas_tf/modules.order := {   echo drivers/net/wireless/marvell/libertas_tf/libertas_tf.ko;   echo drivers/net/wireless/marvell/libertas_tf/libertas_tf_usb.ko; :; } > drivers/net/wireless/marvell/libertas_tf/modules.order

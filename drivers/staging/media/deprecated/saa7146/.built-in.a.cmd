@@ -1,0 +1,1 @@
+cmd_drivers/staging/media/deprecated/saa7146/built-in.a := rm -f drivers/staging/media/deprecated/saa7146/built-in.a;  printf "drivers/staging/media/deprecated/saa7146/%s " common/built-in.a av7110/built-in.a saa7146/built-in.a ttpci/built-in.a | xargs ar cDPrST drivers/staging/media/deprecated/saa7146/built-in.a

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2e.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2e.ko drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2e.o drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2e.mod.o;  true

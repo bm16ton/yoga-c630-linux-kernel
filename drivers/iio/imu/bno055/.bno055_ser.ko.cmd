@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/bno055/bno055_ser.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/bno055/bno055_ser.ko drivers/iio/imu/bno055/bno055_ser.o drivers/iio/imu/bno055/bno055_ser.mod.o;  true

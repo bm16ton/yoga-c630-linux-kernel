@@ -1,0 +1,1 @@
+cmd_drivers/leds/leds-lp3944.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/leds-lp3944.ko drivers/leds/leds-lp3944.o drivers/leds/leds-lp3944.mod.o;  true

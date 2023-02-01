@@ -1,0 +1,3 @@
+drivers/net/ethernet/realtek/8139cp.ko
+drivers/net/ethernet/realtek/8139too.ko
+drivers/net/ethernet/realtek/r8169.ko

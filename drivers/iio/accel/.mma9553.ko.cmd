@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/mma9553.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/mma9553.ko drivers/iio/accel/mma9553.o drivers/iio/accel/mma9553.mod.o;  true

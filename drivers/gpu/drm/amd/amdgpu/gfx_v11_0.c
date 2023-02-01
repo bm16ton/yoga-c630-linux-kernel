@@ -73,6 +73,16 @@ MODULE_FIRMWARE("amdgpu/gc_11_0_2_pfp.bin");
 MODULE_FIRMWARE("amdgpu/gc_11_0_2_me.bin");
 MODULE_FIRMWARE("amdgpu/gc_11_0_2_mec.bin");
 MODULE_FIRMWARE("amdgpu/gc_11_0_2_rlc.bin");
+<<<<<<< HEAD
+MODULE_FIRMWARE("amdgpu/gc_11_0_3_pfp.bin");
+MODULE_FIRMWARE("amdgpu/gc_11_0_3_me.bin");
+MODULE_FIRMWARE("amdgpu/gc_11_0_3_mec.bin");
+MODULE_FIRMWARE("amdgpu/gc_11_0_3_rlc.bin");
+MODULE_FIRMWARE("amdgpu/gc_11_0_4_pfp.bin");
+MODULE_FIRMWARE("amdgpu/gc_11_0_4_me.bin");
+MODULE_FIRMWARE("amdgpu/gc_11_0_4_mec.bin");
+MODULE_FIRMWARE("amdgpu/gc_11_0_4_rlc.bin");
+=======
 
 static const struct soc15_reg_golden golden_settings_gc_11_0[] =
 {
@@ -88,6 +98,7 @@ static const struct soc15_reg_golden golden_settings_gc_rlc_spm_11_0[] =
 {
 	/* Pending on emulation bring up */
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct soc15_reg_golden golden_settings_gc_11_0_1[] =
 {
@@ -269,6 +280,13 @@ static void gfx_v11_0_set_kiq_pm4_funcs(struct amdgpu_device *adev)
 	adev->gfx.kiq.pmf = &gfx_v11_0_kiq_pm4_funcs;
 }
 
+<<<<<<< HEAD
+static void gfx_v11_0_init_golden_registers(struct amdgpu_device *adev)
+{
+	switch (adev->ip_versions[GC_HWIP][0]) {
+	case IP_VERSION(11, 0, 1):
+	case IP_VERSION(11, 0, 4):
+=======
 static void gfx_v11_0_init_spm_golden_registers(struct amdgpu_device *adev)
 {
 	switch (adev->ip_versions[GC_HWIP][0]) {
@@ -297,6 +315,7 @@ static void gfx_v11_0_init_golden_registers(struct amdgpu_device *adev)
 		soc15_program_register_sequence(adev,
 						golden_settings_gc_11_0,
 						(const u32)ARRAY_SIZE(golden_settings_gc_11_0));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		soc15_program_register_sequence(adev,
 						golden_settings_gc_11_0_1,
 						(const u32)ARRAY_SIZE(golden_settings_gc_11_0_1));
@@ -304,7 +323,10 @@ static void gfx_v11_0_init_golden_registers(struct amdgpu_device *adev)
 	default:
 		break;
 	}
+<<<<<<< HEAD
+=======
 	gfx_v11_0_init_spm_golden_registers(adev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void gfx_v11_0_write_data_to_reg(struct amdgpu_ring *ring, int eng_sel,
@@ -474,6 +496,8 @@ static void gfx_v11_0_free_microcode(struct amdgpu_device *adev)
 	kfree(adev->gfx.rlc.register_list_format);
 }
 
+<<<<<<< HEAD
+=======
 static void gfx_v11_0_init_rlc_ext_microcode(struct amdgpu_device *adev)
 {
 	const struct rlc_firmware_header_v2_1 *rlc_hdr;
@@ -517,11 +541,15 @@ static void gfx_v11_0_init_rlcp_rlcv_microcode(struct amdgpu_device *adev)
 	adev->gfx.rlc.rlcv_ucode = (u8 *)rlc_hdr + le32_to_cpu(rlc_hdr->rlcv_ucode_offset_bytes);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 {
 	char fw_name[40];
 	char ucode_prefix[30];
 	int err;
+<<<<<<< HEAD
+	const struct rlc_firmware_header_v2_0 *rlc_hdr;
+=======
 	struct amdgpu_firmware_info *info = NULL;
 	const struct common_firmware_header *header = NULL;
 	const struct gfx_firmware_header_v1_0 *cp_hdr;
@@ -529,6 +557,7 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 	const struct rlc_firmware_header_v2_0 *rlc_hdr;
 	unsigned int *tmp = NULL;
 	unsigned int i = 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	uint16_t version_major;
 	uint16_t version_minor;
 
@@ -549,6 +578,13 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 				adev->gfx.pfp_fw->data, 2, 0);
 	if (adev->gfx.rs64_enable) {
 		dev_info(adev->dev, "CP RS64 enable\n");
+<<<<<<< HEAD
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_PFP);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_PFP_P0_STACK);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_PFP_P1_STACK);
+	} else {
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_PFP);
+=======
 		cp_hdr_v2_0 = (const struct gfx_firmware_header_v2_0 *)adev->gfx.pfp_fw->data;
 		adev->gfx.pfp_fw_version = le32_to_cpu(cp_hdr_v2_0->header.ucode_version);
 		adev->gfx.pfp_feature_version = le32_to_cpu(cp_hdr_v2_0->ucode_feature_version);
@@ -557,6 +593,7 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 		cp_hdr = (const struct gfx_firmware_header_v1_0 *)adev->gfx.pfp_fw->data;
 		adev->gfx.pfp_fw_version = le32_to_cpu(cp_hdr->header.ucode_version);
 		adev->gfx.pfp_feature_version = le32_to_cpu(cp_hdr->ucode_feature_version);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_me.bin", ucode_prefix);
@@ -567,6 +604,13 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 	if (err)
 		goto out;
 	if (adev->gfx.rs64_enable) {
+<<<<<<< HEAD
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_ME);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_ME_P0_STACK);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_ME_P1_STACK);
+	} else {
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_ME);
+=======
 		cp_hdr_v2_0 = (const struct gfx_firmware_header_v2_0 *)adev->gfx.me_fw->data;
 		adev->gfx.me_fw_version = le32_to_cpu(cp_hdr_v2_0->header.ucode_version);
 		adev->gfx.me_feature_version = le32_to_cpu(cp_hdr_v2_0->ucode_feature_version);
@@ -575,6 +619,7 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 		cp_hdr = (const struct gfx_firmware_header_v1_0 *)adev->gfx.me_fw->data;
 		adev->gfx.me_fw_version = le32_to_cpu(cp_hdr->header.ucode_version);
 		adev->gfx.me_feature_version = le32_to_cpu(cp_hdr->ucode_feature_version);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!amdgpu_sriov_vf(adev)) {
@@ -583,6 +628,16 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 		if (err)
 			goto out;
 		err = amdgpu_ucode_validate(adev->gfx.rlc_fw);
+<<<<<<< HEAD
+		if (err)
+			goto out;
+		rlc_hdr = (const struct rlc_firmware_header_v2_0 *)adev->gfx.rlc_fw->data;
+		version_major = le16_to_cpu(rlc_hdr->header.header_version_major);
+		version_minor = le16_to_cpu(rlc_hdr->header.header_version_minor);
+		err = amdgpu_gfx_rlc_init_microcode(adev, version_major, version_minor);
+		if (err)
+			goto out;
+=======
 		rlc_hdr = (const struct rlc_firmware_header_v2_0 *)adev->gfx.rlc_fw->data;
 		version_major = le16_to_cpu(rlc_hdr->header.header_version_major);
 		version_minor = le16_to_cpu(rlc_hdr->header.header_version_minor);
@@ -635,6 +690,7 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 			if (version_minor == 3)
 				gfx_v11_0_init_rlcp_rlcv_microcode(adev);
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_mec.bin", ucode_prefix);
@@ -645,6 +701,16 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 	if (err)
 		goto out;
 	if (adev->gfx.rs64_enable) {
+<<<<<<< HEAD
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_MEC);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_MEC_P0_STACK);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_MEC_P1_STACK);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_MEC_P2_STACK);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_RS64_MEC_P3_STACK);
+	} else {
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_MEC1);
+		amdgpu_gfx_cp_init_microcode(adev, AMDGPU_UCODE_ID_CP_MEC1_JT);
+=======
 		cp_hdr_v2_0 = (const struct gfx_firmware_header_v2_0 *)adev->gfx.mec_fw->data;
 		adev->gfx.mec_fw_version = le32_to_cpu(cp_hdr_v2_0->header.ucode_version);
 		adev->gfx.mec_feature_version = le32_to_cpu(cp_hdr_v2_0->ucode_feature_version);
@@ -653,11 +719,18 @@ static int gfx_v11_0_init_microcode(struct amdgpu_device *adev)
 		cp_hdr = (const struct gfx_firmware_header_v1_0 *)adev->gfx.mec_fw->data;
 		adev->gfx.mec_fw_version = le32_to_cpu(cp_hdr->header.ucode_version);
 		adev->gfx.mec_feature_version = le32_to_cpu(cp_hdr->ucode_feature_version);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* only one MEC for gfx 11.0.0. */
 	adev->gfx.mec2_fw = NULL;
 
+<<<<<<< HEAD
+out:
+	if (err) {
+		dev_err(adev->dev,
+			"gfx11: Failed to init firmware \"%s\"\n",
+=======
 	if (adev->firmware.load_type == AMDGPU_FW_LOAD_PSP) {
 		if (adev->gfx.rs64_enable) {
 			cp_hdr_v2_0 = (const struct gfx_firmware_header_v2_0 *)adev->gfx.pfp_fw->data;
@@ -829,6 +902,7 @@ out:
 	if (err) {
 		dev_err(adev->dev,
 			"gfx11: Failed to load firmware \"%s\"\n",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			fw_name);
 		release_firmware(adev->gfx.pfp_fw);
 		adev->gfx.pfp_fw = NULL;
@@ -1140,7 +1214,10 @@ static const struct amdgpu_gfx_funcs gfx_v11_0_gfx_funcs = {
 	.read_wave_sgprs = &gfx_v11_0_read_wave_sgprs,
 	.read_wave_vgprs = &gfx_v11_0_read_wave_vgprs,
 	.select_me_pipe_q = &gfx_v11_0_select_me_pipe_q,
+<<<<<<< HEAD
+=======
 	.init_spm_golden = &gfx_v11_0_init_spm_golden_registers,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.update_perfmon_mgcg = &gfx_v11_0_update_perf_clk,
 };
 
@@ -1151,6 +1228,10 @@ static int gfx_v11_0_gpu_early_init(struct amdgpu_device *adev)
 	switch (adev->ip_versions[GC_HWIP][0]) {
 	case IP_VERSION(11, 0, 0):
 	case IP_VERSION(11, 0, 2):
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 3):
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adev->gfx.config.max_hw_contexts = 8;
 		adev->gfx.config.sc_prim_fifo_size_frontend = 0x20;
 		adev->gfx.config.sc_prim_fifo_size_backend = 0x100;
@@ -1158,6 +1239,10 @@ static int gfx_v11_0_gpu_early_init(struct amdgpu_device *adev)
 		adev->gfx.config.sc_earlyz_tile_fifo_size = 0x4C0;
 		break;
 	case IP_VERSION(11, 0, 1):
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 4):
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adev->gfx.config.max_hw_contexts = 8;
 		adev->gfx.config.sc_prim_fifo_size_frontend = 0x20;
 		adev->gfx.config.sc_prim_fifo_size_backend = 0x100;
@@ -1584,8 +1669,13 @@ static int gfx_v11_0_sw_init(void *handle)
 
 	switch (adev->ip_versions[GC_HWIP][0]) {
 	case IP_VERSION(11, 0, 0):
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 2):
+	case IP_VERSION(11, 0, 3):
+=======
 	case IP_VERSION(11, 0, 1):
 	case IP_VERSION(11, 0, 2):
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		adev->gfx.me.num_me = 1;
 		adev->gfx.me.num_pipe_per_me = 1;
 		adev->gfx.me.num_queue_per_pipe = 1;
@@ -1593,6 +1683,18 @@ static int gfx_v11_0_sw_init(void *handle)
 		adev->gfx.mec.num_pipe_per_mec = 4;
 		adev->gfx.mec.num_queue_per_pipe = 4;
 		break;
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 1):
+	case IP_VERSION(11, 0, 4):
+		adev->gfx.me.num_me = 1;
+		adev->gfx.me.num_pipe_per_me = 1;
+		adev->gfx.me.num_queue_per_pipe = 1;
+		adev->gfx.mec.num_mec = 1;
+		adev->gfx.mec.num_pipe_per_mec = 4;
+		adev->gfx.mec.num_queue_per_pipe = 4;
+		break;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		adev->gfx.me.num_me = 1;
 		adev->gfx.me.num_pipe_per_me = 1;
@@ -2760,6 +2862,24 @@ static void gfx_v11_0_config_gfx_rs64(struct amdgpu_device *adev)
 					mec_hdr->ucode_start_addr_hi >> 2);
 	}
 	soc21_grbm_select(adev, 0, 0, 0, 0);
+<<<<<<< HEAD
+
+	/* reset mec pipe */
+	tmp = RREG32_SOC15(GC, 0, regCP_MEC_RS64_CNTL);
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE0_RESET, 1);
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE1_RESET, 1);
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE2_RESET, 1);
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE3_RESET, 1);
+	WREG32_SOC15(GC, 0, regCP_MEC_RS64_CNTL, tmp);
+
+	/* clear mec pipe reset */
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE0_RESET, 0);
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE1_RESET, 0);
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE2_RESET, 0);
+	tmp = REG_SET_FIELD(tmp, CP_MEC_RS64_CNTL, MEC_PIPE3_RESET, 0);
+	WREG32_SOC15(GC, 0, regCP_MEC_RS64_CNTL, tmp);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int gfx_v11_0_wait_for_rlc_autoload_complete(struct amdgpu_device *adev)
@@ -2772,7 +2892,12 @@ static int gfx_v11_0_wait_for_rlc_autoload_complete(struct amdgpu_device *adev)
 	for (i = 0; i < adev->usec_timeout; i++) {
 		cp_status = RREG32_SOC15(GC, 0, regCP_STAT);
 
+<<<<<<< HEAD
+		if (adev->ip_versions[GC_HWIP][0] == IP_VERSION(11, 0, 1) ||
+				adev->ip_versions[GC_HWIP][0] == IP_VERSION(11, 0, 4))
+=======
 		if (adev->ip_versions[GC_HWIP][0] == IP_VERSION(11, 0, 1))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			bootload_status = RREG32_SOC15(GC, 0,
 					regRLC_RLCS_BOOTLOAD_STATUS_gc_11_0_1);
 		else
@@ -5260,6 +5385,11 @@ static void gfx_v11_0_update_spm_vmid(struct amdgpu_device *adev, unsigned vmid)
 {
 	u32 reg, data;
 
+<<<<<<< HEAD
+	amdgpu_gfx_off_ctrl(adev, false);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	reg = SOC15_REG_OFFSET(GC, 0, regRLC_SPM_MC_CNTL);
 	if (amdgpu_sriov_is_pp_one_vf(adev))
 		data = RREG32_NO_KIQ(reg);
@@ -5273,6 +5403,11 @@ static void gfx_v11_0_update_spm_vmid(struct amdgpu_device *adev, unsigned vmid)
 		WREG32_SOC15_NO_KIQ(GC, 0, regRLC_SPM_MC_CNTL, data);
 	else
 		WREG32_SOC15(GC, 0, regRLC_SPM_MC_CNTL, data);
+<<<<<<< HEAD
+
+	amdgpu_gfx_off_ctrl(adev, true);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct amdgpu_rlc_funcs gfx_v11_0_rlc_funcs = {
@@ -5304,6 +5439,10 @@ static void gfx_v11_cntl_power_gating(struct amdgpu_device *adev, bool enable)
 	if (enable && (adev->pg_flags & AMD_PG_SUPPORT_GFX_PG)) {
 		switch (adev->ip_versions[GC_HWIP][0]) {
 		case IP_VERSION(11, 0, 1):
+<<<<<<< HEAD
+		case IP_VERSION(11, 0, 4):
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			WREG32_SOC15(GC, 0, regRLC_PG_DELAY_3, RLC_PG_DELAY_3_DEFAULT_GC_11_0_1);
 			break;
 		default:
@@ -5333,9 +5472,17 @@ static int gfx_v11_0_set_powergating_state(void *handle,
 	switch (adev->ip_versions[GC_HWIP][0]) {
 	case IP_VERSION(11, 0, 0):
 	case IP_VERSION(11, 0, 2):
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 3):
 		amdgpu_gfx_off_ctrl(adev, enable);
 		break;
 	case IP_VERSION(11, 0, 1):
+	case IP_VERSION(11, 0, 4):
+=======
+		amdgpu_gfx_off_ctrl(adev, enable);
+		break;
+	case IP_VERSION(11, 0, 1):
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		gfx_v11_cntl_pg(adev, enable);
 		amdgpu_gfx_off_ctrl(adev, enable);
 		break;
@@ -5358,6 +5505,11 @@ static int gfx_v11_0_set_clockgating_state(void *handle,
 	case IP_VERSION(11, 0, 0):
 	case IP_VERSION(11, 0, 1):
 	case IP_VERSION(11, 0, 2):
+<<<<<<< HEAD
+	case IP_VERSION(11, 0, 3):
+	case IP_VERSION(11, 0, 4):
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	        gfx_v11_0_update_gfx_clock_gating(adev,
 	                        state ==  AMD_CG_STATE_GATE);
 	        break;

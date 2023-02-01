@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-core/dvb-core.mod := printf '%s\n'   dvbdev.o dmxdev.o dvb_demux.o dvb_ca_en50221.o dvb_frontend.o dvb_net.o dvb_ringbuffer.o dvb_math.o | awk '!x[$$0]++ { print("drivers/media/dvb-core/"$$0) }' > drivers/media/dvb-core/dvb-core.mod

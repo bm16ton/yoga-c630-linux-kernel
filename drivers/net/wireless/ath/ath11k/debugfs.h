@@ -269,7 +269,7 @@ int ath11k_debugfs_pdev_create(struct ath11k_base *ab);
 void ath11k_debugfs_pdev_destroy(struct ath11k_base *ab);
 int ath11k_debugfs_register(struct ath11k *ar);
 void ath11k_debugfs_unregister(struct ath11k *ar);
-void ath11k_debugfs_fw_stats_process(struct ath11k_base *ab, struct sk_buff *skb);
+void ath11k_debugfs_fw_stats_process(struct ath11k *ar, struct ath11k_fw_stats *stats);
 
 void ath11k_debugfs_fw_stats_init(struct ath11k *ar);
 int ath11k_debugfs_get_fw_stats(struct ath11k *ar, u32 pdev_id,
@@ -306,7 +306,11 @@ static inline int ath11k_debugfs_rx_filter(struct ath11k *ar)
 	return ar->debug.rx_filter;
 }
 
+<<<<<<< HEAD
+void ath11k_debugfs_add_interface(struct ath11k_vif *arvif);
+=======
 int ath11k_debugfs_add_interface(struct ath11k_vif *arvif);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void ath11k_debugfs_remove_interface(struct ath11k_vif *arvif);
 void ath11k_debugfs_add_dbring_entry(struct ath11k *ar,
 				     enum wmi_direct_buffer_module id,
@@ -341,8 +345,8 @@ static inline void ath11k_debugfs_unregister(struct ath11k *ar)
 {
 }
 
-static inline void ath11k_debugfs_fw_stats_process(struct ath11k_base *ab,
-						   struct sk_buff *skb)
+static inline void ath11k_debugfs_fw_stats_process(struct ath11k *ar,
+						   struct ath11k_fw_stats *stats)
 {
 }
 
@@ -386,9 +390,14 @@ static inline int ath11k_debugfs_get_fw_stats(struct ath11k *ar,
 	return 0;
 }
 
+<<<<<<< HEAD
+static inline void ath11k_debugfs_add_interface(struct ath11k_vif *arvif)
+{
+=======
 static inline int ath11k_debugfs_add_interface(struct ath11k_vif *arvif)
 {
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void ath11k_debugfs_remove_interface(struct ath11k_vif *arvif)

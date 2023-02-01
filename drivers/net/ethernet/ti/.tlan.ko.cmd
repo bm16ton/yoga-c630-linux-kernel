@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/ti/tlan.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/ti/tlan.ko drivers/net/ethernet/ti/tlan.o drivers/net/ethernet/ti/tlan.mod.o;  true

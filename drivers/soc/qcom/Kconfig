@@ -63,6 +63,7 @@ config QCOM_GSBI
 config QCOM_LLCC
 	tristate "Qualcomm Technologies, Inc. LLCC driver"
 	depends on ARCH_QCOM || COMPILE_TEST
+	select REGMAP_MMIO
 	help
 	  Qualcomm Technologies, Inc. platform specific
 	  Last Level Cache Controller(LLCC) driver for platforms such as,
@@ -143,7 +144,11 @@ config QCOM_RPMHPD
 
 config QCOM_RPMPD
 	tristate "Qualcomm RPM Power domain driver"
+<<<<<<< HEAD
+	depends on PM && OF
+=======
 	depends on PM
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	depends on QCOM_SMD_RPM
 	select PM_GENERIC_DOMAINS
 	select PM_GENERIC_DOMAINS_OF
@@ -250,6 +255,10 @@ config QCOM_ICC_BWMON
 	tristate "QCOM Interconnect Bandwidth Monitor driver"
 	depends on ARCH_QCOM || COMPILE_TEST
 	select PM_OPP
+<<<<<<< HEAD
+	select REGMAP_MMIO
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Sets up driver monitoring bandwidth on various interconnects and
 	  based on that voting for interconnect bandwidth, adjusting their

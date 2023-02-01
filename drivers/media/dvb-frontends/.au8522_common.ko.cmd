@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/au8522_common.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/dvb-frontends/au8522_common.ko drivers/media/dvb-frontends/au8522_common.o drivers/media/dvb-frontends/au8522_common.mod.o;  true

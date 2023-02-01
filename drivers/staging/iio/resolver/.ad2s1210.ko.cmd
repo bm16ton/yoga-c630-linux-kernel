@@ -1,0 +1,1 @@
+cmd_drivers/staging/iio/resolver/ad2s1210.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/iio/resolver/ad2s1210.ko drivers/staging/iio/resolver/ad2s1210.o drivers/staging/iio/resolver/ad2s1210.mod.o;  true

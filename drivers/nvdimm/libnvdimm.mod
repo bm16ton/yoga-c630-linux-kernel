@@ -1,0 +1,14 @@
+drivers/nvdimm/core.o
+drivers/nvdimm/bus.o
+drivers/nvdimm/dimm_devs.o
+drivers/nvdimm/nd_perf.o
+drivers/nvdimm/dimm.o
+drivers/nvdimm/region_devs.o
+drivers/nvdimm/region.o
+drivers/nvdimm/namespace_devs.o
+drivers/nvdimm/label.o
+drivers/nvdimm/badrange.o
+drivers/nvdimm/claim.o
+drivers/nvdimm/btt_devs.o
+drivers/nvdimm/pfn_devs.o
+drivers/nvdimm/dax_devs.o

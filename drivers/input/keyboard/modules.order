@@ -1,0 +1,10 @@
+drivers/input/keyboard/adc-keys.ko
+drivers/input/keyboard/adp5588-keys.ko
+drivers/input/keyboard/cros_ec_keyb.ko
+drivers/input/keyboard/gpio_keys.ko
+drivers/input/keyboard/lm8323.ko
+drivers/input/keyboard/max7359_keypad.ko
+drivers/input/keyboard/opencores-kbd.ko
+drivers/input/keyboard/qt2160.ko
+drivers/input/keyboard/stowaway.ko
+drivers/input/keyboard/tegra-kbc.ko

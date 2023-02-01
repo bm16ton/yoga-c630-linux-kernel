@@ -61,6 +61,16 @@ Linux 魔術數
 魔術數名              數字             結構                     文件
 ===================== ================ ======================== ==========================================
 PG_MAGIC              'P'              pg_{read,write}_hdr      ``include/linux/pg.h``
+<<<<<<< HEAD
+APM_BIOS_MAGIC        0x4101           apm_user                 ``arch/x86/kernel/apm_32.c``
+FASYNC_MAGIC          0x4601           fasync_struct            ``include/linux/fs.h``
+SLIP_MAGIC            0x5302           slip                     ``drivers/net/slip.h``
+MGSLPC_MAGIC          0x5402           mgslpc_info              ``drivers/char/pcmcia/synclink_cs.c``
+BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/net/baycom_epp.c``
+HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/linux/hdlcdrv.h``
+KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mips/include/asm/sn/klkernvars.h``
+CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/coda_fs_i.h``
+=======
 CMAGIC                0x0111           user                     ``include/linux/a.out.h``
 MKISS_DRIVER_MAGIC    0x04bf           mkiss_channel            ``drivers/net/mkiss.h``
 HDLC_MAGIC            0x239e           n_hdlc                   ``drivers/char/n_hdlc.c``
@@ -131,10 +141,15 @@ NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/linux/
 ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/eni.h``
 CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/coda_fs_i.h``
 DPMEM_MAGIC           0xc0ffee11       gdt_pci_sram             ``drivers/scsi/gdth.h``
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 YAM_MAGIC             0xF10A7654       yam_port                 ``drivers/net/hamradio/yam.c``
 CCB_MAGIC             0xf2691ad2       ccb                      ``drivers/scsi/ncr53c8xx.c``
 QUEUE_MAGIC_FREE      0xf7e1c9a3       queue_entry              ``drivers/scsi/arm/queue.c``
 QUEUE_MAGIC_USED      0xf7e1cc33       queue_entry              ``drivers/scsi/arm/queue.c``
+<<<<<<< HEAD
+NMI_MAGIC             0x48414d4d455201 nmi_s                    ``arch/mips/include/asm/sn/nmi.h``
+===================== ================ ======================== ==========================================
+=======
 HTB_CMAGIC            0xFEFAFEF1       htb_class                ``net/sched/sch_htb.c``
 NMI_MAGIC             0x48414d4d455201 nmi_s                    ``arch/mips/include/asm/sn/nmi.h``
 ===================== ================ ======================== ==========================================
@@ -146,3 +161,4 @@ IrDA子系統也使用了大量的自己的魔術值，查看include/net/irda/ir
 
 HFS是另外一個比較大的使用魔術值的文件系統-你可以在fs/hfs/hfs.h中找到他們。
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

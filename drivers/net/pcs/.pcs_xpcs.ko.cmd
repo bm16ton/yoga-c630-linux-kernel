@@ -1,0 +1,1 @@
+cmd_drivers/net/pcs/pcs_xpcs.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/pcs/pcs_xpcs.ko drivers/net/pcs/pcs_xpcs.o drivers/net/pcs/pcs_xpcs.mod.o;  true

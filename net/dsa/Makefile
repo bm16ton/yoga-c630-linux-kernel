@@ -1,7 +1,19 @@
 # SPDX-License-Identifier: GPL-2.0
 # the core
 obj-$(CONFIG_NET_DSA) += dsa_core.o
+<<<<<<< HEAD
+dsa_core-y += \
+	dsa.o \
+	dsa2.o \
+	master.o \
+	netlink.o \
+	port.o \
+	slave.o \
+	switch.o \
+	tag_8021q.o
+=======
 dsa_core-y += dsa.o dsa2.o master.o port.o slave.o switch.o tag_8021q.o
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # tagging formats
 obj-$(CONFIG_NET_DSA_TAG_AR9331) += tag_ar9331.o

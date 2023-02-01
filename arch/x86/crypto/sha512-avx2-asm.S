@@ -50,6 +50,7 @@
 ########################################################################
 
 #include <linux/linkage.h>
+#include <linux/cfi_types.h>
 
 .text
 
@@ -565,7 +566,11 @@ frame_size = frame_CTX + CTX_SIZE
 # of SHA512 message blocks.
 # "blocks" is the message length in SHA512 blocks
 ########################################################################
+<<<<<<< HEAD
+SYM_TYPED_FUNC_START(sha512_transform_rorx)
+=======
 SYM_FUNC_START(sha512_transform_rorx)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	# Save GPRs
 	push	%rbx
 	push	%r12

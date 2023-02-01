@@ -42,6 +42,10 @@ efct_device_init(void)
 
 	rc = efct_scsi_reg_fc_transport();
 	if (rc) {
+<<<<<<< HEAD
+		efct_scsi_tgt_driver_exit();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pr_err("failed to register to FC host\n");
 		return rc;
 	}

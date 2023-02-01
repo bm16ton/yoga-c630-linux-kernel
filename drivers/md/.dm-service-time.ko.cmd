@@ -1,0 +1,1 @@
+cmd_drivers/md/dm-service-time.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/md/dm-service-time.ko drivers/md/dm-service-time.o drivers/md/dm-service-time.mod.o;  true

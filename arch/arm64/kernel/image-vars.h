@@ -24,9 +24,12 @@ PROVIDE(__efistub_primary_entry_offset	= primary_entry - _text);
  */
 PROVIDE(__efistub_memcmp		= __pi_memcmp);
 PROVIDE(__efistub_memchr		= __pi_memchr);
+<<<<<<< HEAD
+=======
 PROVIDE(__efistub_memcpy		= __pi_memcpy);
 PROVIDE(__efistub_memmove		= __pi_memmove);
 PROVIDE(__efistub_memset		= __pi_memset);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 PROVIDE(__efistub_strlen		= __pi_strlen);
 PROVIDE(__efistub_strnlen		= __pi_strnlen);
 PROVIDE(__efistub_strcmp		= __pi_strcmp);
@@ -40,6 +43,8 @@ PROVIDE(__efistub__edata		= _edata);
 PROVIDE(__efistub_screen_info		= screen_info);
 PROVIDE(__efistub__ctype		= _ctype);
 
+<<<<<<< HEAD
+=======
 /*
  * The __ prefixed memcpy/memset/memmove symbols are provided by KASAN, which
  * instruments the conventional ones. Therefore, any references from the EFI
@@ -50,6 +55,7 @@ PROVIDE(__efistub___memcpy		= __pi_memcpy);
 PROVIDE(__efistub___memmove		= __pi_memmove);
 PROVIDE(__efistub___memset		= __pi_memset);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 PROVIDE(__pi___memcpy			= __pi_memcpy);
 PROVIDE(__pi___memmove			= __pi_memmove);
 PROVIDE(__pi___memset			= __pi_memset);
@@ -73,6 +79,10 @@ KVM_NVHE_ALIAS(spectre_bhb_patch_loop_iter);
 KVM_NVHE_ALIAS(spectre_bhb_patch_loop_mitigation_enable);
 KVM_NVHE_ALIAS(spectre_bhb_patch_wa3);
 KVM_NVHE_ALIAS(spectre_bhb_patch_clearbhb);
+<<<<<<< HEAD
+KVM_NVHE_ALIAS(alt_cb_patch_nops);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Global kernel state accessed by nVHE hyp code. */
 KVM_NVHE_ALIAS(kvm_vgic_global_state);
@@ -88,10 +98,13 @@ KVM_NVHE_ALIAS(__icache_flags);
 
 /* VMID bits set by the KVM VMID allocator */
 KVM_NVHE_ALIAS(kvm_arm_vmid_bits);
+<<<<<<< HEAD
+=======
 
 /* Kernel symbols needed for cpus_have_final/const_caps checks. */
 KVM_NVHE_ALIAS(arm64_const_caps_ready);
 KVM_NVHE_ALIAS(cpu_hwcap_keys);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Static keys which are set if a vGIC trap should be handled in hyp. */
 KVM_NVHE_ALIAS(vgic_v2_cpuif_trap);

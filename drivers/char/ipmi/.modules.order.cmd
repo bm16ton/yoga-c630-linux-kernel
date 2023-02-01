@@ -1,0 +1,1 @@
+cmd_drivers/char/ipmi/modules.order := {   echo drivers/char/ipmi/ipmi_msghandler.ko;   echo drivers/char/ipmi/ipmi_devintf.ko;   echo drivers/char/ipmi/ipmi_si.ko;   echo drivers/char/ipmi/ipmi_ssif.ko;   echo drivers/char/ipmi/ipmi_watchdog.ko;   echo drivers/char/ipmi/ipmi_poweroff.ko; :; } > drivers/char/ipmi/modules.order

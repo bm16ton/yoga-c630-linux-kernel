@@ -216,7 +216,7 @@ static int update_dt_node(struct device_node *dn, s32 scope)
 		nprops = be32_to_cpu(upwa->nprops);
 
 		/* On the first call to ibm,update-properties for a node the
-		 * the first property value descriptor contains an empty
+		 * first property value descriptor contains an empty
 		 * property name, the property value length encoded as u32,
 		 * and the property value is the node path being updated.
 		 */
@@ -736,13 +736,32 @@ static int pseries_migrate_partition(u64 handle)
 {
 	int ret;
 	unsigned int factor = 0;
+<<<<<<< HEAD
+
+#ifdef CONFIG_PPC_WATCHDOG
+	factor = nmi_wd_lpm_factor;
+#endif
+	/*
+	 * When the migration is initiated, the hypervisor changes VAS
+	 * mappings to prepare before OS gets the notification and
+	 * closes all VAS windows. NX generates continuous faults during
+	 * this time and the user space can not differentiate these
+	 * faults from the migration event. So reduce this time window
+	 * by closing VAS windows at the beginning of this function.
+	 */
+	vas_migration_handler(VAS_SUSPEND);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_PPC_WATCHDOG
 	factor = nmi_wd_lpm_factor;
 #endif
 	ret = wait_for_vasi_session_suspending(handle);
 	if (ret)
-		return ret;
+		goto out;
+
+	if (factor)
+		watchdog_nmi_set_timeout_pct(factor);
 
 	vas_migration_handler(VAS_SUSPEND);
 
@@ -765,6 +784,10 @@ static int pseries_migrate_partition(u64 handle)
 	if (factor)
 		watchdog_nmi_set_timeout_pct(0);
 
+<<<<<<< HEAD
+out:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vas_migration_handler(VAS_RESUME);
 
 	return ret;

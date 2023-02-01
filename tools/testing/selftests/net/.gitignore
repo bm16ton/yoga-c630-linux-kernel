@@ -1,5 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-only
+<<<<<<< HEAD
+bind_bhash
 cmsg_sender
+diag_uid
+=======
+cmsg_sender
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 fin_ack_lat
 gro
 hwtstamp_config
@@ -21,6 +27,11 @@ reuseport_bpf_cpu
 reuseport_bpf_numa
 reuseport_dualstack
 rxtimestamp
+<<<<<<< HEAD
+sk_bind_sendto_listen
+sk_connect_zero_addr
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 socket
 so_netns_cookie
 so_txtime

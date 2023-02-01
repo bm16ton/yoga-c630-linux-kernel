@@ -33,21 +33,35 @@ properties:
   vref-supply:
     description: Needed to provide output scaling.
 
+<<<<<<< HEAD
+=======
   spi-max-frequency: true
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg
   - vref-supply
 
+<<<<<<< HEAD
+=======
 additionalProperties: false
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 oneOf:
   - required:
       - spi-cpha
   - required:
       - spi-cpol
 
+<<<<<<< HEAD
+allOf:
+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+
+unevaluatedProperties: false
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
     vref_2v5_reg: regulator-vref {

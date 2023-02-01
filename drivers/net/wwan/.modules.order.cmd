@@ -1,0 +1,1 @@
+cmd_drivers/net/wwan/modules.order := {   echo drivers/net/wwan/wwan.ko;   echo drivers/net/wwan/mhi_wwan_ctrl.ko;   echo drivers/net/wwan/mhi_wwan_mbim.ko;   echo drivers/net/wwan/qcom_bam_dmux.ko;   echo drivers/net/wwan/rpmsg_wwan_ctrl.ko; :; } > drivers/net/wwan/modules.order

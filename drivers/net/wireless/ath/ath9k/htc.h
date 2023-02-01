@@ -327,9 +327,15 @@ static inline struct ath9k_htc_tx_ctl *HTC_SKB_CB(struct sk_buff *skb)
 }
 
 #ifdef CONFIG_ATH9K_HTC_DEBUGFS
+<<<<<<< HEAD
+#define __STAT_SAFE(hif_dev, expr)	do { ((hif_dev)->htc_handle->drv_priv ? (expr) : 0); } while (0)
+#define CAB_STAT_INC(priv)		do { ((priv)->debug.tx_stats.cab_queued++); } while (0)
+#define TX_QSTAT_INC(priv, q)		do { ((priv)->debug.tx_stats.queue_stats[q]++); } while (0)
+=======
 #define __STAT_SAFE(hif_dev, expr)	((hif_dev)->htc_handle->drv_priv ? (expr) : 0)
 #define CAB_STAT_INC(priv)		((priv)->debug.tx_stats.cab_queued++)
 #define TX_QSTAT_INC(priv, q)		((priv)->debug.tx_stats.queue_stats[q]++)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define TX_STAT_INC(hif_dev, c) \
 		__STAT_SAFE((hif_dev), (hif_dev)->htc_handle->drv_priv->debug.tx_stats.c++)
@@ -378,10 +384,17 @@ void ath9k_htc_get_et_stats(struct ieee80211_hw *hw,
 			    struct ethtool_stats *stats, u64 *data);
 #else
 
+<<<<<<< HEAD
+#define TX_STAT_INC(hif_dev, c)		do { } while (0)
+#define TX_STAT_ADD(hif_dev, c, a)	do { } while (0)
+#define RX_STAT_INC(hif_dev, c)		do { } while (0)
+#define RX_STAT_ADD(hif_dev, c, a)	do { } while (0)
+=======
 #define TX_STAT_INC(hif_dev, c)
 #define TX_STAT_ADD(hif_dev, c, a)
 #define RX_STAT_INC(hif_dev, c)
 #define RX_STAT_ADD(hif_dev, c, a)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define CAB_STAT_INC(priv)
 #define TX_QSTAT_INC(priv, c)

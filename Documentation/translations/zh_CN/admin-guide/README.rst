@@ -6,10 +6,17 @@
 
  吴想成 Wu XiangCheng <bobwxc@email.cn>
 
+<<<<<<< HEAD
+Linux内核6.x版本 <http://kernel.org/>
+=========================================
+
+以下是Linux版本6的发行注记。仔细阅读它们，
+=======
 Linux内核5.x版本 <http://kernel.org/>
 =========================================
 
 以下是Linux版本5的发行注记。仔细阅读它们，
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 它们会告诉你这些都是什么，解释如何安装内核，以及遇到问题时该如何做。
 
 什么是Linux？
@@ -61,27 +68,46 @@ Linux内核5.x版本 <http://kernel.org/>
  - 如果您要安装完整的源代码，请把内核tar档案包放在您有权限的目录中（例如您
    的主目录）并将其解包::
 
+<<<<<<< HEAD
+     xz -cd linux-6.x.tar.xz | tar xvf -
+=======
      xz -cd linux-5.x.tar.xz | tar xvf -
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
    将“X”替换成最新内核的版本号。
 
    【不要】使用 /usr/src/linux 目录！这里有一组库头文件使用的内核头文件
    （通常是不完整的）。它们应该与库匹配，而不是被内核的变化搞得一团糟。
 
+<<<<<<< HEAD
+ - 您还可以通过打补丁在6.x版本之间升级。补丁以xz格式分发。要通过打补丁进行
+   安装，请获取所有较新的补丁文件，进入内核源代码（linux-6.x）的目录并
+   执行::
+
+     xz -cd ../patch-6.x.xz | patch -p1
+=======
  - 您还可以通过打补丁在5.x版本之间升级。补丁以xz格式分发。要通过打补丁进行
    安装，请获取所有较新的补丁文件，进入内核源代码（linux-5.x）的目录并
    执行::
 
      xz -cd ../patch-5.x.xz | patch -p1
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
    请【按顺序】替换所有大于当前源代码树版本的“x”，这样就可以了。您可能想要
    删除备份文件（文件名类似xxx~ 或 xxx.orig)，并确保没有失败的补丁（文件名
    类似xxx# 或 xxx.rej）。如果有，不是你就是我犯了错误。
 
+<<<<<<< HEAD
+   与6.x内核的补丁不同，6.x.y内核（也称为稳定版内核）的补丁不是增量的，而是
+   直接应用于基本的6.x内核。例如，如果您的基本内核是6.0，并且希望应用6.0.3
+   补丁，则不应先应用6.0.1和6.0.2的补丁。类似地，如果您运行的是6.0.2内核，
+   并且希望跳转到6.0.3，那么在应用6.0.3补丁之前，必须首先撤销6.0.2补丁
+=======
    与5.x内核的补丁不同，5.x.y内核（也称为稳定版内核）的补丁不是增量的，而是
    直接应用于基本的5.x内核。例如，如果您的基本内核是5.0，并且希望应用5.0.3
    补丁，则不应先应用5.0.1和5.0.2的补丁。类似地，如果您运行的是5.0.2内核，
    并且希望跳转到5.0.3，那么在应用5.0.3补丁之前，必须首先撤销5.0.2补丁
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
    （即patch -R）。更多关于这方面的内容，请阅读
    :ref:`Documentation/process/applying-patches.rst <applying_patches>` 。
 
@@ -103,7 +129,11 @@ Linux内核5.x版本 <http://kernel.org/>
 软件要求
 ---------
 
+<<<<<<< HEAD
+   编译和运行6.x内核需要各种软件包的最新版本。请参考
+=======
    编译和运行5.x内核需要各种软件包的最新版本。请参考
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
    :ref:`Documentation/process/changes.rst <changes>`
    来了解最低版本要求以及如何升级软件包。请注意，使用过旧版本的这些包可能会
    导致很难追踪的间接错误，因此不要以为在生成或操作过程中出现明显问题时可以
@@ -116,12 +146,20 @@ Linux内核5.x版本 <http://kernel.org/>
    ``make O=output/dir`` 选项可以为输出文件（包括 .config）指定备用位置。
    例如::
 
+<<<<<<< HEAD
+     kernel source code: /usr/src/linux-6.x
+=======
      kernel source code: /usr/src/linux-5.x
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
      build directory:    /home/name/build/kernel
 
    要配置和构建内核，请使用::
 
+<<<<<<< HEAD
+     cd /usr/src/linux-6.x
+=======
      cd /usr/src/linux-5.x
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
      make O=/home/name/build/kernel menuconfig
      make O=/home/name/build/kernel
      sudo make O=/home/name/build/kernel modules_install install
@@ -227,8 +265,11 @@ Linux内核5.x版本 <http://kernel.org/>
  - 确保您至少有gcc 5.1可用。
    有关更多信息，请参阅 :ref:`Documentation/process/changes.rst <changes>` 。
 
+<<<<<<< HEAD
+=======
    请注意，您仍然可以使用此内核运行a.out用户程序。
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  - 执行 ``make`` 来创建压缩内核映像。如果您安装了lilo以适配内核makefile，
    那么也可以进行 ``make install`` ，但是您可能需要先检查特定的lilo设置。
 
@@ -282,6 +323,17 @@ Linux内核5.x版本 <http://kernel.org/>
 若遇到问题
 -----------
 
+<<<<<<< HEAD
+如果您发现了一些可能由于内核缺陷所导致的问题，请参阅：
+Documentation/translations/zh_CN/admin-guide/reporting-issues.rst 。
+
+想要理解内核错误报告，请参阅：
+Documentation/translations/zh_CN/admin-guide/bug-hunting.rst 。
+
+更多用GDB调试内核的信息，请参阅：
+Documentation/translations/zh_CN/dev-tools/gdb-kernel-debugging.rst
+和 Documentation/dev-tools/kgdb.rst 。
+=======
  - 如果您发现了一些可能由于内核缺陷所导致的问题，请检查MAINTAINERS（维护者）
    文件看看是否有人与令您遇到麻烦的内核部分相关。如果无人在此列出，那么第二
    个最好的方案就是把它们发给我（torvalds@linux-foundation.org），也可能发送
@@ -346,3 +398,4 @@ Linux内核5.x版本 <http://kernel.org/>
 
    用gdb无法调试一个当前未运行的内核是由于gdb（错误地）忽略了编译内核的起始
    偏移量。
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

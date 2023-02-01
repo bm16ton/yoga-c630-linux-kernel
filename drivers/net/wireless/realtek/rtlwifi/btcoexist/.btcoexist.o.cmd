@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/btcoexist/btcoexist.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/realtek/rtlwifi/btcoexist/btcoexist.o @drivers/net/wireless/realtek/rtlwifi/btcoexist/btcoexist.mod 

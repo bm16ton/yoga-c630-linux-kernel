@@ -47,6 +47,10 @@ struct hists_stats {
 	u64 total_non_filtered_period;
 	u32 nr_samples;
 	u32 nr_non_filtered_samples;
+<<<<<<< HEAD
+	u32 nr_lost_samples;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 void events_stats__inc(struct events_stats *stats, u32 type);

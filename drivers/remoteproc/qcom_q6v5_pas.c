@@ -449,6 +449,7 @@ static int adsp_alloc_memory_region(struct qcom_adsp *adsp)
 	}
 
 	ret = of_address_to_resource(node, 0, &r);
+	of_node_put(node);
 	if (ret)
 		return ret;
 
@@ -556,6 +557,7 @@ static int adsp_probe(struct platform_device *pdev)
 detach_proxy_pds:
 	adsp_pds_detach(adsp, adsp->proxy_pds, adsp->proxy_pd_count);
 free_rproc:
+	device_init_wakeup(adsp->dev, false);
 	rproc_free(rproc);
 
 	return ret;
@@ -572,6 +574,8 @@ static int adsp_remove(struct platform_device *pdev)
 	qcom_remove_sysmon_subdev(adsp->sysmon);
 	qcom_remove_smd_subdev(adsp->rproc, &adsp->smd_subdev);
 	qcom_remove_ssr_subdev(adsp->rproc, &adsp->ssr_subdev);
+	adsp_pds_detach(adsp, adsp->proxy_pds, adsp->proxy_pd_count);
+	device_init_wakeup(adsp->dev, false);
 	rproc_free(adsp->rproc);
 
 	return 0;
@@ -762,6 +766,7 @@ static const struct adsp_data sc8280xp_nsp0_resource = {
 	.auto_boot = true,
 	.proxy_pd_names = (char*[]){
 		"nsp",
+<<<<<<< HEAD
 		NULL
 	},
 	.ssr_name = "cdsp0",
@@ -779,6 +784,25 @@ static const struct adsp_data sc8280xp_nsp1_resource = {
 		"nsp",
 		NULL
 	},
+=======
+		NULL
+	},
+	.ssr_name = "cdsp0",
+	.sysmon_name = "cdsp",
+	.ssctl_id = 0x17,
+};
+
+static const struct adsp_data sc8280xp_nsp1_resource = {
+	.crash_reason_smem = 633,
+	.firmware_name = "cdsp.mdt",
+	.pas_id = 30,
+	.has_aggre2_clk = false,
+	.auto_boot = true,
+	.proxy_pd_names = (char*[]){
+		"nsp",
+		NULL
+	},
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.ssr_name = "cdsp1",
 	.sysmon_name = "cdsp1",
 	.ssctl_id = 0x20,

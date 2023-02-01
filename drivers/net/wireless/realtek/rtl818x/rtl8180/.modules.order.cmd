@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtl818x/rtl8180/modules.order := {   echo drivers/net/wireless/realtek/rtl818x/rtl8180/rtl818x_pci.ko; :; } > drivers/net/wireless/realtek/rtl818x/rtl8180/modules.order

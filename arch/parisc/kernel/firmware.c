@@ -344,7 +344,32 @@ void pdc_cpu_rendezvous_unlock(void)
 {
 	spin_unlock(&pdc_lock);
 }
+<<<<<<< HEAD
+=======
 
+/**
+ * pdc_pat_get_PDC_entrypoint - Get PDC entry point for current CPU
+ * @retval: -1 on error, 0 on success
+ */
+int pdc_pat_get_PDC_entrypoint(unsigned long *pdc_entry)
+{
+	int retval = 0;
+	unsigned long flags;
+
+	if (!IS_ENABLED(CONFIG_SMP) || !is_pdc_pat()) {
+		*pdc_entry = MEM_PDC;
+		return 0;
+	}
+
+	spin_lock_irqsave(&pdc_lock, flags);
+	retval = mem_pdc_call(PDC_PAT_CPU, PDC_PAT_CPU_GET_PDC_ENTRYPOINT,
+			__pa(pdc_result));
+	*pdc_entry = pdc_result[0];
+	spin_unlock_irqrestore(&pdc_lock, flags);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	return retval;
+}
 /**
  * pdc_pat_get_PDC_entrypoint - Get PDC entry point for current CPU
  * @retval: -1 on error, 0 on success
@@ -1288,9 +1313,8 @@ void pdc_io_reset_devices(void)
 
 #endif /* defined(BOOTLOADER) */
 
-/* locked by pdc_console_lock */
-static int __attribute__((aligned(8)))   iodc_retbuf[32];
-static char __attribute__((aligned(64))) iodc_dbuf[4096];
+/* locked by pdc_lock */
+static char iodc_dbuf[4096] __page_aligned_bss;
 
 /**
  * pdc_iodc_print - Console print using IODC.
@@ -1307,6 +1331,9 @@ int pdc_iodc_print(const unsigned char *str, unsigned count)
 	unsigned int i;
 	unsigned long flags;
 
+	count = min_t(unsigned int, count, sizeof(iodc_dbuf));
+
+	spin_lock_irqsave(&pdc_lock, flags);
 	for (i = 0; i < count;) {
 		switch(str[i]) {
 		case '\n':
@@ -1322,12 +1349,11 @@ int pdc_iodc_print(const unsigned char *str, unsigned count)
 	}
 
 print:
-        spin_lock_irqsave(&pdc_lock, flags);
-        real32_call(PAGE0->mem_cons.iodc_io,
-                    (unsigned long)PAGE0->mem_cons.hpa, ENTRY_IO_COUT,
-                    PAGE0->mem_cons.spa, __pa(PAGE0->mem_cons.dp.layers),
-                    __pa(iodc_retbuf), 0, __pa(iodc_dbuf), i, 0);
-        spin_unlock_irqrestore(&pdc_lock, flags);
+	real32_call(PAGE0->mem_cons.iodc_io,
+		(unsigned long)PAGE0->mem_cons.hpa, ENTRY_IO_COUT,
+		PAGE0->mem_cons.spa, __pa(PAGE0->mem_cons.dp.layers),
+		__pa(pdc_result), 0, __pa(iodc_dbuf), i, 0);
+	spin_unlock_irqrestore(&pdc_lock, flags);
 
 	return i;
 }
@@ -1354,10 +1380,11 @@ int pdc_iodc_getc(void)
 	real32_call(PAGE0->mem_kbd.iodc_io,
 		    (unsigned long)PAGE0->mem_kbd.hpa, ENTRY_IO_CIN,
 		    PAGE0->mem_kbd.spa, __pa(PAGE0->mem_kbd.dp.layers), 
-		    __pa(iodc_retbuf), 0, __pa(iodc_dbuf), 1, 0);
+		    __pa(pdc_result), 0, __pa(iodc_dbuf), 1, 0);
 
 	ch = *iodc_dbuf;
-	status = *iodc_retbuf;
+	/* like convert_to_wide() but for first return value only: */
+	status = *(int *)&pdc_result;
 	spin_unlock_irqrestore(&pdc_lock, flags);
 
 	if (status == 0)

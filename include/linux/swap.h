@@ -162,6 +162,10 @@ union swap_header {
  */
 struct reclaim_state {
 	unsigned long reclaimed_slab;
+#ifdef CONFIG_LRU_GEN
+	/* per-thread mm walk data */
+	struct lru_gen_mm_walk *mm_walk;
+#endif
 };
 
 #ifdef __KERNEL__
@@ -351,6 +355,14 @@ static inline swp_entry_t folio_swap_entry(struct folio *folio)
 	return entry;
 }
 
+<<<<<<< HEAD
+static inline void folio_set_swap_entry(struct folio *folio, swp_entry_t entry)
+{
+	folio->private = (void *)entry.val;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* linux/mm/workingset.c */
 void workingset_age_nonresident(struct lruvec *lruvec, unsigned long nr_pages);
 void *workingset_eviction(struct folio *folio, struct mem_cgroup *target_memcg);
@@ -375,11 +387,19 @@ extern unsigned long totalreserve_pages;
 
 
 /* linux/mm/swap.c */
+<<<<<<< HEAD
+void lru_note_cost(struct lruvec *lruvec, bool file, unsigned int nr_pages);
+void lru_note_cost_folio(struct folio *);
+void folio_add_lru(struct folio *);
+void folio_add_lru_vma(struct folio *, struct vm_area_struct *);
+void lru_cache_add(struct page *);
+=======
 extern void lru_note_cost(struct lruvec *lruvec, bool file,
 			  unsigned int nr_pages);
 extern void lru_note_cost_folio(struct folio *);
 extern void folio_add_lru(struct folio *);
 extern void lru_cache_add(struct page *);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void mark_page_accessed(struct page *);
 void folio_mark_accessed(struct folio *);
 
@@ -440,10 +460,17 @@ static inline bool node_reclaim_enabled(void)
 	/* Is any node_reclaim_mode bit set? */
 	return node_reclaim_mode & (RECLAIM_ZONE|RECLAIM_WRITE|RECLAIM_UNMAP);
 }
+<<<<<<< HEAD
 
 void check_move_unevictable_folios(struct folio_batch *fbatch);
 void check_move_unevictable_pages(struct pagevec *pvec);
 
+=======
+
+void check_move_unevictable_folios(struct folio_batch *fbatch);
+void check_move_unevictable_pages(struct pagevec *pvec);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern void kswapd_run(int nid);
 extern void kswapd_stop(int nid);
 
@@ -481,7 +508,12 @@ static inline long get_nr_swap_pages(void)
 
 extern void si_swapinfo(struct sysinfo *);
 swp_entry_t folio_alloc_swap(struct folio *folio);
+<<<<<<< HEAD
+bool folio_free_swap(struct folio *folio);
+void put_swap_folio(struct folio *folio, swp_entry_t entry);
+=======
 extern void put_swap_page(struct page *page, swp_entry_t entry);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern swp_entry_t get_swap_page_of_type(int);
 extern int get_swap_pages(int n, swp_entry_t swp_entries[], int entry_size);
 extern int add_swap_count_continuation(swp_entry_t, gfp_t);
@@ -500,7 +532,10 @@ extern int __swp_swapcount(swp_entry_t entry);
 extern int swp_swapcount(swp_entry_t entry);
 extern struct swap_info_struct *page_swap_info(struct page *);
 extern struct swap_info_struct *swp_swap_info(swp_entry_t entry);
+<<<<<<< HEAD
+=======
 extern int try_to_free_swap(struct page *);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct backing_dev_info;
 extern int init_swap_address_space(unsigned int type, unsigned long nr_pages);
 extern void exit_swap_address_space(unsigned int type);
@@ -566,7 +601,11 @@ static inline void swap_free(swp_entry_t swp)
 {
 }
 
+<<<<<<< HEAD
+static inline void put_swap_folio(struct folio *folio, swp_entry_t swp)
+=======
 static inline void put_swap_page(struct page *page, swp_entry_t swp)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 }
 
@@ -585,11 +624,14 @@ static inline int swp_swapcount(swp_entry_t entry)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
 static inline int try_to_free_swap(struct page *page)
 {
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline swp_entry_t folio_alloc_swap(struct folio *folio)
 {
 	swp_entry_t entry;
@@ -597,6 +639,14 @@ static inline swp_entry_t folio_alloc_swap(struct folio *folio)
 	return entry;
 }
 
+<<<<<<< HEAD
+static inline bool folio_free_swap(struct folio *folio)
+{
+	return false;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline int add_swap_extent(struct swap_info_struct *sis,
 				  unsigned long start_page,
 				  unsigned long nr_pages, sector_t start_block)
@@ -656,6 +706,28 @@ static inline void folio_throttle_swaprate(struct folio *folio, gfp_t gfp)
 {
 	cgroup_throttle_swaprate(&folio->page, gfp);
 }
+<<<<<<< HEAD
+
+#if defined(CONFIG_MEMCG) && defined(CONFIG_SWAP)
+void mem_cgroup_swapout(struct folio *folio, swp_entry_t entry);
+int __mem_cgroup_try_charge_swap(struct folio *folio, swp_entry_t entry);
+static inline int mem_cgroup_try_charge_swap(struct folio *folio,
+		swp_entry_t entry)
+{
+	if (mem_cgroup_disabled())
+		return 0;
+	return __mem_cgroup_try_charge_swap(folio, entry);
+}
+
+extern void __mem_cgroup_uncharge_swap(swp_entry_t entry, unsigned int nr_pages);
+static inline void mem_cgroup_uncharge_swap(swp_entry_t entry, unsigned int nr_pages)
+{
+	if (mem_cgroup_disabled())
+		return;
+	__mem_cgroup_uncharge_swap(entry, nr_pages);
+}
+
+=======
 
 #ifdef CONFIG_MEMCG_SWAP
 void mem_cgroup_swapout(struct folio *folio, swp_entry_t entry);
@@ -676,8 +748,9 @@ static inline void mem_cgroup_uncharge_swap(swp_entry_t entry, unsigned int nr_p
 	__mem_cgroup_uncharge_swap(entry, nr_pages);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern long mem_cgroup_get_nr_swap_pages(struct mem_cgroup *memcg);
-extern bool mem_cgroup_swap_full(struct page *page);
+extern bool mem_cgroup_swap_full(struct folio *folio);
 #else
 static inline void mem_cgroup_swapout(struct folio *folio, swp_entry_t entry)
 {
@@ -699,7 +772,7 @@ static inline long mem_cgroup_get_nr_swap_pages(struct mem_cgroup *memcg)
 	return get_nr_swap_pages();
 }
 
-static inline bool mem_cgroup_swap_full(struct page *page)
+static inline bool mem_cgroup_swap_full(struct folio *folio)
 {
 	return vm_swap_full();
 }

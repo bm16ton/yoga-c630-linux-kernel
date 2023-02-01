@@ -67,7 +67,11 @@ static void invoke_syscall(struct pt_regs *regs, unsigned int scno,
 	 *
 	 * The resulting 5 bits of entropy is seen in SP[8:4].
 	 */
+<<<<<<< HEAD
+	choose_random_kstack_offset(get_random_u16() & 0x1FF);
+=======
 	choose_random_kstack_offset(get_random_int() & 0x1FF);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline bool has_syscall_work(unsigned long flags)

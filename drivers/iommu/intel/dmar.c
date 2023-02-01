@@ -1933,6 +1933,7 @@ static int dmar_fault_do_one(struct intel_iommu *iommu, int type,
 		       type ? "DMA Read" : "DMA Write",
 		       source_id >> 8, PCI_SLOT(source_id & 0xFF),
 		       PCI_FUNC(source_id & 0xFF), addr,
+<<<<<<< HEAD
 		       fault_reason, reason);
 	else
 		pr_err("[%s PASID 0x%x] Request device [%02x:%02x.%d] fault addr 0x%llx [fault reason 0x%02x] %s\n",
@@ -1940,6 +1941,15 @@ static int dmar_fault_do_one(struct intel_iommu *iommu, int type,
 		       source_id >> 8, PCI_SLOT(source_id & 0xFF),
 		       PCI_FUNC(source_id & 0xFF), addr,
 		       fault_reason, reason);
+=======
+		       fault_reason, reason);
+	else
+		pr_err("[%s PASID 0x%x] Request device [%02x:%02x.%d] fault addr 0x%llx [fault reason 0x%02x] %s\n",
+		       type ? "DMA Read" : "DMA Write", pasid,
+		       source_id >> 8, PCI_SLOT(source_id & 0xFF),
+		       PCI_FUNC(source_id & 0xFF), addr,
+		       fault_reason, reason);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dmar_fault_dump_ptes(iommu, source_id, addr, pasid);
 

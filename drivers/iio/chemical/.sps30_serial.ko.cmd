@@ -1,0 +1,1 @@
+cmd_drivers/iio/chemical/sps30_serial.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/chemical/sps30_serial.ko drivers/iio/chemical/sps30_serial.o drivers/iio/chemical/sps30_serial.mod.o;  true

@@ -4,7 +4,11 @@
 
 static void test_xdp_update_frags(void)
 {
+<<<<<<< HEAD
+	const char *file = "./test_xdp_update_frags.bpf.o";
+=======
 	const char *file = "./test_xdp_update_frags.o";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err, prog_fd, max_skb_frags, buf_size, num;
 	struct bpf_program *prog;
 	struct bpf_object *obj;

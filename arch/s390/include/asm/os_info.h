@@ -41,6 +41,8 @@ u32 os_info_csum(struct os_info *os_info);
 
 #ifdef CONFIG_CRASH_DUMP
 void *os_info_old_entry(int nr, unsigned long *size);
+<<<<<<< HEAD
+=======
 size_t copy_oldmem_iter(struct iov_iter *iter, unsigned long src, size_t count);
 
 static inline int copy_oldmem_kernel(void *dst, unsigned long src, size_t count)
@@ -55,6 +57,7 @@ static inline int copy_oldmem_kernel(void *dst, unsigned long src, size_t count)
 		return -EFAULT;
 	return 0;
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline void *os_info_old_entry(int nr, unsigned long *size)
 {

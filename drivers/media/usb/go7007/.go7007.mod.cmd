@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/go7007/go7007.mod := printf '%s\n'   go7007-v4l2.o go7007-driver.o go7007-i2c.o go7007-fw.o snd-go7007.o | awk '!x[$$0]++ { print("drivers/media/usb/go7007/"$$0) }' > drivers/media/usb/go7007/go7007.mod

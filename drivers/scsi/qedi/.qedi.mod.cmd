@@ -1,0 +1,1 @@
+cmd_drivers/scsi/qedi/qedi.mod := printf '%s\n'   qedi_main.o qedi_iscsi.o qedi_fw.o qedi_sysfs.o qedi_dbg.o qedi_fw_api.o qedi_debugfs.o | awk '!x[$$0]++ { print("drivers/scsi/qedi/"$$0) }' > drivers/scsi/qedi/qedi.mod

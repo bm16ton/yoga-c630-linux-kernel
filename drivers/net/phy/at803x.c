@@ -115,6 +115,10 @@
 #define AT803X_DEBUG_REG_HIB_CTRL		0x0b
 #define   AT803X_DEBUG_HIB_CTRL_SEL_RST_80U	BIT(10)
 #define   AT803X_DEBUG_HIB_CTRL_EN_ANY_CHANGE	BIT(13)
+<<<<<<< HEAD
+#define   AT803X_DEBUG_HIB_CTRL_PS_HIB_EN	BIT(15)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define AT803X_DEBUG_REG_3C			0x3C
 
@@ -192,6 +196,12 @@
 #define AT803X_KEEP_PLL_ENABLED			BIT(0)
 #define AT803X_DISABLE_SMARTEEE			BIT(1)
 
+<<<<<<< HEAD
+/* disable hibernation mode */
+#define AT803X_DISABLE_HIBERNATION_MODE		BIT(2)
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* ADC threshold */
 #define QCA808X_PHY_DEBUG_ADC_THRESHOLD		0x2c80
 #define QCA808X_ADC_THRESHOLD_MASK		GENMASK(7, 0)
@@ -672,6 +682,10 @@ static int at803x_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
 	struct phy_device *phydev = upstream;
 	__ETHTOOL_DECLARE_LINK_MODE_MASK(phy_support);
 	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
+<<<<<<< HEAD
+	DECLARE_PHY_INTERFACE_MASK(interfaces);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phy_interface_t iface;
 
 	linkmode_zero(phy_support);
@@ -682,7 +696,11 @@ static int at803x_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
 	phylink_set(phy_support, Asym_Pause);
 
 	linkmode_zero(sfp_support);
+<<<<<<< HEAD
+	sfp_parse_support(phydev->sfp_bus, id, sfp_support, interfaces);
+=======
 	sfp_parse_support(phydev->sfp_bus, id, sfp_support);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Some modules support 10G modes as well as others we support.
 	 * Mask out non-supported modes so the correct interface is picked.
 	 */
@@ -729,6 +747,9 @@ static int at803x_parse_dt(struct phy_device *phydev)
 
 	if (of_property_read_bool(node, "qca,disable-smarteee"))
 		priv->flags |= AT803X_DISABLE_SMARTEEE;
+
+	if (of_property_read_bool(node, "qca,disable-hibernation-mode"))
+		priv->flags |= AT803X_DISABLE_HIBERNATION_MODE;
 
 	if (!of_property_read_u32(node, "qca,smarteee-tw-us-1g", &tw)) {
 		if (!tw || tw > 255) {
@@ -1001,6 +1022,20 @@ static int at8031_pll_config(struct phy_device *phydev)
 					     AT803X_DEBUG_PLL_ON, 0);
 }
 
+static int at803x_hibernation_mode_config(struct phy_device *phydev)
+{
+	struct at803x_priv *priv = phydev->priv;
+
+	/* The default after hardware reset is hibernation mode enabled. After
+	 * software reset, the value is retained.
+	 */
+	if (!(priv->flags & AT803X_DISABLE_HIBERNATION_MODE))
+		return 0;
+
+	return at803x_debug_reg_mask(phydev, AT803X_DEBUG_REG_HIB_CTRL,
+					 AT803X_DEBUG_HIB_CTRL_PS_HIB_EN, 0);
+}
+
 static int at803x_config_init(struct phy_device *phydev)
 {
 	struct at803x_priv *priv = phydev->priv;
@@ -1053,6 +1088,13 @@ static int at803x_config_init(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
+<<<<<<< HEAD
+	ret = at803x_hibernation_mode_config(phydev);
+	if (ret < 0)
+		return ret;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Ar803x extended next page bit is enabled by default. Cisco
 	 * multigig switches read this bit and attempt to negotiate 10Gbps
 	 * rates even if the next page bit is disabled. This is incorrect
@@ -1734,7 +1776,11 @@ static int qca808x_phy_fast_retrain_config(struct phy_device *phydev)
 
 static int qca808x_phy_ms_random_seed_set(struct phy_device *phydev)
 {
+<<<<<<< HEAD
+	u16 seed_value = prandom_u32_max(QCA808X_MASTER_SLAVE_SEED_RANGE);
+=======
 	u16 seed_value = (prandom_u32() % QCA808X_MASTER_SLAVE_SEED_RANGE);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return at803x_debug_reg_mask(phydev, QCA808X_PHY_DEBUG_LOCAL_SEED,
 			QCA808X_MASTER_SLAVE_SEED_CFG,
@@ -2076,6 +2122,7 @@ static struct phy_driver at803x_driver[] = {
 	.name			= "Qualcomm Atheros AR9331 built-in PHY",
 	.probe			= at803x_probe,
 	.remove			= at803x_remove,
+<<<<<<< HEAD
 	.suspend		= at803x_suspend,
 	.resume			= at803x_resume,
 	.flags			= PHY_POLL_CABLE_TEST,
@@ -2093,6 +2140,8 @@ static struct phy_driver at803x_driver[] = {
 	.name			= "Qualcomm Atheros QCA9561 built-in PHY",
 	.probe			= at803x_probe,
 	.remove			= at803x_remove,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.suspend		= at803x_suspend,
 	.resume			= at803x_resume,
 	.flags			= PHY_POLL_CABLE_TEST,
@@ -2105,6 +2154,26 @@ static struct phy_driver at803x_driver[] = {
 	.soft_reset		= genphy_soft_reset,
 	.config_aneg		= at803x_config_aneg,
 }, {
+<<<<<<< HEAD
+=======
+	/* Qualcomm Atheros QCA9561 */
+	PHY_ID_MATCH_EXACT(QCA9561_PHY_ID),
+	.name			= "Qualcomm Atheros QCA9561 built-in PHY",
+	.probe			= at803x_probe,
+	.remove			= at803x_remove,
+	.suspend		= at803x_suspend,
+	.resume			= at803x_resume,
+	.flags			= PHY_POLL_CABLE_TEST,
+	/* PHY_BASIC_FEATURES */
+	.config_intr		= &at803x_config_intr,
+	.handle_interrupt	= at803x_handle_interrupt,
+	.cable_test_start	= at803x_cable_test_start,
+	.cable_test_get_status	= at803x_cable_test_get_status,
+	.read_status		= at803x_read_status,
+	.soft_reset		= genphy_soft_reset,
+	.config_aneg		= at803x_config_aneg,
+}, {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* QCA8337 */
 	.phy_id			= QCA8337_PHY_ID,
 	.phy_id_mask		= QCA8K_PHY_ID_MASK,

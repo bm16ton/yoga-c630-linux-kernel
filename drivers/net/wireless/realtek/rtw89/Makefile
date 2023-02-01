@@ -12,6 +12,10 @@ rtw89_core-y += core.o \
 		sar.o \
 		coex.o \
 		ps.o \
+<<<<<<< HEAD
+		chan.o \
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ser.o
 
 obj-$(CONFIG_RTW89_8852A) += rtw89_8852a.o

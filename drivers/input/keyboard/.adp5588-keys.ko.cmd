@@ -1,0 +1,1 @@
+cmd_drivers/input/keyboard/adp5588-keys.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/keyboard/adp5588-keys.ko drivers/input/keyboard/adp5588-keys.o drivers/input/keyboard/adp5588-keys.mod.o;  true

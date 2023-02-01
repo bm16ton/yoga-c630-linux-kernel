@@ -279,8 +279,13 @@ cifs_mark_tcp_ses_conns_for_reconnect(struct TCP_Server_Info *server,
 			tcon->need_reconnect = true;
 			tcon->status = TID_NEED_RECON;
 		}
-		if (ses->tcon_ipc)
+		if (ses->tcon_ipc) {
 			ses->tcon_ipc->need_reconnect = true;
+<<<<<<< HEAD
+			ses->tcon_ipc->status = TID_NEED_RECON;
+		}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 next_session:
 		spin_unlock(&ses->chan_lock);
@@ -311,7 +316,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
 	}
 	server->sequence_number = 0;
 	server->session_estab = false;
-	kfree(server->session_key.response);
+	kfree_sensitive(server->session_key.response);
 	server->session_key.response = NULL;
 	server->session_key.len = 0;
 	server->lstrp = jiffies;
@@ -384,6 +389,7 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
 
 	if (!cifs_tcp_ses_needs_reconnect(server, 1))
 		return 0;
+<<<<<<< HEAD
 
 	cifs_mark_tcp_ses_conns_for_reconnect(server, mark_smb_session);
 
@@ -393,6 +399,17 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
 		try_to_freeze();
 		cifs_server_lock(server);
 
+=======
+
+	cifs_mark_tcp_ses_conns_for_reconnect(server, mark_smb_session);
+
+	cifs_abort_connection(server);
+
+	do {
+		try_to_freeze();
+		cifs_server_lock(server);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!cifs_swn_set_server_dstaddr(server)) {
 			/* resolve the hostname again to make sure that IP address is up-to-date */
 			rc = reconn_set_ipaddr_from_hostname(server);
@@ -1580,10 +1597,14 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
 
 	cifs_crypto_secmech_release(server);
 
-	kfree(server->session_key.response);
+	kfree_sensitive(server->session_key.response);
 	server->session_key.response = NULL;
 	server->session_key.len = 0;
 	kfree(server->hostname);
+<<<<<<< HEAD
+	server->hostname = NULL;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	task = xchg(&server->tsk, NULL);
 	if (task)
@@ -1870,6 +1891,9 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
 
 	cifs_dbg(FYI, "IPC tcon rc=%d ipc tid=0x%x\n", rc, tcon->tid);
 
+	spin_lock(&tcon->tc_lock);
+	tcon->status = TID_GOOD;
+	spin_unlock(&tcon->tc_lock);
 	ses->tcon_ipc = tcon;
 out:
 	return rc;
@@ -1878,9 +1902,15 @@ out:
 /**
  * cifs_free_ipc - helper to release the session IPC tcon
  * @ses: smb session to unmount the IPC from
+<<<<<<< HEAD
  *
  * Needs to be called everytime a session is destroyed.
  *
+=======
+ *
+ * Needs to be called everytime a session is destroyed.
+ *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * On session close, the IPC is closed and the server must release all tcons of the session.
  * No need to send a tree disconnect here.
  *
@@ -1940,7 +1970,12 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
 	spin_unlock(&ses->ses_lock);
 
 	cifs_dbg(FYI, "%s: ses_count=%d\n", __func__, ses->ses_count);
+<<<<<<< HEAD
+	cifs_dbg(FYI,
+		 "%s: ses ipc: %s\n", __func__, ses->tcon_ipc ? ses->tcon_ipc->tree_name : "NONE");
+=======
 	cifs_dbg(FYI, "%s: ses ipc: %s\n", __func__, ses->tcon_ipc ? ses->tcon_ipc->treeName : "NONE");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	spin_lock(&cifs_tcp_ses_lock);
 	if (--ses->ses_count > 0) {
@@ -2155,7 +2190,7 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx __attribute__((unused)),
 struct cifs_ses *
 cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
 {
-	int rc = -ENOMEM;
+	int rc = 0;
 	unsigned int xid;
 	struct cifs_ses *ses;
 	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
@@ -2203,6 +2238,8 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
 		free_xid(xid);
 		return ses;
 	}
+
+	rc = -ENOMEM;
 
 	cifs_dbg(FYI, "Existing smb sess not found\n");
 	ses = sesInfoAlloc();
@@ -2276,9 +2313,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
 	list_add(&ses->smb_ses_list, &server->smb_ses_list);
 	spin_unlock(&cifs_tcp_ses_lock);
 
-	free_xid(xid);
-
 	cifs_setup_ipc(ses, ctx);
+
+	free_xid(xid);
 
 	return ses;
 
@@ -2293,7 +2330,7 @@ static int match_tcon(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
 {
 	if (tcon->status == TID_EXITING)
 		return 0;
-	if (strncmp(tcon->treeName, ctx->UNC, MAX_TREE_SIZE))
+	if (strncmp(tcon->tree_name, ctx->UNC, MAX_TREE_SIZE))
 		return 0;
 	if (tcon->seal != ctx->seal)
 		return 0;
@@ -2598,6 +2635,16 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
 	tcon->nodelete = ctx->nodelete;
 	tcon->local_lease = ctx->local_lease;
 	INIT_LIST_HEAD(&tcon->pending_opens);
+	tcon->status = TID_GOOD;
+
+	INIT_DELAYED_WORK(&tcon->query_interfaces,
+			  smb2_query_server_interfaces);
+	if (ses->server->dialect >= SMB30_PROT_ID &&
+	    (ses->server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
+		/* schedule query interfaces poll */
+		queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
+				   (SMB_INTERFACE_POLL_INTERVAL * HZ));
+	}
 
 	/* schedule query interfaces poll */
 	INIT_DELAYED_WORK(&tcon->query_interfaces,
@@ -2831,9 +2878,12 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
 	 * sessinit is sent but no second negprot
 	 */
 	struct rfc1002_session_packet *ses_init_buf;
+	unsigned int req_noscope_len;
 	struct smb_hdr *smb_buf;
+
 	ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
 			       GFP_KERNEL);
+
 	if (ses_init_buf) {
 		ses_init_buf->trailer.session_req.called_len = 32;
 
@@ -2869,8 +2919,12 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
 		ses_init_buf->trailer.session_req.scope2 = 0;
 		smb_buf = (struct smb_hdr *)ses_init_buf;
 
-		/* sizeof RFC1002_SESSION_REQUEST with no scope */
-		smb_buf->smb_buf_length = cpu_to_be32(0x81000044);
+		/* sizeof RFC1002_SESSION_REQUEST with no scopes */
+		req_noscope_len = sizeof(struct rfc1002_session_packet) - 2;
+
+		/* == cpu_to_be32(0x81000044) */
+		smb_buf->smb_buf_length =
+			cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | req_noscope_len);
 		rc = smb_send(server, smb_buf, 0x44);
 		kfree(ses_init_buf);
 		/*
@@ -3553,12 +3607,17 @@ static int is_path_remote(struct mount_ctx *mnt_ctx)
 
 	rc = server->ops->is_path_accessible(xid, tcon, cifs_sb,
 					     full_path);
+<<<<<<< HEAD
+	if (rc != 0 && rc != -EREMOTE)
+		goto out;
+=======
 #ifdef CONFIG_CIFS_DFS_UPCALL
 	if (nodfs) {
 		if (rc == -EREMOTE)
 			rc = -EOPNOTSUPP;
 		goto out;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* path *might* exist with non-ASCII characters in DFS root
 	 * try again with full path (only if nodfs is not set) */
@@ -3603,6 +3662,7 @@ static int is_dfs_mount(struct mount_ctx *mnt_ctx, bool *isdfs, struct dfs_cache
 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
 
 	*isdfs = true;
+<<<<<<< HEAD
 
 	rc = mount_get_conns(mnt_ctx);
 	/*
@@ -3627,6 +3687,32 @@ static int is_dfs_mount(struct mount_ctx *mnt_ctx, bool *isdfs, struct dfs_cache
 	return 0;
 }
 
+=======
+
+	rc = mount_get_conns(mnt_ctx);
+	/*
+	 * If called with 'nodfs' mount option, then skip DFS resolving.  Otherwise unconditionally
+	 * try to get an DFS referral (even cached) to determine whether it is an DFS mount.
+	 *
+	 * Skip prefix path to provide support for DFS referrals from w2k8 servers which don't seem
+	 * to respond with PATH_NOT_COVERED to requests that include the prefix.
+	 */
+	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS) ||
+	    dfs_cache_find(mnt_ctx->xid, mnt_ctx->ses, cifs_sb->local_nls, cifs_remap(cifs_sb),
+			   ctx->UNC + 1, NULL, root_tl)) {
+		if (rc)
+			return rc;
+		/* Check if it is fully accessible and then mount it */
+		rc = is_path_remote(mnt_ctx);
+		if (!rc)
+			*isdfs = false;
+		else if (rc != -EREMOTE)
+			return rc;
+	}
+	return 0;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int connect_dfs_target(struct mount_ctx *mnt_ctx, const char *full_path,
 			      const char *ref_path, struct dfs_cache_tgt_iterator *tit)
 {
@@ -3637,11 +3723,19 @@ static int connect_dfs_target(struct mount_ctx *mnt_ctx, const char *full_path,
 
 	cifs_dbg(FYI, "%s: full_path=%s ref_path=%s target=%s\n", __func__, full_path, ref_path,
 		 dfs_cache_get_tgt_name(tit));
+<<<<<<< HEAD
 
 	rc = dfs_cache_get_tgt_referral(ref_path, tit, &ref);
 	if (rc)
 		goto out;
 
+=======
+
+	rc = dfs_cache_get_tgt_referral(ref_path, tit, &ref);
+	if (rc)
+		goto out;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = expand_dfs_referral(mnt_ctx, full_path, &ref);
 	if (rc)
 		goto out;
@@ -3801,6 +3895,7 @@ static void setup_server_referral_paths(struct mount_ctx *mnt_ctx)
 	mutex_unlock(&server->refpath_lock);
 	mnt_ctx->origin_fullpath = mnt_ctx->leaf_fullpath = NULL;
 }
+<<<<<<< HEAD
 
 int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
 {
@@ -3809,6 +3904,16 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
 	struct dfs_cache_tgt_list tl = DFS_CACHE_TGT_LIST_INIT(tl);
 	bool isdfs;
 
+=======
+
+int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+{
+	int rc;
+	struct mount_ctx mnt_ctx = { .cifs_sb = cifs_sb, .fs_ctx = ctx, };
+	struct dfs_cache_tgt_list tl = DFS_CACHE_TGT_LIST_INIT(tl);
+	bool isdfs;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = is_dfs_mount(&mnt_ctx, &isdfs, &tl);
 	if (rc)
 		goto error;
@@ -3996,7 +4101,11 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
 		}
 		bcc_ptr += length + 1;
 		bytes_left -= (length + 1);
+<<<<<<< HEAD
+		strscpy(tcon->tree_name, tree, sizeof(tcon->tree_name));
+=======
 		strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* mostly informational -- no need to fail on error here */
 		kfree(tcon->nativeFileSystem);
@@ -4109,6 +4218,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
 		scnprintf(ses->ip_addr, sizeof(ses->ip_addr), "%pI6", &addr6->sin6_addr);
 	else
 		scnprintf(ses->ip_addr, sizeof(ses->ip_addr), "%pI4", &addr->sin_addr);
+<<<<<<< HEAD
 
 	if (ses->ses_status != SES_GOOD &&
 	    ses->ses_status != SES_NEW &&
@@ -4129,6 +4239,28 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
 	cifs_chan_set_in_reconnect(ses, server);
 	spin_unlock(&ses->chan_lock);
 
+=======
+
+	if (ses->ses_status != SES_GOOD &&
+	    ses->ses_status != SES_NEW &&
+	    ses->ses_status != SES_NEED_RECON) {
+		spin_unlock(&ses->ses_lock);
+		return 0;
+	}
+
+	/* only send once per connect */
+	spin_lock(&ses->chan_lock);
+	if (CIFS_ALL_CHANS_GOOD(ses) ||
+	    cifs_chan_in_reconnect(ses, server)) {
+		spin_unlock(&ses->chan_lock);
+		spin_unlock(&ses->ses_lock);
+		return 0;
+	}
+	is_binding = !CIFS_ALL_CHANS_NEED_RECONNECT(ses);
+	cifs_chan_set_in_reconnect(ses, server);
+	spin_unlock(&ses->chan_lock);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!is_binding)
 		ses->ses_status = SES_IN_SETUP;
 	spin_unlock(&ses->ses_lock);
@@ -4141,7 +4273,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
 		if (ses->auth_key.response) {
 			cifs_dbg(FYI, "Free previous auth_key.response = %p\n",
 				 ses->auth_key.response);
-			kfree(ses->auth_key.response);
+			kfree_sensitive(ses->auth_key.response);
 			ses->auth_key.response = NULL;
 			ses->auth_key.len = 0;
 		}
@@ -4204,7 +4336,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
 	ctx->local_nls = cifs_sb->local_nls;
 	ctx->linux_uid = fsuid;
 	ctx->cred_uid = fsuid;
-	ctx->UNC = master_tcon->treeName;
+	ctx->UNC = master_tcon->tree_name;
 	ctx->retry = master_tcon->retry;
 	ctx->nocase = master_tcon->nocase;
 	ctx->nohandlecache = master_tcon->nohandlecache;
@@ -4670,7 +4802,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
 	/* If it is not dfs or there was no cached dfs referral, then reconnect to same share */
 	if (!server->current_fullpath ||
 	    dfs_cache_noreq_find(server->current_fullpath + 1, &ref, &tl)) {
+<<<<<<< HEAD
+		rc = ops->tree_connect(xid, tcon->ses, tcon->tree_name, tcon, cifs_sb->local_nls);
+=======
 		rc = ops->tree_connect(xid, tcon->ses, tcon->treeName, tcon, cifs_sb->local_nls);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out;
 	}
 
@@ -4714,7 +4850,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
 	tcon->status = TID_IN_TCON;
 	spin_unlock(&tcon->tc_lock);
 
+<<<<<<< HEAD
+	rc = ops->tree_connect(xid, tcon->ses, tcon->tree_name, tcon, nlsc);
+=======
 	rc = ops->tree_connect(xid, tcon->ses, tcon->treeName, tcon, nlsc);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (rc) {
 		spin_lock(&tcon->tc_lock);
 		if (tcon->status == TID_IN_TCON)

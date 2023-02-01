@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/vcnl3020.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/vcnl3020.ko drivers/iio/proximity/vcnl3020.o drivers/iio/proximity/vcnl3020.mod.o;  true

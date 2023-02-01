@@ -49,7 +49,11 @@
 
 /* Masks with bits that must be read zero */
 #define TPM_ACCESS_READ_ZERO 0x48
+<<<<<<< HEAD
+#define TPM_INT_ENABLE_ZERO 0x7FFFFF60
+=======
 #define TPM_INT_ENABLE_ZERO 0x7FFFFF6
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define TPM_STS_READ_ZERO 0x23
 #define TPM_INTF_CAPABILITY_ZERO 0x0FFFF000
 #define TPM_I2C_INTERFACE_CAPABILITY_ZERO 0x80000000
@@ -329,6 +333,10 @@ static int tpm_tis_i2c_probe(struct i2c_client *dev,
 	if (!phy->io_buf)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	set_bit(TPM_TIS_DEFAULT_CANCELLATION, &phy->priv.flags);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phy->i2c_client = dev;
 
 	/* must precede all communication with the tpm */
@@ -351,13 +359,20 @@ static int tpm_tis_i2c_probe(struct i2c_client *dev,
 				 NULL);
 }
 
+<<<<<<< HEAD
+static void tpm_tis_i2c_remove(struct i2c_client *client)
+=======
 static int tpm_tis_i2c_remove(struct i2c_client *client)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct tpm_chip *chip = i2c_get_clientdata(client);
 
 	tpm_chip_unregister(chip);
 	tpm_tis_remove(chip);
+<<<<<<< HEAD
+=======
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tpm_tis_i2c_id[] = {

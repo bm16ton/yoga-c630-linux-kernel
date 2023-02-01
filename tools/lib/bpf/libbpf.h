@@ -262,6 +262,8 @@ LIBBPF_API const char *bpf_program__name(const struct bpf_program *prog);
 LIBBPF_API const char *bpf_program__section_name(const struct bpf_program *prog);
 LIBBPF_API bool bpf_program__autoload(const struct bpf_program *prog);
 LIBBPF_API int bpf_program__set_autoload(struct bpf_program *prog, bool autoload);
+LIBBPF_API bool bpf_program__autoattach(const struct bpf_program *prog);
+LIBBPF_API void bpf_program__set_autoattach(struct bpf_program *prog, bool autoattach);
 
 struct bpf_insn;
 
@@ -304,6 +306,50 @@ LIBBPF_API const struct bpf_insn *bpf_program__insns(const struct bpf_program *p
 LIBBPF_API int bpf_program__set_insns(struct bpf_program *prog,
 				      struct bpf_insn *new_insns, size_t new_insn_cnt);
 
+<<<<<<< HEAD
+=======
+struct bpf_insn;
+
+/**
+ * @brief **bpf_program__insns()** gives read-only access to BPF program's
+ * underlying BPF instructions.
+ * @param prog BPF program for which to return instructions
+ * @return a pointer to an array of BPF instructions that belong to the
+ * specified BPF program
+ *
+ * Returned pointer is always valid and not NULL. Number of `struct bpf_insn`
+ * pointed to can be fetched using **bpf_program__insn_cnt()** API.
+ *
+ * Keep in mind, libbpf can modify and append/delete BPF program's
+ * instructions as it processes BPF object file and prepares everything for
+ * uploading into the kernel. So depending on the point in BPF object
+ * lifetime, **bpf_program__insns()** can return different sets of
+ * instructions. As an example, during BPF object load phase BPF program
+ * instructions will be CO-RE-relocated, BPF subprograms instructions will be
+ * appended, ldimm64 instructions will have FDs embedded, etc. So instructions
+ * returned before **bpf_object__load()** and after it might be quite
+ * different.
+ */
+LIBBPF_API const struct bpf_insn *bpf_program__insns(const struct bpf_program *prog);
+
+/**
+ * @brief **bpf_program__set_insns()** can set BPF program's underlying
+ * BPF instructions.
+ *
+ * WARNING: This is a very advanced libbpf API and users need to know
+ * what they are doing. This should be used from prog_prepare_load_fn
+ * callback only.
+ *
+ * @param prog BPF program for which to return instructions
+ * @param new_insns a pointer to an array of BPF instructions
+ * @param new_insn_cnt number of `struct bpf_insn`'s that form
+ * specified BPF program
+ * @return 0, on success; negative error code, otherwise
+ */
+LIBBPF_API int bpf_program__set_insns(struct bpf_program *prog,
+				      struct bpf_insn *new_insns, size_t new_insn_cnt);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * @brief **bpf_program__insn_cnt()** returns number of `struct bpf_insn`'s
  * that form specified BPF program.
@@ -397,6 +443,7 @@ LIBBPF_API int bpf_link__destroy(struct bpf_link *link);
  *   - raw tracepoint
  *   - tracing programs (typed raw TP/fentry/fexit/fmod_ret)
  */
+<<<<<<< HEAD
 LIBBPF_API struct bpf_link *
 bpf_program__attach(const struct bpf_program *prog);
 
@@ -429,6 +476,40 @@ struct bpf_kprobe_opts {
 #define bpf_kprobe_opts__last_field retprobe
 
 LIBBPF_API struct bpf_link *
+=======
+LIBBPF_API struct bpf_link *
+bpf_program__attach(const struct bpf_program *prog);
+
+struct bpf_perf_event_opts {
+	/* size of this struct, for forward/backward compatiblity */
+	size_t sz;
+	/* custom user-provided value fetchable through bpf_get_attach_cookie() */
+	__u64 bpf_cookie;
+};
+#define bpf_perf_event_opts__last_field bpf_cookie
+
+LIBBPF_API struct bpf_link *
+bpf_program__attach_perf_event(const struct bpf_program *prog, int pfd);
+
+LIBBPF_API struct bpf_link *
+bpf_program__attach_perf_event_opts(const struct bpf_program *prog, int pfd,
+				    const struct bpf_perf_event_opts *opts);
+
+struct bpf_kprobe_opts {
+	/* size of this struct, for forward/backward compatiblity */
+	size_t sz;
+	/* custom user-provided value fetchable through bpf_get_attach_cookie() */
+	__u64 bpf_cookie;
+	/* function's offset to install kprobe to */
+	size_t offset;
+	/* kprobe is return probe */
+	bool retprobe;
+	size_t :0;
+};
+#define bpf_kprobe_opts__last_field retprobe
+
+LIBBPF_API struct bpf_link *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bpf_program__attach_kprobe(const struct bpf_program *prog, bool retprobe,
 			   const char *func_name);
 LIBBPF_API struct bpf_link *
@@ -563,6 +644,7 @@ bpf_program__attach_uprobe(const struct bpf_program *prog, bool retprobe,
  * @return Reference to the newly created BPF link; or NULL is returned on error,
  * error code is stored in errno
  */
+<<<<<<< HEAD
 LIBBPF_API struct bpf_link *
 bpf_program__attach_uprobe_opts(const struct bpf_program *prog, pid_t pid,
 				const char *binary_path, size_t func_offset,
@@ -608,6 +690,53 @@ struct bpf_tracepoint_opts {
 #define bpf_tracepoint_opts__last_field bpf_cookie
 
 LIBBPF_API struct bpf_link *
+=======
+LIBBPF_API struct bpf_link *
+bpf_program__attach_uprobe_opts(const struct bpf_program *prog, pid_t pid,
+				const char *binary_path, size_t func_offset,
+				const struct bpf_uprobe_opts *opts);
+
+struct bpf_usdt_opts {
+	/* size of this struct, for forward/backward compatibility */
+	size_t sz;
+	/* custom user-provided value accessible through usdt_cookie() */
+	__u64 usdt_cookie;
+	size_t :0;
+};
+#define bpf_usdt_opts__last_field usdt_cookie
+
+/**
+ * @brief **bpf_program__attach_usdt()** is just like
+ * bpf_program__attach_uprobe_opts() except it covers USDT (User-space
+ * Statically Defined Tracepoint) attachment, instead of attaching to
+ * user-space function entry or exit.
+ *
+ * @param prog BPF program to attach
+ * @param pid Process ID to attach the uprobe to, 0 for self (own process),
+ * -1 for all processes
+ * @param binary_path Path to binary that contains provided USDT probe
+ * @param usdt_provider USDT provider name
+ * @param usdt_name USDT probe name
+ * @param opts Options for altering program attachment
+ * @return Reference to the newly created BPF link; or NULL is returned on error,
+ * error code is stored in errno
+ */
+LIBBPF_API struct bpf_link *
+bpf_program__attach_usdt(const struct bpf_program *prog,
+			 pid_t pid, const char *binary_path,
+			 const char *usdt_provider, const char *usdt_name,
+			 const struct bpf_usdt_opts *opts);
+
+struct bpf_tracepoint_opts {
+	/* size of this struct, for forward/backward compatiblity */
+	size_t sz;
+	/* custom user-provided value fetchable through bpf_get_attach_cookie() */
+	__u64 bpf_cookie;
+};
+#define bpf_tracepoint_opts__last_field bpf_cookie
+
+LIBBPF_API struct bpf_link *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bpf_program__attach_tracepoint(const struct bpf_program *prog,
 			       const char *tp_category,
 			       const char *tp_name);
@@ -629,12 +758,21 @@ struct bpf_trace_opts {
 };
 #define bpf_trace_opts__last_field cookie
 
+<<<<<<< HEAD
 LIBBPF_API struct bpf_link *
 bpf_program__attach_trace(const struct bpf_program *prog);
 LIBBPF_API struct bpf_link *
 bpf_program__attach_trace_opts(const struct bpf_program *prog, const struct bpf_trace_opts *opts);
 
 LIBBPF_API struct bpf_link *
+=======
+LIBBPF_API struct bpf_link *
+bpf_program__attach_trace(const struct bpf_program *prog);
+LIBBPF_API struct bpf_link *
+bpf_program__attach_trace_opts(const struct bpf_program *prog, const struct bpf_trace_opts *opts);
+
+LIBBPF_API struct bpf_link *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bpf_program__attach_lsm(const struct bpf_program *prog);
 LIBBPF_API struct bpf_link *
 bpf_program__attach_cgroup(const struct bpf_program *prog, int cgroup_fd);
@@ -933,6 +1071,7 @@ LIBBPF_API int bpf_map__lookup_and_delete_elem(const struct bpf_map *map,
  */
 LIBBPF_API int bpf_map__get_next_key(const struct bpf_map *map,
 				     const void *cur_key, void *next_key, size_t key_sz);
+<<<<<<< HEAD
 
 struct bpf_xdp_set_link_opts {
 	size_t sz;
@@ -948,6 +1087,23 @@ struct bpf_xdp_attach_opts {
 };
 #define bpf_xdp_attach_opts__last_field old_prog_fd
 
+=======
+
+struct bpf_xdp_set_link_opts {
+	size_t sz;
+	int old_fd;
+	size_t :0;
+};
+#define bpf_xdp_set_link_opts__last_field old_fd
+
+struct bpf_xdp_attach_opts {
+	size_t sz;
+	int old_prog_fd;
+	size_t :0;
+};
+#define bpf_xdp_attach_opts__last_field old_prog_fd
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct bpf_xdp_query_opts {
 	size_t sz;
 	__u32 prog_id;		/* output */
@@ -1011,6 +1167,7 @@ LIBBPF_API int bpf_tc_query(const struct bpf_tc_hook *hook,
 
 /* Ring buffer APIs */
 struct ring_buffer;
+struct user_ring_buffer;
 
 typedef int (*ring_buffer_sample_fn)(void *ctx, void *data, size_t size);
 
@@ -1029,6 +1186,112 @@ LIBBPF_API int ring_buffer__add(struct ring_buffer *rb, int map_fd,
 LIBBPF_API int ring_buffer__poll(struct ring_buffer *rb, int timeout_ms);
 LIBBPF_API int ring_buffer__consume(struct ring_buffer *rb);
 LIBBPF_API int ring_buffer__epoll_fd(const struct ring_buffer *rb);
+
+struct user_ring_buffer_opts {
+	size_t sz; /* size of this struct, for forward/backward compatibility */
+};
+
+#define user_ring_buffer_opts__last_field sz
+
+/* @brief **user_ring_buffer__new()** creates a new instance of a user ring
+ * buffer.
+ *
+ * @param map_fd A file descriptor to a BPF_MAP_TYPE_USER_RINGBUF map.
+ * @param opts Options for how the ring buffer should be created.
+ * @return A user ring buffer on success; NULL and errno being set on a
+ * failure.
+ */
+LIBBPF_API struct user_ring_buffer *
+user_ring_buffer__new(int map_fd, const struct user_ring_buffer_opts *opts);
+
+/* @brief **user_ring_buffer__reserve()** reserves a pointer to a sample in the
+ * user ring buffer.
+ * @param rb A pointer to a user ring buffer.
+ * @param size The size of the sample, in bytes.
+ * @return A pointer to an 8-byte aligned reserved region of the user ring
+ * buffer; NULL, and errno being set if a sample could not be reserved.
+ *
+ * This function is *not* thread safe, and callers must synchronize accessing
+ * this function if there are multiple producers.  If a size is requested that
+ * is larger than the size of the entire ring buffer, errno will be set to
+ * E2BIG and NULL is returned. If the ring buffer could accommodate the size,
+ * but currently does not have enough space, errno is set to ENOSPC and NULL is
+ * returned.
+ *
+ * After initializing the sample, callers must invoke
+ * **user_ring_buffer__submit()** to post the sample to the kernel. Otherwise,
+ * the sample must be freed with **user_ring_buffer__discard()**.
+ */
+LIBBPF_API void *user_ring_buffer__reserve(struct user_ring_buffer *rb, __u32 size);
+
+/* @brief **user_ring_buffer__reserve_blocking()** reserves a record in the
+ * ring buffer, possibly blocking for up to @timeout_ms until a sample becomes
+ * available.
+ * @param rb The user ring buffer.
+ * @param size The size of the sample, in bytes.
+ * @param timeout_ms The amount of time, in milliseconds, for which the caller
+ * should block when waiting for a sample. -1 causes the caller to block
+ * indefinitely.
+ * @return A pointer to an 8-byte aligned reserved region of the user ring
+ * buffer; NULL, and errno being set if a sample could not be reserved.
+ *
+ * This function is *not* thread safe, and callers must synchronize
+ * accessing this function if there are multiple producers
+ *
+ * If **timeout_ms** is -1, the function will block indefinitely until a sample
+ * becomes available. Otherwise, **timeout_ms** must be non-negative, or errno
+ * is set to EINVAL, and NULL is returned. If **timeout_ms** is 0, no blocking
+ * will occur and the function will return immediately after attempting to
+ * reserve a sample.
+ *
+ * If **size** is larger than the size of the entire ring buffer, errno is set
+ * to E2BIG and NULL is returned. If the ring buffer could accommodate
+ * **size**, but currently does not have enough space, the caller will block
+ * until at most **timeout_ms** has elapsed. If insufficient space is available
+ * at that time, errno is set to ENOSPC, and NULL is returned.
+ *
+ * The kernel guarantees that it will wake up this thread to check if
+ * sufficient space is available in the ring buffer at least once per
+ * invocation of the **bpf_ringbuf_drain()** helper function, provided that at
+ * least one sample is consumed, and the BPF program did not invoke the
+ * function with BPF_RB_NO_WAKEUP. A wakeup may occur sooner than that, but the
+ * kernel does not guarantee this. If the helper function is invoked with
+ * BPF_RB_FORCE_WAKEUP, a wakeup event will be sent even if no sample is
+ * consumed.
+ *
+ * When a sample of size **size** is found within **timeout_ms**, a pointer to
+ * the sample is returned. After initializing the sample, callers must invoke
+ * **user_ring_buffer__submit()** to post the sample to the ring buffer.
+ * Otherwise, the sample must be freed with **user_ring_buffer__discard()**.
+ */
+LIBBPF_API void *user_ring_buffer__reserve_blocking(struct user_ring_buffer *rb,
+						    __u32 size,
+						    int timeout_ms);
+
+/* @brief **user_ring_buffer__submit()** submits a previously reserved sample
+ * into the ring buffer.
+ * @param rb The user ring buffer.
+ * @param sample A reserved sample.
+ *
+ * It is not necessary to synchronize amongst multiple producers when invoking
+ * this function.
+ */
+LIBBPF_API void user_ring_buffer__submit(struct user_ring_buffer *rb, void *sample);
+
+/* @brief **user_ring_buffer__discard()** discards a previously reserved sample.
+ * @param rb The user ring buffer.
+ * @param sample A reserved sample.
+ *
+ * It is not necessary to synchronize amongst multiple producers when invoking
+ * this function.
+ */
+LIBBPF_API void user_ring_buffer__discard(struct user_ring_buffer *rb, void *sample);
+
+/* @brief **user_ring_buffer__free()** frees a ring buffer that was previously
+ * created with **user_ring_buffer__new()**.
+ * @param rb The user ring buffer being freed.
+ */
+LIBBPF_API void user_ring_buffer__free(struct user_ring_buffer *rb);
 
 /* Perf buffer APIs */
 struct perf_buffer;

@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-saitek.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-saitek.ko drivers/hid/hid-saitek.o drivers/hid/hid-saitek.mod.o;  true

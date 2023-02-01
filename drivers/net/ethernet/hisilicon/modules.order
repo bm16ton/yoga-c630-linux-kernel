@@ -1,0 +1,11 @@
+drivers/net/ethernet/hisilicon/hix5hd2_gmac.ko
+drivers/net/ethernet/hisilicon/hip04_eth.ko
+drivers/net/ethernet/hisilicon/hns_mdio.ko
+drivers/net/ethernet/hisilicon/hns/hnae.ko
+drivers/net/ethernet/hisilicon/hns/hns_dsaf.ko
+drivers/net/ethernet/hisilicon/hns/hns_enet_drv.ko
+drivers/net/ethernet/hisilicon/hns3/hnae3.ko
+drivers/net/ethernet/hisilicon/hns3/hns3.ko
+drivers/net/ethernet/hisilicon/hns3/hclgevf.ko
+drivers/net/ethernet/hisilicon/hns3/hclge.ko
+drivers/net/ethernet/hisilicon/hisi_femac.ko

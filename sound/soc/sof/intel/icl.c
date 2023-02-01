@@ -13,6 +13,10 @@
 #include <linux/kconfig.h>
 #include <linux/export.h>
 #include <linux/bits.h>
+<<<<<<< HEAD
+#include "../ipc4-priv.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../ops.h"
 #include "hda.h"
 #include "hda-ipc.h"
@@ -56,11 +60,24 @@ static int icl_dsp_post_fw_run(struct snd_sof_dev *sdev)
 	int ret;
 
 	if (sdev->first_boot) {
+<<<<<<< HEAD
+		struct sof_intel_hda_dev *hdev = sdev->pdata->hw_pdata;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = hda_sdw_startup(sdev);
 		if (ret < 0) {
 			dev_err(sdev->dev, "error: could not startup SoundWire links\n");
 			return ret;
 		}
+<<<<<<< HEAD
+
+		/* Check if IMR boot is usable */
+		if (!sof_debug_check_flag(SOF_DBG_IGNORE_D3_PERSISTENT) &&
+		    sdev->fw_ready.flags & SOF_IPC_INFO_D3_PERSISTENT)
+			hdev->imrboot_supported = true;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	hda_sdw_int_enable(sdev, true);
@@ -88,6 +105,72 @@ static int icl_dsp_post_fw_run(struct snd_sof_dev *sdev)
 }
 
 /* Icelake ops */
+<<<<<<< HEAD
+struct snd_sof_dsp_ops sof_icl_ops;
+EXPORT_SYMBOL_NS(sof_icl_ops, SND_SOC_SOF_INTEL_HDA_COMMON);
+
+int sof_icl_ops_init(struct snd_sof_dev *sdev)
+{
+	/* common defaults */
+	memcpy(&sof_icl_ops, &sof_hda_common_ops, sizeof(struct snd_sof_dsp_ops));
+
+	/* probe/remove/shutdown */
+	sof_icl_ops.shutdown	= hda_dsp_shutdown;
+
+	if (sdev->pdata->ipc_type == SOF_IPC) {
+		/* doorbell */
+		sof_icl_ops.irq_thread	= cnl_ipc_irq_thread;
+
+		/* ipc */
+		sof_icl_ops.send_msg	= cnl_ipc_send_msg;
+
+		/* debug */
+		sof_icl_ops.ipc_dump	= cnl_ipc_dump;
+	}
+
+	if (sdev->pdata->ipc_type == SOF_INTEL_IPC4) {
+		struct sof_ipc4_fw_data *ipc4_data;
+
+		sdev->private = devm_kzalloc(sdev->dev, sizeof(*ipc4_data), GFP_KERNEL);
+		if (!sdev->private)
+			return -ENOMEM;
+
+		ipc4_data = sdev->private;
+		ipc4_data->manifest_fw_hdr_offset = SOF_MAN4_FW_HDR_OFFSET;
+
+		ipc4_data->mtrace_type = SOF_IPC4_MTRACE_INTEL_CAVS_2;
+
+		/* doorbell */
+		sof_icl_ops.irq_thread	= cnl_ipc4_irq_thread;
+
+		/* ipc */
+		sof_icl_ops.send_msg	= cnl_ipc4_send_msg;
+
+		/* debug */
+		sof_icl_ops.ipc_dump	= cnl_ipc4_dump;
+	}
+
+	/* debug */
+	sof_icl_ops.debug_map	= icl_dsp_debugfs;
+	sof_icl_ops.debug_map_count	= ARRAY_SIZE(icl_dsp_debugfs);
+
+	/* pre/post fw run */
+	sof_icl_ops.post_fw_run = icl_dsp_post_fw_run;
+
+	/* firmware run */
+	sof_icl_ops.run = hda_dsp_cl_boot_firmware_iccmax;
+	sof_icl_ops.stall = icl_dsp_core_stall;
+
+	/* dsp core get/put */
+	sof_icl_ops.core_get = hda_dsp_core_get;
+
+	/* set DAI driver ops */
+	hda_set_dai_drv_ops(sdev, &sof_icl_ops);
+
+	return 0;
+};
+EXPORT_SYMBOL_NS(sof_icl_ops_init, SND_SOC_SOF_INTEL_HDA_COMMON);
+=======
 const struct snd_sof_dsp_ops sof_icl_ops = {
 	/* probe/remove/shutdown */
 	.probe		= hda_dsp_probe,
@@ -191,6 +274,7 @@ const struct snd_sof_dsp_ops sof_icl_ops = {
 	.dsp_arch_ops = &sof_xtensa_arch_ops,
 };
 EXPORT_SYMBOL_NS(sof_icl_ops, SND_SOC_SOF_INTEL_HDA_COMMON);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 const struct sof_intel_dsp_desc icl_chip_info = {
 	/* Icelake */
@@ -202,11 +286,23 @@ const struct sof_intel_dsp_desc icl_chip_info = {
 	.ipc_ack = CNL_DSP_REG_HIPCIDA,
 	.ipc_ack_mask = CNL_DSP_REG_HIPCIDA_DONE,
 	.ipc_ctl = CNL_DSP_REG_HIPCCTL,
+<<<<<<< HEAD
+	.rom_status_reg = HDA_DSP_SRAM_REG_ROM_STATUS,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.rom_init_timeout	= 300,
 	.ssp_count = ICL_SSP_COUNT,
 	.ssp_base_offset = CNL_SSP_BASE_OFFSET,
 	.sdw_shim_base = SDW_SHIM_BASE,
 	.sdw_alh_base = SDW_ALH_BASE,
 	.check_sdw_irq	= hda_common_check_sdw_irq,
+<<<<<<< HEAD
+	.check_ipc_irq	= hda_dsp_check_ipc_irq,
+	.cl_init = cl_dsp_init,
+	.power_down_dsp = hda_power_down_dsp,
+	.disable_interrupts = hda_dsp_disable_interrupts,
+	.hw_ip_version = SOF_INTEL_CAVS_2_0,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(icl_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);

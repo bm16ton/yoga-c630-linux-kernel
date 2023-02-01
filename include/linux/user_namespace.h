@@ -54,6 +54,18 @@ enum ucount_type {
 	UCOUNT_FANOTIFY_GROUPS,
 	UCOUNT_FANOTIFY_MARKS,
 #endif
+<<<<<<< HEAD
+	UCOUNT_COUNTS,
+};
+
+enum rlimit_type {
+	UCOUNT_RLIMIT_NPROC,
+	UCOUNT_RLIMIT_MSGQUEUE,
+	UCOUNT_RLIMIT_SIGPENDING,
+	UCOUNT_RLIMIT_MEMLOCK,
+	UCOUNT_RLIMIT_COUNTS,
+};
+=======
 	UCOUNT_RLIMIT_NPROC,
 	UCOUNT_RLIMIT_MSGQUEUE,
 	UCOUNT_RLIMIT_SIGPENDING,
@@ -62,6 +74,7 @@ enum ucount_type {
 };
 
 #define MAX_PER_NAMESPACE_UCOUNTS UCOUNT_RLIMIT_NPROC
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct user_namespace {
 	struct uid_gid_map	uid_map;
@@ -99,6 +112,10 @@ struct user_namespace {
 #endif
 	struct ucounts		*ucounts;
 	long ucount_max[UCOUNT_COUNTS];
+<<<<<<< HEAD
+	long rlimit_max[UCOUNT_RLIMIT_COUNTS];
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __randomize_layout;
 
 struct ucounts {
@@ -107,6 +124,10 @@ struct ucounts {
 	kuid_t uid;
 	atomic_t count;
 	atomic_long_t ucount[UCOUNT_COUNTS];
+<<<<<<< HEAD
+	atomic_long_t rlimit[UCOUNT_RLIMIT_COUNTS];
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 extern struct user_namespace init_user_ns;
@@ -120,6 +141,28 @@ struct ucounts *alloc_ucounts(struct user_namespace *ns, kuid_t uid);
 struct ucounts * __must_check get_ucounts(struct ucounts *ucounts);
 void put_ucounts(struct ucounts *ucounts);
 
+<<<<<<< HEAD
+static inline long get_rlimit_value(struct ucounts *ucounts, enum rlimit_type type)
+{
+	return atomic_long_read(&ucounts->rlimit[type]);
+}
+
+long inc_rlimit_ucounts(struct ucounts *ucounts, enum rlimit_type type, long v);
+bool dec_rlimit_ucounts(struct ucounts *ucounts, enum rlimit_type type, long v);
+long inc_rlimit_get_ucounts(struct ucounts *ucounts, enum rlimit_type type);
+void dec_rlimit_put_ucounts(struct ucounts *ucounts, enum rlimit_type type);
+bool is_rlimit_overlimit(struct ucounts *ucounts, enum rlimit_type type, unsigned long max);
+
+static inline long get_userns_rlimit_max(struct user_namespace *ns, enum rlimit_type type)
+{
+	return READ_ONCE(ns->rlimit_max[type]);
+}
+
+static inline void set_userns_rlimit_max(struct user_namespace *ns,
+		enum rlimit_type type, unsigned long max)
+{
+	ns->rlimit_max[type] = max <= LONG_MAX ? max : LONG_MAX;
+=======
 static inline long get_ucounts_value(struct ucounts *ucounts, enum ucount_type type)
 {
 	return atomic_long_read(&ucounts->ucount[type]);
@@ -135,6 +178,7 @@ static inline void set_rlimit_ucount_max(struct user_namespace *ns,
 		enum ucount_type type, unsigned long max)
 {
 	ns->ucount_max[type] = max <= LONG_MAX ? max : LONG_MAX;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 #ifdef CONFIG_USER_NS

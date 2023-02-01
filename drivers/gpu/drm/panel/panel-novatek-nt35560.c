@@ -523,14 +523,21 @@ static int nt35560_probe(struct mipi_dsi_device *dsi)
 	return 0;
 }
 
+<<<<<<< HEAD
+static void nt35560_remove(struct mipi_dsi_device *dsi)
+=======
 static int nt35560_remove(struct mipi_dsi_device *dsi)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct nt35560 *nt = mipi_dsi_get_drvdata(dsi);
 
 	mipi_dsi_detach(dsi);
 	drm_panel_remove(&nt->panel);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id nt35560_of_match[] = {

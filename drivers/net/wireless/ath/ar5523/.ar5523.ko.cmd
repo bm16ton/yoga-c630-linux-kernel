@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ar5523/ar5523.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/ath/ar5523/ar5523.ko drivers/net/wireless/ath/ar5523/ar5523.o drivers/net/wireless/ath/ar5523/ar5523.mod.o;  true

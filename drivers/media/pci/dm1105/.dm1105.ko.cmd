@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/dm1105/dm1105.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/dm1105/dm1105.ko drivers/media/pci/dm1105/dm1105.o drivers/media/pci/dm1105/dm1105.mod.o;  true

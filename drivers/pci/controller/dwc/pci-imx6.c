@@ -51,6 +51,10 @@ enum imx6_pcie_variants {
 	IMX7D,
 	IMX8MQ,
 	IMX8MM,
+<<<<<<< HEAD
+	IMX8MP,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define IMX6_PCIE_FLAG_IMX6_PHY			BIT(0)
@@ -61,6 +65,7 @@ struct imx6_pcie_drvdata {
 	enum imx6_pcie_variants variant;
 	u32 flags;
 	int dbi_length;
+	const char *gpr;
 };
 
 struct imx6_pcie {
@@ -150,7 +155,12 @@ struct imx6_pcie {
 static unsigned int imx6_pcie_grp_offset(const struct imx6_pcie *imx6_pcie)
 {
 	WARN_ON(imx6_pcie->drvdata->variant != IMX8MQ &&
+<<<<<<< HEAD
+		imx6_pcie->drvdata->variant != IMX8MM &&
+		imx6_pcie->drvdata->variant != IMX8MP);
+=======
 		imx6_pcie->drvdata->variant != IMX8MM);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return imx6_pcie->controller_id == 1 ? IOMUXC_GPR16 : IOMUXC_GPR14;
 }
 
@@ -301,6 +311,10 @@ static void imx6_pcie_init_phy(struct imx6_pcie *imx6_pcie)
 {
 	switch (imx6_pcie->drvdata->variant) {
 	case IMX8MM:
+<<<<<<< HEAD
+	case IMX8MP:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * The PHY initialization had been done in the PHY
 		 * driver, break here directly.
@@ -558,6 +572,7 @@ static int imx6_pcie_enable_ref_clk(struct imx6_pcie *imx6_pcie)
 		break;
 	case IMX8MM:
 	case IMX8MQ:
+	case IMX8MP:
 		ret = clk_prepare_enable(imx6_pcie->pcie_aux);
 		if (ret) {
 			dev_err(dev, "unable to enable pcie_aux clock\n");
@@ -602,6 +617,10 @@ static void imx6_pcie_disable_ref_clk(struct imx6_pcie *imx6_pcie)
 		break;
 	case IMX8MM:
 	case IMX8MQ:
+<<<<<<< HEAD
+	case IMX8MP:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		clk_disable_unprepare(imx6_pcie->pcie_aux);
 		break;
 	default:
@@ -659,6 +678,11 @@ static void imx6_pcie_clk_disable(struct imx6_pcie *imx6_pcie)
 	clk_disable_unprepare(imx6_pcie->pcie);
 	clk_disable_unprepare(imx6_pcie->pcie_bus);
 	clk_disable_unprepare(imx6_pcie->pcie_phy);
+<<<<<<< HEAD
+}
+
+static void imx6_pcie_assert_core_reset(struct imx6_pcie *imx6_pcie)
+=======
 }
 
 static void imx6_pcie_assert_core_reset(struct imx6_pcie *imx6_pcie)
@@ -669,6 +693,50 @@ static void imx6_pcie_assert_core_reset(struct imx6_pcie *imx6_pcie)
 		reset_control_assert(imx6_pcie->pciephy_reset);
 		fallthrough;
 	case IMX8MM:
+		reset_control_assert(imx6_pcie->apps_reset);
+		break;
+	case IMX6SX:
+		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR12,
+				   IMX6SX_GPR12_PCIE_TEST_POWERDOWN,
+				   IMX6SX_GPR12_PCIE_TEST_POWERDOWN);
+		/* Force PCIe PHY reset */
+		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR5,
+				   IMX6SX_GPR5_PCIE_BTNRST_RESET,
+				   IMX6SX_GPR5_PCIE_BTNRST_RESET);
+		break;
+	case IMX6QP:
+		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR1,
+				   IMX6Q_GPR1_PCIE_SW_RST,
+				   IMX6Q_GPR1_PCIE_SW_RST);
+		break;
+	case IMX6Q:
+		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR1,
+				   IMX6Q_GPR1_PCIE_TEST_PD, 1 << 18);
+		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR1,
+				   IMX6Q_GPR1_PCIE_REF_CLK_EN, 0 << 16);
+		break;
+	}
+
+	/* Some boards don't have PCIe reset GPIO. */
+	if (gpio_is_valid(imx6_pcie->reset_gpio))
+		gpio_set_value_cansleep(imx6_pcie->reset_gpio,
+					imx6_pcie->gpio_active_high);
+}
+
+static int imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+{
+	struct dw_pcie *pci = imx6_pcie->pci;
+	struct device *dev = pci->dev;
+
+	switch (imx6_pcie->drvdata->variant) {
+<<<<<<< HEAD
+	case IMX7D:
+	case IMX8MQ:
+		reset_control_assert(imx6_pcie->pciephy_reset);
+		fallthrough;
+	case IMX8MM:
+	case IMX8MP:
 		reset_control_assert(imx6_pcie->apps_reset);
 		break;
 	case IMX6SX:
@@ -744,9 +812,54 @@ static int imx6_pcie_deassert_core_reset(struct imx6_pcie *imx6_pcie)
 		break;
 	case IMX6Q:		/* Nothing to do */
 	case IMX8MM:
+	case IMX8MP:
 		break;
 	}
 
+=======
+	case IMX8MQ:
+		reset_control_deassert(imx6_pcie->pciephy_reset);
+		break;
+	case IMX7D:
+		reset_control_deassert(imx6_pcie->pciephy_reset);
+
+		/* Workaround for ERR010728, failure of PCI-e PLL VCO to
+		 * oscillate, especially when cold.  This turns off "Duty-cycle
+		 * Corrector" and other mysterious undocumented things.
+		 */
+		if (likely(imx6_pcie->phy_base)) {
+			/* De-assert DCC_FB_EN */
+			writel(PCIE_PHY_CMN_REG4_DCC_FB_EN,
+			       imx6_pcie->phy_base + PCIE_PHY_CMN_REG4);
+			/* Assert RX_EQS and RX_EQS_SEL */
+			writel(PCIE_PHY_CMN_REG24_RX_EQ_SEL
+				| PCIE_PHY_CMN_REG24_RX_EQ,
+			       imx6_pcie->phy_base + PCIE_PHY_CMN_REG24);
+			/* Assert ATT_MODE */
+			writel(PCIE_PHY_CMN_REG26_ATT_MODE,
+			       imx6_pcie->phy_base + PCIE_PHY_CMN_REG26);
+		} else {
+			dev_warn(dev, "Unable to apply ERR010728 workaround. DT missing fsl,imx7d-pcie-phy phandle ?\n");
+		}
+
+		imx7d_pcie_wait_for_phy_pll_lock(imx6_pcie);
+		break;
+	case IMX6SX:
+		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR5,
+				   IMX6SX_GPR5_PCIE_BTNRST_RESET, 0);
+		break;
+	case IMX6QP:
+		regmap_update_bits(imx6_pcie->iomuxc_gpr, IOMUXC_GPR1,
+				   IMX6Q_GPR1_PCIE_SW_RST, 0);
+
+		usleep_range(200, 500);
+		break;
+	case IMX6Q:		/* Nothing to do */
+	case IMX8MM:
+		break;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Some boards don't have PCIe reset GPIO. */
 	if (gpio_is_valid(imx6_pcie->reset_gpio)) {
 		msleep(100);
@@ -793,6 +906,10 @@ static void imx6_pcie_ltssm_enable(struct device *dev)
 	case IMX7D:
 	case IMX8MQ:
 	case IMX8MM:
+<<<<<<< HEAD
+	case IMX8MP:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		reset_control_deassert(imx6_pcie->apps_reset);
 		break;
 	}
@@ -812,6 +929,10 @@ static void imx6_pcie_ltssm_disable(struct device *dev)
 	case IMX7D:
 	case IMX8MQ:
 	case IMX8MM:
+<<<<<<< HEAD
+	case IMX8MP:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		reset_control_assert(imx6_pcie->apps_reset);
 		break;
 	}
@@ -899,6 +1020,7 @@ err_reset_phy:
 		dw_pcie_readl_dbi(pci, PCIE_PORT_DEBUG1));
 	imx6_pcie_reset_phy(imx6_pcie);
 	return 0;
+<<<<<<< HEAD
 }
 
 static void imx6_pcie_stop_link(struct dw_pcie *pci)
@@ -909,6 +1031,18 @@ static void imx6_pcie_stop_link(struct dw_pcie *pci)
 	imx6_pcie_ltssm_disable(dev);
 }
 
+=======
+}
+
+static void imx6_pcie_stop_link(struct dw_pcie *pci)
+{
+	struct device *dev = pci->dev;
+
+	/* Turn off PCIe LTSSM */
+	imx6_pcie_ltssm_disable(dev);
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int imx6_pcie_host_init(struct dw_pcie_rp *pp)
 {
 	struct dw_pcie *pci = to_dw_pcie_from_pp(pp);
@@ -935,19 +1069,36 @@ static int imx6_pcie_host_init(struct dw_pcie_rp *pp)
 	}
 
 	if (imx6_pcie->phy) {
+<<<<<<< HEAD
+		ret = phy_init(imx6_pcie->phy);
+=======
 		ret = phy_power_on(imx6_pcie->phy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret) {
 			dev_err(dev, "pcie PHY power up failed\n");
 			goto err_clk_disable;
 		}
 	}
 
+<<<<<<< HEAD
+	if (imx6_pcie->phy) {
+		ret = phy_power_on(imx6_pcie->phy);
+		if (ret) {
+			dev_err(dev, "waiting for PHY ready timeout!\n");
+			goto err_phy_off;
+		}
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = imx6_pcie_deassert_core_reset(imx6_pcie);
 	if (ret < 0) {
 		dev_err(dev, "pcie deassert core reset failed: %d\n", ret);
 		goto err_phy_off;
 	}
 
+<<<<<<< HEAD
+=======
 	if (imx6_pcie->phy) {
 		ret = phy_init(imx6_pcie->phy);
 		if (ret) {
@@ -955,13 +1106,18 @@ static int imx6_pcie_host_init(struct dw_pcie_rp *pp)
 			goto err_phy_off;
 		}
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	imx6_setup_phy_mpll(imx6_pcie);
 
 	return 0;
 
 err_phy_off:
 	if (imx6_pcie->phy)
+<<<<<<< HEAD
+		phy_exit(imx6_pcie->phy);
+=======
 		phy_power_off(imx6_pcie->phy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_clk_disable:
 	imx6_pcie_clk_disable(imx6_pcie);
 err_reg_disable:
@@ -1179,6 +1335,10 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 		}
 		break;
 	case IMX8MM:
+<<<<<<< HEAD
+	case IMX8MP:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		imx6_pcie->pcie_aux = devm_clk_get(dev, "pcie_aux");
 		if (IS_ERR(imx6_pcie->pcie_aux))
 			return dev_err_probe(dev, PTR_ERR(imx6_pcie->pcie_aux),
@@ -1216,7 +1376,7 @@ static int imx6_pcie_probe(struct platform_device *pdev)
 
 	/* Grab GPR config register range */
 	imx6_pcie->iomuxc_gpr =
-		 syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
+		 syscon_regmap_lookup_by_compatible(imx6_pcie->drvdata->gpr);
 	if (IS_ERR(imx6_pcie->iomuxc_gpr)) {
 		dev_err(dev, "unable to find iomuxc registers\n");
 		return PTR_ERR(imx6_pcie->iomuxc_gpr);
@@ -1295,12 +1455,14 @@ static const struct imx6_pcie_drvdata drvdata[] = {
 		.flags = IMX6_PCIE_FLAG_IMX6_PHY |
 			 IMX6_PCIE_FLAG_IMX6_SPEED_CHANGE,
 		.dbi_length = 0x200,
+		.gpr = "fsl,imx6q-iomuxc-gpr",
 	},
 	[IMX6SX] = {
 		.variant = IMX6SX,
 		.flags = IMX6_PCIE_FLAG_IMX6_PHY |
 			 IMX6_PCIE_FLAG_IMX6_SPEED_CHANGE |
 			 IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+		.gpr = "fsl,imx6q-iomuxc-gpr",
 	},
 	[IMX6QP] = {
 		.variant = IMX6QP,
@@ -1308,13 +1470,29 @@ static const struct imx6_pcie_drvdata drvdata[] = {
 			 IMX6_PCIE_FLAG_IMX6_SPEED_CHANGE |
 			 IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
 		.dbi_length = 0x200,
+<<<<<<< HEAD
+		.gpr = "fsl,imx6q-iomuxc-gpr",
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	[IMX7D] = {
 		.variant = IMX7D,
 		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+		.gpr = "fsl,imx7d-iomuxc-gpr",
 	},
 	[IMX8MQ] = {
 		.variant = IMX8MQ,
+		.gpr = "fsl,imx8mq-iomuxc-gpr",
+	},
+	[IMX8MM] = {
+		.variant = IMX8MM,
+		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+		.gpr = "fsl,imx8mm-iomuxc-gpr",
+	},
+	[IMX8MP] = {
+		.variant = IMX8MP,
+		.flags = IMX6_PCIE_FLAG_SUPPORTS_SUSPEND,
+		.gpr = "fsl,imx8mp-iomuxc-gpr",
 	},
 	[IMX8MM] = {
 		.variant = IMX8MM,
@@ -1329,6 +1507,10 @@ static const struct of_device_id imx6_pcie_of_match[] = {
 	{ .compatible = "fsl,imx7d-pcie",  .data = &drvdata[IMX7D],  },
 	{ .compatible = "fsl,imx8mq-pcie", .data = &drvdata[IMX8MQ], },
 	{ .compatible = "fsl,imx8mm-pcie", .data = &drvdata[IMX8MM], },
+<<<<<<< HEAD
+	{ .compatible = "fsl,imx8mp-pcie", .data = &drvdata[IMX8MP], },
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{},
 };
 

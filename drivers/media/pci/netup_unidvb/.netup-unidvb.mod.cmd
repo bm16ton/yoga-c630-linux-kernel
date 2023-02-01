@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/netup_unidvb/netup-unidvb.mod := printf '%s\n'   netup_unidvb_core.o netup_unidvb_i2c.o netup_unidvb_ci.o netup_unidvb_spi.o | awk '!x[$$0]++ { print("drivers/media/pci/netup_unidvb/"$$0) }' > drivers/media/pci/netup_unidvb/netup-unidvb.mod

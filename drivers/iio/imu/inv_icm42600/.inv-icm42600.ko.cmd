@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/inv_icm42600/inv-icm42600.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/inv_icm42600/inv-icm42600.ko drivers/iio/imu/inv_icm42600/inv-icm42600.o drivers/iio/imu/inv_icm42600/inv-icm42600.mod.o;  true

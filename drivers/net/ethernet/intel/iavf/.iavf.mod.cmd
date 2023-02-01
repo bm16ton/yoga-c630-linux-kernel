@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/iavf/iavf.mod := printf '%s\n'   iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o iavf_adv_rss.o iavf_txrx.o iavf_common.o iavf_adminq.o iavf_client.o | awk '!x[$$0]++ { print("drivers/net/ethernet/intel/iavf/"$$0) }' > drivers/net/ethernet/intel/iavf/iavf.mod

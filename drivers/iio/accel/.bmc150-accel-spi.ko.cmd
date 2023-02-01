@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/bmc150-accel-spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/bmc150-accel-spi.ko drivers/iio/accel/bmc150-accel-spi.o drivers/iio/accel/bmc150-accel-spi.mod.o;  true

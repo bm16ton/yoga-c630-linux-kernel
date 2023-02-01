@@ -278,7 +278,11 @@ static void svm_range_free(struct svm_range *prange, bool update_mem_usage)
 	svm_range_free_dma_mappings(prange);
 
 	if (update_mem_usage && !p->xnack_enabled) {
+<<<<<<< HEAD
+		pr_debug("unreserve prange 0x%p size: 0x%llx\n", prange, size);
+=======
 		pr_debug("unreserve mem limit: %lld\n", size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		amdgpu_amdkfd_unreserve_mem_limit(NULL, size,
 					KFD_IOC_ALLOC_MEM_FLAGS_USERPTR);
 	}
@@ -2913,13 +2917,23 @@ retry_write_locked:
 				 */
 				if (prange->actual_loc)
 					r = svm_migrate_vram_to_ram(prange, mm,
+<<<<<<< HEAD
+					   KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU,
+					   NULL);
+=======
 					   KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				else
 					r = 0;
 			}
 		} else {
 			r = svm_migrate_vram_to_ram(prange, mm,
+<<<<<<< HEAD
+					KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU,
+					NULL);
+=======
 					KFD_MIGRATE_TRIGGER_PAGEFAULT_GPU);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		if (r) {
 			pr_debug("failed %d to migrate svms %p [0x%lx 0x%lx]\n",
@@ -2956,6 +2970,67 @@ out:
 	return r;
 }
 
+<<<<<<< HEAD
+int
+svm_range_switch_xnack_reserve_mem(struct kfd_process *p, bool xnack_enabled)
+{
+	struct svm_range *prange, *pchild;
+	uint64_t reserved_size = 0;
+	uint64_t size;
+	int r = 0;
+
+	pr_debug("switching xnack from %d to %d\n", p->xnack_enabled, xnack_enabled);
+
+	mutex_lock(&p->svms.lock);
+
+	list_for_each_entry(prange, &p->svms.list, list) {
+		svm_range_lock(prange);
+		list_for_each_entry(pchild, &prange->child_list, child_list) {
+			size = (pchild->last - pchild->start + 1) << PAGE_SHIFT;
+			if (xnack_enabled) {
+				amdgpu_amdkfd_unreserve_mem_limit(NULL, size,
+						KFD_IOC_ALLOC_MEM_FLAGS_USERPTR);
+			} else {
+				r = amdgpu_amdkfd_reserve_mem_limit(NULL, size,
+						KFD_IOC_ALLOC_MEM_FLAGS_USERPTR);
+				if (r)
+					goto out_unlock;
+				reserved_size += size;
+			}
+		}
+
+		size = (prange->last - prange->start + 1) << PAGE_SHIFT;
+		if (xnack_enabled) {
+			amdgpu_amdkfd_unreserve_mem_limit(NULL, size,
+						KFD_IOC_ALLOC_MEM_FLAGS_USERPTR);
+		} else {
+			r = amdgpu_amdkfd_reserve_mem_limit(NULL, size,
+						KFD_IOC_ALLOC_MEM_FLAGS_USERPTR);
+			if (r)
+				goto out_unlock;
+			reserved_size += size;
+		}
+out_unlock:
+		svm_range_unlock(prange);
+		if (r)
+			break;
+	}
+
+	if (r)
+		amdgpu_amdkfd_unreserve_mem_limit(NULL, reserved_size,
+						KFD_IOC_ALLOC_MEM_FLAGS_USERPTR);
+	else
+		/* Change xnack mode must be inside svms lock, to avoid race with
+		 * svm_range_deferred_list_work unreserve memory in parallel.
+		 */
+		p->xnack_enabled = xnack_enabled;
+
+	mutex_unlock(&p->svms.lock);
+	return r;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void svm_range_list_fini(struct kfd_process *p)
 {
 	struct svm_range *prange;
@@ -3181,6 +3256,8 @@ out:
 	return best_loc;
 }
 
+<<<<<<< HEAD
+=======
 /* FIXME: This is a workaround for page locking bug when some pages are
  * invalid during migration to VRAM
  */
@@ -3203,6 +3280,7 @@ void svm_range_prefault(struct svm_range *prange, struct mm_struct *mm,
 	}
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* svm_range_trigger_migration - start page migration if prefetch loc changed
  * @mm: current process mm_struct
  * @prange: svm range structure
@@ -3242,7 +3320,12 @@ svm_range_trigger_migration(struct mm_struct *mm, struct svm_range *prange,
 		return 0;
 
 	if (!best_loc) {
+<<<<<<< HEAD
+		r = svm_migrate_vram_to_ram(prange, mm,
+					KFD_MIGRATE_TRIGGER_PREFETCH, NULL);
+=======
 		r = svm_migrate_vram_to_ram(prange, mm, KFD_MIGRATE_TRIGGER_PREFETCH);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*migrated = !r;
 		return r;
 	}
@@ -3303,7 +3386,11 @@ static void svm_range_evict_svm_bo_worker(struct work_struct *work)
 		mutex_lock(&prange->migrate_mutex);
 		do {
 			r = svm_migrate_vram_to_ram(prange, mm,
+<<<<<<< HEAD
+					KFD_MIGRATE_TRIGGER_TTM_EVICTION, NULL);
+=======
 						KFD_MIGRATE_TRIGGER_TTM_EVICTION);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} while (!r && prange->actual_loc && --retries);
 
 		if (!r && prange->actual_loc)

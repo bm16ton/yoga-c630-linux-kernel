@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt7615/mt7615-common.mod := printf '%s\n'   main.o init.o mcu.o eeprom.o mac.o debugfs.o trace.o testmode.o | awk '!x[$$0]++ { print("drivers/net/wireless/mediatek/mt76/mt7615/"$$0) }' > drivers/net/wireless/mediatek/mt76/mt7615/mt7615-common.mod

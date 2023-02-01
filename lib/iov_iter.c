@@ -174,13 +174,23 @@ static int copyout(void __user *to, const void *from, size_t n)
 
 static int copyin(void *to, const void __user *from, size_t n)
 {
+	size_t res = n;
+
 	if (should_fail_usercopy())
 		return n;
 	if (access_ok(from, n)) {
+<<<<<<< HEAD
+		instrument_copy_from_user_before(to, from, n);
+		res = raw_copy_from_user(to, from, n);
+		instrument_copy_from_user_after(to, from, n, res);
+	}
+	return res;
+=======
 		instrument_copy_from_user(to, from, n);
 		n = raw_copy_from_user(to, from, n);
 	}
 	return n;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline struct pipe_buffer *pipe_buf(const struct pipe_inode_info *pipe,
@@ -340,10 +350,17 @@ static size_t copy_page_to_iter_pipe(struct page *page, size_t offset, size_t by
  *
  * Fault in one or more iovecs of the given iov_iter, to a maximum length of
  * @size.  For each iovec, fault in each page that constitutes the iovec.
+<<<<<<< HEAD
  *
  * Returns the number of bytes not faulted in (like copy_to_user() and
  * copy_from_user()).
  *
+=======
+ *
+ * Returns the number of bytes not faulted in (like copy_to_user() and
+ * copy_from_user()).
+ *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Always returns 0 for non-userspace iterators.
  */
 size_t fault_in_iov_iter_readable(const struct iov_iter *i, size_t size)
@@ -442,9 +459,15 @@ static inline unsigned int pipe_npages(const struct iov_iter *i, int *npages)
 	struct pipe_inode_info *pipe = i->pipe;
 	int used = pipe->head - pipe->tail;
 	int off = i->last_offset;
+<<<<<<< HEAD
 
 	*npages = max((int)pipe->max_usage - used, 0);
 
+=======
+
+	*npages = max((int)pipe->max_usage - used, 0);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (off > 0 && off < PAGE_SIZE) { // anon and not full
 		(*npages)++;
 		return off;
@@ -1209,6 +1232,7 @@ static unsigned long iov_iter_alignment_iovec(const struct iov_iter *i)
 	}
 	return res;
 }
+<<<<<<< HEAD
 
 static unsigned long iov_iter_alignment_bvec(const struct iov_iter *i)
 {
@@ -1239,6 +1263,38 @@ unsigned long iov_iter_alignment(const struct iov_iter *i)
 		return 0;
 	}
 
+=======
+
+static unsigned long iov_iter_alignment_bvec(const struct iov_iter *i)
+{
+	unsigned res = 0;
+	size_t size = i->count;
+	unsigned skip = i->iov_offset;
+	unsigned k;
+
+	for (k = 0; k < i->nr_segs; k++, skip = 0) {
+		size_t len = i->bvec[k].bv_len - skip;
+		res |= (unsigned long)i->bvec[k].bv_offset + skip;
+		if (len > size)
+			len = size;
+		res |= len;
+		size -= len;
+		if (!size)
+			break;
+	}
+	return res;
+}
+
+unsigned long iov_iter_alignment(const struct iov_iter *i)
+{
+	if (likely(iter_is_ubuf(i))) {
+		size_t size = i->count;
+		if (size)
+			return ((unsigned long)i->ubuf + i->iov_offset) | size;
+		return 0;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* iovec and kvec have identical layouts */
 	if (likely(iter_is_iovec(i) || iov_iter_is_kvec(i)))
 		return iov_iter_alignment_iovec(i);

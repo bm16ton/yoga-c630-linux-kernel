@@ -110,6 +110,10 @@
 #define RING_SBBSTATE(base)			_MMIO((base) + 0x118) /* hsw+ */
 #define RING_SBBADDR_UDW(base)			_MMIO((base) + 0x11c) /* gen8+ */
 #define RING_BBADDR(base)			_MMIO((base) + 0x140)
+<<<<<<< HEAD
+#define RING_BB_OFFSET(base)			_MMIO((base) + 0x158)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define RING_BBADDR_UDW(base)			_MMIO((base) + 0x168) /* gen8+ */
 #define CCID(base)				_MMIO((base) + 0x180)
 #define   CCID_EN				BIT(0)

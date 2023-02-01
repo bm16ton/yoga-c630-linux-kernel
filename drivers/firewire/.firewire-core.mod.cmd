@@ -1,0 +1,1 @@
+cmd_drivers/firewire/firewire-core.mod := printf '%s\n'   core-card.o core-cdev.o core-device.o core-iso.o core-topology.o core-transaction.o | awk '!x[$$0]++ { print("drivers/firewire/"$$0) }' > drivers/firewire/firewire-core.mod

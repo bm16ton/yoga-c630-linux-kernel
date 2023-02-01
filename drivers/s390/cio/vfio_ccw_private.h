@@ -18,6 +18,10 @@
 #include <linux/workqueue.h>
 #include <linux/vfio_ccw.h>
 #include <linux/vfio.h>
+<<<<<<< HEAD
+#include <linux/mdev.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <asm/crw.h>
 #include <asm/debug.h>
 
@@ -72,7 +76,10 @@ struct vfio_ccw_crw {
  * @sch: pointer to the subchannel
  * @state: internal state of the device
  * @completion: synchronization helper of the I/O completion
+<<<<<<< HEAD
+=======
  * @avail: available for creating a mediated device
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @io_region: MMIO region to input/output I/O arguments/results
  * @io_mutex: protect against concurrent update of I/O regions
  * @region: additional regions for other subchannel operations
@@ -88,13 +95,18 @@ struct vfio_ccw_crw {
  * @req_trigger: eventfd ctx for signaling userspace to return device
  * @io_work: work for deferral process of I/O handling
  * @crw_work: work for deferral process of CRW handling
+ * @release_comp: synchronization helper for vfio device release
+ * @parent: parent data structures for mdevs created
  */
 struct vfio_ccw_private {
 	struct vfio_device vdev;
 	struct subchannel	*sch;
 	int			state;
 	struct completion	*completion;
+<<<<<<< HEAD
+=======
 	atomic_t		avail;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct ccw_io_region	*io_region;
 	struct mutex		io_mutex;
 	struct vfio_ccw_region *region;
@@ -113,6 +125,12 @@ struct vfio_ccw_private {
 	struct eventfd_ctx	*req_trigger;
 	struct work_struct	io_work;
 	struct work_struct	crw_work;
+
+	struct completion	release_comp;
+
+	struct mdev_parent	parent;
+	struct mdev_type	mdev_type;
+	struct mdev_type	*mdev_types[1];
 } __aligned(8);
 
 int vfio_ccw_sch_quiesce(struct subchannel *sch);

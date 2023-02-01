@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/as3935.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/as3935.ko drivers/iio/proximity/as3935.o drivers/iio/proximity/as3935.mod.o;  true

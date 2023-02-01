@@ -226,6 +226,8 @@ config QCOM_SCM_DOWNLOAD_MODE_DEFAULT
 
 	  Say Y here to enable "download mode" by default.
 
+<<<<<<< HEAD
+=======
 config QCOM_TEE
 	tristate
 	select QCOM_SCM
@@ -246,6 +248,7 @@ config QCOM_TEE_UEFISECAPP
 	  Select Y or M here to provide access to EFI variables on the
 	  aforementioned platforms.
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config SYSFB
 	bool
 	select BOOT_VESA_SUPPORT

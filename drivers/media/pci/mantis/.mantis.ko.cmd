@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/mantis/mantis.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/mantis/mantis.ko drivers/media/pci/mantis/mantis.o drivers/media/pci/mantis/mantis.mod.o;  true

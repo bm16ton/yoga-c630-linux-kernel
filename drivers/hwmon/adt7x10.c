@@ -209,9 +209,15 @@ static int adt7x10_hyst_write(struct adt7x10_data *data, long hyst)
 	ret = regmap_read(data->regmap, ADT7X10_T_ALARM_HIGH, &regval);
 	if (ret < 0)
 		goto abort;
+<<<<<<< HEAD
 
 	limit = ADT7X10_REG_TO_TEMP(data, regval);
 
+=======
+
+	limit = ADT7X10_REG_TO_TEMP(data, regval);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	hyst = clamp_val(hyst, ADT7X10_TEMP_MIN, ADT7X10_TEMP_MAX);
 	regval = clamp_val(DIV_ROUND_CLOSEST(limit - hyst, 1000), 0,
 			   ADT7X10_T_HYST_MASK);
@@ -233,6 +239,36 @@ static int adt7x10_alarm_read(struct adt7x10_data *data, int index, long *val)
 	*val = !!(status & index);
 
 	return 0;
+<<<<<<< HEAD
+}
+
+static umode_t adt7x10_is_visible(const void *data,
+				  enum hwmon_sensor_types type,
+				  u32 attr, int channel)
+{
+	switch (attr) {
+	case hwmon_temp_max:
+	case hwmon_temp_min:
+	case hwmon_temp_crit:
+	case hwmon_temp_max_hyst:
+		return 0644;
+	case hwmon_temp_input:
+	case hwmon_temp_min_alarm:
+	case hwmon_temp_max_alarm:
+	case hwmon_temp_crit_alarm:
+	case hwmon_temp_min_hyst:
+	case hwmon_temp_crit_hyst:
+		return 0444;
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+static int adt7x10_read(struct device *dev, enum hwmon_sensor_types type,
+			u32 attr, int channel, long *val)
+=======
 }
 
 static umode_t adt7x10_is_visible(const void *data,
@@ -292,6 +328,50 @@ static int adt7x10_read(struct device *dev, enum hwmon_sensor_types type,
 
 static int adt7x10_write(struct device *dev, enum hwmon_sensor_types type,
 			 u32 attr, int channel, long val)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+{
+	struct adt7x10_data *data = dev_get_drvdata(dev);
+
+	switch (attr) {
+<<<<<<< HEAD
+	case hwmon_temp_input:
+		return adt7x10_temp_read(data, adt7x10_temperature, val);
+	case hwmon_temp_max:
+		return adt7x10_temp_read(data, adt7x10_t_alarm_high, val);
+	case hwmon_temp_min:
+		return adt7x10_temp_read(data, adt7x10_t_alarm_low, val);
+	case hwmon_temp_crit:
+		return adt7x10_temp_read(data, adt7x10_t_crit, val);
+	case hwmon_temp_max_hyst:
+		return adt7x10_hyst_read(data, adt7x10_t_alarm_high, val);
+	case hwmon_temp_min_hyst:
+		return adt7x10_hyst_read(data, adt7x10_t_alarm_low, val);
+	case hwmon_temp_crit_hyst:
+		return adt7x10_hyst_read(data, adt7x10_t_crit, val);
+	case hwmon_temp_min_alarm:
+		return adt7x10_alarm_read(data, ADT7X10_STAT_T_LOW, val);
+	case hwmon_temp_max_alarm:
+		return adt7x10_alarm_read(data, ADT7X10_STAT_T_HIGH, val);
+	case hwmon_temp_crit_alarm:
+		return adt7x10_alarm_read(data, ADT7X10_STAT_T_CRIT, val);
+=======
+	case hwmon_temp_max:
+		return adt7x10_temp_write(data, adt7x10_t_alarm_high, val);
+	case hwmon_temp_min:
+		return adt7x10_temp_write(data, adt7x10_t_alarm_low, val);
+	case hwmon_temp_crit:
+		return adt7x10_temp_write(data, adt7x10_t_crit, val);
+	case hwmon_temp_max_hyst:
+		return adt7x10_hyst_write(data, val);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	default:
+		return -EOPNOTSUPP;
+	}
+}
+
+<<<<<<< HEAD
+static int adt7x10_write(struct device *dev, enum hwmon_sensor_types type,
+			 u32 attr, int channel, long val)
 {
 	struct adt7x10_data *data = dev_get_drvdata(dev);
 
@@ -309,12 +389,15 @@ static int adt7x10_write(struct device *dev, enum hwmon_sensor_types type,
 	}
 }
 
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct hwmon_channel_info *adt7x10_info[] = {
 	HWMON_CHANNEL_INFO(temp, HWMON_T_INPUT | HWMON_T_MAX | HWMON_T_MIN |
 			   HWMON_T_CRIT | HWMON_T_MAX_HYST | HWMON_T_MIN_HYST |
 			   HWMON_T_CRIT_HYST | HWMON_T_MIN_ALARM |
 			   HWMON_T_MAX_ALARM | HWMON_T_CRIT_ALARM),
 	NULL,
+<<<<<<< HEAD
 };
 
 static const struct hwmon_ops adt7x10_hwmon_ops = {
@@ -328,6 +411,21 @@ static const struct hwmon_chip_info adt7x10_chip_info = {
 	.info = adt7x10_info,
 };
 
+=======
+};
+
+static const struct hwmon_ops adt7x10_hwmon_ops = {
+	.is_visible = adt7x10_is_visible,
+	.read = adt7x10_read,
+	.write = adt7x10_write,
+};
+
+static const struct hwmon_chip_info adt7x10_chip_info = {
+	.ops = &adt7x10_hwmon_ops,
+	.info = adt7x10_info,
+};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void adt7x10_restore_config(void *private)
 {
 	struct adt7x10_data *data = private;
@@ -397,8 +495,11 @@ int adt7x10_probe(struct device *dev, const char *name, int irq,
 }
 EXPORT_SYMBOL_GPL(adt7x10_probe);
 
+<<<<<<< HEAD
+=======
 #ifdef CONFIG_PM_SLEEP
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int adt7x10_suspend(struct device *dev)
 {
 	struct adt7x10_data *data = dev_get_drvdata(dev);
@@ -414,10 +515,7 @@ static int adt7x10_resume(struct device *dev)
 	return regmap_write(data->regmap, ADT7X10_CONFIG, data->config);
 }
 
-SIMPLE_DEV_PM_OPS(adt7x10_dev_pm_ops, adt7x10_suspend, adt7x10_resume);
-EXPORT_SYMBOL_GPL(adt7x10_dev_pm_ops);
-
-#endif /* CONFIG_PM_SLEEP */
+EXPORT_SIMPLE_DEV_PM_OPS(adt7x10_dev_pm_ops, adt7x10_suspend, adt7x10_resume);
 
 MODULE_AUTHOR("Hartmut Knaack");
 MODULE_DESCRIPTION("ADT7410/ADT7420, ADT7310/ADT7320 common code");

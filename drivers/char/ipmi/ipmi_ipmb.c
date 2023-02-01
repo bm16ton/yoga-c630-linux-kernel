@@ -218,8 +218,13 @@ static void ipmi_ipmb_send_response(struct ipmi_ipmb_dev *iidev,
 {
 	if ((msg->data[0] >> 2) & 1) {
 		/*
+<<<<<<< HEAD
+		 * It's a response being sent, we need to return a
+		 * response to the response.  Fake a send msg command
+=======
 		 * It's a response being sent, we needto return a
 		 * response response.  Fake a send msg command
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * response with channel 0.  This will always be ipmb
 		 * direct.
 		 */
@@ -424,10 +429,15 @@ static void ipmi_ipmb_request_events(void *send_info)
 	/* We don't fetch events here. */
 }
 
+<<<<<<< HEAD
+static void ipmi_ipmb_cleanup(struct ipmi_ipmb_dev *iidev)
+{
+=======
 static int ipmi_ipmb_remove(struct i2c_client *client)
 {
 	struct ipmi_ipmb_dev *iidev = i2c_get_clientdata(client);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (iidev->slave) {
 		i2c_slave_unregister(iidev->slave);
 		if (iidev->slave != iidev->client)
@@ -436,10 +446,21 @@ static int ipmi_ipmb_remove(struct i2c_client *client)
 	iidev->slave = NULL;
 	iidev->client = NULL;
 	ipmi_ipmb_stop_thread(iidev);
+<<<<<<< HEAD
+}
+
+static void ipmi_ipmb_remove(struct i2c_client *client)
+{
+	struct ipmi_ipmb_dev *iidev = i2c_get_clientdata(client);
+
+	ipmi_ipmb_cleanup(iidev);
+	ipmi_unregister_smi(iidev->intf);
+=======
 
 	ipmi_unregister_smi(iidev->intf);
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ipmi_ipmb_probe(struct i2c_client *client)
@@ -544,7 +565,11 @@ static int ipmi_ipmb_probe(struct i2c_client *client)
 out_err:
 	if (slave && slave != client)
 		i2c_unregister_device(slave);
+<<<<<<< HEAD
+	ipmi_ipmb_cleanup(iidev);
+=======
 	ipmi_ipmb_remove(client);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return rv;
 }
 

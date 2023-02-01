@@ -1,0 +1,3 @@
+drivers/net/ethernet/hisilicon/hns/hnae.ko
+drivers/net/ethernet/hisilicon/hns/hns_dsaf.ko
+drivers/net/ethernet/hisilicon/hns/hns_enet_drv.ko

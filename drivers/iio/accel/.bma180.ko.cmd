@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/bma180.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/bma180.ko drivers/iio/accel/bma180.o drivers/iio/accel/bma180.mod.o;  true

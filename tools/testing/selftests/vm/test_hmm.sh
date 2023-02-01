@@ -51,6 +51,8 @@ load_driver()
 			"spm_addr_dev0 and spm_addr_dev1"
 			usage
 		fi
+<<<<<<< HEAD
+=======
 	fi
 	if [ $? == 0 ]; then
 		major=$(awk "\$2==\"HMM_DMIRROR\" {print \$1}" /proc/devices)
@@ -60,13 +62,13 @@ load_driver()
 			mknod /dev/hmm_dmirror2 c $major 2
 			mknod /dev/hmm_dmirror3 c $major 3
 		fi
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	fi
 }
 
 unload_driver()
 {
 	modprobe -r $DRIVER > /dev/null 2>&1
-	rm -f /dev/hmm_dmirror?
 }
 
 run_smoke()

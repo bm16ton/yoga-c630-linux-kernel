@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/cros_ec_mkbp_proximity.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/cros_ec_mkbp_proximity.ko drivers/iio/proximity/cros_ec_mkbp_proximity.o drivers/iio/proximity/cros_ec_mkbp_proximity.mod.o;  true

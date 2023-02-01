@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/adv748x/adv748x.mod := printf '%s\n'   adv748x-afe.o adv748x-core.o adv748x-csi2.o adv748x-hdmi.o | awk '!x[$$0]++ { print("drivers/media/i2c/adv748x/"$$0) }' > drivers/media/i2c/adv748x/adv748x.mod

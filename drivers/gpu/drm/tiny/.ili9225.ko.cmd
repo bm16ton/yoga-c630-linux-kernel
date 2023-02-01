@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/tiny/ili9225.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/tiny/ili9225.ko drivers/gpu/drm/tiny/ili9225.o drivers/gpu/drm/tiny/ili9225.mod.o;  true

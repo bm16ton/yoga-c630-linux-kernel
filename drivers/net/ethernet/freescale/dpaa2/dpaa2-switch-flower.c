@@ -132,6 +132,10 @@ int dpaa2_switch_acl_entry_add(struct dpaa2_switch_filter_block *filter_block,
 						 DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, acl_entry_cfg->key_iova))) {
 		dev_err(dev, "DMA mapping failed\n");
+<<<<<<< HEAD
+		kfree(cmd_buff);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFAULT;
 	}
 
@@ -142,6 +146,10 @@ int dpaa2_switch_acl_entry_add(struct dpaa2_switch_filter_block *filter_block,
 			 DMA_TO_DEVICE);
 	if (err) {
 		dev_err(dev, "dpsw_acl_add_entry() failed %d\n", err);
+<<<<<<< HEAD
+		kfree(cmd_buff);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return err;
 	}
 
@@ -172,6 +180,10 @@ dpaa2_switch_acl_entry_remove(struct dpaa2_switch_filter_block *block,
 						 DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, acl_entry_cfg->key_iova))) {
 		dev_err(dev, "DMA mapping failed\n");
+<<<<<<< HEAD
+		kfree(cmd_buff);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFAULT;
 	}
 
@@ -182,6 +194,10 @@ dpaa2_switch_acl_entry_remove(struct dpaa2_switch_filter_block *block,
 			 DMA_TO_DEVICE);
 	if (err) {
 		dev_err(dev, "dpsw_acl_remove_entry() failed %d\n", err);
+<<<<<<< HEAD
+		kfree(cmd_buff);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return err;
 	}
 

@@ -5,10 +5,14 @@
 
 #include "../include/osdep_service.h"
 #include "../include/drv_types.h"
+<<<<<<< HEAD
+#include "../include/hal_intf.h"
+=======
 #include "../include/recv_osdep.h"
 #include "../include/xmit_osdep.h"
 #include "../include/hal_intf.h"
 #include "../include/mlme_osdep.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../include/sta_info.h"
 #include "../include/wifi.h"
 #include "../include/wlan_bssdef.h"
@@ -190,6 +194,40 @@ u8 *rtw_get_beacon_interval_from_ie(u8 *ie)
 	return ie + 8;
 }
 
+<<<<<<< HEAD
+static void rtw_join_timeout_handler(struct timer_list *t)
+{
+	struct adapter *adapter = from_timer(adapter, t, mlmepriv.assoc_timer);
+
+	_rtw_join_timeout_handler(adapter);
+}
+
+static void _rtw_scan_timeout_handler(struct timer_list *t)
+{
+	struct adapter *adapter = from_timer(adapter, t, mlmepriv.scan_to_timer);
+
+	rtw_scan_timeout_handler(adapter);
+}
+
+static void _dynamic_check_timer_handlder(struct timer_list *t)
+{
+	struct adapter *adapter = from_timer(adapter, t, mlmepriv.dynamic_chk_timer);
+
+	rtw_dynamic_check_timer_handlder(adapter);
+	_set_timer(&adapter->mlmepriv.dynamic_chk_timer, 2000);
+}
+
+static void rtw_init_mlme_timer(struct adapter *padapter)
+{
+	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
+
+	timer_setup(&pmlmepriv->assoc_timer, rtw_join_timeout_handler, 0);
+	timer_setup(&pmlmepriv->scan_to_timer, _rtw_scan_timeout_handler, 0);
+	timer_setup(&pmlmepriv->dynamic_chk_timer, _dynamic_check_timer_handlder, 0);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int rtw_init_mlme_priv(struct adapter *padapter)/* struct	mlme_priv *pmlmepriv) */
 {
 	int	i;
@@ -235,8 +273,11 @@ int rtw_init_mlme_priv(struct adapter *padapter)/* struct	mlme_priv *pmlmepriv) 
 
 	/* allocate DMA-able/Non-Page memory for cmd_buf and rsp_buf */
 
+<<<<<<< HEAD
+=======
 	rtw_clear_scan_deny(padapter);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rtw_init_mlme_timer(padapter);
 
 exit:
@@ -641,6 +682,26 @@ exit:
 	spin_unlock_bh(&pmlmepriv->lock);
 }
 
+<<<<<<< HEAD
+static void rtw_xmit_schedule(struct adapter *padapter)
+{
+	struct xmit_priv *pxmitpriv;
+
+	if (!padapter)
+		return;
+
+	pxmitpriv = &padapter->xmitpriv;
+
+	spin_lock_bh(&pxmitpriv->lock);
+
+	if (rtw_txframes_pending(padapter))
+		tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
+
+	spin_unlock_bh(&pxmitpriv->lock);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtw_surveydone_event_callback(struct adapter	*adapter, u8 *pbuf)
 {
 	struct	mlme_priv *pmlmepriv = &adapter->mlmepriv;
@@ -697,7 +758,11 @@ void rtw_surveydone_event_callback(struct adapter	*adapter, u8 *pbuf)
 			} else {
 				if (rtw_to_roaming(adapter) != 0) {
 					if (--pmlmepriv->to_roaming == 0 ||
+<<<<<<< HEAD
+					    rtw_sitesurvey_cmd(adapter, &pmlmepriv->assoc_ssid, 1) != _SUCCESS) {
+=======
 					    rtw_sitesurvey_cmd(adapter, &pmlmepriv->assoc_ssid, 1, NULL, 0) != _SUCCESS) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						rtw_set_roaming(adapter, 0);
 						rtw_free_assoc_resources(adapter, 1);
 						rtw_indicate_disconnect(adapter);
@@ -719,7 +784,11 @@ void rtw_surveydone_event_callback(struct adapter	*adapter, u8 *pbuf)
 	if (check_fwstate(pmlmepriv, _FW_LINKED))
 		p2p_ps_wk_cmd(adapter, P2P_PS_SCAN_DONE, 0);
 
+<<<<<<< HEAD
+	rtw_xmit_schedule(adapter);
+=======
 	rtw_os_xmit_schedule(adapter);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void free_scanqueue(struct	mlme_priv *pmlmepriv)
@@ -795,6 +864,51 @@ void rtw_free_assoc_resources(struct adapter *adapter, int lock_scanned_queue)
 
 }
 
+<<<<<<< HEAD
+static struct rt_pmkid_list backup_pmkid[NUM_PMKID_CACHE];
+
+static void rtw_reset_securitypriv(struct adapter *adapter)
+{
+	u8 backup_index;
+	u8 backup_counter;
+	u32 backup_time;
+
+	if (adapter->securitypriv.dot11AuthAlgrthm == dot11AuthAlgrthm_8021X) {
+		/* 802.1x */
+		/*  We have to backup the PMK information for WiFi PMK Caching test item. */
+		/*  Backup the btkip_countermeasure information. */
+		/*  When the countermeasure is trigger, the driver have to disconnect with AP for 60 seconds. */
+		memcpy(&backup_pmkid[0], &adapter->securitypriv.PMKIDList[0], sizeof(struct rt_pmkid_list) * NUM_PMKID_CACHE);
+		backup_index = adapter->securitypriv.PMKIDIndex;
+		backup_counter = adapter->securitypriv.btkip_countermeasure;
+		backup_time = adapter->securitypriv.btkip_countermeasure_time;
+		memset((unsigned char *)&adapter->securitypriv, 0, sizeof(struct security_priv));
+
+		/*  Restore the PMK information to securitypriv structure for the following connection. */
+		memcpy(&adapter->securitypriv.PMKIDList[0],
+			    &backup_pmkid[0],
+			    sizeof(struct rt_pmkid_list) * NUM_PMKID_CACHE);
+		adapter->securitypriv.PMKIDIndex = backup_index;
+		adapter->securitypriv.btkip_countermeasure = backup_counter;
+		adapter->securitypriv.btkip_countermeasure_time = backup_time;
+		adapter->securitypriv.ndisauthtype = Ndis802_11AuthModeOpen;
+		adapter->securitypriv.ndisencryptstatus = Ndis802_11WEPDisabled;
+	} else {
+		/* reset values in securitypriv */
+		struct security_priv *psec_priv = &adapter->securitypriv;
+
+		psec_priv->dot11AuthAlgrthm = dot11AuthAlgrthm_Open;  /* open system */
+		psec_priv->dot11PrivacyAlgrthm = _NO_PRIVACY_;
+		psec_priv->dot11PrivacyKeyIndex = 0;
+		psec_priv->dot118021XGrpPrivacy = _NO_PRIVACY_;
+		psec_priv->dot118021XGrpKeyid = 1;
+		psec_priv->ndisauthtype = Ndis802_11AuthModeOpen;
+		psec_priv->ndisencryptstatus = Ndis802_11WEPDisabled;
+	}
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
 *rtw_indicate_connect: the caller has to lock pmlmepriv->lock
 */
@@ -809,12 +923,22 @@ void rtw_indicate_connect(struct adapter *padapter)
 
 		rtw_led_control(padapter, LED_CTL_LINK);
 
+<<<<<<< HEAD
+		rtw_indicate_wx_assoc_event(padapter);
+		netif_carrier_on(padapter->pnetdev);
+		if (padapter->pid[2] != 0)
+			rtw_signal_process(padapter->pid[2], SIGALRM);
+	}
+
+	pmlmepriv->to_roaming = 0;
+=======
 		rtw_os_indicate_connect(padapter);
 	}
 
 	pmlmepriv->to_roaming = 0;
 
 	rtw_set_scan_deny(padapter, 3000);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -831,11 +955,22 @@ void rtw_indicate_disconnect(struct adapter *padapter)
 
 	if (check_fwstate(&padapter->mlmepriv, _FW_LINKED) ||
 	    (pmlmepriv->to_roaming <= 0)) {
+<<<<<<< HEAD
+		/*  Do it first for tx broadcast pkt after disconnection issue! */
+		netif_carrier_off(padapter->pnetdev);
+
+		rtw_indicate_wx_disassoc_event(padapter);
+		rtw_reset_securitypriv(padapter);
+
+		_clr_fwstate_(pmlmepriv, _FW_LINKED);
+		rtw_led_control(padapter, LED_CTL_NO_LINK);
+=======
 		rtw_os_indicate_disconnect(padapter);
 
 		_clr_fwstate_(pmlmepriv, _FW_LINKED);
 		rtw_led_control(padapter, LED_CTL_NO_LINK);
 		rtw_clear_scan_deny(padapter);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	p2p_ps_wk_cmd(padapter, P2P_PS_DISABLE, 1);
 
@@ -843,9 +978,15 @@ void rtw_indicate_disconnect(struct adapter *padapter)
 
 }
 
+<<<<<<< HEAD
+inline void rtw_indicate_scan_done(struct adapter *padapter)
+{
+	indicate_wx_scan_complete_event(padapter);
+=======
 inline void rtw_indicate_scan_done(struct adapter *padapter, bool aborted)
 {
 	rtw_os_indicate_scan_done(padapter, aborted);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct sta_info *rtw_joinbss_update_stainfo(struct adapter *padapter, struct wlan_network *pnetwork)
@@ -1068,8 +1209,12 @@ void rtw_joinbss_event_callback(struct adapter *adapter, u8 *pbuf)
 
 	mlmeext_joinbss_event_callback(adapter, pnetwork->join_res);
 
+<<<<<<< HEAD
+	rtw_xmit_schedule(adapter);
+=======
 	rtw_os_xmit_schedule(adapter);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void rtw_set_max_rpt_macid(struct adapter *adapter, u8 macid)
@@ -1316,7 +1461,11 @@ void rtw_scan_timeout_handler (struct adapter *adapter)
 	spin_lock_bh(&pmlmepriv->lock);
 	_clr_fwstate_(pmlmepriv, _FW_UNDER_SURVEY);
 	spin_unlock_bh(&pmlmepriv->lock);
+<<<<<<< HEAD
+	rtw_indicate_scan_done(adapter);
+=======
 	rtw_indicate_scan_done(adapter, true);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void rtw_auto_scan_handler(struct adapter *padapter)
@@ -1442,10 +1591,13 @@ int rtw_select_and_join_from_scanned_queue(struct mlme_priv *pmlmepriv)
 	pmlmepriv->pscanned = phead->next;
 	while (phead != pmlmepriv->pscanned) {
 		pnetwork = container_of(pmlmepriv->pscanned, struct wlan_network, list);
+<<<<<<< HEAD
+=======
 		if (!pnetwork) {
 			ret = _FAIL;
 			goto exit;
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pmlmepriv->pscanned = pmlmepriv->pscanned->next;
 		rtw_check_join_candidate(pmlmepriv, &candidate, pnetwork);
 	}
@@ -1639,6 +1791,36 @@ static int rtw_append_pmkid(struct adapter *Adapter, int iEntry, u8 *ie, uint ie
 	return ie_len;
 }
 
+<<<<<<< HEAD
+static void rtw_report_sec_ie(struct adapter *adapter, u8 authmode, u8 *sec_ie)
+{
+	uint len;
+	u8 *buff, *p, i;
+	union iwreq_data wrqu;
+
+	buff = NULL;
+	if (authmode == _WPA_IE_ID_) {
+		buff = kzalloc(IW_CUSTOM_MAX, GFP_ATOMIC);
+		if (!buff)
+			return;
+		p = buff;
+		p += sprintf(p, "ASSOCINFO(ReqIEs =");
+		len = sec_ie[1] + 2;
+		len =  (len < IW_CUSTOM_MAX) ? len : IW_CUSTOM_MAX;
+		for (i = 0; i < len; i++)
+			p += sprintf(p, "%02x", sec_ie[i]);
+		p += sprintf(p, ")");
+		memset(&wrqu, 0, sizeof(wrqu));
+		wrqu.data.length = p - buff;
+		wrqu.data.length = (wrqu.data.length < IW_CUSTOM_MAX) ?
+				   wrqu.data.length : IW_CUSTOM_MAX;
+		wireless_send_event(adapter->pnetdev, IWEVCUSTOM, &wrqu, buff);
+		kfree(buff);
+	}
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int rtw_restruct_sec_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_len)
 {
 	u8 authmode = 0;

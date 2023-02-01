@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-wiimote.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-wiimote.ko drivers/hid/hid-wiimote.o drivers/hid/hid-wiimote.mod.o;  true

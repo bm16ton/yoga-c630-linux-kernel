@@ -8,6 +8,7 @@
 #include <asm/udbg.h>
 #include <asm/io.h>
 #include <asm/reg_a2.h>
+#include <asm/early_ioremap.h>
 
 extern u8 real_readb(volatile u8 __iomem  *addr);
 extern void real_writeb(u8 data, volatile u8 __iomem *addr);
@@ -297,6 +298,39 @@ void __init udbg_init_40x_realmode(void)
 
 #endif /* CONFIG_PPC_EARLY_DEBUG_40x */
 
+<<<<<<< HEAD
+#ifdef CONFIG_PPC_EARLY_DEBUG_16550
+
+static void __iomem *udbg_uart_early_addr;
+
+void __init udbg_init_debug_16550(void)
+{
+	udbg_uart_early_addr = early_ioremap(CONFIG_PPC_EARLY_DEBUG_16550_PHYSADDR, 0x1000);
+	udbg_uart_init_mmio(udbg_uart_early_addr, CONFIG_PPC_EARLY_DEBUG_16550_STRIDE);
+}
+
+static int __init udbg_init_debug_16550_ioremap(void)
+{
+	void __iomem *addr;
+
+	if (!udbg_uart_early_addr)
+		return 0;
+
+	addr = ioremap(CONFIG_PPC_EARLY_DEBUG_16550_PHYSADDR, 0x1000);
+	if (WARN_ON(!addr))
+		return -ENOMEM;
+
+	udbg_uart_init_mmio(addr, CONFIG_PPC_EARLY_DEBUG_16550_STRIDE);
+	early_iounmap(udbg_uart_early_addr, 0x1000);
+	udbg_uart_early_addr = NULL;
+
+	return 0;
+}
+
+early_initcall(udbg_init_debug_16550_ioremap);
+
+#endif /* CONFIG_PPC_EARLY_DEBUG_16550 */
+=======
 #ifdef CONFIG_PPC_EARLY_DEBUG_MICROWATT
 
 #define UDBG_UART_MW_ADDR	((void __iomem *)0xc0002000)
@@ -335,3 +369,4 @@ void __init udbg_init_debug_microwatt(void)
 }
 
 #endif /* CONFIG_PPC_EARLY_DEBUG_MICROWATT */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

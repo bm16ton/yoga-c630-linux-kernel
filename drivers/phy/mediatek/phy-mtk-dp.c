@@ -85,7 +85,11 @@ struct mtk_dp_phy {
 static int mtk_dp_phy_init(struct phy *phy)
 {
 	struct mtk_dp_phy *dp_phy = phy_get_drvdata(phy);
+<<<<<<< HEAD
+	static const u32 driving_params[] = {
+=======
 	u32 driving_params[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DRIVING_PARAM_3_DEFAULT,
 		DRIVING_PARAM_4_DEFAULT,
 		DRIVING_PARAM_5_DEFAULT,

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/8390/8390.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/8390/8390.ko drivers/net/ethernet/8390/8390.o drivers/net/ethernet/8390/8390.mod.o;  true

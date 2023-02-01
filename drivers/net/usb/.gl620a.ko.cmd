@@ -1,0 +1,1 @@
+cmd_drivers/net/usb/gl620a.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/usb/gl620a.ko drivers/net/usb/gl620a.o drivers/net/usb/gl620a.mod.o;  true

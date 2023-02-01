@@ -1,0 +1,1 @@
+cmd_drivers/misc/ad525x_dpot-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/ad525x_dpot-i2c.ko drivers/misc/ad525x_dpot-i2c.o drivers/misc/ad525x_dpot-i2c.mod.o;  true

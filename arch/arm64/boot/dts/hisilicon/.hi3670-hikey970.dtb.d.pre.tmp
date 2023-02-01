@@ -1,0 +1,10 @@
+hi3670-hikey970.o: arch/arm64/boot/dts/hisilicon/hi3670-hikey970.dts \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ arch/arm64/boot/dts/hisilicon/hi3670.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/hi3670-clock.h \
+ arch/arm64/boot/dts/hisilicon/hikey970-pinctrl.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/hisi.h \
+ arch/arm64/boot/dts/hisilicon/hikey970-pmic.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/spmi/spmi.h

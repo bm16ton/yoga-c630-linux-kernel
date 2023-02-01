@@ -1,0 +1,10 @@
+sun50i-a100-allwinner-perf1.o: \
+ arch/arm64/boot/dts/allwinner/sun50i-a100-allwinner-perf1.dts \
+ arch/arm64/boot/dts/allwinner/sun50i-a100.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun50i-a100-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/sun50i-a100-r-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun50i-a100-ccu.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/sun50i-a100-r-ccu.h \
+ arch/arm64/boot/dts/allwinner/axp803.dtsi

@@ -1,7 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
 PHONY := __default
+<<<<<<< HEAD
+__default: vmlinux.o modules.builtin.modinfo modules.builtin
+=======
 __default: vmlinux.o
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 include include/config/auto.conf
 include $(srctree)/scripts/Kbuild.include
@@ -18,7 +22,11 @@ quiet_cmd_gen_initcalls_lds = GEN     $@
 	$(PERL) $(real-prereqs) > $@
 
 .tmp_initcalls.lds: $(srctree)/scripts/generate_initcall_order.pl \
+<<<<<<< HEAD
+		vmlinux.a $(KBUILD_VMLINUX_LIBS) FORCE
+=======
 		$(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS) FORCE
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	$(call if_changed,gen_initcalls_lds)
 
 targets := .tmp_initcalls.lds
@@ -35,6 +43,13 @@ endif
 
 objtool-enabled := $(or $(delay-objtool),$(CONFIG_NOINSTR_VALIDATION))
 
+<<<<<<< HEAD
+vmlinux-objtool-args-$(delay-objtool)			+= $(objtool-args-y)
+vmlinux-objtool-args-$(CONFIG_GCOV_KERNEL)		+= --no-unreachable
+vmlinux-objtool-args-$(CONFIG_NOINSTR_VALIDATION)	+= --noinstr $(if $(CONFIG_CPU_UNRET_ENTRY), --unret)
+
+objtool-args = $(vmlinux-objtool-args-y) --link
+=======
 # Reuse objtool_args defined in scripts/Makefile.lib if LTO or IBT is enabled.
 #
 # Add some more flags as needed.
@@ -47,6 +62,7 @@ objtool_args := \
 	$(if $(CONFIG_NOINSTR_VALIDATION), --noinstr $(if $(CONFIG_CPU_UNRET_ENTRY), --unret)) \
 	$(if $(CONFIG_GCOV_KERNEL), --no-unreachable) \
 	--link
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # Link of vmlinux.o used for section mismatch analysis
 # ---------------------------------------------------------------------------
@@ -55,7 +71,11 @@ quiet_cmd_ld_vmlinux.o = LD      $@
       cmd_ld_vmlinux.o = \
 	$(LD) ${KBUILD_LDFLAGS} -r -o $@ \
 	$(addprefix -T , $(initcalls-lds)) \
+<<<<<<< HEAD
+	--whole-archive vmlinux.a --no-whole-archive \
+=======
 	--whole-archive $(KBUILD_VMLINUX_OBJS) --no-whole-archive \
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	--start-group $(KBUILD_VMLINUX_LIBS) --end-group \
 	$(cmd_objtool)
 
@@ -64,11 +84,42 @@ define rule_ld_vmlinux.o
 	$(call cmd,gen_objtooldep)
 endef
 
+<<<<<<< HEAD
+vmlinux.o: $(initcalls-lds) vmlinux.a $(KBUILD_VMLINUX_LIBS) FORCE
+=======
 vmlinux.o: $(initcalls-lds) $(KBUILD_VMLINUX_OBJS) $(KBUILD_VMLINUX_LIBS) FORCE
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	$(call if_changed_rule,ld_vmlinux.o)
 
 targets += vmlinux.o
 
+<<<<<<< HEAD
+# module.builtin.modinfo
+# ---------------------------------------------------------------------------
+
+OBJCOPYFLAGS_modules.builtin.modinfo := -j .modinfo -O binary
+
+targets += modules.builtin.modinfo
+modules.builtin.modinfo: vmlinux.o FORCE
+	$(call if_changed,objcopy)
+
+# module.builtin
+# ---------------------------------------------------------------------------
+
+# The second line aids cases where multiple modules share the same object.
+
+quiet_cmd_modules_builtin = GEN     $@
+      cmd_modules_builtin = \
+	tr '\0' '\n' < $< | \
+	sed -n 's/^[[:alnum:]:_]*\.file=//p' | \
+	tr ' ' '\n' | uniq | sed -e 's:^:kernel/:' -e 's/$$/.ko/' > $@
+
+targets += modules.builtin
+modules.builtin: modules.builtin.modinfo FORCE
+	$(call if_changed,modules_builtin)
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # Add FORCE to the prequisites of a target to force it to be always rebuilt.
 # ---------------------------------------------------------------------------
 

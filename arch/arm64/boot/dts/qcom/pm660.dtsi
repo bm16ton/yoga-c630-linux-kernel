@@ -163,7 +163,11 @@
 				qcom,pre-scaling = <1 3>;
 			};
 
+<<<<<<< HEAD
+			vcoin: vcoin@85 {
+=======
 			vcoin: vcoin@83 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				reg = <ADC5_VCOIN>;
 				qcom,decimation = <1024>;
 				qcom,pre-scaling = <1 3>;
@@ -187,7 +191,11 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
+<<<<<<< HEAD
+		pm660_spmi_regulators: regulators {
+=======
 		pm660_spmi_regulators: pm660-regulators {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,pm660-regulators";
 		};
 	};

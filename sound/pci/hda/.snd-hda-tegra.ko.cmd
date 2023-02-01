@@ -1,0 +1,1 @@
+cmd_sound/pci/hda/snd-hda-tegra.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/hda/snd-hda-tegra.ko sound/pci/hda/snd-hda-tegra.o sound/pci/hda/snd-hda-tegra.mod.o;  true

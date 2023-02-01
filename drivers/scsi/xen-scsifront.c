@@ -289,6 +289,8 @@ static unsigned int scsifront_host_byte(int32_t rslt)
 		return DID_TRANSPORT_DISRUPTED;
 	case XEN_VSCSIIF_RSLT_HOST_TRANSPORT_FAILFAST:
 		return DID_TRANSPORT_FAILFAST;
+<<<<<<< HEAD
+=======
 	case XEN_VSCSIIF_RSLT_HOST_TARGET_FAILURE:
 		return DID_TARGET_FAILURE;
 	case XEN_VSCSIIF_RSLT_HOST_NEXUS_FAILURE:
@@ -297,6 +299,7 @@ static unsigned int scsifront_host_byte(int32_t rslt)
 		return DID_ALLOC_FAILURE;
 	case XEN_VSCSIIF_RSLT_HOST_MEDIUM_ERROR:
 		return DID_MEDIUM_ERROR;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	case XEN_VSCSIIF_RSLT_HOST_TRANSPORT_MARGINAL:
 		return DID_TRANSPORT_MARGINAL;
 	default:

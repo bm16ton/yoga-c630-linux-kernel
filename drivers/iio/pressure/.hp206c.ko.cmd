@@ -1,0 +1,1 @@
+cmd_drivers/iio/pressure/hp206c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/pressure/hp206c.ko drivers/iio/pressure/hp206c.o drivers/iio/pressure/hp206c.mod.o;  true

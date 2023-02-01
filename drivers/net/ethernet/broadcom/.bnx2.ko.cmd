@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/broadcom/bnx2.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/broadcom/bnx2.ko drivers/net/ethernet/broadcom/bnx2.o drivers/net/ethernet/broadcom/bnx2.mod.o;  true

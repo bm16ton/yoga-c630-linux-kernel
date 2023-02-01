@@ -24,6 +24,13 @@ static const struct brcmf_dmi_data acepc_t8_data = {
 	BRCM_CC_4345_CHIP_ID, 6, "acepc-t8"
 };
 
+/* The Chuwi Hi8 Pro uses the same Ampak AP6212 module as the Chuwi Vi8 Plus
+ * and the nvram for the Vi8 Plus is already in linux-firmware, so use that.
+ */
+static const struct brcmf_dmi_data chuwi_hi8_pro_data = {
+	BRCM_CC_43430_CHIP_ID, 0, "ilife-S806"
+};
+
 static const struct brcmf_dmi_data gpd_win_pocket_data = {
 	BRCM_CC_4356_CHIP_ID, 2, "gpd-win-pocket"
 };
@@ -76,6 +83,20 @@ static const struct dmi_system_id dmi_platform_data[] = {
 		.driver_data = (void *)&acepc_t8_data,
 	},
 	{
+<<<<<<< HEAD
+		/* Chuwi Hi8 Pro with D2D3_Hi8Pro.233 BIOS */
+		.matches = {
+			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "Hampoo"),
+			DMI_EXACT_MATCH(DMI_BOARD_NAME, "Cherry Trail CR"),
+			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "MRD"),
+			/* Above strings are too generic, also match on BIOS date */
+			DMI_MATCH(DMI_BIOS_DATE, "05/10/2016"),
+		},
+		.driver_data = (void *)&chuwi_hi8_pro_data,
+	},
+	{
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Cyberbook T116 rugged tablet */
 		.matches = {
 			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "Default string"),

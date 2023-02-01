@@ -85,10 +85,18 @@ static int clk_composite_determine_rate(struct clk_hw *hw,
 		req->best_parent_hw = NULL;
 
 		if (clk_hw_get_flags(hw) & CLK_SET_RATE_NO_REPARENT) {
+<<<<<<< HEAD
+			struct clk_rate_request tmp_req;
+
+			parent = clk_hw_get_parent(mux_hw);
+
+			clk_hw_forward_rate_request(hw, req, parent, &tmp_req, req->rate);
+=======
 			struct clk_rate_request tmp_req = *req;
 
 			parent = clk_hw_get_parent(mux_hw);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = clk_composite_determine_rate_for_parent(rate_hw,
 								      &tmp_req,
 								      parent,
@@ -104,12 +112,20 @@ static int clk_composite_determine_rate(struct clk_hw *hw,
 		}
 
 		for (i = 0; i < clk_hw_get_num_parents(mux_hw); i++) {
+<<<<<<< HEAD
+			struct clk_rate_request tmp_req;
+=======
 			struct clk_rate_request tmp_req = *req;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 			parent = clk_hw_get_parent_by_index(mux_hw, i);
 			if (!parent)
 				continue;
 
+<<<<<<< HEAD
+			clk_hw_forward_rate_request(hw, req, parent, &tmp_req, req->rate);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = clk_composite_determine_rate_for_parent(rate_hw,
 								      &tmp_req,
 								      parent,

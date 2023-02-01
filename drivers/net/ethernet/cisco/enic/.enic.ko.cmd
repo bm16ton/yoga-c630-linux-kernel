@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cisco/enic/enic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/cisco/enic/enic.ko drivers/net/ethernet/cisco/enic/enic.o drivers/net/ethernet/cisco/enic/enic.mod.o;  true

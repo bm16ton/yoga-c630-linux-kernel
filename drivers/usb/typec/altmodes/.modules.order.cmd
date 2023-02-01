@@ -1,0 +1,1 @@
+cmd_drivers/usb/typec/altmodes/modules.order := {   echo drivers/usb/typec/altmodes/typec_displayport.ko;   echo drivers/usb/typec/altmodes/typec_nvidia.ko; :; } > drivers/usb/typec/altmodes/modules.order

@@ -130,6 +130,8 @@ res="${res}${config_localversion}${LOCALVERSION}"
 if grep -q "^CONFIG_LOCALVERSION_AUTO=y$" include/config/auto.conf; then
 	# full scm version string
 	res="$res$(scm_version)"
+<<<<<<< HEAD
+=======
 elif [ "${LOCALVERSION+set}" != "set" ]; then
 	# If the variable LOCALVERSION is not set, append a plus
 	# sign if the repository is not in a clean annotated or
@@ -140,6 +142,7 @@ elif [ "${LOCALVERSION+set}" != "set" ]; then
 	# to an empty string), we don't want to append a plus sign.
 	scm=$(scm_version --short)
 	res="$res${scm:++}"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 fi
 
 echo "$res"

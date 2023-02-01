@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-only
+<<<<<<< HEAD
+obj-y += b2c2/ siano/ v4l2-tpg/ videobuf2/
+=======
 obj-y += b2c2/ saa7146/ siano/ v4l2-tpg/ videobuf2/
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # Please keep it alphabetically sorted by Kconfig name
 # (e. g. LC_ALL=C sort Makefile)

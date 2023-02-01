@@ -894,7 +894,11 @@ static void pegasus_get_drvinfo(struct net_device *dev,
 {
 	pegasus_t *pegasus = netdev_priv(dev);
 
+<<<<<<< HEAD
+	strscpy(info->driver, driver_name, sizeof(info->driver));
+=======
 	strlcpy(info->driver, driver_name, sizeof(info->driver));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	usb_make_path(pegasus->usb, info->bus_info, sizeof(info->bus_info));
 }
 

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-alink-dtu-m.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-alink-dtu-m.ko drivers/media/rc/keymaps/rc-alink-dtu-m.o drivers/media/rc/keymaps/rc-alink-dtu-m.mod.o;  true

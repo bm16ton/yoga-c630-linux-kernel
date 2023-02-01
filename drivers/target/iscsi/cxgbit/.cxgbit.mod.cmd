@@ -1,0 +1,1 @@
+cmd_drivers/target/iscsi/cxgbit/cxgbit.mod := printf '%s\n'   cxgbit_main.o cxgbit_cm.o cxgbit_target.o cxgbit_ddp.o | awk '!x[$$0]++ { print("drivers/target/iscsi/cxgbit/"$$0) }' > drivers/target/iscsi/cxgbit/cxgbit.mod

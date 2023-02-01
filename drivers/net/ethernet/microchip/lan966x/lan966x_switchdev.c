@@ -6,8 +6,11 @@
 #include "lan966x_main.h"
 
 static struct notifier_block lan966x_netdevice_nb __read_mostly;
+<<<<<<< HEAD
+=======
 static struct notifier_block lan966x_switchdev_nb __read_mostly;
 static struct notifier_block lan966x_switchdev_blocking_nb __read_mostly;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void lan966x_port_set_mcast_ip_flood(struct lan966x_port *port,
 					    u32 pgid_ip)
@@ -132,7 +135,11 @@ static int lan966x_port_pre_bridge_flags(struct lan966x_port *port,
 	return 0;
 }
 
+<<<<<<< HEAD
+void lan966x_update_fwd_mask(struct lan966x *lan966x)
+=======
 static void lan966x_update_fwd_mask(struct lan966x *lan966x)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int i;
 
@@ -140,9 +147,20 @@ static void lan966x_update_fwd_mask(struct lan966x *lan966x)
 		struct lan966x_port *port = lan966x->ports[i];
 		unsigned long mask = 0;
 
+<<<<<<< HEAD
+		if (port && lan966x->bridge_fwd_mask & BIT(i)) {
+			mask = lan966x->bridge_fwd_mask & ~BIT(i);
+
+			if (port->bond)
+				mask &= ~lan966x_lag_get_mask(lan966x,
+							      port->bond);
+		}
+
+=======
 		if (port && lan966x->bridge_fwd_mask & BIT(i))
 			mask = lan966x->bridge_fwd_mask & ~BIT(i);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mask |= BIT(CPU_PORT);
 
 		lan_wr(ANA_PGID_PGID_SET(mask),
@@ -150,7 +168,11 @@ static void lan966x_update_fwd_mask(struct lan966x *lan966x)
 	}
 }
 
+<<<<<<< HEAD
+void lan966x_port_stp_state_set(struct lan966x_port *port, u8 state)
+=======
 static void lan966x_port_stp_state_set(struct lan966x_port *port, u8 state)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct lan966x *lan966x = port->lan966x;
 	bool learn_ena = false;
@@ -171,8 +193,13 @@ static void lan966x_port_stp_state_set(struct lan966x_port *port, u8 state)
 	lan966x_update_fwd_mask(lan966x);
 }
 
+<<<<<<< HEAD
+void lan966x_port_ageing_set(struct lan966x_port *port,
+			     unsigned long ageing_clock_t)
+=======
 static void lan966x_port_ageing_set(struct lan966x_port *port,
 				    unsigned long ageing_clock_t)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unsigned long ageing_jiffies = clock_t_to_jiffies(ageing_clock_t);
 	u32 ageing_time = jiffies_to_msecs(ageing_jiffies) / 1000;
@@ -241,6 +268,10 @@ static int lan966x_port_attr_set(struct net_device *dev, const void *ctx,
 }
 
 static int lan966x_port_bridge_join(struct lan966x_port *port,
+<<<<<<< HEAD
+				    struct net_device *brport_dev,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				    struct net_device *bridge,
 				    struct netlink_ext_ack *extack)
 {
@@ -258,7 +289,11 @@ static int lan966x_port_bridge_join(struct lan966x_port *port,
 		}
 	}
 
+<<<<<<< HEAD
+	err = switchdev_bridge_port_offload(brport_dev, dev, port,
+=======
 	err = switchdev_bridge_port_offload(dev, dev, port,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					    &lan966x_switchdev_nb,
 					    &lan966x_switchdev_blocking_nb,
 					    false, extack);
@@ -295,8 +330,14 @@ static void lan966x_port_bridge_leave(struct lan966x_port *port,
 	lan966x_vlan_port_apply(port);
 }
 
+<<<<<<< HEAD
+int lan966x_port_changeupper(struct net_device *dev,
+			     struct net_device *brport_dev,
+			     struct netdev_notifier_changeupper_info *info)
+=======
 static int lan966x_port_changeupper(struct net_device *dev,
 				    struct netdev_notifier_changeupper_info *info)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct lan966x_port *port = netdev_priv(dev);
 	struct netlink_ext_ack *extack;
@@ -306,12 +347,69 @@ static int lan966x_port_changeupper(struct net_device *dev,
 
 	if (netif_is_bridge_master(info->upper_dev)) {
 		if (info->linking)
+<<<<<<< HEAD
+			err = lan966x_port_bridge_join(port, brport_dev,
+						       info->upper_dev,
+=======
 			err = lan966x_port_bridge_join(port, info->upper_dev,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						       extack);
 		else
 			lan966x_port_bridge_leave(port, info->upper_dev);
 	}
 
+<<<<<<< HEAD
+	if (netif_is_lag_master(info->upper_dev)) {
+		if (info->linking)
+			err = lan966x_lag_port_join(port, info->upper_dev,
+						    info->upper_dev,
+						    extack);
+		else
+			lan966x_lag_port_leave(port, info->upper_dev);
+	}
+
+	return err;
+}
+
+int lan966x_port_prechangeupper(struct net_device *dev,
+				struct net_device *brport_dev,
+				struct netdev_notifier_changeupper_info *info)
+{
+	struct lan966x_port *port = netdev_priv(dev);
+	int err = NOTIFY_DONE;
+
+	if (netif_is_bridge_master(info->upper_dev) && !info->linking) {
+		switchdev_bridge_port_unoffload(port->dev, port, NULL, NULL);
+		lan966x_fdb_flush_workqueue(port->lan966x);
+	}
+
+	if (netif_is_lag_master(info->upper_dev)) {
+		err = lan966x_lag_port_prechangeupper(dev, info);
+		if (err || info->linking)
+			return err;
+
+		switchdev_bridge_port_unoffload(brport_dev, port, NULL, NULL);
+		lan966x_fdb_flush_workqueue(port->lan966x);
+	}
+
+	return err;
+}
+
+static int lan966x_foreign_bridging_check(struct net_device *upper,
+					  bool *has_foreign,
+					  bool *seen_lan966x,
+					  struct netlink_ext_ack *extack)
+{
+	struct lan966x *lan966x = NULL;
+	struct net_device *dev;
+	struct list_head *iter;
+
+	if (!netif_is_bridge_master(upper) &&
+	    !netif_is_lag_master(upper))
+		return 0;
+
+	netdev_for_each_lower_dev(upper, dev, iter) {
+=======
 	return err;
 }
 
@@ -339,11 +437,16 @@ static int lan966x_foreign_bridging_check(struct net_device *bridge,
 		return 0;
 
 	netdev_for_each_lower_dev(bridge, dev, iter) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (lan966x_netdevice_check(dev)) {
 			struct lan966x_port *port = netdev_priv(dev);
 
 			if (lan966x) {
+<<<<<<< HEAD
+				/* Upper already has at least one port of a
+=======
 				/* Bridge already has at least one port of a
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 * lan966x switch inside it, check that it's
 				 * the same instance of the driver.
 				 */
@@ -354,6 +457,26 @@ static int lan966x_foreign_bridging_check(struct net_device *bridge,
 				}
 			} else {
 				/* This is the first lan966x port inside this
+<<<<<<< HEAD
+				 * upper device
+				 */
+				lan966x = port->lan966x;
+				*seen_lan966x = true;
+			}
+		} else if (netif_is_lag_master(dev)) {
+			/* Allow to have bond interfaces that have only lan966x
+			 * devices
+			 */
+			if (lan966x_foreign_bridging_check(dev, has_foreign,
+							   seen_lan966x,
+							   extack))
+				return -EINVAL;
+		} else {
+			*has_foreign = true;
+		}
+
+		if (*seen_lan966x && *has_foreign) {
+=======
 				 * bridge
 				 */
 				lan966x = port->lan966x;
@@ -363,6 +486,7 @@ static int lan966x_foreign_bridging_check(struct net_device *bridge,
 		}
 
 		if (lan966x && has_foreign) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			NL_SET_ERR_MSG_MOD(extack,
 					   "Bridging lan966x ports with foreign interfaces disallowed");
 			return -EINVAL;
@@ -375,7 +499,16 @@ static int lan966x_foreign_bridging_check(struct net_device *bridge,
 static int lan966x_bridge_check(struct net_device *dev,
 				struct netdev_notifier_changeupper_info *info)
 {
+<<<<<<< HEAD
+	bool has_foreign = false;
+	bool seen_lan966x = false;
+
 	return lan966x_foreign_bridging_check(info->upper_dev,
+					      &has_foreign,
+					      &seen_lan966x,
+=======
+	return lan966x_foreign_bridging_check(info->upper_dev,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					      info->info.extack);
 }
 
@@ -386,21 +519,57 @@ static int lan966x_netdevice_port_event(struct net_device *dev,
 	int err = 0;
 
 	if (!lan966x_netdevice_check(dev)) {
+<<<<<<< HEAD
+		switch (event) {
+		case NETDEV_CHANGEUPPER:
+		case NETDEV_PRECHANGEUPPER:
+			err = lan966x_bridge_check(dev, ptr);
+			if (err)
+				return err;
+
+			if (netif_is_lag_master(dev)) {
+				if (event == NETDEV_CHANGEUPPER)
+					err = lan966x_lag_netdev_changeupper(dev,
+									     ptr);
+				else
+					err = lan966x_lag_netdev_prechangeupper(dev,
+										ptr);
+
+				return err;
+			}
+			break;
+		default:
+			return 0;
+		}
+
+=======
 		if (event == NETDEV_CHANGEUPPER)
 			return lan966x_bridge_check(dev, ptr);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 
 	switch (event) {
 	case NETDEV_PRECHANGEUPPER:
+<<<<<<< HEAD
+		err = lan966x_port_prechangeupper(dev, dev, ptr);
+=======
 		err = lan966x_port_prechangeupper(dev, ptr);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case NETDEV_CHANGEUPPER:
 		err = lan966x_bridge_check(dev, ptr);
 		if (err)
 			return err;
 
+<<<<<<< HEAD
+		err = lan966x_port_changeupper(dev, dev, ptr);
+		break;
+	case NETDEV_CHANGELOWERSTATE:
+		err = lan966x_lag_port_changelowerstate(dev, ptr);
+=======
 		err = lan966x_port_changeupper(dev, ptr);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 
@@ -418,19 +587,35 @@ static int lan966x_netdevice_event(struct notifier_block *nb,
 	return notifier_from_errno(ret);
 }
 
+<<<<<<< HEAD
+=======
 /* We don't offload uppers such as LAG as bridge ports, so every device except
  * the bridge itself is foreign.
  */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static bool lan966x_foreign_dev_check(const struct net_device *dev,
 				      const struct net_device *foreign_dev)
 {
 	struct lan966x_port *port = netdev_priv(dev);
 	struct lan966x *lan966x = port->lan966x;
+<<<<<<< HEAD
+	int i;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (netif_is_bridge_master(foreign_dev))
 		if (lan966x->bridge == foreign_dev)
 			return false;
 
+<<<<<<< HEAD
+	if (netif_is_lag_master(foreign_dev))
+		for (i = 0; i < lan966x->num_phys_ports; ++i)
+			if (lan966x->ports[i] &&
+			    lan966x->ports[i]->bond == foreign_dev)
+				return false;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return true;
 }
 
@@ -571,11 +756,19 @@ static struct notifier_block lan966x_netdevice_nb __read_mostly = {
 	.notifier_call = lan966x_netdevice_event,
 };
 
+<<<<<<< HEAD
+struct notifier_block lan966x_switchdev_nb __read_mostly = {
+	.notifier_call = lan966x_switchdev_event,
+};
+
+struct notifier_block lan966x_switchdev_blocking_nb __read_mostly = {
+=======
 static struct notifier_block lan966x_switchdev_nb __read_mostly = {
 	.notifier_call = lan966x_switchdev_event,
 };
 
 static struct notifier_block lan966x_switchdev_blocking_nb __read_mostly = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.notifier_call = lan966x_switchdev_blocking_event,
 };
 

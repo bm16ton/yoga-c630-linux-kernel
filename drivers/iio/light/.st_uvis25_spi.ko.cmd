@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/st_uvis25_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/st_uvis25_spi.ko drivers/iio/light/st_uvis25_spi.o drivers/iio/light/st_uvis25_spi.mod.o;  true

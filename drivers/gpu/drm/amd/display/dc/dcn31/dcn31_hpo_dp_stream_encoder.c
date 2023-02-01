@@ -197,7 +197,11 @@ static void dcn31_hpo_dp_stream_enc_set_stream_attribute(
 	uint32_t h_back_porch;
 	uint32_t h_width;
 	uint32_t v_height;
+<<<<<<< HEAD
+	uint64_t v_freq;
+=======
 	unsigned long long v_freq;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	uint8_t misc0 = 0;
 	uint8_t misc1 = 0;
 	uint8_t hsp;
@@ -360,7 +364,11 @@ static void dcn31_hpo_dp_stream_enc_set_stream_attribute(
 	v_height = hw_crtc_timing.v_border_top + hw_crtc_timing.v_addressable + hw_crtc_timing.v_border_bottom;
 	hsp = hw_crtc_timing.flags.HSYNC_POSITIVE_POLARITY ? 0 : 0x80;
 	vsp = hw_crtc_timing.flags.VSYNC_POSITIVE_POLARITY ? 0 : 0x80;
+<<<<<<< HEAD
+	v_freq = (uint64_t)hw_crtc_timing.pix_clk_100hz * 100;
+=======
 	v_freq = hw_crtc_timing.pix_clk_100hz * 100;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*   MSA Packet Mapping to 32-bit Link Symbols - DP2 spec, section 2.7.4.1
 	 *
@@ -436,32 +444,51 @@ static void dcn31_hpo_dp_stream_enc_update_dp_info_packets(
 {
 	struct dcn31_hpo_dp_stream_encoder *enc3 = DCN3_1_HPO_DP_STREAM_ENC_FROM_HPO_STREAM_ENC(enc);
 	uint32_t dmdata_packet_enabled = 0;
+<<<<<<< HEAD
+
+	if (info_frame->vsc.valid)
+=======
 	bool sdp_stream_enable = false;
 
 	if (info_frame->vsc.valid) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		enc->vpg->funcs->update_generic_info_packet(
 				enc->vpg,
 				0,  /* packetIndex */
 				&info_frame->vsc,
 				true);
+<<<<<<< HEAD
+
+	if (info_frame->spd.valid)
+=======
 		sdp_stream_enable = true;
 	}
 	if (info_frame->spd.valid) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		enc->vpg->funcs->update_generic_info_packet(
 				enc->vpg,
 				2,  /* packetIndex */
 				&info_frame->spd,
 				true);
+<<<<<<< HEAD
+
+	if (info_frame->hdrsmd.valid)
+=======
 		sdp_stream_enable = true;
 	}
 	if (info_frame->hdrsmd.valid) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		enc->vpg->funcs->update_generic_info_packet(
 				enc->vpg,
 				3,  /* packetIndex */
 				&info_frame->hdrsmd,
 				true);
+<<<<<<< HEAD
+
+=======
 		sdp_stream_enable = true;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* enable/disable transmission of packet(s).
 	 * If enabled, packet transmission begins on the next frame
 	 */

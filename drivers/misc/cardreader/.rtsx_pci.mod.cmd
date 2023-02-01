@@ -1,0 +1,1 @@
+cmd_drivers/misc/cardreader/rtsx_pci.mod := printf '%s\n'   rtsx_pcr.o rts5209.o rts5229.o rtl8411.o rts5227.o rts5249.o rts5260.o rts5261.o rts5228.o | awk '!x[$$0]++ { print("drivers/misc/cardreader/"$$0) }' > drivers/misc/cardreader/rtsx_pci.mod

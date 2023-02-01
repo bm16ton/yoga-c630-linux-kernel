@@ -8,7 +8,11 @@ title: Qualcomm Technologies Inc BAM DMA controller
 
 maintainers:
   - Andy Gross <agross@kernel.org>
+<<<<<<< HEAD
+  - Bjorn Andersson <andersson@kernel.org>
+=======
   - Bjorn Andersson <bjorn.andersson@linaro.org>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 allOf:
   - $ref: "dma-controller.yaml#"
@@ -20,7 +24,11 @@ properties:
       - qcom,bam-v1.3.0
         # MSM8974, APQ8074 and APQ8084
       - qcom,bam-v1.4.0
+<<<<<<< HEAD
+        # MSM8916 and SDM845
+=======
         # MSM8916
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - qcom,bam-v1.7.0
 
   clocks:
@@ -90,8 +98,13 @@ examples:
 
     dma-controller@f9944000 {
         compatible = "qcom,bam-v1.4.0";
+<<<<<<< HEAD
+        reg = <0xf9944000 0x19000>;
+        interrupts = <GIC_SPI 239 IRQ_TYPE_LEVEL_HIGH>;
+=======
         reg = <0xf9944000 0x15000>;
         interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         clocks = <&gcc GCC_BLSP2_AHB_CLK>;
         clock-names = "bam_clk";
         #dma-cells = <1>;

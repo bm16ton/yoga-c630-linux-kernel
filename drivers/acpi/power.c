@@ -944,13 +944,19 @@ struct acpi_device *acpi_add_power_resource(acpi_handle handle)
 		return NULL;
 
 	device = &resource->device;
+<<<<<<< HEAD
+	acpi_init_device_object(device, handle, ACPI_BUS_TYPE_POWER,
+				acpi_release_power_resource);
+=======
 	acpi_init_device_object(device, handle, ACPI_BUS_TYPE_POWER);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&resource->resource_lock);
 	INIT_LIST_HEAD(&resource->list_node);
 	INIT_LIST_HEAD(&resource->dependents);
 	strcpy(acpi_device_name(device), ACPI_POWER_DEVICE_NAME);
 	strcpy(acpi_device_class(device), ACPI_POWER_CLASS);
 	device->power.state = ACPI_STATE_UNKNOWN;
+	device->flags.match_driver = true;
 
 	/* Evaluate the object to get the system level and resource order. */
 	status = acpi_evaluate_object(handle, NULL, NULL, &buffer);
@@ -960,6 +966,20 @@ struct acpi_device *acpi_add_power_resource(acpi_handle handle)
 	resource->system_level = acpi_object.power_resource.system_level;
 	resource->order = acpi_object.power_resource.resource_order;
 	resource->state = ACPI_POWER_RESOURCE_STATE_UNKNOWN;
+<<<<<<< HEAD
+
+	/* Get the initial state or just flip it on if that fails. */
+	if (acpi_power_get_state(resource, &state_dummy))
+		__acpi_power_on(resource);
+
+	pr_info("%s [%s]\n", acpi_device_name(device), acpi_device_bid(device));
+
+	result = acpi_tie_acpi_dev(device);
+	if (result)
+		goto err;
+
+	result = acpi_device_add(device);
+=======
 
 	/* Get the initial state or just flip it on if that fails. */
 	if (acpi_power_get_state(resource, &state_dummy))
@@ -969,6 +989,7 @@ struct acpi_device *acpi_add_power_resource(acpi_handle handle)
 
 	device->flags.match_driver = true;
 	result = acpi_device_add(device, acpi_release_power_resource);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (result)
 		goto err;
 

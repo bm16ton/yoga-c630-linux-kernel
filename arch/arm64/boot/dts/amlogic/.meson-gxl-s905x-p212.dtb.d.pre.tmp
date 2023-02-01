@@ -1,0 +1,17 @@
+meson-gxl-s905x-p212.o: \
+ arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dts \
+ arch/arm64/boot/dts/amlogic/meson-gxl-s905x-p212.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-gxl-s905x.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-gx.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/meson-gxbb-power.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/gxbb-clkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/gxbb-aoclkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/meson-gxl-gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/amlogic,meson-gxbb-reset.h \
+ arch/arm64/boot/dts/amlogic/meson-gxl-mali.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-gx-mali450.dtsi

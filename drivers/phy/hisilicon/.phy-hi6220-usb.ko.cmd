@@ -1,0 +1,1 @@
+cmd_drivers/phy/hisilicon/phy-hi6220-usb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/hisilicon/phy-hi6220-usb.ko drivers/phy/hisilicon/phy-hi6220-usb.o drivers/phy/hisilicon/phy-hi6220-usb.mod.o;  true

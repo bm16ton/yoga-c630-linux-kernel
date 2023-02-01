@@ -1,0 +1,1 @@
+cmd_drivers/scsi/aic7xxx/aic79xx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/aic7xxx/aic79xx.ko drivers/scsi/aic7xxx/aic79xx.o drivers/scsi/aic7xxx/aic79xx.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qlogic/netxen/netxen_nic.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/ethernet/qlogic/netxen/netxen_nic.o @drivers/net/ethernet/qlogic/netxen/netxen_nic.mod 

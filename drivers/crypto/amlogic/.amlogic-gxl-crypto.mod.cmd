@@ -1,0 +1,1 @@
+cmd_drivers/crypto/amlogic/amlogic-gxl-crypto.mod := printf '%s\n'   amlogic-gxl-core.o amlogic-gxl-cipher.o | awk '!x[$$0]++ { print("drivers/crypto/amlogic/"$$0) }' > drivers/crypto/amlogic/amlogic-gxl-crypto.mod

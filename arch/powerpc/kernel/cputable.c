@@ -18,6 +18,7 @@
 #include <asm/mce.h>
 #include <asm/mmu.h>
 #include <asm/setup.h>
+#include <asm/cpu_setup.h>
 
 static struct cpu_spec the_cpu_spec __read_mostly;
 
@@ -27,6 +28,9 @@ EXPORT_SYMBOL(cur_cpu_spec);
 /* The platform string corresponding to the real PVR */
 const char *powerpc_base_platform;
 
+<<<<<<< HEAD
+#include "cpu_specs.h"
+=======
 /* NOTE:
  * Unlike ppc32, ppc64 will only call this once for the boot CPU, it's
  * the responsibility of the appropriate CPU save/restore functions to
@@ -1943,6 +1947,7 @@ static struct cpu_spec __initdata cpu_specs[] = {
 #endif /* CONFIG_PPC32 */
 #endif /* CONFIG_E500 */
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void __init set_cur_cpu_spec(struct cpu_spec *s)
 {
@@ -2017,6 +2022,8 @@ struct cpu_spec * __init identify_cpu(unsigned long offset, unsigned int pvr)
 {
 	struct cpu_spec *s = cpu_specs;
 	int i;
+
+	BUILD_BUG_ON(!ARRAY_SIZE(cpu_specs));
 
 	s = PTRRELOC(s);
 

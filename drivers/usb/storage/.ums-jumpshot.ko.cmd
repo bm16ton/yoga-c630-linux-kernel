@@ -1,0 +1,1 @@
+cmd_drivers/usb/storage/ums-jumpshot.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/storage/ums-jumpshot.ko drivers/usb/storage/ums-jumpshot.o drivers/usb/storage/ums-jumpshot.mod.o;  true

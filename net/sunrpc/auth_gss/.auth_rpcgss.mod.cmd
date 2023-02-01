@@ -1,0 +1,1 @@
+cmd_net/sunrpc/auth_gss/auth_rpcgss.mod := printf '%s\n'   auth_gss.o gss_generic_token.o gss_mech_switch.o svcauth_gss.o gss_rpc_upcall.o gss_rpc_xdr.o trace.o | awk '!x[$$0]++ { print("net/sunrpc/auth_gss/"$$0) }' > net/sunrpc/auth_gss/auth_rpcgss.mod

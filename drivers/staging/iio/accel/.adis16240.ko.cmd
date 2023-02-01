@@ -1,0 +1,1 @@
+cmd_drivers/staging/iio/accel/adis16240.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/iio/accel/adis16240.ko drivers/staging/iio/accel/adis16240.o drivers/staging/iio/accel/adis16240.mod.o;  true

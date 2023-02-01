@@ -1,0 +1,1 @@
+arch/arm64/boot/dts/cavium/thunder-88xx.dtb: arch/arm64/boot/dts/cavium/.thunder-88xx.dtb.dts.tmp arch/arm64/boot/dts/cavium/thunder-88xx.dtsi

@@ -1,0 +1,1 @@
+cmd_lib/test_static_key_base.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o lib/test_static_key_base.ko lib/test_static_key_base.o lib/test_static_key_base.mod.o;  true

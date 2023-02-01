@@ -1,0 +1,1 @@
+cmd_drivers/ata/pata_ninja32.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/ata/pata_ninja32.ko drivers/ata/pata_ninja32.o drivers/ata/pata_ninja32.mod.o;  true

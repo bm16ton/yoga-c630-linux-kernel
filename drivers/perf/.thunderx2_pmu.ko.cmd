@@ -1,0 +1,1 @@
+cmd_drivers/perf/thunderx2_pmu.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/perf/thunderx2_pmu.ko drivers/perf/thunderx2_pmu.o drivers/perf/thunderx2_pmu.mod.o;  true

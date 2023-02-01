@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/dw_mmc-pltfm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/dw_mmc-pltfm.ko drivers/mmc/host/dw_mmc-pltfm.o drivers/mmc/host/dw_mmc-pltfm.mod.o;  true

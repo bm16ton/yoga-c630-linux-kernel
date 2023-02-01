@@ -1,9 +1,13 @@
 # SPDX-License-Identifier: GPL-2.0
 # Makefile for vm selftests
 
+<<<<<<< HEAD
+LOCAL_HDRS += $(top_srcdir)/mm/gup_test.h
+=======
 LOCAL_HDRS += $(selfdir)/vm/local_config.h $(top_srcdir)/mm/gup_test.h
 
 include local_config.mk
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 uname_M := $(shell uname -m 2>/dev/null || echo not)
 MACHINE ?= $(shell echo $(uname_M) | sed -e 's/aarch64.*/arm64/' -e 's/ppc64.*/ppc64/')
@@ -25,7 +29,11 @@ MACHINE ?= $(shell echo $(uname_M) | sed -e 's/aarch64.*/arm64/' -e 's/ppc64.*/p
 # LDLIBS.
 MAKEFLAGS += --no-builtin-rules
 
+<<<<<<< HEAD
+CFLAGS = -Wall -I $(top_srcdir) -I $(top_srcdir)/usr/include $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+=======
 CFLAGS = -Wall -I ../../../../usr/include $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 LDLIBS = -lrt -lpthread
 TEST_GEN_FILES = compaction_test
 TEST_GEN_FILES += gup_test
@@ -97,9 +105,17 @@ TEST_FILES += va_128TBswitch.sh
 
 include ../lib.mk
 
+<<<<<<< HEAD
+$(OUTPUT)/khugepaged: vm_util.c
 $(OUTPUT)/madv_populate: vm_util.c
 $(OUTPUT)/soft-dirty: vm_util.c
 $(OUTPUT)/split_huge_page_test: vm_util.c
+$(OUTPUT)/userfaultfd: vm_util.c
+=======
+$(OUTPUT)/madv_populate: vm_util.c
+$(OUTPUT)/soft-dirty: vm_util.c
+$(OUTPUT)/split_huge_page_test: vm_util.c
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 ifeq ($(MACHINE),x86_64)
 BINARIES_32 := $(patsubst %,$(OUTPUT)/%,$(BINARIES_32))
@@ -151,6 +167,10 @@ endif
 endif
 
 $(OUTPUT)/mlock-random-test $(OUTPUT)/memfd_secret: LDLIBS += -lcap
+<<<<<<< HEAD
+
+$(OUTPUT)/ksm_tests: LDLIBS += -lnuma
+=======
 
 # HMM_EXTRA_LIBS may get set in local_config.mk, or it may be left empty.
 $(OUTPUT)/hmm-tests: LDLIBS += $(HMM_EXTRA_LIBS)
@@ -161,14 +181,6 @@ $(OUTPUT)/migration: LDLIBS += -lnuma
 
 local_config.mk local_config.h: check_config.sh
 	/bin/sh ./check_config.sh $(CC)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-EXTRA_CLEAN += local_config.mk local_config.h
-
-ifeq ($(HMM_EXTRA_LIBS),)
-all: warn_missing_hugelibs
-
-warn_missing_hugelibs:
-	@echo ; \
-	echo "Warning: missing libhugetlbfs support. Some HMM tests will be skipped." ; \
-	echo
-endif
+$(OUTPUT)/migration: LDLIBS += -lnuma

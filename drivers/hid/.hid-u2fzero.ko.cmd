@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-u2fzero.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-u2fzero.ko drivers/hid/hid-u2fzero.o drivers/hid/hid-u2fzero.mod.o;  true

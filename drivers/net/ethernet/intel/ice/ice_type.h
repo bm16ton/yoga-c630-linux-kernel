@@ -347,6 +347,10 @@ struct ice_ts_func_info {
 #define ICE_TS_DEV_ENA_M		BIT(24)
 #define ICE_TS_TMR0_ENA_M		BIT(25)
 #define ICE_TS_TMR1_ENA_M		BIT(26)
+<<<<<<< HEAD
+#define ICE_TS_LL_TX_TS_READ_M		BIT(28)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct ice_ts_dev_info {
 	/* Device specific info */
@@ -359,6 +363,10 @@ struct ice_ts_dev_info {
 	u8 ena;
 	u8 tmr0_ena;
 	u8 tmr1_ena;
+<<<<<<< HEAD
+	u8 ts_ll_read;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* Function specific capabilities */
@@ -563,6 +571,8 @@ enum ice_rl_type {
 #define ICE_SCHED_DFLT_BW_WT		4
 #define ICE_SCHED_INVAL_PROF_ID		0xFFFF
 #define ICE_SCHED_DFLT_BURST_SIZE	(15 * 1024)	/* in bytes (15k) */
+
+#define ICE_MAX_PORT_PER_PCI_DEV 8
 
  /* Data structure for saving BW information */
 enum ice_bw_type {
@@ -885,7 +895,13 @@ struct ice_hw {
 	/* INTRL granularity in 1 us */
 	u8 intrl_gran;
 
-	u8 ucast_shared;	/* true if VSIs can share unicast addr */
+#define ICE_PHY_PER_NAC		1
+#define ICE_MAX_QUAD		2
+#define ICE_NUM_QUAD_TYPE	2
+#define ICE_PORTS_PER_QUAD	4
+#define ICE_PHY_0_LAST_QUAD	1
+#define ICE_PORTS_PER_PHY	8
+#define ICE_NUM_EXTERNAL_PORTS		ICE_PORTS_PER_PHY
 
 #define ICE_PHY_PER_NAC		1
 #define ICE_MAX_QUAD		2

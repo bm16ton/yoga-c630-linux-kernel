@@ -22,6 +22,9 @@
 #include "bus.h"
 #include "intel.h"
 
+/* IDA min selected to avoid conflicts with HDaudio/iDISP SDI values */
+#define INTEL_DEV_NUM_IDA_MIN           4
+
 #define INTEL_MASTER_SUSPEND_DELAY_MS	3000
 #define INTEL_MASTER_RESET_ITERATIONS	10
 
@@ -135,7 +138,7 @@ static int intel_reg_show(struct seq_file *s_file, void *data)
 	if (!buf)
 		return -ENOMEM;
 
-	links = intel_readl(s, SDW_SHIM_LCAP) & GENMASK(2, 0);
+	links = intel_readl(s, SDW_SHIM_LCAP) & SDW_SHIM_LCAP_LCOUNT_MASK;
 
 	ret = scnprintf(buf, RD_BUF, "Register  Value\n");
 	ret += scnprintf(buf + ret, RD_BUF - ret, "\nShim\n");
@@ -167,9 +170,8 @@ static int intel_reg_show(struct seq_file *s_file, void *data)
 			ret += intel_sprintf(s, false, buf, ret,
 					SDW_SHIM_PCMSYCHC(i, j));
 		}
-		ret += scnprintf(buf + ret, RD_BUF - ret, "\n PDMSCAP, IOCTL, CTMCTL\n");
+		ret += scnprintf(buf + ret, RD_BUF - ret, "\n IOCTL, CTMCTL\n");
 
-		ret += intel_sprintf(s, false, buf, ret, SDW_SHIM_PDMSCAP(i));
 		ret += intel_sprintf(s, false, buf, ret, SDW_SHIM_IOCTL(i));
 		ret += intel_sprintf(s, false, buf, ret, SDW_SHIM_CTMCTL(i));
 	}
@@ -258,86 +260,6 @@ static void intel_debugfs_exit(struct sdw_intel *sdw) {}
 /*
  * shim ops
  */
-
-static int intel_link_power_up(struct sdw_intel *sdw)
-{
-	unsigned int link_id = sdw->instance;
-	void __iomem *shim = sdw->link_res->shim;
-	u32 *shim_mask = sdw->link_res->shim_mask;
-	struct sdw_bus *bus = &sdw->cdns.bus;
-	struct sdw_master_prop *prop = &bus->prop;
-	u32 spa_mask, cpa_mask;
-	u32 link_control;
-	int ret = 0;
-	u32 syncprd;
-	u32 sync_reg;
-
-	mutex_lock(sdw->link_res->shim_lock);
-
-	/*
-	 * The hardware relies on an internal counter, typically 4kHz,
-	 * to generate the SoundWire SSP - which defines a 'safe'
-	 * synchronization point between commands and audio transport
-	 * and allows for multi link synchronization. The SYNCPRD value
-	 * is only dependent on the oscillator clock provided to
-	 * the IP, so adjust based on _DSD properties reported in DSDT
-	 * tables. The values reported are based on either 24MHz
-	 * (CNL/CML) or 38.4 MHz (ICL/TGL+).
-	 */
-	if (prop->mclk_freq % 6000000)
-		syncprd = SDW_SHIM_SYNC_SYNCPRD_VAL_38_4;
-	else
-		syncprd = SDW_SHIM_SYNC_SYNCPRD_VAL_24;
-
-	if (!*shim_mask) {
-		dev_dbg(sdw->cdns.dev, "%s: powering up all links\n", __func__);
-
-		/* we first need to program the SyncPRD/CPU registers */
-		dev_dbg(sdw->cdns.dev,
-			"%s: first link up, programming SYNCPRD\n", __func__);
-
-		/* set SyncPRD period */
-		sync_reg = intel_readl(shim, SDW_SHIM_SYNC);
-		u32p_replace_bits(&sync_reg, syncprd, SDW_SHIM_SYNC_SYNCPRD);
-
-		/* Set SyncCPU bit */
-		sync_reg |= SDW_SHIM_SYNC_SYNCCPU;
-		intel_writel(shim, SDW_SHIM_SYNC, sync_reg);
-
-		/* Link power up sequence */
-		link_control = intel_readl(shim, SDW_SHIM_LCTL);
-
-		/* only power-up enabled links */
-		spa_mask = FIELD_PREP(SDW_SHIM_LCTL_SPA_MASK, sdw->link_res->link_mask);
-		cpa_mask = FIELD_PREP(SDW_SHIM_LCTL_CPA_MASK, sdw->link_res->link_mask);
-
-		link_control |=  spa_mask;
-
-		ret = intel_set_bit(shim, SDW_SHIM_LCTL, link_control, cpa_mask);
-		if (ret < 0) {
-			dev_err(sdw->cdns.dev, "Failed to power up link: %d\n", ret);
-			goto out;
-		}
-
-		/* SyncCPU will change once link is active */
-		ret = intel_wait_bit(shim, SDW_SHIM_SYNC,
-				     SDW_SHIM_SYNC_SYNCCPU, 0);
-		if (ret < 0) {
-			dev_err(sdw->cdns.dev,
-				"Failed to set SHIM_SYNC: %d\n", ret);
-			goto out;
-		}
-	}
-
-	*shim_mask |= BIT(link_id);
-
-	sdw->cdns.link_up = true;
-out:
-	mutex_unlock(sdw->link_res->shim_lock);
-
-	return ret;
-}
-
 /* this needs to be called with shim_lock */
 static void intel_shim_glue_to_master_ip(struct sdw_intel *sdw)
 {
@@ -389,14 +311,12 @@ static void intel_shim_master_ip_to_glue(struct sdw_intel *sdw)
 	/* at this point Integration Glue has full control of the I/Os */
 }
 
-static int intel_shim_init(struct sdw_intel *sdw, bool clock_stop)
+/* this needs to be called with shim_lock */
+static void intel_shim_init(struct sdw_intel *sdw)
 {
 	void __iomem *shim = sdw->link_res->shim;
 	unsigned int link_id = sdw->instance;
-	int ret = 0;
 	u16 ioctl = 0, act = 0;
-
-	mutex_lock(sdw->link_res->shim_lock);
 
 	/* Initialize Shim */
 	ioctl |= SDW_SHIM_IOCTL_BKE;
@@ -422,10 +342,17 @@ static int intel_shim_init(struct sdw_intel *sdw, bool clock_stop)
 	act |= SDW_SHIM_CTMCTL_DODS;
 	intel_writew(shim, SDW_SHIM_CTMCTL(link_id), act);
 	usleep_range(10, 15);
+}
 
-	mutex_unlock(sdw->link_res->shim_lock);
+static int intel_shim_check_wake(struct sdw_intel *sdw)
+{
+	void __iomem *shim;
+	u16 wake_sts;
 
-	return ret;
+	shim = sdw->link_res->shim;
+	wake_sts = intel_readw(shim, SDW_SHIM_WAKESTS);
+
+	return wake_sts & BIT(sdw->instance);
 }
 
 static void intel_shim_wake(struct sdw_intel *sdw, bool wake_enable)
@@ -450,8 +377,93 @@ static void intel_shim_wake(struct sdw_intel *sdw, bool wake_enable)
 		wake_sts = intel_readw(shim, SDW_SHIM_WAKESTS);
 		wake_sts |= (SDW_SHIM_WAKESTS_STATUS << link_id);
 		intel_writew(shim, SDW_SHIM_WAKESTS, wake_sts);
+<<<<<<< HEAD
 	}
 	mutex_unlock(sdw->link_res->shim_lock);
+}
+
+static int intel_link_power_up(struct sdw_intel *sdw)
+{
+	unsigned int link_id = sdw->instance;
+	void __iomem *shim = sdw->link_res->shim;
+	u32 *shim_mask = sdw->link_res->shim_mask;
+	struct sdw_bus *bus = &sdw->cdns.bus;
+	struct sdw_master_prop *prop = &bus->prop;
+	u32 spa_mask, cpa_mask;
+	u32 link_control;
+	int ret = 0;
+	u32 syncprd;
+	u32 sync_reg;
+
+	mutex_lock(sdw->link_res->shim_lock);
+
+	/*
+	 * The hardware relies on an internal counter, typically 4kHz,
+	 * to generate the SoundWire SSP - which defines a 'safe'
+	 * synchronization point between commands and audio transport
+	 * and allows for multi link synchronization. The SYNCPRD value
+	 * is only dependent on the oscillator clock provided to
+	 * the IP, so adjust based on _DSD properties reported in DSDT
+	 * tables. The values reported are based on either 24MHz
+	 * (CNL/CML) or 38.4 MHz (ICL/TGL+).
+	 */
+	if (prop->mclk_freq % 6000000)
+		syncprd = SDW_SHIM_SYNC_SYNCPRD_VAL_38_4;
+	else
+		syncprd = SDW_SHIM_SYNC_SYNCPRD_VAL_24;
+
+	if (!*shim_mask) {
+		dev_dbg(sdw->cdns.dev, "powering up all links\n");
+
+		/* we first need to program the SyncPRD/CPU registers */
+		dev_dbg(sdw->cdns.dev,
+			"first link up, programming SYNCPRD\n");
+
+		/* set SyncPRD period */
+		sync_reg = intel_readl(shim, SDW_SHIM_SYNC);
+		u32p_replace_bits(&sync_reg, syncprd, SDW_SHIM_SYNC_SYNCPRD);
+
+		/* Set SyncCPU bit */
+		sync_reg |= SDW_SHIM_SYNC_SYNCCPU;
+		intel_writel(shim, SDW_SHIM_SYNC, sync_reg);
+
+		/* Link power up sequence */
+		link_control = intel_readl(shim, SDW_SHIM_LCTL);
+
+		/* only power-up enabled links */
+		spa_mask = FIELD_PREP(SDW_SHIM_LCTL_SPA_MASK, sdw->link_res->link_mask);
+		cpa_mask = FIELD_PREP(SDW_SHIM_LCTL_CPA_MASK, sdw->link_res->link_mask);
+
+		link_control |=  spa_mask;
+
+		ret = intel_set_bit(shim, SDW_SHIM_LCTL, link_control, cpa_mask);
+		if (ret < 0) {
+			dev_err(sdw->cdns.dev, "Failed to power up link: %d\n", ret);
+			goto out;
+		}
+
+		/* SyncCPU will change once link is active */
+		ret = intel_wait_bit(shim, SDW_SHIM_SYNC,
+				     SDW_SHIM_SYNC_SYNCCPU, 0);
+		if (ret < 0) {
+			dev_err(sdw->cdns.dev,
+				"Failed to set SHIM_SYNC: %d\n", ret);
+			goto out;
+		}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	}
+
+	*shim_mask |= BIT(link_id);
+
+	sdw->cdns.link_up = true;
+
+	intel_shim_init(sdw);
+
+out:
+	mutex_unlock(sdw->link_res->shim_lock);
+
+	return ret;
 }
 
 static int intel_link_power_down(struct sdw_intel *sdw)
@@ -476,7 +488,7 @@ static int intel_link_power_down(struct sdw_intel *sdw)
 
 	if (!*shim_mask) {
 
-		dev_dbg(sdw->cdns.dev, "%s: powering down all links\n", __func__);
+		dev_dbg(sdw->cdns.dev, "powering down all links\n");
 
 		/* Link power down sequence */
 		link_control = intel_readl(shim, SDW_SHIM_LCTL);
@@ -1007,6 +1019,7 @@ static int intel_trigger(struct snd_pcm_substream *substream, int cmd, struct sn
 	struct sdw_intel_link_res *res = sdw->link_res;
 	struct sdw_cdns_dma_data *dma;
 	int ret = 0;
+<<<<<<< HEAD
 
 	/*
 	 * The .trigger callback is used to send required IPC to audio
@@ -1122,6 +1135,123 @@ static const struct snd_soc_dai_ops intel_pcm_dai_ops = {
 	.get_stream = intel_get_sdw_stream,
 };
 
+=======
+
+	/*
+	 * The .trigger callback is used to send required IPC to audio
+	 * firmware. The .free_stream callback will still be called
+	 * by intel_free_stream() in the TRIGGER_SUSPEND case.
+	 */
+	if (res->ops && res->ops->trigger)
+		res->ops->trigger(dai, cmd, substream->stream);
+
+	dma = snd_soc_dai_get_dma_data(dai, substream);
+	if (!dma) {
+		dev_err(dai->dev, "failed to get dma data in %s\n",
+			__func__);
+		return -EIO;
+	}
+
+	switch (cmd) {
+	case SNDRV_PCM_TRIGGER_SUSPEND:
+
+		/*
+		 * The .prepare callback is used to deal with xruns and resume operations.
+		 * In the case of xruns, the DMAs and SHIM registers cannot be touched,
+		 * but for resume operations the DMAs and SHIM registers need to be initialized.
+		 * the .trigger callback is used to track the suspend case only.
+		 */
+
+		dma->suspended = true;
+
+		ret = intel_free_stream(sdw, substream->stream, dai, sdw->instance);
+		break;
+
+	case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
+		dma->paused = true;
+		break;
+	case SNDRV_PCM_TRIGGER_STOP:
+	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
+		dma->paused = false;
+		break;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
+static int intel_component_probe(struct snd_soc_component *component)
+{
+	int ret;
+
+	/*
+	 * make sure the device is pm_runtime_active before initiating
+	 * bus transactions during the card registration.
+	 * We use pm_runtime_resume() here, without taking a reference
+	 * and releasing it immediately.
+	 */
+	ret = pm_runtime_resume(component->dev);
+	if (ret < 0 && ret != -EACCES)
+		return ret;
+
+	return 0;
+}
+
+static int intel_component_dais_suspend(struct snd_soc_component *component)
+{
+	struct snd_soc_dai *dai;
+
+	/*
+	 * In the corner case where a SUSPEND happens during a PAUSE, the ALSA core
+	 * does not throw the TRIGGER_SUSPEND. This leaves the DAIs in an unbalanced state.
+	 * Since the component suspend is called last, we can trap this corner case
+	 * and force the DAIs to release their resources.
+	 */
+	for_each_component_dais(component, dai) {
+		struct sdw_cdns *cdns = snd_soc_dai_get_drvdata(dai);
+		struct sdw_intel *sdw = cdns_to_intel(cdns);
+		struct sdw_cdns_dma_data *dma;
+		int stream;
+		int ret;
+
+		dma = dai->playback_dma_data;
+		stream = SNDRV_PCM_STREAM_PLAYBACK;
+		if (!dma) {
+			dma = dai->capture_dma_data;
+			stream = SNDRV_PCM_STREAM_CAPTURE;
+		}
+
+		if (!dma)
+			continue;
+
+		if (dma->suspended)
+			continue;
+
+		if (dma->paused) {
+			dma->suspended = true;
+
+			ret = intel_free_stream(sdw, stream, dai, sdw->instance);
+			if (ret < 0)
+				return ret;
+		}
+	}
+
+	return 0;
+}
+
+static const struct snd_soc_dai_ops intel_pcm_dai_ops = {
+	.startup = intel_startup,
+	.hw_params = intel_hw_params,
+	.prepare = intel_prepare,
+	.hw_free = intel_hw_free,
+	.trigger = intel_trigger,
+	.shutdown = intel_shutdown,
+	.set_stream = intel_pcm_set_sdw_stream,
+	.get_stream = intel_get_sdw_stream,
+};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct snd_soc_component_driver dai_component = {
 	.name			= "soundwire",
 	.probe			= intel_component_probe,
@@ -1169,10 +1299,19 @@ static int intel_create_dai(struct sdw_cdns *cdns,
 
 static int intel_register_dai(struct sdw_intel *sdw)
 {
+	struct sdw_cdns_stream_config config;
 	struct sdw_cdns *cdns = &sdw->cdns;
 	struct sdw_cdns_streams *stream;
 	struct snd_soc_dai_driver *dais;
 	int num_dai, ret, off = 0;
+
+	/* Read the PDI config and initialize cadence PDI */
+	intel_pdi_init(sdw, &config);
+	ret = sdw_cdns_pdi_init(cdns, config);
+	if (ret)
+		return ret;
+
+	intel_pdi_ch_update(sdw);
 
 	/* DAIs are created based on total number of PDIs supported */
 	num_dai = cdns->pcm.num_pdi;
@@ -1199,10 +1338,213 @@ static int intel_register_dai(struct sdw_intel *sdw)
 	ret = intel_create_dai(cdns, dais, INTEL_PDI_BD, cdns->pcm.num_bd,
 			       off, stream->num_ch_bd);
 	if (ret)
+<<<<<<< HEAD
 		return ret;
 
-	return snd_soc_register_component(cdns->dev, &dai_component,
-					  dais, num_dai);
+	return devm_snd_soc_register_component(cdns->dev, &dai_component,
+					       dais, num_dai);
+}
+
+static int intel_start_bus(struct sdw_intel *sdw)
+{
+	struct device *dev = sdw->cdns.dev;
+	struct sdw_cdns *cdns = &sdw->cdns;
+	struct sdw_bus *bus = &cdns->bus;
+	int ret;
+
+	ret = sdw_cdns_enable_interrupt(cdns, true);
+	if (ret < 0) {
+		dev_err(dev, "%s: cannot enable interrupts: %d\n", __func__, ret);
+		return ret;
+	}
+
+	/*
+	 * follow recommended programming flows to avoid timeouts when
+	 * gsync is enabled
+	 */
+	if (bus->multi_link)
+		intel_shim_sync_arm(sdw);
+
+	ret = sdw_cdns_init(cdns);
+	if (ret < 0) {
+		dev_err(dev, "%s: unable to initialize Cadence IP: %d\n", __func__, ret);
+		goto err_interrupt;
+	}
+
+	ret = sdw_cdns_exit_reset(cdns);
+	if (ret < 0) {
+		dev_err(dev, "%s: unable to exit bus reset sequence: %d\n", __func__, ret);
+		goto err_interrupt;
+	}
+
+	if (bus->multi_link) {
+		ret = intel_shim_sync_go(sdw);
+		if (ret < 0) {
+			dev_err(dev, "%s: sync go failed: %d\n", __func__, ret);
+			goto err_interrupt;
+		}
+	}
+	sdw_cdns_check_self_clearing_bits(cdns, __func__,
+					  true, INTEL_MASTER_RESET_ITERATIONS);
+
+	return 0;
+
+err_interrupt:
+	sdw_cdns_enable_interrupt(cdns, false);
+	return ret;
+}
+
+static int intel_start_bus_after_reset(struct sdw_intel *sdw)
+{
+	struct device *dev = sdw->cdns.dev;
+	struct sdw_cdns *cdns = &sdw->cdns;
+	struct sdw_bus *bus = &cdns->bus;
+	bool clock_stop0;
+	int status;
+	int ret;
+
+	/*
+	 * An exception condition occurs for the CLK_STOP_BUS_RESET
+	 * case if one or more masters remain active. In this condition,
+	 * all the masters are powered on for they are in the same power
+	 * domain. Master can preserve its context for clock stop0, so
+	 * there is no need to clear slave status and reset bus.
+	 */
+	clock_stop0 = sdw_cdns_is_clock_stop(&sdw->cdns);
+
+	if (!clock_stop0) {
+
+		/*
+		 * make sure all Slaves are tagged as UNATTACHED and
+		 * provide reason for reinitialization
+		 */
+
+		status = SDW_UNATTACH_REQUEST_MASTER_RESET;
+		sdw_clear_slave_status(bus, status);
+
+		ret = sdw_cdns_enable_interrupt(cdns, true);
+		if (ret < 0) {
+			dev_err(dev, "cannot enable interrupts during resume\n");
+			return ret;
+		}
+
+		/*
+		 * follow recommended programming flows to avoid
+		 * timeouts when gsync is enabled
+		 */
+		if (bus->multi_link)
+			intel_shim_sync_arm(sdw);
+
+		/*
+		 * Re-initialize the IP since it was powered-off
+		 */
+		sdw_cdns_init(&sdw->cdns);
+
+	} else {
+		ret = sdw_cdns_enable_interrupt(cdns, true);
+		if (ret < 0) {
+			dev_err(dev, "cannot enable interrupts during resume\n");
+			return ret;
+		}
+	}
+
+	ret = sdw_cdns_clock_restart(cdns, !clock_stop0);
+	if (ret < 0) {
+		dev_err(dev, "unable to restart clock during resume\n");
+		goto err_interrupt;
+	}
+
+	if (!clock_stop0) {
+		ret = sdw_cdns_exit_reset(cdns);
+		if (ret < 0) {
+			dev_err(dev, "unable to exit bus reset sequence during resume\n");
+			goto err_interrupt;
+		}
+
+		if (bus->multi_link) {
+			ret = intel_shim_sync_go(sdw);
+			if (ret < 0) {
+				dev_err(sdw->cdns.dev, "sync go failed during resume\n");
+				goto err_interrupt;
+			}
+		}
+	}
+	sdw_cdns_check_self_clearing_bits(cdns, __func__, true, INTEL_MASTER_RESET_ITERATIONS);
+
+	return 0;
+
+err_interrupt:
+	sdw_cdns_enable_interrupt(cdns, false);
+	return ret;
+}
+
+static void intel_check_clock_stop(struct sdw_intel *sdw)
+{
+	struct device *dev = sdw->cdns.dev;
+	bool clock_stop0;
+
+	clock_stop0 = sdw_cdns_is_clock_stop(&sdw->cdns);
+	if (!clock_stop0)
+		dev_err(dev, "%s: invalid configuration, clock was not stopped\n", __func__);
+}
+
+static int intel_start_bus_after_clock_stop(struct sdw_intel *sdw)
+{
+	struct device *dev = sdw->cdns.dev;
+	struct sdw_cdns *cdns = &sdw->cdns;
+	int ret;
+
+	ret = sdw_cdns_enable_interrupt(cdns, true);
+	if (ret < 0) {
+		dev_err(dev, "%s: cannot enable interrupts: %d\n", __func__, ret);
+		return ret;
+	}
+
+	ret = sdw_cdns_clock_restart(cdns, false);
+	if (ret < 0) {
+		dev_err(dev, "%s: unable to restart clock: %d\n", __func__, ret);
+		sdw_cdns_enable_interrupt(cdns, false);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		return ret;
+	}
+
+	sdw_cdns_check_self_clearing_bits(cdns, "intel_resume_runtime no_quirks",
+					  true, INTEL_MASTER_RESET_ITERATIONS);
+
+	return 0;
+}
+
+static int intel_stop_bus(struct sdw_intel *sdw, bool clock_stop)
+{
+	struct device *dev = sdw->cdns.dev;
+	struct sdw_cdns *cdns = &sdw->cdns;
+	bool wake_enable = false;
+	int ret;
+
+	if (clock_stop) {
+		ret = sdw_cdns_clock_stop(cdns, true);
+		if (ret < 0)
+			dev_err(dev, "%s: cannot stop clock: %d\n", __func__, ret);
+		else
+			wake_enable = true;
+	}
+
+	ret = sdw_cdns_enable_interrupt(cdns, false);
+	if (ret < 0) {
+		dev_err(dev, "%s: cannot disable interrupts: %d\n", __func__, ret);
+		return ret;
+	}
+
+	ret = intel_link_power_down(sdw);
+	if (ret) {
+		dev_err(dev, "%s: Link power down failed: %d\n", __func__, ret);
+		return ret;
+	}
+
+	intel_shim_wake(sdw, wake_enable);
+
+	return 0;
 }
 
 static int sdw_master_read_intel_prop(struct sdw_bus *bus)
@@ -1254,7 +1596,11 @@ static int intel_prop_read(struct sdw_bus *bus)
 }
 
 static struct sdw_master_ops sdw_intel_ops = {
+<<<<<<< HEAD
+	.read_prop = intel_prop_read,
+=======
 	.read_prop = sdw_master_read_prop,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.override_adr = sdw_dmi_override_adr,
 	.xfer_msg = cdns_xfer_msg,
 	.xfer_msg_defer = cdns_xfer_msg_defer,
@@ -1262,21 +1608,8 @@ static struct sdw_master_ops sdw_intel_ops = {
 	.set_bus_conf = cdns_bus_conf,
 	.pre_bank_switch = intel_pre_bank_switch,
 	.post_bank_switch = intel_post_bank_switch,
+	.read_ping_status = cdns_read_ping_status,
 };
-
-static int intel_init(struct sdw_intel *sdw)
-{
-	bool clock_stop;
-
-	/* Initialize shim and controller */
-	intel_link_power_up(sdw);
-
-	clock_stop = sdw_cdns_is_clock_stop(&sdw->cdns);
-
-	intel_shim_init(sdw, clock_stop);
-
-	return 0;
-}
 
 /*
  * probe and init (aux_dev_id argument is required by function prototype but not used)
@@ -1307,11 +1640,15 @@ static int intel_link_probe(struct auxiliary_device *auxdev,
 	cdns->msg_count = 0;
 
 	bus->link_id = auxdev->id;
+<<<<<<< HEAD
+	bus->dev_num_ida_min = INTEL_DEV_NUM_IDA_MIN;
+	bus->clk_stop_timeout = 1;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	sdw_cdns_probe(cdns);
 
-	/* Set property read ops */
-	sdw_intel_ops.read_prop = intel_prop_read;
+	/* Set ops */
 	bus->ops = &sdw_intel_ops;
 
 	/* set driver data, accessed by snd_soc_dai_get_drvdata() */
@@ -1344,7 +1681,10 @@ static int intel_link_probe(struct auxiliary_device *auxdev,
 
 int intel_link_startup(struct auxiliary_device *auxdev)
 {
+<<<<<<< HEAD
+=======
 	struct sdw_cdns_stream_config config;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct device *dev = &auxdev->dev;
 	struct sdw_cdns *cdns = auxiliary_get_drvdata(auxdev);
 	struct sdw_intel *sdw = cdns_to_intel(cdns);
@@ -1365,7 +1705,6 @@ int intel_link_startup(struct auxiliary_device *auxdev)
 	multi_link = !(link_flags & SDW_INTEL_MASTER_DISABLE_MULTI_LINK);
 	if (!multi_link) {
 		dev_dbg(dev, "Multi-link is disabled\n");
-		bus->multi_link = false;
 	} else {
 		/*
 		 * hardware-based synchronization is required regardless
@@ -1373,21 +1712,17 @@ int intel_link_startup(struct auxiliary_device *auxdev)
 		 * synchronization is gated by gsync when the multi-master
 		 * mode is set.
 		 */
-		bus->multi_link = true;
 		bus->hw_sync_min_links = 1;
 	}
+	bus->multi_link = multi_link;
 
 	/* Initialize shim, controller */
-	ret = intel_init(sdw);
+	ret = intel_link_power_up(sdw);
 	if (ret)
 		goto err_init;
 
-	/* Read the PDI config and initialize cadence PDI */
-	intel_pdi_init(sdw, &config);
-	ret = sdw_cdns_pdi_init(cdns, config);
-	if (ret)
-		goto err_init;
-
+<<<<<<< HEAD
+=======
 	intel_pdi_ch_update(sdw);
 
 	ret = sdw_cdns_enable_interrupt(cdns, true);
@@ -1425,14 +1760,26 @@ int intel_link_startup(struct auxiliary_device *auxdev)
 	sdw_cdns_check_self_clearing_bits(cdns, __func__,
 					  true, INTEL_MASTER_RESET_ITERATIONS);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Register DAIs */
 	ret = intel_register_dai(sdw);
 	if (ret) {
 		dev_err(dev, "DAI registration failed: %d\n", ret);
+<<<<<<< HEAD
+		goto err_power_up;
+=======
 		goto err_interrupt;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	intel_debugfs_init(sdw);
+
+	/* start bus */
+	ret = intel_start_bus(sdw);
+	if (ret) {
+		dev_err(dev, "bus start failed: %d\n", ret);
+		goto err_power_up;
+	}
 
 	/* Enable runtime PM */
 	if (!(link_flags & SDW_INTEL_MASTER_DISABLE_PM_RUNTIME)) {
@@ -1478,15 +1825,18 @@ int intel_link_startup(struct auxiliary_device *auxdev)
 	sdw->startup_done = true;
 	return 0;
 
-err_interrupt:
-	sdw_cdns_enable_interrupt(cdns, false);
+err_power_up:
+	intel_link_power_down(sdw);
 err_init:
 	return ret;
 }
 
 static void intel_link_remove(struct auxiliary_device *auxdev)
 {
+<<<<<<< HEAD
+=======
 	struct device *dev = &auxdev->dev;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sdw_cdns *cdns = auxiliary_get_drvdata(auxdev);
 	struct sdw_intel *sdw = cdns_to_intel(cdns);
 	struct sdw_bus *bus = &cdns->bus;
@@ -1499,7 +1849,6 @@ static void intel_link_remove(struct auxiliary_device *auxdev)
 	if (!bus->prop.hw_disabled) {
 		intel_debugfs_exit(sdw);
 		sdw_cdns_enable_interrupt(cdns, false);
-		snd_soc_unregister_component(dev);
 	}
 	sdw_bus_master_delete(bus);
 }
@@ -1509,8 +1858,6 @@ int intel_link_process_wakeen_event(struct auxiliary_device *auxdev)
 	struct device *dev = &auxdev->dev;
 	struct sdw_intel *sdw;
 	struct sdw_bus *bus;
-	void __iomem *shim;
-	u16 wake_sts;
 
 	sdw = auxiliary_get_drvdata(auxdev);
 	bus = &sdw->cdns.bus;
@@ -1521,10 +1868,7 @@ int intel_link_process_wakeen_event(struct auxiliary_device *auxdev)
 		return 0;
 	}
 
-	shim = sdw->link_res->shim;
-	wake_sts = intel_readw(shim, SDW_SHIM_WAKESTS);
-
-	if (!(wake_sts & BIT(sdw->instance)))
+	if (!intel_shim_check_wake(sdw))
 		return 0;
 
 	/* disable WAKEEN interrupt ASAP to prevent interrupt flood */
@@ -1552,11 +1896,19 @@ static int intel_resume_child_device(struct device *dev, void *data)
 	struct sdw_slave *slave = dev_to_sdw_dev(dev);
 
 	if (!slave->probed) {
+<<<<<<< HEAD
+		dev_dbg(dev, "skipping device, no probed driver\n");
+		return 0;
+	}
+	if (!slave->dev_num_sticky) {
+		dev_dbg(dev, "skipping device, never detected on bus\n");
+=======
 		dev_dbg(dev, "%s: skipping device, no probed driver\n", __func__);
 		return 0;
 	}
 	if (!slave->dev_num_sticky) {
 		dev_dbg(dev, "%s: skipping device, never detected on bus\n", __func__);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 0;
 	}
 
@@ -1642,7 +1994,7 @@ static int __maybe_unused intel_suspend(struct device *dev)
 	}
 
 	if (pm_runtime_suspended(dev)) {
-		dev_dbg(dev, "%s: pm_runtime status: suspended\n", __func__);
+		dev_dbg(dev, "pm_runtime status: suspended\n");
 
 		clock_stop_quirks = sdw->link_res->clock_stop_quirks;
 
@@ -1663,8 +2015,11 @@ static int __maybe_unused intel_suspend(struct device *dev)
 		return 0;
 	}
 
-	ret = sdw_cdns_enable_interrupt(cdns, false);
+	ret = intel_stop_bus(sdw, false);
 	if (ret < 0) {
+<<<<<<< HEAD
+		dev_err(dev, "%s: cannot stop bus: %d\n", __func__, ret);
+=======
 		dev_err(dev, "cannot disable interrupts on suspend\n");
 		return ret;
 	}
@@ -1672,10 +2027,9 @@ static int __maybe_unused intel_suspend(struct device *dev)
 	ret = intel_link_power_down(sdw);
 	if (ret) {
 		dev_err(dev, "Link power down failed: %d\n", ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return ret;
 	}
-
-	intel_shim_wake(sdw, false);
 
 	return 0;
 }
@@ -1697,12 +2051,16 @@ static int __maybe_unused intel_suspend_runtime(struct device *dev)
 	clock_stop_quirks = sdw->link_res->clock_stop_quirks;
 
 	if (clock_stop_quirks & SDW_INTEL_CLK_STOP_TEARDOWN) {
-
-		ret = sdw_cdns_enable_interrupt(cdns, false);
+		ret = intel_stop_bus(sdw, false);
 		if (ret < 0) {
-			dev_err(dev, "cannot disable interrupts on suspend\n");
+			dev_err(dev, "%s: cannot stop bus during teardown: %d\n",
+				__func__, ret);
 			return ret;
 		}
+<<<<<<< HEAD
+	} else if (clock_stop_quirks & SDW_INTEL_CLK_STOP_BUS_RESET || !clock_stop_quirks) {
+		ret = intel_stop_bus(sdw, true);
+=======
 
 		ret = intel_link_power_down(sdw);
 		if (ret) {
@@ -1723,10 +2081,14 @@ static int __maybe_unused intel_suspend_runtime(struct device *dev)
 		}
 
 		ret = sdw_cdns_enable_interrupt(cdns, false);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret < 0) {
-			dev_err(dev, "cannot disable interrupts on suspend\n");
+			dev_err(dev, "%s: cannot stop bus during clock_stop: %d\n",
+				__func__, ret);
 			return ret;
 		}
+<<<<<<< HEAD
+=======
 
 		ret = intel_link_power_down(sdw);
 		if (ret) {
@@ -1735,6 +2097,7 @@ static int __maybe_unused intel_suspend_runtime(struct device *dev)
 		}
 
 		intel_shim_wake(sdw, wake_enable);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		dev_err(dev, "%s clock_stop_quirks %x unsupported\n",
 			__func__, clock_stop_quirks);
@@ -1750,7 +2113,6 @@ static int __maybe_unused intel_resume(struct device *dev)
 	struct sdw_intel *sdw = cdns_to_intel(cdns);
 	struct sdw_bus *bus = &cdns->bus;
 	int link_flags;
-	bool multi_link;
 	int ret;
 
 	if (bus->prop.hw_disabled || !sdw->startup_done) {
@@ -1760,10 +2122,9 @@ static int __maybe_unused intel_resume(struct device *dev)
 	}
 
 	link_flags = md_flags >> (bus->link_id * 8);
-	multi_link = !(link_flags & SDW_INTEL_MASTER_DISABLE_MULTI_LINK);
 
 	if (pm_runtime_suspended(dev)) {
-		dev_dbg(dev, "%s: pm_runtime status was suspended, forcing active\n", __func__);
+		dev_dbg(dev, "pm_runtime status was suspended, forcing active\n");
 
 		/* follow required sequence from runtime_pm.rst */
 		pm_runtime_disable(dev);
@@ -1777,7 +2138,7 @@ static int __maybe_unused intel_resume(struct device *dev)
 			pm_runtime_idle(dev);
 	}
 
-	ret = intel_init(sdw);
+	ret = intel_link_power_up(sdw);
 	if (ret) {
 		dev_err(dev, "%s failed: %d\n", __func__, ret);
 		return ret;
@@ -1789,31 +2150,15 @@ static int __maybe_unused intel_resume(struct device *dev)
 	 */
 	sdw_clear_slave_status(bus, SDW_UNATTACH_REQUEST_MASTER_RESET);
 
-	ret = sdw_cdns_enable_interrupt(cdns, true);
+	ret = intel_start_bus(sdw);
 	if (ret < 0) {
-		dev_err(dev, "cannot enable interrupts during resume\n");
+		dev_err(dev, "cannot start bus during resume\n");
+		intel_link_power_down(sdw);
 		return ret;
 	}
 
-	/*
-	 * follow recommended programming flows to avoid timeouts when
-	 * gsync is enabled
-	 */
-	if (multi_link)
-		intel_shim_sync_arm(sdw);
-
-	ret = sdw_cdns_init(&sdw->cdns);
-	if (ret < 0) {
-		dev_err(dev, "unable to initialize Cadence IP during resume\n");
-		return ret;
-	}
-
-	ret = sdw_cdns_exit_reset(cdns);
-	if (ret < 0) {
-		dev_err(dev, "unable to exit bus reset sequence during resume\n");
-		return ret;
-	}
-
+<<<<<<< HEAD
+=======
 	if (multi_link) {
 		ret = intel_shim_sync_go(sdw);
 		if (ret < 0) {
@@ -1824,6 +2169,7 @@ static int __maybe_unused intel_resume(struct device *dev)
 	sdw_cdns_check_self_clearing_bits(cdns, __func__,
 					  true, INTEL_MASTER_RESET_ITERATIONS);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * after system resume, the pm_runtime suspend() may kick in
 	 * during the enumeration, before any children device force the
@@ -1836,7 +2182,7 @@ static int __maybe_unused intel_resume(struct device *dev)
 	 */
 	pm_runtime_mark_last_busy(dev);
 
-	return ret;
+	return 0;
 }
 
 static int __maybe_unused intel_resume_runtime(struct device *dev)
@@ -1845,10 +2191,6 @@ static int __maybe_unused intel_resume_runtime(struct device *dev)
 	struct sdw_intel *sdw = cdns_to_intel(cdns);
 	struct sdw_bus *bus = &cdns->bus;
 	u32 clock_stop_quirks;
-	bool clock_stop0;
-	int link_flags;
-	bool multi_link;
-	int status;
 	int ret;
 
 	if (bus->prop.hw_disabled || !sdw->startup_done) {
@@ -1859,16 +2201,23 @@ static int __maybe_unused intel_resume_runtime(struct device *dev)
 
 	/* unconditionally disable WAKEEN interrupt */
 	intel_shim_wake(sdw, false);
+<<<<<<< HEAD
+=======
 
 	link_flags = md_flags >> (bus->link_id * 8);
 	multi_link = !(link_flags & SDW_INTEL_MASTER_DISABLE_MULTI_LINK);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	clock_stop_quirks = sdw->link_res->clock_stop_quirks;
 
 	if (clock_stop_quirks & SDW_INTEL_CLK_STOP_TEARDOWN) {
-		ret = intel_init(sdw);
+		ret = intel_link_power_up(sdw);
 		if (ret) {
+<<<<<<< HEAD
+			dev_err(dev, "%s: power_up failed after teardown: %d\n", __func__, ret);
+=======
 			dev_err(dev, "%s failed: %d\n", __func__, ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return ret;
 		}
 
@@ -1878,19 +2227,16 @@ static int __maybe_unused intel_resume_runtime(struct device *dev)
 		 */
 		sdw_clear_slave_status(bus, SDW_UNATTACH_REQUEST_MASTER_RESET);
 
-		ret = sdw_cdns_enable_interrupt(cdns, true);
+		ret = intel_start_bus(sdw);
 		if (ret < 0) {
-			dev_err(dev, "cannot enable interrupts during resume\n");
+			dev_err(dev, "%s: cannot start bus after teardown: %d\n", __func__, ret);
+			intel_link_power_down(sdw);
 			return ret;
 		}
 
-		/*
-		 * follow recommended programming flows to avoid
-		 * timeouts when gsync is enabled
-		 */
-		if (multi_link)
-			intel_shim_sync_arm(sdw);
 
+<<<<<<< HEAD
+=======
 		ret = sdw_cdns_init(&sdw->cdns);
 		if (ret < 0) {
 			dev_err(dev, "unable to initialize Cadence IP during resume\n");
@@ -1913,63 +2259,26 @@ static int __maybe_unused intel_resume_runtime(struct device *dev)
 		sdw_cdns_check_self_clearing_bits(cdns, "intel_resume_runtime TEARDOWN",
 						  true, INTEL_MASTER_RESET_ITERATIONS);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (clock_stop_quirks & SDW_INTEL_CLK_STOP_BUS_RESET) {
-		ret = intel_init(sdw);
+		ret = intel_link_power_up(sdw);
 		if (ret) {
+<<<<<<< HEAD
+			dev_err(dev, "%s: power_up failed after bus reset: %d\n", __func__, ret);
+=======
 			dev_err(dev, "%s failed: %d\n", __func__, ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return ret;
 		}
 
-		/*
-		 * An exception condition occurs for the CLK_STOP_BUS_RESET
-		 * case if one or more masters remain active. In this condition,
-		 * all the masters are powered on for they are in the same power
-		 * domain. Master can preserve its context for clock stop0, so
-		 * there is no need to clear slave status and reset bus.
-		 */
-		clock_stop0 = sdw_cdns_is_clock_stop(&sdw->cdns);
-
-		if (!clock_stop0) {
-
-			/*
-			 * make sure all Slaves are tagged as UNATTACHED and
-			 * provide reason for reinitialization
-			 */
-
-			status = SDW_UNATTACH_REQUEST_MASTER_RESET;
-			sdw_clear_slave_status(bus, status);
-
-			ret = sdw_cdns_enable_interrupt(cdns, true);
-			if (ret < 0) {
-				dev_err(dev, "cannot enable interrupts during resume\n");
-				return ret;
-			}
-
-			/*
-			 * follow recommended programming flows to avoid
-			 * timeouts when gsync is enabled
-			 */
-			if (multi_link)
-				intel_shim_sync_arm(sdw);
-
-			/*
-			 * Re-initialize the IP since it was powered-off
-			 */
-			sdw_cdns_init(&sdw->cdns);
-
-		} else {
-			ret = sdw_cdns_enable_interrupt(cdns, true);
-			if (ret < 0) {
-				dev_err(dev, "cannot enable interrupts during resume\n");
-				return ret;
-			}
-		}
-
-		ret = sdw_cdns_clock_restart(cdns, !clock_stop0);
+		ret = intel_start_bus_after_reset(sdw);
 		if (ret < 0) {
-			dev_err(dev, "unable to restart clock during resume\n");
+			dev_err(dev, "%s: cannot start bus after reset: %d\n", __func__, ret);
+			intel_link_power_down(sdw);
 			return ret;
 		}
+<<<<<<< HEAD
+=======
 
 		if (!clock_stop0) {
 			ret = sdw_cdns_exit_reset(cdns);
@@ -1989,34 +2298,32 @@ static int __maybe_unused intel_resume_runtime(struct device *dev)
 		sdw_cdns_check_self_clearing_bits(cdns, "intel_resume_runtime BUS_RESET",
 						  true, INTEL_MASTER_RESET_ITERATIONS);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else if (!clock_stop_quirks) {
 
-		clock_stop0 = sdw_cdns_is_clock_stop(&sdw->cdns);
-		if (!clock_stop0)
-			dev_err(dev, "%s invalid configuration, clock was not stopped", __func__);
+		intel_check_clock_stop(sdw);
 
-		ret = intel_init(sdw);
+		ret = intel_link_power_up(sdw);
 		if (ret) {
+<<<<<<< HEAD
+			dev_err(dev, "%s: power_up failed: %d\n", __func__, ret);
+=======
 			dev_err(dev, "%s failed: %d\n", __func__, ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return ret;
 		}
 
-		ret = sdw_cdns_enable_interrupt(cdns, true);
+		ret = intel_start_bus_after_clock_stop(sdw);
 		if (ret < 0) {
-			dev_err(dev, "cannot enable interrupts during resume\n");
-			return ret;
-		}
-
-		ret = sdw_cdns_clock_restart(cdns, false);
-		if (ret < 0) {
-			dev_err(dev, "unable to resume master during resume\n");
+			dev_err(dev, "%s: cannot start bus after clock stop: %d\n", __func__, ret);
+			intel_link_power_down(sdw);
 			return ret;
 		}
 
 		sdw_cdns_check_self_clearing_bits(cdns, "intel_resume_runtime no_quirks",
 						  true, INTEL_MASTER_RESET_ITERATIONS);
 	} else {
-		dev_err(dev, "%s clock_stop_quirks %x unsupported\n",
+		dev_err(dev, "%s: clock_stop_quirks %x unsupported\n",
 			__func__, clock_stop_quirks);
 		ret = -EINVAL;
 	}

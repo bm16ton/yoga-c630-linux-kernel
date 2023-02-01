@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/cx18/cx18.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/cx18/cx18.ko drivers/media/pci/cx18/cx18.o drivers/media/pci/cx18/cx18.mod.o;  true

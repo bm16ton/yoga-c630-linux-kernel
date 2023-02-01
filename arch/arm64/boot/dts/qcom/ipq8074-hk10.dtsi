@@ -39,12 +39,20 @@
 
 &pcie0 {
 	status = "ok";
+<<<<<<< HEAD
+	perst-gpios = <&tlmm 58 0x1>;
+=======
 	perst-gpio = <&tlmm 58 0x1>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &pcie1 {
 	status = "ok";
+<<<<<<< HEAD
+	perst-gpios = <&tlmm 61 0x1>;
+=======
 	perst-gpio = <&tlmm 61 0x1>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 &pcie_phy0 {

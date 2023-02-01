@@ -301,6 +301,8 @@ typedef bool (*kunit_resource_match_t)(struct kunit *test,
 				       void *match_data);
 
 /**
+<<<<<<< HEAD
+=======
  * kunit_resource_instance_match() - Match a resource with the same instance.
  * @test: Test case to which the resource belongs.
  * @res: The resource.
@@ -317,6 +319,7 @@ static inline bool kunit_resource_instance_match(struct kunit *test,
 }
 
 /**
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * kunit_resource_name_match() - Match a resource with the same name.
  * @test: Test case to which the resource belongs.
  * @res: The resource.

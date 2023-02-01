@@ -1,0 +1,1 @@
+cmd_drivers/scsi/esas2r/esas2r.mod := printf '%s\n'   esas2r_log.o esas2r_disc.o esas2r_flash.o esas2r_init.o esas2r_int.o esas2r_io.o esas2r_ioctl.o esas2r_targdb.o esas2r_vda.o esas2r_main.o | awk '!x[$$0]++ { print("drivers/scsi/esas2r/"$$0) }' > drivers/scsi/esas2r/esas2r.mod

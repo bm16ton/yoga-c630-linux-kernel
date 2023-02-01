@@ -3785,7 +3785,7 @@ static int resp_write_scat(struct scsi_cmnd *scp,
 		mk_sense_buffer(scp, ILLEGAL_REQUEST, INVALID_FIELD_IN_CDB, 0);
 		return illegal_condition_result;
 	}
-	lrdp = kzalloc(lbdof_blen, GFP_ATOMIC);
+	lrdp = kzalloc(lbdof_blen, GFP_ATOMIC | __GFP_NOWARN);
 	if (lrdp == NULL)
 		return SCSI_MLQUEUE_HOST_BUSY;
 	if (sdebug_verbose)
@@ -4436,7 +4436,7 @@ static int resp_verify(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
 	if (ret)
 		return ret;
 
-	arr = kcalloc(lb_size, vnum, GFP_ATOMIC);
+	arr = kcalloc(lb_size, vnum, GFP_ATOMIC | __GFP_NOWARN);
 	if (!arr) {
 		mk_sense_buffer(scp, ILLEGAL_REQUEST, INSUFF_RES_ASC,
 				INSUFF_RES_ASCQ);
@@ -4504,7 +4504,11 @@ static int resp_report_zones(struct scsi_cmnd *scp,
 
 	rep_max_zones = (alloc_len - 64) >> ilog2(RZONES_DESC_HD);
 
+<<<<<<< HEAD
+	arr = kzalloc(alloc_len, GFP_ATOMIC | __GFP_NOWARN);
+=======
 	arr = kzalloc(alloc_len, GFP_ATOMIC);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!arr) {
 		mk_sense_buffer(scp, ILLEGAL_REQUEST, INSUFF_RES_ASC,
 				INSUFF_RES_ASCQ);
@@ -7340,7 +7344,10 @@ clean:
 		kfree(sdbg_devinfo->zstate);
 		kfree(sdbg_devinfo);
 	}
-	kfree(sdbg_host);
+	if (sdbg_host->dev.release)
+		put_device(&sdbg_host->dev);
+	else
+		kfree(sdbg_host);
 	pr_warn("%s: failed, errno=%d\n", __func__, -error);
 	return error;
 }
@@ -7485,12 +7492,20 @@ static int resp_not_ready(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
 	return check_condition_result;
 }
 
+<<<<<<< HEAD
+static void sdebug_map_queues(struct Scsi_Host *shost)
+=======
 static int sdebug_map_queues(struct Scsi_Host *shost)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	int i, qoff;
 
 	if (shost->nr_hw_queues == 1)
+<<<<<<< HEAD
+		return;
+=======
 		return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for (i = 0, qoff = 0; i < HCTX_MAX_TYPES; i++) {
 		struct blk_mq_queue_map *map = &shost->tag_set.map[i];
@@ -7512,9 +7527,12 @@ static int sdebug_map_queues(struct Scsi_Host *shost)
 
 		qoff += map->nr_queues;
 	}
+<<<<<<< HEAD
+=======
 
 	return 0;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int sdebug_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num)

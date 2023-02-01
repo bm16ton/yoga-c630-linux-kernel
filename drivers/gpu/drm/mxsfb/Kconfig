@@ -10,7 +10,11 @@ config DRM_MXSFB
 	depends on COMMON_CLK
 	select DRM_MXS
 	select DRM_KMS_HELPER
+<<<<<<< HEAD
+	select DRM_GEM_DMA_HELPER
+=======
 	select DRM_GEM_CMA_HELPER
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select DRM_PANEL
 	select DRM_PANEL_BRIDGE
 	help
@@ -26,7 +30,11 @@ config DRM_IMX_LCDIF
 	depends on COMMON_CLK
 	select DRM_MXS
 	select DRM_KMS_HELPER
+<<<<<<< HEAD
+	select DRM_GEM_DMA_HELPER
+=======
 	select DRM_GEM_CMA_HELPER
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select DRM_PANEL
 	select DRM_PANEL_BRIDGE
 	help

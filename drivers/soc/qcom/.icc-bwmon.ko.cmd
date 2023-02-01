@@ -1,0 +1,1 @@
+cmd_drivers/soc/qcom/icc-bwmon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/soc/qcom/icc-bwmon.ko drivers/soc/qcom/icc-bwmon.o drivers/soc/qcom/icc-bwmon.mod.o;  true

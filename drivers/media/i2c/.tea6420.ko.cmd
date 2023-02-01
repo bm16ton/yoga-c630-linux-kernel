@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/tea6420.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/i2c/tea6420.ko drivers/media/i2c/tea6420.o drivers/media/i2c/tea6420.mod.o;  true

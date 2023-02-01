@@ -18,11 +18,14 @@ struct ssd130x_spi_transport {
 	struct gpio_desc *dc;
 };
 
+<<<<<<< HEAD
+=======
 static const struct regmap_config ssd130x_spi_regmap_config = {
 	.reg_bits = 8,
 	.val_bits = 8,
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * The regmap bus .write handler, it is just a wrapper around spi_write()
  * but toggling the Data/Command control pin (D/C#). Since for 4-wire SPI
@@ -56,6 +59,14 @@ static int ssd130x_spi_read(void *context, const void *reg, size_t reg_size,
 	return -EOPNOTSUPP;
 }
 
+<<<<<<< HEAD
+static const struct regmap_config ssd130x_spi_regmap_config = {
+	.reg_bits = 8,
+	.val_bits = 8,
+	.write = ssd130x_spi_write,
+	.read = ssd130x_spi_read,
+	.can_multi_write = true,
+=======
 /*
  * A custom bus is needed due the special write that toggles a D/C# pin,
  * another option could be to just have a .reg_write() callback but that
@@ -67,6 +78,7 @@ static int ssd130x_spi_read(void *context, const void *reg, size_t reg_size,
 static struct regmap_bus regmap_ssd130x_spi_bus = {
 	.write = ssd130x_spi_write,
 	.read = ssd130x_spi_read,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int ssd130x_spi_probe(struct spi_device *spi)
@@ -90,8 +102,12 @@ static int ssd130x_spi_probe(struct spi_device *spi)
 	t->spi = spi;
 	t->dc = dc;
 
+<<<<<<< HEAD
+	regmap = devm_regmap_init(dev, NULL, t, &ssd130x_spi_regmap_config);
+=======
 	regmap = devm_regmap_init(dev, &regmap_ssd130x_spi_bus, t,
 				  &ssd130x_spi_regmap_config);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/e1000/e1000.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/intel/e1000/e1000.ko drivers/net/ethernet/intel/e1000/e1000.o drivers/net/ethernet/intel/e1000/e1000.mod.o;  true

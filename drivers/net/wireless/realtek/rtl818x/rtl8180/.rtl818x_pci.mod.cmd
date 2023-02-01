@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtl818x/rtl8180/rtl818x_pci.mod := printf '%s\n'   dev.o rtl8225.o sa2400.o max2820.o grf5101.o rtl8225se.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtl818x/rtl8180/"$$0) }' > drivers/net/wireless/realtek/rtl818x/rtl8180/rtl818x_pci.mod

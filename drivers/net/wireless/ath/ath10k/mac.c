@@ -4051,7 +4051,11 @@ static int ath10k_mac_tx(struct ath10k *ar,
 		ath10k_tx_h_seq_no(vif, skb);
 		break;
 	case ATH10K_HW_TXRX_ETHERNET:
+<<<<<<< HEAD
+		/* Convert 802.11->802.3 header only if the frame was earlier
+=======
 		/* Convert 802.11->802.3 header only if the frame was erlier
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * encapsulated to 802.11 by mac80211. Otherwise pass it as is.
 		 */
 		if (!(info->flags & IEEE80211_TX_CTL_HW_80211_ENCAP))
@@ -8097,7 +8101,7 @@ static void ath10k_flush(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 
 /* TODO: Implement this function properly
  * For now it is needed to reply to Probe Requests in IBSS mode.
- * Propably we need this information from FW.
+ * Probably we need this information from FW.
  */
 static int ath10k_tx_last_beacon(struct ieee80211_hw *hw)
 {
@@ -8520,7 +8524,11 @@ static void ath10k_sta_rc_update(struct ieee80211_hw *hw,
 		   "mac sta rc update for %pM changed %08x bw %d nss %d smps %d\n",
 		   sta->addr, changed, sta->deflink.bandwidth,
 		   sta->deflink.rx_nss,
+<<<<<<< HEAD
+		   sta->deflink.smps_mode);
+=======
 		   sta->smps_mode);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (changed & IEEE80211_RC_BW_CHANGED) {
 		bw = WMI_PEER_CHWIDTH_20MHZ;
@@ -8554,7 +8562,7 @@ static void ath10k_sta_rc_update(struct ieee80211_hw *hw,
 	if (changed & IEEE80211_RC_SMPS_CHANGED) {
 		smps = WMI_PEER_SMPS_PS_NONE;
 
-		switch (sta->smps_mode) {
+		switch (sta->deflink.smps_mode) {
 		case IEEE80211_SMPS_AUTOMATIC:
 		case IEEE80211_SMPS_OFF:
 			smps = WMI_PEER_SMPS_PS_NONE;
@@ -8567,7 +8575,7 @@ static void ath10k_sta_rc_update(struct ieee80211_hw *hw,
 			break;
 		case IEEE80211_SMPS_NUM_MODES:
 			ath10k_warn(ar, "Invalid smps %d in sta rc update for %pM\n",
-				    sta->smps_mode, sta->addr);
+				    sta->deflink.smps_mode, sta->addr);
 			smps = WMI_PEER_SMPS_PS_NONE;
 			break;
 		}
@@ -9686,7 +9694,7 @@ static const struct ieee80211_iface_limit ath10k_tlv_if_limit_ibss[] = {
 	},
 };
 
-/* FIXME: This is not thouroughly tested. These combinations may over- or
+/* FIXME: This is not thoroughly tested. These combinations may over- or
  * underestimate hw/fw capabilities.
  */
 static struct ieee80211_iface_combination ath10k_tlv_if_comb[] = {
@@ -9926,7 +9934,7 @@ int ath10k_mac_register(struct ath10k *ar)
 		WLAN_CIPHER_SUITE_BIP_GMAC_128,
 		WLAN_CIPHER_SUITE_BIP_GMAC_256,
 
-		/* Only QCA99x0 and QCA4019 varients support GCMP-128, GCMP-256
+		/* Only QCA99x0 and QCA4019 variants support GCMP-128, GCMP-256
 		 * and CCMP-256 in hardware.
 		 */
 		WLAN_CIPHER_SUITE_GCMP,

@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/inv_mpu6050/inv-mpu6050.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/inv_mpu6050/inv-mpu6050.ko drivers/iio/imu/inv_mpu6050/inv-mpu6050.o drivers/iio/imu/inv_mpu6050/inv-mpu6050.mod.o;  true

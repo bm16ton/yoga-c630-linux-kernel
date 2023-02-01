@@ -1,0 +1,1 @@
+cmd_drivers/i2c/busses/i2c-ti-smusbdig.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/busses/i2c-ti-smusbdig.ko drivers/i2c/busses/i2c-ti-smusbdig.o drivers/i2c/busses/i2c-ti-smusbdig.mod.o;  true

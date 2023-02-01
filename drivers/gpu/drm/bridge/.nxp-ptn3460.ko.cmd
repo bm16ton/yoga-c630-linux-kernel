@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/bridge/nxp-ptn3460.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/bridge/nxp-ptn3460.ko drivers/gpu/drm/bridge/nxp-ptn3460.o drivers/gpu/drm/bridge/nxp-ptn3460.mod.o;  true

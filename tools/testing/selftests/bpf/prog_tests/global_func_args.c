@@ -39,7 +39,11 @@ static void test_global_func_args0(struct bpf_object *obj)
 
 void test_global_func_args(void)
 {
+<<<<<<< HEAD
+	const char *file = "./test_global_func_args.bpf.o";
+=======
 	const char *file = "./test_global_func_args.o";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct bpf_object *obj;
 	int err, prog_fd;
 	LIBBPF_OPTS(bpf_test_run_opts, topts,

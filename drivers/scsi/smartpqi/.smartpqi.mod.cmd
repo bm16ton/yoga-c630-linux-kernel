@@ -1,0 +1,1 @@
+cmd_drivers/scsi/smartpqi/smartpqi.mod := printf '%s\n'   smartpqi_init.o smartpqi_sis.o smartpqi_sas_transport.o | awk '!x[$$0]++ { print("drivers/scsi/smartpqi/"$$0) }' > drivers/scsi/smartpqi/smartpqi.mod

@@ -1,0 +1,1 @@
+cmd_sound/usb/snd-usb-audio.mod := printf '%s\n'   card.o clock.o endpoint.o format.o helper.o implicit.o mixer.o mixer_quirks.o mixer_scarlett.o mixer_scarlett_gen2.o mixer_us16x08.o mixer_s1810c.o pcm.o power.o proc.o quirks.o stream.o validate.o media.o | awk '!x[$$0]++ { print("sound/usb/"$$0) }' > sound/usb/snd-usb-audio.mod

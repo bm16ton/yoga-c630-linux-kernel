@@ -1,0 +1,2 @@
+drivers/misc/cardreader/rtsx_pci.ko
+drivers/misc/cardreader/rtsx_usb.ko

@@ -1,0 +1,23 @@
+# 1 "arch/arm64/boot/dts/cavium/thunder-88xx.dts"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "arch/arm64/boot/dts/cavium/thunder-88xx.dts"
+# 50 "arch/arm64/boot/dts/cavium/thunder-88xx.dts"
+/dts-v1/;
+
+/include/ "thunder-88xx.dtsi"
+
+/ {
+ model = "Cavium ThunderX CN88XX board";
+ compatible = "cavium,thunder-88xx";
+
+ aliases {
+  serial0 = &uaa0;
+  serial1 = &uaa1;
+ };
+
+ memory@0 {
+  device_type = "memory";
+  reg = <0x0 0x00000000 0x0 0x80000000>;
+ };
+};

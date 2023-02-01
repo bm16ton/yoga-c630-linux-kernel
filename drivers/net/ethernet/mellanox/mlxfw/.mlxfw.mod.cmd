@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/mellanox/mlxfw/mlxfw.mod := printf '%s\n'   mlxfw_fsm.o mlxfw_mfa2_tlv_multi.o mlxfw_mfa2.o | awk '!x[$$0]++ { print("drivers/net/ethernet/mellanox/mlxfw/"$$0) }' > drivers/net/ethernet/mellanox/mlxfw/mlxfw.mod

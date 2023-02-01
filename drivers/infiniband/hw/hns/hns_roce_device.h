@@ -202,6 +202,10 @@ struct hns_roce_ucontext {
 	struct list_head	page_list;
 	struct mutex		page_mutex;
 	struct hns_user_mmap_entry *db_mmap_entry;
+<<<<<<< HEAD
+	u32			config;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct hns_roce_pd {
@@ -240,7 +244,6 @@ struct hns_roce_hem_table {
 	/* Single obj size */
 	unsigned long	obj_size;
 	unsigned long	table_chunk_size;
-	int		lowmem;
 	struct mutex	mutex;
 	struct hns_roce_hem **hem;
 	u64		**bt_l1;
@@ -335,6 +338,10 @@ struct hns_roce_wq {
 	u32		head;
 	u32		tail;
 	void __iomem	*db_reg;
+<<<<<<< HEAD
+	u32		ext_sge_cnt;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct hns_roce_sge {
@@ -599,7 +606,6 @@ struct hns_roce_qp {
 	struct hns_roce_db	rdb;
 	struct hns_roce_db	sdb;
 	unsigned long		en_flags;
-	u32			doorbell_qpn;
 	enum ib_sig_type	sq_signal_bits;
 	struct hns_roce_wq	sq;
 
@@ -637,6 +643,10 @@ struct hns_roce_qp {
 	struct list_head	rq_node; /* all recv qps are on a list */
 	struct list_head	sq_node; /* all send qps are on a list */
 	struct hns_user_mmap_entry *dwqe_mmap_entry;
+<<<<<<< HEAD
+	u32			config;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct hns_roce_ib_iboe {
@@ -726,7 +736,7 @@ struct hns_roce_caps {
 	u32		max_sq_sg;
 	u32		max_sq_inline;
 	u32		max_rq_sg;
-	u32		max_extend_sg;
+	u32		rsv0;
 	u32		num_qps;
 	u32		num_pi_qps;
 	u32		reserved_qps;
@@ -736,7 +746,7 @@ struct hns_roce_caps {
 	u32		max_srq_sges;
 	u32		max_sq_desc_sz;
 	u32		max_rq_desc_sz;
-	u32		max_srq_desc_sz;
+	u32		rsv2;
 	int		max_qp_init_rdma;
 	int		max_qp_dest_rdma;
 	u32		num_cqs;
@@ -749,7 +759,11 @@ struct hns_roce_caps {
 	int		num_comp_vectors;
 	int		num_other_vectors;
 	u32		num_mtpts;
+<<<<<<< HEAD
+	u32		rsv1;
+=======
 	u32		num_mtt_segs;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32		num_srqwqe_segs;
 	u32		num_idx_segs;
 	int		reserved_mrws;
@@ -846,11 +860,14 @@ struct hns_roce_caps {
 	u16		default_aeq_arm_st;
 	u16		default_ceq_arm_st;
 	enum cong_type	cong_type;
+<<<<<<< HEAD
+=======
 };
 
 struct hns_roce_dfx_hw {
 	int (*query_cqc_info)(struct hns_roce_dev *hr_dev, u32 cqn,
 			      int *buffer);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 enum hns_roce_device_state {
@@ -898,6 +915,12 @@ struct hns_roce_hw {
 	int (*init_eq)(struct hns_roce_dev *hr_dev);
 	void (*cleanup_eq)(struct hns_roce_dev *hr_dev);
 	int (*write_srqc)(struct hns_roce_srq *srq, void *mb_buf);
+<<<<<<< HEAD
+	int (*query_cqc)(struct hns_roce_dev *hr_dev, u32 cqn, void *buffer);
+	int (*query_qpc)(struct hns_roce_dev *hr_dev, u32 qpn, void *buffer);
+	int (*query_mpt)(struct hns_roce_dev *hr_dev, u32 key, void *buffer);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct ib_device_ops *hns_roce_dev_ops;
 	const struct ib_device_ops *hns_roce_dev_srq_ops;
 };
@@ -959,7 +982,10 @@ struct hns_roce_dev {
 	void			*priv;
 	struct workqueue_struct *irq_workq;
 	struct work_struct ecc_work;
+<<<<<<< HEAD
+=======
 	const struct hns_roce_dfx_hw *dfx;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 func_num;
 	u32 is_vf;
 	u32 cong_algo_tmpl_id;
@@ -1227,8 +1253,17 @@ u8 hns_get_gid_index(struct hns_roce_dev *hr_dev, u32 port, int gid_index);
 void hns_roce_handle_device_err(struct hns_roce_dev *hr_dev);
 int hns_roce_init(struct hns_roce_dev *hr_dev);
 void hns_roce_exit(struct hns_roce_dev *hr_dev);
+<<<<<<< HEAD
+int hns_roce_fill_res_cq_entry(struct sk_buff *msg, struct ib_cq *ib_cq);
+int hns_roce_fill_res_cq_entry_raw(struct sk_buff *msg, struct ib_cq *ib_cq);
+int hns_roce_fill_res_qp_entry(struct sk_buff *msg, struct ib_qp *ib_qp);
+int hns_roce_fill_res_qp_entry_raw(struct sk_buff *msg, struct ib_qp *ib_qp);
+int hns_roce_fill_res_mr_entry(struct sk_buff *msg, struct ib_mr *ib_mr);
+int hns_roce_fill_res_mr_entry_raw(struct sk_buff *msg, struct ib_mr *ib_mr);
+=======
 int hns_roce_fill_res_cq_entry(struct sk_buff *msg,
 			       struct ib_cq *ib_cq);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct hns_user_mmap_entry *
 hns_roce_user_mmap_entry_insert(struct ib_ucontext *ucontext, u64 address,
 				size_t length,

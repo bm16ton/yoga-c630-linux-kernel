@@ -1,0 +1,1 @@
+cmd_drivers/firmware/google/coreboot_table.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/firmware/google/coreboot_table.ko drivers/firmware/google/coreboot_table.o drivers/firmware/google/coreboot_table.mod.o;  true

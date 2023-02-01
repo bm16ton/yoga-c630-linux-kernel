@@ -164,6 +164,9 @@ either after ``late_init``, or when the test module is loaded (if the test was
 built as a module).
 
 For more information, see Documentation/dev-tools/kunit/api/test.rst.
+<<<<<<< HEAD
+
+.. _kunit-on-non-uml:
 
 Writing Tests For Other Architectures
 -------------------------------------
@@ -173,6 +176,17 @@ particular architecture. It is better to write tests that run under QEMU or
 another easy to obtain (and monetarily free) software environment to a specific
 piece of hardware.
 
+=======
+
+Writing Tests For Other Architectures
+-------------------------------------
+
+It is better to write tests that run on UML to tests that only run under a
+particular architecture. It is better to write tests that run under QEMU or
+another easy to obtain (and monetarily free) software environment to a specific
+piece of hardware.
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 Nevertheless, there are still valid reasons to write a test that is architecture
 or hardware specific. For example, we might want to test code that really
 belongs in ``arch/some-arch/*``. Even so, try to write the test so that it does
@@ -477,6 +491,7 @@ helper macro variation, for example:
 
 
 There is more boilerplate code involved, but it can:
+<<<<<<< HEAD
 
 * be more readable when there are multiple inputs/outputs (due to field names).
 
@@ -484,6 +499,15 @@ There is more boilerplate code involved, but it can:
 
 * reduce duplication if test cases are shared across multiple tests.
 
+=======
+
+* be more readable when there are multiple inputs/outputs (due to field names).
+
+  * For example, see ``fs/ext4/inode-test.c``.
+
+* reduce duplication if test cases are shared across multiple tests.
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   * For example: if we want to test ``sha256sum``, we could add a ``sha256``
     field and reuse ``cases``.
 
@@ -544,8 +568,157 @@ By reusing the same ``cases`` array from above, we can write the test as a
 		{}
 	};
 
-.. _kunit-on-non-uml:
+Exiting Early on Failed Expectations
+------------------------------------
 
+We can use ``KUNIT_EXPECT_EQ`` to mark the test as failed and continue
+execution.  In some cases, it is unsafe to continue. We can use the
+``KUNIT_ASSERT`` variant to exit on failure.
+
+.. code-block:: c
+
+<<<<<<< HEAD
+	void example_test_user_alloc_function(struct kunit *test)
+	{
+		void *object = alloc_some_object_for_me();
+
+		/* Make sure we got a valid pointer back. */
+		KUNIT_ASSERT_NOT_ERR_OR_NULL(test, object);
+		do_something_with_object(object);
+	}
+
+Allocating Memory
+-----------------
+
+Where you might use ``kzalloc``, you can instead use ``kunit_kzalloc`` as KUnit
+will then ensure that the memory is freed once the test completes.
+
+This is useful because it lets us use the ``KUNIT_ASSERT_EQ`` macros to exit
+early from a test without having to worry about remembering to call ``kfree``.
+For example:
+
+.. code-block:: c
+
+	void example_test_allocation(struct kunit *test)
+	{
+		char *buffer = kunit_kzalloc(test, 16, GFP_KERNEL);
+		/* Ensure allocation succeeded. */
+		KUNIT_ASSERT_NOT_ERR_OR_NULL(test, buffer);
+
+		KUNIT_ASSERT_STREQ(test, buffer, "");
+	}
+
+
+Testing Static Functions
+------------------------
+
+If we do not want to expose functions or variables for testing, one option is to
+conditionally ``#include`` the test file at the end of your .c file. For
+example:
+
+.. code-block:: c
+
+	/* In my_file.c */
+
+	static int do_interesting_thing();
+
+	#ifdef CONFIG_MY_KUNIT_TEST
+	#include "my_kunit_test.c"
+	#endif
+
+Injecting Test-Only Code
+------------------------
+
+Similar to as shown above, we can add test-specific logic. For example:
+
+.. code-block:: c
+
+	/* In my_file.h */
+
+	#ifdef CONFIG_MY_KUNIT_TEST
+	/* Defined in my_kunit_test.c */
+	void test_only_hook(void);
+	#else
+	void test_only_hook(void) { }
+	#endif
+
+This test-only code can be made more useful by accessing the current ``kunit_test``
+as shown in next section: *Accessing The Current Test*.
+
+Accessing The Current Test
+--------------------------
+
+In some cases, we need to call test-only code from outside the test file.
+For example, see example in section *Injecting Test-Only Code* or if
+we are providing a fake implementation of an ops struct. Using
+``kunit_test`` field in ``task_struct``, we can access it via
+``current->kunit_test``.
+
+The example below includes how to implement "mocking":
+
+.. code-block:: c
+
+	#include <linux/sched.h> /* for current */
+
+	struct test_data {
+		int foo_result;
+		int want_foo_called_with;
+	};
+
+	static int fake_foo(int arg)
+	{
+		struct kunit *test = current->kunit_test;
+		struct test_data *test_data = test->priv;
+
+		KUNIT_EXPECT_EQ(test, test_data->want_foo_called_with, arg);
+		return test_data->foo_result;
+	}
+
+	static void example_simple_test(struct kunit *test)
+	{
+		/* Assume priv (private, a member used to pass test data from
+		 * the init function) is allocated in the suite's .init */
+		struct test_data *test_data = test->priv;
+
+		test_data->foo_result = 42;
+		test_data->want_foo_called_with = 1;
+
+		/* In a real test, we'd probably pass a pointer to fake_foo somewhere
+		 * like an ops struct, etc. instead of calling it directly. */
+		KUNIT_EXPECT_EQ(test, fake_foo(1), 42);
+	}
+
+In this example, we are using the ``priv`` member of ``struct kunit`` as a way
+of passing data to the test from the init function. In general ``priv`` is
+pointer that can be used for any user data. This is preferred over static
+variables, as it avoids concurrency issues.
+
+Had we wanted something more flexible, we could have used a named ``kunit_resource``.
+Each test can have multiple resources which have string names providing the same
+flexibility as a ``priv`` member, but also, for example, allowing helper
+functions to create resources without conflicting with each other. It is also
+possible to define a clean up function for each resource, making it easy to
+avoid resource leaks. For more information, see Documentation/dev-tools/kunit/api/test.rst.
+
+Failing The Current Test
+------------------------
+
+If we want to fail the current test, we can use ``kunit_fail_current_test(fmt, args...)``
+which is defined in ``<kunit/test-bug.h>`` and does not require pulling in ``<kunit/test.h>``.
+For example, we have an option to enable some extra debug checks on some data
+structures as shown below:
+
+.. code-block:: c
+
+	#include <kunit/test-bug.h>
+
+	#ifdef CONFIG_EXTRA_DEBUG_CHECKS
+	static void validate_my_data(struct data *data)
+	{
+		if (is_valid(data))
+			return;
+
+=======
 Exiting Early on Failed Expectations
 ------------------------------------
 
@@ -695,6 +868,7 @@ structures as shown below:
 		if (is_valid(data))
 			return;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kunit_fail_current_test("data %p is invalid", data);
 
 		/* Normal, non-KUnit, error reporting code here. */

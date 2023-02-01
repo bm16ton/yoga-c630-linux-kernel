@@ -1,0 +1,1 @@
+cmd_drivers/thermal/thermal-generic-adc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/thermal/thermal-generic-adc.ko drivers/thermal/thermal-generic-adc.o drivers/thermal/thermal-generic-adc.mod.o;  true

@@ -427,6 +427,21 @@ extern int kexec_load_disabled;
 extern bool kexec_in_progress;
 
 int crash_shrink_memory(unsigned long new_size);
+<<<<<<< HEAD
+ssize_t crash_get_memory_size(void);
+
+#ifndef arch_kexec_protect_crashkres
+/*
+ * Protection mechanism for crashkernel reserved memory after
+ * the kdump kernel is loaded.
+ *
+ * Provide an empty default implementation here -- architecture
+ * code may override this
+ */
+static inline void arch_kexec_protect_crashkres(void) { }
+#endif
+
+=======
 size_t crash_get_memory_size(void);
 
 #ifndef arch_kexec_protect_crashkres
@@ -440,6 +455,7 @@ size_t crash_get_memory_size(void);
 static inline void arch_kexec_protect_crashkres(void) { }
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifndef arch_kexec_unprotect_crashkres
 static inline void arch_kexec_unprotect_crashkres(void) { }
 #endif

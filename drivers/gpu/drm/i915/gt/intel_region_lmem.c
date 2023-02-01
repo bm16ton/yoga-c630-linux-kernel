@@ -4,8 +4,15 @@
  */
 
 #include "i915_drv.h"
+<<<<<<< HEAD
+#include "i915_pci.h"
 #include "i915_reg.h"
 #include "intel_memory_region.h"
+#include "intel_pci_config.h"
+=======
+#include "i915_reg.h"
+#include "intel_memory_region.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "intel_region_lmem.h"
 #include "intel_region_ttm.h"
 #include "gem/i915_gem_lmem.h"
@@ -45,7 +52,10 @@ _resize_bar(struct drm_i915_private *i915, int resno, resource_size_t size)
 	drm_info(&i915->drm, "BAR%d resized to %dM\n", resno, 1 << bar_size);
 }
 
+<<<<<<< HEAD
+=======
 #define LMEM_BAR_NUM 2
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void i915_resize_lmem_bar(struct drm_i915_private *i915, resource_size_t lmem_size)
 {
 	struct pci_dev *pdev = to_pci_dev(i915->drm.dev);
@@ -56,15 +66,23 @@ static void i915_resize_lmem_bar(struct drm_i915_private *i915, resource_size_t 
 	u32 pci_cmd;
 	int i;
 
+<<<<<<< HEAD
+	current_size = roundup_pow_of_two(pci_resource_len(pdev, GEN12_LMEM_BAR));
+=======
 	current_size = roundup_pow_of_two(pci_resource_len(pdev, LMEM_BAR_NUM));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (i915->params.lmem_bar_size) {
 		u32 bar_sizes;
 
 		rebar_size = i915->params.lmem_bar_size *
 			(resource_size_t)SZ_1M;
+<<<<<<< HEAD
+		bar_sizes = pci_rebar_get_possible_sizes(pdev, GEN12_LMEM_BAR);
+=======
 		bar_sizes = pci_rebar_get_possible_sizes(pdev,
 							 LMEM_BAR_NUM);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		if (rebar_size == current_size)
 			return;
@@ -101,6 +119,16 @@ static void i915_resize_lmem_bar(struct drm_i915_private *i915, resource_size_t 
 		drm_info(&i915->drm, "Can't resize LMEM BAR - platform support is missing\n");
 		return;
 	}
+<<<<<<< HEAD
+
+	/* First disable PCI memory decoding references */
+	pci_read_config_dword(pdev, PCI_COMMAND, &pci_cmd);
+	pci_write_config_dword(pdev, PCI_COMMAND,
+			       pci_cmd & ~PCI_COMMAND_MEMORY);
+
+	_resize_bar(i915, GEN12_LMEM_BAR, rebar_size);
+
+=======
 
 	/* First disable PCI memory decoding references */
 	pci_read_config_dword(pdev, PCI_COMMAND, &pci_cmd);
@@ -109,6 +137,7 @@ static void i915_resize_lmem_bar(struct drm_i915_private *i915, resource_size_t 
 
 	_resize_bar(i915, LMEM_BAR_NUM, rebar_size);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pci_assign_unassigned_bus_resources(pdev->bus);
 	pci_write_config_dword(pdev, PCI_COMMAND, pci_cmd);
 }
@@ -140,9 +169,15 @@ region_lmem_init(struct intel_memory_region *mem)
 	ret = intel_region_ttm_init(mem);
 	if (ret)
 		goto out_no_buddy;
+<<<<<<< HEAD
 
 	return 0;
 
+=======
+
+	return 0;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out_no_buddy:
 	io_mapping_fini(&mem->iomap);
 
@@ -201,6 +236,12 @@ static struct intel_memory_region *setup_lmem(struct intel_gt *gt)
 
 	if (!IS_DGFX(i915))
 		return ERR_PTR(-ENODEV);
+<<<<<<< HEAD
+
+	if (!i915_pci_resource_valid(pdev, GEN12_LMEM_BAR))
+		return ERR_PTR(-ENXIO);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (HAS_FLAT_CCS(i915)) {
 		resource_size_t lmem_range;
@@ -236,8 +277,13 @@ static struct intel_memory_region *setup_lmem(struct intel_gt *gt)
 				  mul_u32_u32(i915->params.lmem_size, SZ_1M));
 	}
 
+<<<<<<< HEAD
+	io_start = pci_resource_start(pdev, GEN12_LMEM_BAR);
+	io_size = min(pci_resource_len(pdev, GEN12_LMEM_BAR), lmem_size);
+=======
 	io_start = pci_resource_start(pdev, 2);
 	io_size = min(pci_resource_len(pdev, 2), lmem_size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!io_size)
 		return ERR_PTR(-EIO);
 

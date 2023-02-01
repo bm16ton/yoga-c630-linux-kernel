@@ -1,0 +1,1 @@
+cmd_drivers/nvdimm/modules.order := {   echo drivers/nvdimm/libnvdimm.ko;   echo drivers/nvdimm/nd_pmem.ko;   echo drivers/nvdimm/nd_btt.ko;   echo drivers/nvdimm/of_pmem.ko;   echo drivers/nvdimm/virtio_pmem.ko;   echo drivers/nvdimm/nd_virtio.ko; :; } > drivers/nvdimm/modules.order

@@ -1,0 +1,10 @@
+drivers/target/target_core_mod.ko
+drivers/target/target_core_iblock.ko
+drivers/target/target_core_file.ko
+drivers/target/target_core_pscsi.ko
+drivers/target/target_core_user.ko
+drivers/target/loopback/tcm_loop.ko
+drivers/target/tcm_fc/tcm_fc.ko
+drivers/target/iscsi/iscsi_target_mod.ko
+drivers/target/iscsi/cxgbit/cxgbit.ko
+drivers/target/sbp/sbp_target.ko

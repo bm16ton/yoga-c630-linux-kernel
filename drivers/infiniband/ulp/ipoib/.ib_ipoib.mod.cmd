@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/ulp/ipoib/ib_ipoib.mod := printf '%s\n'   ipoib_main.o ipoib_ib.o ipoib_multicast.o ipoib_verbs.o ipoib_vlan.o ipoib_ethtool.o ipoib_netlink.o ipoib_cm.o ipoib_fs.o | awk '!x[$$0]++ { print("drivers/infiniband/ulp/ipoib/"$$0) }' > drivers/infiniband/ulp/ipoib/ib_ipoib.mod

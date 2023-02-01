@@ -164,9 +164,9 @@ static int rcar_gen3_thermal_round(int temp)
 	return result * RCAR3_THERMAL_GRAN;
 }
 
-static int rcar_gen3_thermal_get_temp(void *devdata, int *temp)
+static int rcar_gen3_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 {
-	struct rcar_gen3_thermal_tsc *tsc = devdata;
+	struct rcar_gen3_thermal_tsc *tsc = tz->devdata;
 	int mcelsius, val;
 	int reg;
 
@@ -203,9 +203,15 @@ static int rcar_gen3_thermal_mcelsius_to_temp(struct rcar_gen3_thermal_tsc *tsc,
 	return INT_FIXPT(val);
 }
 
+<<<<<<< HEAD
+static int rcar_gen3_thermal_set_trips(struct thermal_zone_device *tz, int low, int high)
+{
+	struct rcar_gen3_thermal_tsc *tsc = tz->devdata;
+=======
 static int rcar_gen3_thermal_set_trips(void *devdata, int low, int high)
 {
 	struct rcar_gen3_thermal_tsc *tsc = devdata;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 irqmsk = 0;
 
 	if (low != -INT_MAX) {
@@ -225,7 +231,11 @@ static int rcar_gen3_thermal_set_trips(void *devdata, int low, int high)
 	return 0;
 }
 
+<<<<<<< HEAD
+static struct thermal_zone_device_ops rcar_gen3_tz_of_ops = {
+=======
 static struct thermal_zone_of_device_ops rcar_gen3_tz_of_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_temp	= rcar_gen3_thermal_get_temp,
 	.set_trips	= rcar_gen3_thermal_set_trips,
 };
@@ -501,6 +511,15 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
 	}
 
 	priv->num_tscs = i;
+<<<<<<< HEAD
+=======
+
+	if (!rcar_gen3_thermal_read_fuses(priv))
+		dev_info(dev, "No calibration values fused, fallback to driver values\n");
+
+	for (i = 0; i < priv->num_tscs; i++) {
+		struct rcar_gen3_thermal_tsc *tsc = priv->tscs[i];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!rcar_gen3_thermal_read_fuses(priv))
 		dev_info(dev, "No calibration values fused, fallback to driver values\n");
@@ -508,8 +527,8 @@ static int rcar_gen3_thermal_probe(struct platform_device *pdev)
 	for (i = 0; i < priv->num_tscs; i++) {
 		struct rcar_gen3_thermal_tsc *tsc = priv->tscs[i];
 
-		zone = devm_thermal_zone_of_sensor_register(dev, i, tsc,
-							    &rcar_gen3_tz_of_ops);
+		zone = devm_thermal_of_zone_register(dev, i, tsc,
+						     &rcar_gen3_tz_of_ops);
 		if (IS_ERR(zone)) {
 			dev_err(dev, "Sensor %u: Can't register thermal zone\n", i);
 			ret = PTR_ERR(zone);
@@ -560,7 +579,11 @@ static int __maybe_unused rcar_gen3_thermal_resume(struct device *dev)
 
 		priv->thermal_init(tsc);
 		if (zone->ops->set_trips)
+<<<<<<< HEAD
+			rcar_gen3_thermal_set_trips(zone, zone->prev_low_trip,
+=======
 			rcar_gen3_thermal_set_trips(tsc, zone->prev_low_trip,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						    zone->prev_high_trip);
 	}
 

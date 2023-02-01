@@ -19,7 +19,13 @@ properties:
           - fsl,imx7ulp-spi
           - fsl,imx8qxp-spi
       - items:
+<<<<<<< HEAD
+          - enum:
+              - fsl,imx8ulp-spi
+              - fsl,imx93-spi
+=======
           - const: fsl,imx8ulp-spi
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - const: fsl,imx7ulp-spi
   reg:
     maxItems: 1
@@ -36,6 +42,16 @@ properties:
     items:
       - const: per
       - const: ipg
+
+  dmas:
+    items:
+      - description: TX DMA Channel
+      - description: RX DMA Channel
+
+  dma-names:
+    items:
+      - const: tx
+      - const: rx
 
   fsl,spi-only-use-cs1-sel:
     description:

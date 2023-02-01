@@ -1,0 +1,1 @@
+cmd_fs/dlm/dlm.mod := printf '%s\n'   ast.o config.o dir.o lock.o lockspace.o main.o member.o memory.o midcomms.o lowcomms.o plock.o rcom.o recover.o recoverd.o requestqueue.o user.o util.o debug_fs.o | awk '!x[$$0]++ { print("fs/dlm/"$$0) }' > fs/dlm/dlm.mod

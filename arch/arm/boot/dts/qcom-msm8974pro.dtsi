@@ -10,10 +10,19 @@
 };
 
 &sdhc_1 {
+<<<<<<< HEAD
+	clocks = <&gcc GCC_SDCC1_AHB_CLK>,
+		 <&gcc GCC_SDCC1_APPS_CLK>,
+		 <&xo_board>,
+		 <&gcc GCC_SDCC1_CDCCAL_FF_CLK>,
+		 <&gcc GCC_SDCC1_CDCCAL_SLEEP_CLK>;
+	clock-names = "iface", "core", "xo", "cal", "sleep";
+=======
 	clocks = <&gcc GCC_SDCC1_APPS_CLK>,
 		 <&gcc GCC_SDCC1_AHB_CLK>,
 		 <&xo_board>,
 		 <&gcc GCC_SDCC1_CDCCAL_FF_CLK>,
 		 <&gcc GCC_SDCC1_CDCCAL_SLEEP_CLK>;
 	clock-names = "core", "iface", "xo", "cal", "sleep";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

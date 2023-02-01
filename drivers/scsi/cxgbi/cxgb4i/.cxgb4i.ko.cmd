@@ -1,0 +1,1 @@
+cmd_drivers/scsi/cxgbi/cxgb4i/cxgb4i.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/cxgbi/cxgb4i/cxgb4i.ko drivers/scsi/cxgbi/cxgb4i/cxgb4i.o drivers/scsi/cxgbi/cxgb4i/cxgb4i.mod.o;  true

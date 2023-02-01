@@ -4,7 +4,11 @@
 $id: http://devicetree.org/schemas/pinctrl/intel,pinctrl-thunderbay.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
+<<<<<<< HEAD
+title: Intel Thunder Bay pin controller
+=======
 title: Intel Thunder Bay pin controller Device Tree Bindings
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 maintainers:
   - Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
@@ -42,6 +46,10 @@ properties:
 patternProperties:
   '^gpio@[0-9a-f]*$':
     type: object
+<<<<<<< HEAD
+    additionalProperties: false
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     description:
       Child nodes can be specified to contain pin configuration information,

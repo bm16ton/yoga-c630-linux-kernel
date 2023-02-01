@@ -5,6 +5,9 @@
 #include <linux/sched.h>
 #include <asm/sbi.h>
 #include <asm/mmu_context.h>
+<<<<<<< HEAD
+#include <asm/tlbflush.h>
+=======
 
 static inline void local_flush_tlb_all_asid(unsigned long asid)
 {
@@ -22,6 +25,7 @@ static inline void local_flush_tlb_page_asid(unsigned long addr,
 			: "r" (addr), "r" (asid)
 			: "memory");
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void flush_tlb_all(void)
 {
@@ -31,6 +35,10 @@ void flush_tlb_all(void)
 static void __sbi_tlb_flush_range(struct mm_struct *mm, unsigned long start,
 				  unsigned long size, unsigned long stride)
 {
+<<<<<<< HEAD
+	struct cpumask *pmask = &mm->context.tlb_stale_mask;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct cpumask *cmask = mm_cpumask(mm);
 	unsigned int cpuid;
 	bool broadcast;
@@ -44,6 +52,18 @@ static void __sbi_tlb_flush_range(struct mm_struct *mm, unsigned long start,
 	if (static_branch_unlikely(&use_asid_allocator)) {
 		unsigned long asid = atomic_long_read(&mm->context.id);
 
+<<<<<<< HEAD
+		/*
+		 * TLB will be immediately flushed on harts concurrently
+		 * executing this MM context. TLB flush on other harts
+		 * is deferred until this MM context migrates there.
+		 */
+		cpumask_setall(pmask);
+		cpumask_clear_cpu(cpuid, pmask);
+		cpumask_andnot(pmask, pmask, cmask);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (broadcast) {
 			sbi_remote_sfence_vma_asid(cmask, start, size, asid);
 		} else if (size <= stride) {

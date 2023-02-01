@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/snd-soc-wm8903.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/codecs/snd-soc-wm8903.ko sound/soc/codecs/snd-soc-wm8903.o sound/soc/codecs/snd-soc-wm8903.mod.o;  true

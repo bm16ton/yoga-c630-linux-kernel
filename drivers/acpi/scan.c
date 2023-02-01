@@ -20,6 +20,10 @@
 #include <linux/platform_data/x86/apple.h>
 #include <linux/pgtable.h>
 #include <linux/crc32.h>
+<<<<<<< HEAD
+#include <linux/dma-direct.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "internal.h"
 
@@ -28,8 +32,6 @@ extern struct acpi_device *acpi_root;
 #define ACPI_BUS_CLASS			"system_bus"
 #define ACPI_BUS_HID			"LNXSYBUS"
 #define ACPI_BUS_DEVICE_NAME		"System Bus"
-
-#define ACPI_IS_ROOT_DEVICE(device)    (!(device)->parent)
 
 #define INVALID_ACPI_HANDLE	((acpi_handle)empty_zero_page)
 
@@ -429,7 +431,7 @@ void acpi_device_hotplug(struct acpi_device *adev, u32 src)
 	acpi_evaluate_ost(adev->handle, src, ost_code, NULL);
 
  out:
-	acpi_bus_put_acpi_device(adev);
+	acpi_put_acpi_dev(adev);
 	mutex_unlock(&acpi_scan_lock);
 	unlock_device_hotplug();
 }
@@ -599,11 +601,26 @@ static void get_acpi_device(void *dev)
 	acpi_dev_get(dev);
 }
 
-struct acpi_device *acpi_bus_get_acpi_device(acpi_handle handle)
+/**
+ * acpi_get_acpi_dev - Retrieve ACPI device object and reference count it.
+ * @handle: ACPI handle associated with the requested ACPI device object.
+ *
+ * Return a pointer to the ACPI device object associated with @handle and bump
+ * up that object's reference counter (under the ACPI Namespace lock), if
+ * present, or return NULL otherwise.
+ *
+ * The ACPI device object reference acquired by this function needs to be
+ * dropped via acpi_dev_put().
+ */
+struct acpi_device *acpi_get_acpi_dev(acpi_handle handle)
 {
 	return handle_to_device(handle, get_acpi_device);
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL_GPL(acpi_get_acpi_dev);
+=======
 EXPORT_SYMBOL_GPL(acpi_bus_get_acpi_device);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct acpi_device_bus_id *acpi_device_bus_id_match(const char *dev_id)
 {
@@ -632,7 +649,11 @@ static int acpi_device_set_name(struct acpi_device *device,
 	return 0;
 }
 
+<<<<<<< HEAD
+int acpi_tie_acpi_dev(struct acpi_device *adev)
+=======
 static int acpi_tie_acpi_dev(struct acpi_device *adev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	acpi_handle handle = adev->handle;
 	acpi_status status;
@@ -662,8 +683,12 @@ static void acpi_store_pld_crc(struct acpi_device *adev)
 	ACPI_FREE(pld);
 }
 
+<<<<<<< HEAD
+int acpi_device_add(struct acpi_device *device)
+=======
 static int __acpi_device_add(struct acpi_device *device,
 			     void (*release)(struct device *))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct acpi_device_bus_id *acpi_device_bus_id;
 	int result;
@@ -716,14 +741,14 @@ static int __acpi_device_add(struct acpi_device *device,
 		list_add_tail(&device->wakeup_list, &acpi_wakeup_device_list);
 
 	acpi_store_pld_crc(device);
+<<<<<<< HEAD
+=======
+
+	mutex_unlock(&acpi_device_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_unlock(&acpi_device_lock);
 
-	if (device->parent)
-		device->dev.parent = &device->parent->dev;
-
-	device->dev.bus = &acpi_bus_type;
-	device->dev.release = release;
 	result = device_add(&device->dev);
 	if (result) {
 		dev_err(&device->dev, "Error registering device\n");
@@ -806,10 +831,14 @@ static const char * const acpi_honor_dep_ids[] = {
 	NULL
 };
 
-static struct acpi_device *acpi_bus_get_parent(acpi_handle handle)
+static struct acpi_device *acpi_find_parent_acpi_dev(acpi_handle handle)
 {
+<<<<<<< HEAD
+	struct acpi_device *adev;
+=======
 	struct acpi_device *device;
 	acpi_status status;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Fixed hardware devices do not appear in the namespace and do not
@@ -820,13 +849,27 @@ static struct acpi_device *acpi_bus_get_parent(acpi_handle handle)
 		return acpi_root;
 
 	do {
+		acpi_status status;
+
 		status = acpi_get_parent(handle, &handle);
+<<<<<<< HEAD
+		if (ACPI_FAILURE(status)) {
+			if (status != AE_NULL_ENTRY)
+				return acpi_root;
+
+			return NULL;
+		}
+		adev = acpi_fetch_acpi_dev(handle);
+	} while (!adev);
+	return adev;
+=======
 		if (ACPI_FAILURE(status))
 			return status == AE_NULL_ENTRY ? NULL : acpi_root;
 
 		device = acpi_fetch_acpi_dev(handle);
 	} while (!device);
 	return device;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 acpi_status
@@ -1113,7 +1156,7 @@ static void acpi_device_get_busid(struct acpi_device *device)
 	 * The device's Bus ID is simply the object name.
 	 * TBD: Shouldn't this value be unique (within the ACPI namespace)?
 	 */
-	if (ACPI_IS_ROOT_DEVICE(device)) {
+	if (!acpi_dev_parent(device)) {
 		strcpy(device->pnp.bus_id, "ACPI");
 		return;
 	}
@@ -1373,9 +1416,12 @@ static void acpi_set_pnp_ids(acpi_handle handle, struct acpi_device_pnp *pnp,
 		 * Some devices don't reliably have _HIDs & _CIDs, so add
 		 * synthetic HIDs to make sure drivers can find them.
 		 */
-		if (acpi_is_video_device(handle))
+		if (acpi_is_video_device(handle)) {
 			acpi_add_id(pnp, ACPI_VIDEO_HID);
-		else if (acpi_bay_match(handle))
+			pnp->type.backlight = 1;
+			break;
+		}
+		if (acpi_bay_match(handle))
 			acpi_add_id(pnp, ACPI_BAY_HID);
 		else if (acpi_dock_match(handle))
 			acpi_add_id(pnp, ACPI_DOCK_HID);
@@ -1468,25 +1514,21 @@ enum dev_dma_attr acpi_get_dma_attr(struct acpi_device *adev)
  * acpi_dma_get_range() - Get device DMA parameters.
  *
  * @dev: device to configure
- * @dma_addr: pointer device DMA address result
- * @offset: pointer to the DMA offset result
- * @size: pointer to DMA range size result
+ * @map: pointer to DMA ranges result
  *
- * Evaluate DMA regions and return respectively DMA region start, offset
- * and size in dma_addr, offset and size on parsing success; it does not
- * update the passed in values on failure.
+ * Evaluate DMA regions and return pointer to DMA regions on
+ * parsing success; it does not update the passed in values on failure.
  *
  * Return 0 on success, < 0 on failure.
  */
-int acpi_dma_get_range(struct device *dev, u64 *dma_addr, u64 *offset,
-		       u64 *size)
+int acpi_dma_get_range(struct device *dev, const struct bus_dma_region **map)
 {
 	struct acpi_device *adev;
 	LIST_HEAD(list);
 	struct resource_entry *rentry;
 	int ret;
 	struct device *dma_dev = dev;
-	u64 len, dma_start = U64_MAX, dma_end = 0, dma_offset = 0;
+	struct bus_dma_region *r;
 
 	/*
 	 * Walk the device tree chasing an ACPI companion with a _DMA
@@ -1511,31 +1553,29 @@ int acpi_dma_get_range(struct device *dev, u64 *dma_addr, u64 *offset,
 
 	ret = acpi_dev_get_dma_resources(adev, &list);
 	if (ret > 0) {
-		list_for_each_entry(rentry, &list, node) {
-			if (dma_offset && rentry->offset != dma_offset) {
-				ret = -EINVAL;
-				dev_warn(dma_dev, "Can't handle multiple windows with different offsets\n");
-				goto out;
-			}
-			dma_offset = rentry->offset;
-
-			/* Take lower and upper limits */
-			if (rentry->res->start < dma_start)
-				dma_start = rentry->res->start;
-			if (rentry->res->end > dma_end)
-				dma_end = rentry->res->end;
-		}
-
-		if (dma_start >= dma_end) {
-			ret = -EINVAL;
-			dev_dbg(dma_dev, "Invalid DMA regions configuration\n");
+		r = kcalloc(ret + 1, sizeof(*r), GFP_KERNEL);
+		if (!r) {
+			ret = -ENOMEM;
 			goto out;
 		}
 
-		*dma_addr = dma_start - dma_offset;
-		len = dma_end - dma_start;
-		*size = max(len, len + 1);
-		*offset = dma_offset;
+		*map = r;
+
+		list_for_each_entry(rentry, &list, node) {
+			if (rentry->res->start >= rentry->res->end) {
+				kfree(*map);
+				*map = NULL;
+				ret = -EINVAL;
+				dev_dbg(dma_dev, "Invalid DMA regions configuration\n");
+				goto out;
+			}
+
+			r->cpu_start = rentry->res->start;
+			r->dma_start = rentry->res->start - rentry->offset;
+			r->size = resource_size(rentry->res);
+			r->offset = rentry->offset;
+			r++;
+		}
 	}
  out:
 	acpi_dev_free_resource_list(&list);
@@ -1625,20 +1665,23 @@ int acpi_dma_configure_id(struct device *dev, enum dev_dma_attr attr,
 			  const u32 *input_id)
 {
 	const struct iommu_ops *iommu;
-	u64 dma_addr = 0, size = 0;
 
 	if (attr == DEV_DMA_NOT_SUPPORTED) {
 		set_dma_ops(dev, &dma_dummy_ops);
 		return 0;
 	}
 
+<<<<<<< HEAD
+	acpi_arch_dma_setup(dev);
+=======
 	acpi_arch_dma_setup(dev, &dma_addr, &size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	iommu = acpi_iommu_configure_id(dev, input_id);
 	if (PTR_ERR(iommu) == -EPROBE_DEFER)
 		return -EPROBE_DEFER;
 
-	arch_setup_dma_ops(dev, dma_addr, size,
+	arch_setup_dma_ops(dev, 0, U64_MAX,
 				iommu, attr == DEV_DMA_COHERENT);
 
 	return 0;
@@ -1649,7 +1692,7 @@ static void acpi_init_coherency(struct acpi_device *adev)
 {
 	unsigned long long cca = 0;
 	acpi_status status;
-	struct acpi_device *parent = adev->parent;
+	struct acpi_device *parent = acpi_dev_parent(adev);
 
 	if (parent && parent->flags.cca_seen) {
 		/*
@@ -1693,7 +1736,7 @@ static int acpi_check_serial_bus_slave(struct acpi_resource *ares, void *data)
 
 static bool acpi_is_indirect_io_slave(struct acpi_device *device)
 {
-	struct acpi_device *parent = device->parent;
+	struct acpi_device *parent = acpi_dev_parent(device);
 	static const struct acpi_device_id indirect_io_hosts[] = {
 		{"HISI0191", 0},
 		{}
@@ -1763,12 +1806,20 @@ static bool acpi_device_enumeration_by_parent(struct acpi_device *device)
 }
 
 void acpi_init_device_object(struct acpi_device *device, acpi_handle handle,
+<<<<<<< HEAD
+			     int type, void (*release)(struct device *))
+=======
 			     int type)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
+	struct acpi_device *parent = acpi_find_parent_acpi_dev(handle);
+
 	INIT_LIST_HEAD(&device->pnp.ids);
 	device->device_type = type;
 	device->handle = handle;
-	device->parent = acpi_bus_get_parent(handle);
+	device->dev.parent = parent ? &parent->dev : NULL;
+	device->dev.release = release;
+	device->dev.bus = &acpi_bus_type;
 	fwnode_init(&device->fwnode, &acpi_device_fwnode_ops);
 	acpi_set_device_status(device, ACPI_STA_DEFAULT);
 	acpi_device_get_busid(device);
@@ -1822,7 +1873,11 @@ static int acpi_add_single_object(struct acpi_device **child,
 	if (!device)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	acpi_init_device_object(device, handle, type, acpi_device_release);
+=======
 	acpi_init_device_object(device, handle, type);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Getting the status is delayed till here so that we can call
 	 * acpi_bus_get_status() and use its quirk handling.  Note that
@@ -1852,7 +1907,11 @@ static int acpi_add_single_object(struct acpi_device **child,
 		mutex_unlock(&acpi_dep_list_lock);
 
 	if (!result)
+<<<<<<< HEAD
+		result = acpi_device_add(device);
+=======
 		result = __acpi_device_add(device, acpi_device_release);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (result) {
 		acpi_device_release(&device->dev);
@@ -1863,8 +1922,8 @@ static int acpi_add_single_object(struct acpi_device **child,
 	acpi_device_add_finalize(device);
 
 	acpi_handle_debug(handle, "Added as %s, parent %s\n",
-			  dev_name(&device->dev), device->parent ?
-				dev_name(&device->parent->dev) : "(null)");
+			  dev_name(&device->dev), device->dev.parent ?
+				dev_name(device->dev.parent) : "(null)");
 
 	*child = device;
 	return 0;
@@ -2236,9 +2295,113 @@ ok:
 	return 0;
 }
 
+<<<<<<< HEAD
+static int acpi_dev_get_next_consumer_dev_cb(struct acpi_dep_data *dep, void *data)
+{
+	struct acpi_device **adev_p = data;
+	struct acpi_device *adev = *adev_p;
+
+	/*
+	 * If we're passed a 'previous' consumer device then we need to skip
+	 * any consumers until we meet the previous one, and then NULL @data
+	 * so the next one can be returned.
+	 */
+	if (adev) {
+		if (dep->consumer == adev->handle)
+			*adev_p = NULL;
+
+		return 0;
+	}
+
+	adev = acpi_get_acpi_dev(dep->consumer);
+	if (adev) {
+		*(struct acpi_device **)data = adev;
+		return 1;
+	}
+	/* Continue parsing if the device object is not present. */
+	return 0;
+}
+
+struct acpi_scan_clear_dep_work {
+	struct work_struct work;
+=======
 static int acpi_dev_get_first_consumer_dev_cb(struct acpi_dep_data *dep, void *data)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct acpi_device *adev;
+};
+
+static void acpi_scan_clear_dep_fn(struct work_struct *work)
+{
+	struct acpi_scan_clear_dep_work *cdw;
+
+	cdw = container_of(work, struct acpi_scan_clear_dep_work, work);
+
+	acpi_scan_lock_acquire();
+	acpi_bus_attach(cdw->adev, (void *)true);
+	acpi_scan_lock_release();
+
+	acpi_dev_put(cdw->adev);
+	kfree(cdw);
+}
+
+static bool acpi_scan_clear_dep_queue(struct acpi_device *adev)
+{
+	struct acpi_scan_clear_dep_work *cdw;
+
+	if (adev->dep_unmet)
+		return false;
+
+	cdw = kmalloc(sizeof(*cdw), GFP_KERNEL);
+	if (!cdw)
+		return false;
+
+	cdw->adev = adev;
+	INIT_WORK(&cdw->work, acpi_scan_clear_dep_fn);
+	/*
+	 * Since the work function may block on the lock until the entire
+	 * initial enumeration of devices is complete, put it into the unbound
+	 * workqueue.
+	 */
+	queue_work(system_unbound_wq, &cdw->work);
+
+	return true;
+}
+
+static int acpi_scan_clear_dep(struct acpi_dep_data *dep, void *data)
+{
+	struct acpi_device *adev = acpi_get_acpi_dev(dep->consumer);
+
+	if (adev) {
+		adev->dep_unmet--;
+		if (!acpi_scan_clear_dep_queue(adev))
+			acpi_dev_put(adev);
+	}
+
+	list_del(&dep->node);
+	kfree(dep);
+
+	return 0;
+}
+
+/**
+ * acpi_walk_dep_device_list - Apply a callback to every entry in acpi_dep_list
+ * @handle:	The ACPI handle of the supplier device
+ * @callback:	Pointer to the callback function to apply
+ * @data:	Pointer to some data to pass to the callback
+ *
+ * The return value of the callback determines this function's behaviour. If 0
+ * is returned we continue to iterate over acpi_dep_list. If a positive value
+ * is returned then the loop is broken but this function returns 0. If a
+ * negative value is returned by the callback then the loop is broken and that
+ * value is returned as the final error.
+ */
+static int acpi_walk_dep_device_list(acpi_handle handle,
+				int (*callback)(struct acpi_dep_data *, void *),
+				void *data)
+{
+	struct acpi_dep_data *dep, *tmp;
+	int ret = 0;
 
 	adev = acpi_bus_get_acpi_device(dep->consumer);
 	if (adev) {
@@ -2369,6 +2532,34 @@ bool acpi_dev_ready_for_enumeration(const struct acpi_device *device)
 EXPORT_SYMBOL_GPL(acpi_dev_ready_for_enumeration);
 
 /**
+<<<<<<< HEAD
+ * acpi_dev_get_next_consumer_dev - Return the next adev dependent on @supplier
+ * @supplier: Pointer to the dependee device
+ * @start: Pointer to the current dependent device
+ *
+ * Returns the next &struct acpi_device which declares itself dependent on
+ * @supplier via the _DEP buffer, parsed from the acpi_dep_list.
+ *
+ * If the returned adev is not passed as @start to this function, the caller is
+ * responsible for putting the reference to adev when it is no longer needed.
+ */
+struct acpi_device *acpi_dev_get_next_consumer_dev(struct acpi_device *supplier,
+						   struct acpi_device *start)
+{
+	struct acpi_device *adev = start;
+
+	acpi_walk_dep_device_list(supplier->handle,
+				  acpi_dev_get_next_consumer_dev_cb, &adev);
+
+	acpi_dev_put(start);
+
+	if (adev == start)
+		return NULL;
+
+	return adev;
+}
+EXPORT_SYMBOL_GPL(acpi_dev_get_next_consumer_dev);
+=======
  * acpi_dev_get_first_consumer_dev - Return ACPI device dependent on @supplier
  * @supplier: Pointer to the dependee device
  *
@@ -2388,6 +2579,7 @@ struct acpi_device *acpi_dev_get_first_consumer_dev(struct acpi_device *supplier
 	return adev;
 }
 EXPORT_SYMBOL_GPL(acpi_dev_get_first_consumer_dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * acpi_bus_scan - Add ACPI device node objects in a given namespace scope.

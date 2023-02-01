@@ -77,6 +77,7 @@ static int smu_sys_get_pp_feature_mask(void *handle,
 		return -EOPNOTSUPP;
 
 	return smu_get_pp_feature_mask(smu, buf);
+<<<<<<< HEAD
 }
 
 static int smu_sys_set_pp_feature_mask(void *handle,
@@ -88,6 +89,42 @@ static int smu_sys_set_pp_feature_mask(void *handle,
 		return -EOPNOTSUPP;
 
 	return smu_set_pp_feature_mask(smu, new_mask);
+}
+
+int smu_set_residency_gfxoff(struct smu_context *smu, bool value)
+{
+	if (!smu->ppt_funcs->set_gfx_off_residency)
+		return -EINVAL;
+=======
+}
+
+static int smu_sys_set_pp_feature_mask(void *handle,
+				       uint64_t new_mask)
+{
+	struct smu_context *smu = handle;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+	return smu_set_gfx_off_residency(smu, value);
+}
+
+<<<<<<< HEAD
+int smu_get_residency_gfxoff(struct smu_context *smu, u32 *value)
+{
+	if (!smu->ppt_funcs->get_gfx_off_residency)
+		return -EINVAL;
+
+	return smu_get_gfx_off_residency(smu, value);
+}
+
+int smu_get_entrycount_gfxoff(struct smu_context *smu, u64 *value)
+{
+	if (!smu->ppt_funcs->get_gfx_off_entrycount)
+		return -EINVAL;
+
+	return smu_get_gfx_off_entrycount(smu, value);
+=======
+	return smu_set_pp_feature_mask(smu, new_mask);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int smu_get_status_gfxoff(struct smu_context *smu, uint32_t *value)
@@ -561,6 +598,10 @@ static int smu_set_funcs(struct amdgpu_device *adev)
 		yellow_carp_set_ppt_funcs(smu);
 		break;
 	case IP_VERSION(13, 0, 4):
+<<<<<<< HEAD
+	case IP_VERSION(13, 0, 11):
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		smu_v13_0_4_set_ppt_funcs(smu);
 		break;
 	case IP_VERSION(13, 0, 5):
@@ -581,6 +622,10 @@ static int smu_set_funcs(struct amdgpu_device *adev)
 		smu->od_enabled = true;
 		break;
 	case IP_VERSION(13, 0, 0):
+<<<<<<< HEAD
+	case IP_VERSION(13, 0, 10):
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		smu_v13_0_0_set_ppt_funcs(smu);
 		break;
 	case IP_VERSION(13, 0, 7):
@@ -1288,8 +1333,8 @@ static int smu_smc_hw_setup(struct smu_context *smu)
 
 	ret = smu_enable_thermal_alert(smu);
 	if (ret) {
-		dev_err(adev->dev, "Failed to enable thermal alert!\n");
-		return ret;
+	  dev_err(adev->dev, "Failed to enable thermal alert!\n");
+	  return ret;
 	}
 
 	ret = smu_notify_display_change(smu);
@@ -1575,6 +1620,7 @@ static int smu_suspend(void *handle)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct smu_context *smu = adev->powerplay.pp_handle;
 	int ret;
+	uint64_t count;
 
 	if (amdgpu_sriov_vf(adev)&& !amdgpu_sriov_is_pp_one_vf(adev))
 		return 0;
@@ -1591,6 +1637,17 @@ static int smu_suspend(void *handle)
 	smu->watermarks_bitmap &= ~(WATERMARKS_LOADED);
 
 	smu_set_gfx_cgpg(smu, false);
+<<<<<<< HEAD
+
+	/*
+	 * pwfw resets entrycount when device is suspended, so we save the
+	 * last value to be used when we resume to keep it consistent
+	 */
+	ret = smu_get_entrycount_gfxoff(smu, &count);
+	if (!ret)
+		adev->gfx.gfx_off_entrycount = count;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -2166,12 +2223,21 @@ static int smu_set_fan_speed_rpm(void *handle, uint32_t speed)
 
 	if (speed == U32_MAX)
 		return -EINVAL;
+<<<<<<< HEAD
 
 	ret = smu->ppt_funcs->set_fan_speed_rpm(smu, speed);
 	if (!ret && !(smu->user_dpm_profile.flags & SMU_DPM_USER_PROFILE_RESTORE)) {
 		smu->user_dpm_profile.flags |= SMU_CUSTOM_FAN_SPEED_RPM;
 		smu->user_dpm_profile.fan_speed_rpm = speed;
 
+=======
+
+	ret = smu->ppt_funcs->set_fan_speed_rpm(smu, speed);
+	if (!ret && !(smu->user_dpm_profile.flags & SMU_DPM_USER_PROFILE_RESTORE)) {
+		smu->user_dpm_profile.flags |= SMU_CUSTOM_FAN_SPEED_RPM;
+		smu->user_dpm_profile.fan_speed_rpm = speed;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Override custom PWM setting as they cannot co-exist */
 		smu->user_dpm_profile.flags &= ~SMU_CUSTOM_FAN_SPEED_PWM;
 		smu->user_dpm_profile.fan_speed_pwm = 0;
@@ -2527,6 +2593,7 @@ static int smu_set_fan_control_mode(void *handle, u32 value)
 
 	if (value == U32_MAX)
 		return -EINVAL;
+<<<<<<< HEAD
 
 	ret = smu->ppt_funcs->set_fan_control_mode(smu, value);
 	if (ret)
@@ -2543,6 +2610,24 @@ static int smu_set_fan_control_mode(void *handle, u32 value)
 		}
 	}
 
+=======
+
+	ret = smu->ppt_funcs->set_fan_control_mode(smu, value);
+	if (ret)
+		goto out;
+
+	if (!(smu->user_dpm_profile.flags & SMU_DPM_USER_PROFILE_RESTORE)) {
+		smu->user_dpm_profile.fan_mode = value;
+
+		/* reset user dpm fan speed */
+		if (value != AMD_FAN_CTRL_MANUAL) {
+			smu->user_dpm_profile.fan_speed_pwm = 0;
+			smu->user_dpm_profile.fan_speed_rpm = 0;
+			smu->user_dpm_profile.flags &= ~(SMU_CUSTOM_FAN_SPEED_RPM | SMU_CUSTOM_FAN_SPEED_PWM);
+		}
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 out:
 	return ret;
 }

@@ -1,0 +1,1 @@
+cmd_net/sunrpc/xprtrdma/rpcrdma.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/sunrpc/xprtrdma/rpcrdma.ko net/sunrpc/xprtrdma/rpcrdma.o net/sunrpc/xprtrdma/rpcrdma.mod.o;  true

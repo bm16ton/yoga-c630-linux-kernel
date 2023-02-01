@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/function/usb_f_printer.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/function/usb_f_printer.ko drivers/usb/gadget/function/usb_f_printer.o drivers/usb/gadget/function/usb_f_printer.mod.o;  true

@@ -1,0 +1,11 @@
+drivers/gpu/drm/ttm/ttm_tt.o
+drivers/gpu/drm/ttm/ttm_bo.o
+drivers/gpu/drm/ttm/ttm_bo_util.o
+drivers/gpu/drm/ttm/ttm_bo_vm.o
+drivers/gpu/drm/ttm/ttm_module.o
+drivers/gpu/drm/ttm/ttm_execbuf_util.o
+drivers/gpu/drm/ttm/ttm_range_manager.o
+drivers/gpu/drm/ttm/ttm_resource.o
+drivers/gpu/drm/ttm/ttm_pool.o
+drivers/gpu/drm/ttm/ttm_device.o
+drivers/gpu/drm/ttm/ttm_sys_manager.o

@@ -19,6 +19,19 @@ properties:
     description: "device name prefix"
     $ref: /schemas/types.yaml#/definitions/string
   convert-rate:
+<<<<<<< HEAD
+    $ref: "/schemas/sound/dai-params.yaml#/$defs/dai-sample-rate"
+  convert-channels:
+    $ref: "/schemas/sound/dai-params.yaml#/$defs/dai-channels"
+  convert-sample-format:
+    $ref: "/schemas/sound/dai-params.yaml#/$defs/dai-sample-format"
+
+patternProperties:
+  "^endpoint(@[0-9a-f]+)?":
+    $ref: /schemas/graph.yaml#/$defs/endpoint-base
+    unevaluatedProperties: false
+
+=======
     description: CPU to Codec rate convert.
     $ref: /schemas/types.yaml#/definitions/uint32
   convert-channels:
@@ -27,12 +40,15 @@ properties:
 patternProperties:
   "^endpoint(@[0-9a-f]+)?":
     $ref: /schemas/graph.yaml#/$defs/endpoint-base
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     properties:
       mclk-fs:
         description: |
           Multiplication factor between stream rate and codec mclk.
           When defined, mclk-fs property defined in dai-link sub nodes are
           ignored.
+<<<<<<< HEAD
+=======
         $ref: /schemas/types.yaml#/definitions/uint32
       frame-inversion:
         description: dai-link uses frame clock inversion
@@ -66,11 +82,57 @@ patternProperties:
             - lsb
       convert-rate:
         description: CPU to Codec rate convert.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         $ref: /schemas/types.yaml#/definitions/uint32
+      frame-inversion:
+        description: dai-link uses frame clock inversion
+        $ref: /schemas/types.yaml#/definitions/flag
+      bitclock-inversion:
+        description: dai-link uses bit clock inversion
+        $ref: /schemas/types.yaml#/definitions/flag
+      frame-master:
+        description: Indicates dai-link frame master.
+        oneOf:
+          - $ref: /schemas/types.yaml#/definitions/flag
+          - $ref: /schemas/types.yaml#/definitions/phandle
+      bitclock-master:
+        description: Indicates dai-link bit clock master
+        oneOf:
+          - $ref: /schemas/types.yaml#/definitions/flag
+          - $ref: /schemas/types.yaml#/definitions/phandle
+
+      dai-format:
+        description: audio format.
+        items:
+          enum:
+            - i2s
+            - right_j
+            - left_j
+            - dsp_a
+            - dsp_b
+            - ac97
+            - pdm
+            - msb
+            - lsb
+      convert-rate:
+        $ref: "/schemas/sound/dai-params.yaml#/$defs/dai-sample-rate"
       convert-channels:
+<<<<<<< HEAD
+        $ref: "/schemas/sound/dai-params.yaml#/$defs/dai-channels"
+      convert-sample-format:
+        $ref: "/schemas/sound/dai-params.yaml#/$defs/dai-sample-format"
+
+      dai-tdm-slot-num:
+        description: Number of slots in use.
+        $ref: /schemas/types.yaml#/definitions/uint32
+      dai-tdm-slot-width:
+        description: Width in bits for each slot.
+        $ref: /schemas/types.yaml#/definitions/uint32
+=======
         description: CPU to Codec rate channels.
         $ref: /schemas/types.yaml#/definitions/uint32
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       dai-tdm-slot-width-map:
         description: Mapping of sample widths to slot widths. For hardware
           that cannot support a fixed slot width or a slot width always

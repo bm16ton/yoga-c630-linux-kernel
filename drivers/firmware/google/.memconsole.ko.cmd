@@ -1,0 +1,1 @@
+cmd_drivers/firmware/google/memconsole.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/firmware/google/memconsole.ko drivers/firmware/google/memconsole.o drivers/firmware/google/memconsole.mod.o;  true

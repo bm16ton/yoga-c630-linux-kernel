@@ -375,6 +375,232 @@ static int adm9240_init_client(struct adm9240_data *data)
 		return err;
 	data->fan_div[0] = (regval >> 4) & 3;
 	data->fan_div[1] = (regval >> 6) & 3;
+<<<<<<< HEAD
+	return 0;
+}
+
+static int adm9240_chip_read(struct device *dev, u32 attr, long *val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	u8 regs[2];
+	int err;
+
+	switch (attr) {
+	case hwmon_chip_alarms:
+		err = regmap_bulk_read(data->regmap, ADM9240_REG_INT(0), &regs, 2);
+		if (err < 0)
+			return err;
+		*val = regs[0] | regs[1] << 8;
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	return 0;
+}
+
+static int adm9240_intrusion_read(struct device *dev, u32 attr, long *val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	unsigned int regval;
+	int err;
+
+	switch (attr) {
+	case hwmon_intrusion_alarm:
+		err = regmap_read(data->regmap, ADM9240_REG_INT(1), &regval);
+		if (err < 0)
+			return err;
+		*val = !!(regval & BIT(4));
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	return 0;
+}
+
+static int adm9240_intrusion_write(struct device *dev, u32 attr, long val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	int err;
+
+	switch (attr) {
+	case hwmon_intrusion_alarm:
+		if (val)
+			return -EINVAL;
+		err = regmap_write(data->regmap, ADM9240_REG_CHASSIS_CLEAR, 0x80);
+		if (err < 0)
+			return err;
+		dev_dbg(data->dev, "chassis intrusion latch cleared\n");
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	return 0;
+}
+
+static int adm9240_in_read(struct device *dev, u32 attr, int channel, long *val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	unsigned int regval;
+	int reg;
+	int err;
+
+	switch (attr) {
+	case hwmon_in_input:
+		reg = ADM9240_REG_IN(channel);
+		break;
+	case hwmon_in_min:
+		reg = ADM9240_REG_IN_MIN(channel);
+		break;
+	case hwmon_in_max:
+		reg = ADM9240_REG_IN_MAX(channel);
+		break;
+	case hwmon_in_alarm:
+		if (channel < 4) {
+			reg = ADM9240_REG_INT(0);
+		} else {
+			reg = ADM9240_REG_INT(1);
+			channel -= 4;
+		}
+		err = regmap_read(data->regmap, reg, &regval);
+		if (err < 0)
+			return err;
+		*val = !!(regval & BIT(channel));
+		return 0;
+	default:
+		return -EOPNOTSUPP;
+	}
+	err = regmap_read(data->regmap, reg, &regval);
+	if (err < 0)
+		return err;
+	*val = IN_FROM_REG(regval, channel);
+	return 0;
+}
+
+static int adm9240_in_write(struct device *dev, u32 attr, int channel, long val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	int reg;
+
+	switch (attr) {
+	case hwmon_in_min:
+		reg = ADM9240_REG_IN_MIN(channel);
+		break;
+	case hwmon_in_max:
+		reg = ADM9240_REG_IN_MAX(channel);
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	return regmap_write(data->regmap, reg, IN_TO_REG(val, channel));
+}
+
+static int adm9240_fan_read(struct device *dev, u32 attr, int channel, long *val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	unsigned int regval;
+	int err;
+
+	switch (attr) {
+	case hwmon_fan_input:
+		mutex_lock(&data->update_lock);
+		err = regmap_read(data->regmap, ADM9240_REG_FAN(channel), &regval);
+		if (err < 0) {
+			mutex_unlock(&data->update_lock);
+			return err;
+		}
+		if (regval == 255 && data->fan_div[channel] < 3) {
+			/* adjust fan clock divider on overflow */
+			err = adm9240_write_fan_div(data, channel,
+						    ++data->fan_div[channel]);
+			if (err) {
+				mutex_unlock(&data->update_lock);
+				return err;
+			}
+		}
+		*val = FAN_FROM_REG(regval, BIT(data->fan_div[channel]));
+		mutex_unlock(&data->update_lock);
+		break;
+	case hwmon_fan_div:
+		*val = BIT(data->fan_div[channel]);
+		break;
+	case hwmon_fan_min:
+		err = regmap_read(data->regmap, ADM9240_REG_FAN_MIN(channel), &regval);
+		if (err < 0)
+			return err;
+		*val = FAN_FROM_REG(regval, BIT(data->fan_div[channel]));
+		break;
+	case hwmon_fan_alarm:
+		err = regmap_read(data->regmap, ADM9240_REG_INT(0), &regval);
+		if (err < 0)
+			return err;
+		*val = !!(regval & BIT(channel + 6));
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	return 0;
+}
+
+static int adm9240_fan_write(struct device *dev, u32 attr, int channel, long val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	int err;
+
+	switch (attr) {
+	case hwmon_fan_min:
+		err = adm9240_fan_min_write(data, channel, val);
+		if (err < 0)
+			return err;
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	return 0;
+}
+
+static int adm9240_temp_read(struct device *dev, u32 attr, int channel, long *val)
+{
+	struct adm9240_data *data = dev_get_drvdata(dev);
+	unsigned int regval;
+	int err, temp;
+
+	switch (attr) {
+	case hwmon_temp_input:
+		err = regmap_read(data->regmap, ADM9240_REG_TEMP, &regval);
+		if (err < 0)
+			return err;
+		temp = regval << 1;
+		err = regmap_read(data->regmap, ADM9240_REG_TEMP_CONF, &regval);
+		if (err < 0)
+			return err;
+		temp |= regval >> 7;
+		*val = sign_extend32(temp, 8) * 500;
+		break;
+	case hwmon_temp_max:
+		err = regmap_read(data->regmap, ADM9240_REG_TEMP_MAX(0), &regval);
+		if (err < 0)
+			return err;
+		*val = (s8)regval * 1000;
+		break;
+	case hwmon_temp_max_hyst:
+		err = regmap_read(data->regmap, ADM9240_REG_TEMP_MAX(1), &regval);
+		if (err < 0)
+			return err;
+		*val = (s8)regval * 1000;
+		break;
+	case hwmon_temp_alarm:
+		err = regmap_read(data->regmap, ADM9240_REG_INT(0), &regval);
+		if (err < 0)
+			return err;
+		*val = !!(regval & BIT(4));
+		break;
+	default:
+		return -EOPNOTSUPP;
+	}
+	return 0;
+}
+
+=======
 	return 0;
 }
 
@@ -593,6 +819,7 @@ static int adm9240_temp_read(struct device *dev, u32 attr, int channel, long *va
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int adm9240_temp_write(struct device *dev, u32 attr, int channel, long val)
 {
 	struct adm9240_data *data = dev_get_drvdata(dev);

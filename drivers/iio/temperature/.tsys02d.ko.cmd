@@ -1,0 +1,1 @@
+cmd_drivers/iio/temperature/tsys02d.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/temperature/tsys02d.ko drivers/iio/temperature/tsys02d.o drivers/iio/temperature/tsys02d.mod.o;  true

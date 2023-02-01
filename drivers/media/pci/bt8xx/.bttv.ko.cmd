@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/bt8xx/bttv.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/bt8xx/bttv.ko drivers/media/pci/bt8xx/bttv.o drivers/media/pci/bt8xx/bttv.mod.o;  true

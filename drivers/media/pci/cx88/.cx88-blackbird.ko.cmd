@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/cx88/cx88-blackbird.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/cx88/cx88-blackbird.ko drivers/media/pci/cx88/cx88-blackbird.o drivers/media/pci/cx88/cx88-blackbird.mod.o;  true

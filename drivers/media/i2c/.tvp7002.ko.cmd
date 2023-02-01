@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/tvp7002.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/i2c/tvp7002.ko drivers/media/i2c/tvp7002.o drivers/media/i2c/tvp7002.mod.o;  true

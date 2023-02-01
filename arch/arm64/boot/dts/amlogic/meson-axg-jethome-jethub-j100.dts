@@ -1,14 +1,26 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
+<<<<<<< HEAD
+ * Copyright (c) 2022 Vyacheslav Bocharov <adeep@lexina.in>
+ * Copyright (c) 2022 JetHome
+=======
  * Copyright (c) 2021 Vyacheslav Bocharov <adeep@lexina.in>
  * Copyright (c) 2020 JetHome
  * Author: Aleksandr Kazantsev <ak@tvip.ru>
  * Author: Alexey Shevelkin <ash@tvip.ru>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Author: Vyacheslav Bocharov <adeep@lexina.in>
  */
 
 /dts-v1/;
 
+<<<<<<< HEAD
+#include "meson-axg-jethome-jethub-j1xx.dtsi"
+
+/ {
+	compatible = "jethome,jethub-j100", "amlogic,a113d", "amlogic,meson-axg";
+	model = "JetHome JetHub D1 (J100)";
+=======
 #include "meson-axg.dtsi"
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/thermal/thermal.h>
@@ -25,12 +37,21 @@
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* 1024MB RAM */
 	memory@0 {
 		device_type = "memory";
 		reg = <0x0 0x0 0x0 0x40000000>;
 	};
+<<<<<<< HEAD
+};
+
+
+/* wifi module */
+&sd_emmc_b {
+	non-removable;
+=======
 
 	reserved-memory {
 		linux,cma {
@@ -265,6 +286,7 @@
 
 	vmmc-supply = <&vddao_3v3>;
 	vqmmc-supply = <&vddio_boot>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	brcmf: wifi@1 {
 		reg = <1>;
@@ -272,6 +294,10 @@
 	};
 };
 
+<<<<<<< HEAD
+/* UART Bluetooth */
+&uart_B {
+=======
 /* emmc storage */
 &sd_emmc_c {
 	status = "okay";
@@ -300,11 +326,14 @@
 	pinctrl-names = "default";
 	uart-has-rtscts;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bluetooth {
 		compatible = "brcm,bcm43438-bt";
 		shutdown-gpios = <&gpio GPIOZ_7 GPIO_ACTIVE_HIGH>;
 	};
 };
+<<<<<<< HEAD
+=======
 
 /* UART Console */
 &uart_AO {
@@ -368,3 +397,4 @@
 &cpu3 {
 	#cooling-cells = <2>;
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

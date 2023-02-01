@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/bmi160/bmi160_i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/bmi160/bmi160_i2c.ko drivers/iio/imu/bmi160/bmi160_i2c.o drivers/iio/imu/bmi160/bmi160_i2c.mod.o;  true

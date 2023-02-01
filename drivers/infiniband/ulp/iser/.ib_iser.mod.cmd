@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/ulp/iser/ib_iser.mod := printf '%s\n'   iser_verbs.o iser_initiator.o iser_memory.o iscsi_iser.o | awk '!x[$$0]++ { print("drivers/infiniband/ulp/iser/"$$0) }' > drivers/infiniband/ulp/iser/ib_iser.mod

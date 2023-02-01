@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/bridge/simple-bridge.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/bridge/simple-bridge.ko drivers/gpu/drm/bridge/simple-bridge.o drivers/gpu/drm/bridge/simple-bridge.mod.o;  true

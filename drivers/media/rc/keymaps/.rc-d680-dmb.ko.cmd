@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-d680-dmb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-d680-dmb.ko drivers/media/rc/keymaps/rc-d680-dmb.o drivers/media/rc/keymaps/rc-d680-dmb.mod.o;  true

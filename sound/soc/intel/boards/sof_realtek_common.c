@@ -253,10 +253,43 @@ EXPORT_SYMBOL_NS(sof_rt1015p_codec_conf, SND_SOC_INTEL_SOF_REALTEK_COMMON);
  * RT1015 audio amplifier
  */
 
+<<<<<<< HEAD
+static const struct {
+	unsigned int tx;
+	unsigned int rx;
+} rt1015_tdm_mask[] = {
+	{.tx = 0x0, .rx = 0x1},
+	{.tx = 0x0, .rx = 0x2},
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int rt1015_hw_params(struct snd_pcm_substream *substream,
 			    struct snd_pcm_hw_params *params)
 {
 	struct snd_soc_pcm_runtime *rtd = asoc_substream_to_rtd(substream);
+<<<<<<< HEAD
+	struct snd_soc_dai_link *dai_link = rtd->dai_link;
+	struct snd_soc_dai *codec_dai;
+	int i, clk_freq, ret;
+
+	clk_freq = sof_dai_get_bclk(rtd);
+
+	if (clk_freq <= 0) {
+		dev_err(rtd->dev, "fail to get bclk freq, ret %d\n", clk_freq);
+		return -EINVAL;
+	}
+
+	for_each_rtd_codec_dais(rtd, i, codec_dai) {
+		ret = snd_soc_dai_set_pll(codec_dai, 0, RT1015_PLL_S_BCLK,
+					  clk_freq,
+					  params_rate(params) * 256);
+		if (ret) {
+			dev_err(codec_dai->dev, "fail to set pll, ret %d\n",
+				ret);
+			return ret;
+		}
+=======
 	struct snd_soc_dai *codec_dai;
 	int i, fs = 64, ret;
 
@@ -290,10 +323,41 @@ static int rt1015_hw_params_pll_and_tdm(struct snd_pcm_substream *substream,
 					  params_rate(params) * 256);
 		if (ret)
 			return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		ret = snd_soc_dai_set_sysclk(codec_dai, RT1015_SCLK_S_PLL,
 					     params_rate(params) * 256,
 					     SND_SOC_CLOCK_IN);
+<<<<<<< HEAD
+		if (ret) {
+			dev_err(codec_dai->dev, "fail to set sysclk, ret %d\n",
+				ret);
+			return ret;
+		}
+
+		switch (dai_link->dai_fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
+		case SND_SOC_DAIFMT_DSP_A:
+		case SND_SOC_DAIFMT_DSP_B:
+			/* 4-slot TDM */
+			ret = snd_soc_dai_set_tdm_slot(codec_dai,
+						       rt1015_tdm_mask[i].tx,
+						       rt1015_tdm_mask[i].rx,
+						       4,
+						       params_width(params));
+			if (ret < 0) {
+				dev_err(codec_dai->dev, "fail to set tdm slot, ret %d\n",
+					ret);
+				return ret;
+			}
+			break;
+		default:
+			dev_dbg(codec_dai->dev, "codec is in I2S mode\n");
+			break;
+		}
+	}
+
+	return ret;
+=======
 		if (ret)
 			return ret;
 	}
@@ -310,6 +374,7 @@ static int rt1015_hw_params_pll_and_tdm(struct snd_pcm_substream *substream,
 		return ret;
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct snd_soc_ops rt1015_ops = {
@@ -351,15 +416,22 @@ void sof_rt1015_codec_conf(struct snd_soc_card *card)
 }
 EXPORT_SYMBOL_NS(sof_rt1015_codec_conf, SND_SOC_INTEL_SOF_REALTEK_COMMON);
 
+<<<<<<< HEAD
+void sof_rt1015_dai_link(struct snd_soc_dai_link *link)
+=======
 void sof_rt1015_dai_link(struct snd_soc_dai_link *link, unsigned int fs)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	link->codecs = rt1015_components;
 	link->num_codecs = ARRAY_SIZE(rt1015_components);
 	link->init = speaker_codec_init_lr;
 	link->ops = &rt1015_ops;
+<<<<<<< HEAD
+=======
 
 	if (fs == 100)
 		rt1015_ops.hw_params = rt1015_hw_params_pll_and_tdm;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_NS(sof_rt1015_dai_link, SND_SOC_INTEL_SOF_REALTEK_COMMON);
 
@@ -459,5 +531,47 @@ void sof_rt1308_dai_link(struct snd_soc_dai_link *link)
 }
 EXPORT_SYMBOL_NS(sof_rt1308_dai_link, SND_SOC_INTEL_SOF_REALTEK_COMMON);
 
+<<<<<<< HEAD
+/*
+ * 2-amp Configuration for RT1019
+ */
+
+static const struct snd_soc_dapm_route rt1019p_dapm_routes[] = {
+	/* speaker */
+	{ "Left Spk", NULL, "Speaker" },
+	{ "Right Spk", NULL, "Speaker" },
+};
+
+static struct snd_soc_dai_link_component rt1019p_components[] = {
+	{
+		.name = RT1019P_DEV0_NAME,
+		.dai_name = RT1019P_CODEC_DAI,
+	},
+};
+
+static int rt1019p_init(struct snd_soc_pcm_runtime *rtd)
+{
+	struct snd_soc_card *card = rtd->card;
+	int ret;
+
+	ret = snd_soc_dapm_add_routes(&card->dapm, rt1019p_dapm_routes,
+				      ARRAY_SIZE(rt1019p_dapm_routes));
+	if (ret) {
+		dev_err(rtd->dev, "Speaker map addition failed: %d\n", ret);
+		return ret;
+	}
+	return ret;
+}
+
+void sof_rt1019p_dai_link(struct snd_soc_dai_link *link)
+{
+	link->codecs = rt1019p_components;
+	link->num_codecs = ARRAY_SIZE(rt1019p_components);
+	link->init = rt1019p_init;
+}
+EXPORT_SYMBOL_NS(sof_rt1019p_dai_link, SND_SOC_INTEL_SOF_REALTEK_COMMON);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_DESCRIPTION("ASoC Intel SOF Realtek helpers");
 MODULE_LICENSE("GPL");

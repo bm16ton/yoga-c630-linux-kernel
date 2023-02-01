@@ -35,9 +35,13 @@
 #define  BCM6358_MODE_MUX_SYS_IRQ	BIT(15)
 
 struct bcm6358_pingroup {
+<<<<<<< HEAD
+	struct pingroup grp;
+=======
 	const char *name;
 	const unsigned * const pins;
 	const unsigned num_pins;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	const uint16_t mode_val;
 
@@ -131,9 +135,13 @@ static unsigned sys_irq_grp_pins[] = { 5 };
 
 #define BCM6358_GPIO_MUX_GROUP(n, bit, dir)			\
 	{							\
+<<<<<<< HEAD
+		.grp = BCM_PIN_GROUP(n),			\
+=======
 		.name = #n,					\
 		.pins = n##_pins,				\
 		.num_pins = ARRAY_SIZE(n##_pins),		\
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.mode_val = BCM6358_MODE_MUX_##bit,		\
 		.direction = dir,				\
 	}
@@ -219,15 +227,26 @@ static int bcm6358_pinctrl_get_group_count(struct pinctrl_dev *pctldev)
 static const char *bcm6358_pinctrl_get_group_name(struct pinctrl_dev *pctldev,
 						  unsigned group)
 {
+<<<<<<< HEAD
+	return bcm6358_groups[group].grp.name;
+=======
 	return bcm6358_groups[group].name;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int bcm6358_pinctrl_get_group_pins(struct pinctrl_dev *pctldev,
 					  unsigned group, const unsigned **pins,
+<<<<<<< HEAD
+					  unsigned *npins)
+{
+	*pins = bcm6358_groups[group].grp.pins;
+	*npins = bcm6358_groups[group].grp.npins;
+=======
 					  unsigned *num_pins)
 {
 	*pins = bcm6358_groups[group].pins;
 	*num_pins = bcm6358_groups[group].num_pins;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -264,12 +283,20 @@ static int bcm6358_pinctrl_set_mux(struct pinctrl_dev *pctldev,
 	unsigned int mask = val;
 	unsigned pin;
 
+<<<<<<< HEAD
+	for (pin = 0; pin < pg->grp.npins; pin++)
+=======
 	for (pin = 0; pin < pg->num_pins; pin++)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mask |= (unsigned long)bcm6358_pins[pin].drv_data;
 
 	regmap_field_update_bits(priv->overlays, mask, val);
 
+<<<<<<< HEAD
+	for (pin = 0; pin < pg->grp.npins; pin++) {
+=======
 	for (pin = 0; pin < pg->num_pins; pin++) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct pinctrl_gpio_range *range;
 		unsigned int hw_gpio = bcm6358_pins[pin].number;
 

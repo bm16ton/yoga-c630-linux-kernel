@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-snapstream-firefly.mod := printf '%s\n'   rc-snapstream-firefly.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-snapstream-firefly.mod

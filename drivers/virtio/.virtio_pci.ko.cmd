@@ -1,0 +1,1 @@
+cmd_drivers/virtio/virtio_pci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/virtio/virtio_pci.ko drivers/virtio/virtio_pci.o drivers/virtio/virtio_pci.mod.o;  true

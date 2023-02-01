@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/amd/xgbe/amd-xgbe.mod := printf '%s\n'   xgbe-main.o xgbe-drv.o xgbe-dev.o xgbe-desc.o xgbe-ethtool.o xgbe-mdio.o xgbe-ptp.o xgbe-i2c.o xgbe-phy-v1.o xgbe-phy-v2.o xgbe-platform.o xgbe-pci.o xgbe-dcb.o xgbe-debugfs.o | awk '!x[$$0]++ { print("drivers/net/ethernet/amd/xgbe/"$$0) }' > drivers/net/ethernet/amd/xgbe/amd-xgbe.mod

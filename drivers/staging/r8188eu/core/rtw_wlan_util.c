@@ -222,6 +222,8 @@ void get_rate_set(struct adapter *padapter, unsigned char *pbssrate, int *bssrat
 	memcpy(pbssrate, supportedrates, *bssrate_len);
 }
 
+<<<<<<< HEAD
+=======
 void UpdateBrateTbl(struct adapter *Adapter, u8 *mbrate)
 {
 	u8	i;
@@ -262,6 +264,7 @@ void UpdateBrateTblForSoftAP(u8 *bssrateset, u32 bssratelen)
 	}
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void Save_DM_Func_Flag(struct adapter *padapter)
 {
 	struct hal_data_8188e *haldata = &padapter->haldata;
@@ -1578,10 +1581,15 @@ void beacon_timing_control(struct adapter *padapter)
 
 static struct adapter *pbuddy_padapter;
 
+<<<<<<< HEAD
+void rtw_handle_dualmac(struct adapter *adapter, bool init)
+{
+=======
 int rtw_handle_dualmac(struct adapter *adapter, bool init)
 {
 	int status = _SUCCESS;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (init) {
 		if (!pbuddy_padapter) {
 			pbuddy_padapter = adapter;
@@ -1594,5 +1602,8 @@ int rtw_handle_dualmac(struct adapter *adapter, bool init)
 	} else {
 		pbuddy_padapter = NULL;
 	}
+<<<<<<< HEAD
+=======
 	return status;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

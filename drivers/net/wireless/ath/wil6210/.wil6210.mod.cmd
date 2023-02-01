@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/wil6210/wil6210.mod := printf '%s\n'   main.o netdev.o cfg80211.o pcie_bus.o debugfs.o wmi.o interrupt.o txrx.o txrx_edma.o debug.o rx_reorder.o fw.o pm.o pmc.o trace.o wil_platform.o ethtool.o wil_crash_dump.o p2p.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/wil6210/"$$0) }' > drivers/net/wireless/ath/wil6210/wil6210.mod

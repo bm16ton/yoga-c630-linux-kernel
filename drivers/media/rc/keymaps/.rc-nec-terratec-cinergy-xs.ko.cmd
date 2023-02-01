@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-nec-terratec-cinergy-xs.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-nec-terratec-cinergy-xs.ko drivers/media/rc/keymaps/rc-nec-terratec-cinergy-xs.o drivers/media/rc/keymaps/rc-nec-terratec-cinergy-xs.mod.o;  true

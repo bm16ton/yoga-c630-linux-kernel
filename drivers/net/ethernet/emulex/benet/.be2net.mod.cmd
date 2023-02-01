@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/emulex/benet/be2net.mod := printf '%s\n'   be_main.o be_cmds.o be_ethtool.o be_roce.o | awk '!x[$$0]++ { print("drivers/net/ethernet/emulex/benet/"$$0) }' > drivers/net/ethernet/emulex/benet/be2net.mod

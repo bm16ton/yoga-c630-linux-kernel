@@ -15,6 +15,10 @@
 /* *************************************
 *  Dependencies
 ***************************************/
+<<<<<<< HEAD
+#include <linux/module.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "mem.h"
 #include "error_private.h"       /* ERR_*, ERROR */
 #define FSE_STATIC_LINKING_ONLY  /* FSE_MIN_TABLELOG */
@@ -239,7 +243,11 @@ size_t FSE_readNCount(
 {
     return FSE_readNCount_bmi2(normalizedCounter, maxSVPtr, tableLogPtr, headerBuffer, hbSize, /* bmi2 */ 0);
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL_GPL(FSE_readNCount);
+=======
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*! HUF_readStats() :
     Read compact Huffman tree, saved by HUF_writeCTable().
@@ -255,6 +263,10 @@ size_t HUF_readStats(BYTE* huffWeight, size_t hwSize, U32* rankStats,
     U32 wksp[HUF_READ_STATS_WORKSPACE_SIZE_U32];
     return HUF_readStats_wksp(huffWeight, hwSize, rankStats, nbSymbolsPtr, tableLogPtr, src, srcSize, wksp, sizeof(wksp), /* bmi2 */ 0);
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL_GPL(HUF_readStats);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 FORCE_INLINE_TEMPLATE size_t
 HUF_readStats_body(BYTE* huffWeight, size_t hwSize, U32* rankStats,
@@ -355,3 +367,7 @@ size_t HUF_readStats_wksp(BYTE* huffWeight, size_t hwSize, U32* rankStats,
     (void)bmi2;
     return HUF_readStats_body_default(huffWeight, hwSize, rankStats, nbSymbolsPtr, tableLogPtr, src, srcSize, workSpace, wkspSize);
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL_GPL(HUF_readStats_wksp);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

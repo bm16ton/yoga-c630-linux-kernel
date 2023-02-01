@@ -1,0 +1,1 @@
+cmd_drivers/soc/rockchip/io-domain.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/soc/rockchip/io-domain.ko drivers/soc/rockchip/io-domain.o drivers/soc/rockchip/io-domain.mod.o;  true

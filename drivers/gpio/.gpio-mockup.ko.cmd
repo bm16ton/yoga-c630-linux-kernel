@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-mockup.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-mockup.ko drivers/gpio/gpio-mockup.o drivers/gpio/gpio-mockup.mod.o;  true

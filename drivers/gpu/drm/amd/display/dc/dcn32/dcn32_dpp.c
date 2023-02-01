@@ -31,7 +31,11 @@
 #include "dcn30/dcn30_cm_common.h"
 
 /* Compute the maximum number of lines that we can fit in the line buffer */
+<<<<<<< HEAD
+static void dscl32_calc_lb_num_partitions(
+=======
 void dscl32_calc_lb_num_partitions(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		const struct scaler_data *scl_data,
 		enum lb_memory_config lb_config,
 		int *num_part_y,

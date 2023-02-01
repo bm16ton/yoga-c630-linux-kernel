@@ -296,6 +296,17 @@ struct tegra_wake_event {
 	} gpio;
 };
 
+#define TEGRA_WAKE_SIMPLE(_name, _id)			\
+	{						\
+		.name = _name,				\
+		.id = _id,				\
+		.irq = 0,				\
+		.gpio = {				\
+			.instance = UINT_MAX,		\
+			.pin = UINT_MAX,		\
+		},					\
+	}
+
 #define TEGRA_WAKE_IRQ(_name, _id, _irq)		\
 	{						\
 		.name = _name,				\
@@ -2239,6 +2250,7 @@ static int tegra_pmc_irq_alloc(struct irq_domain *domain, unsigned int virq,
 	for (i = 0; i < soc->num_wake_events; i++) {
 		const struct tegra_wake_event *event = &soc->wake_events[i];
 
+		/* IRQ and simple wake events */
 		if (fwspec->param_count == 2) {
 			struct irq_fwspec spec;
 
@@ -2250,6 +2262,12 @@ static int tegra_pmc_irq_alloc(struct irq_domain *domain, unsigned int virq,
 							    &pmc->irq, pmc);
 			if (err < 0)
 				break;
+
+			/* simple hierarchies stop at the PMC level */
+			if (event->irq == 0) {
+				err = irq_domain_disconnect_hierarchy(domain->parent, virq);
+				break;
+			}
 
 			spec.fwnode = &pmc->dev->of_node->fwnode;
 			spec.param_count = 3;
@@ -2263,6 +2281,7 @@ static int tegra_pmc_irq_alloc(struct irq_domain *domain, unsigned int virq,
 			break;
 		}
 
+		/* GPIO wake events */
 		if (fwspec->param_count == 3) {
 			if (event->gpio.instance != fwspec->param[0] ||
 			    event->gpio.pin != fwspec->param[1])
@@ -2274,7 +2293,7 @@ static int tegra_pmc_irq_alloc(struct irq_domain *domain, unsigned int virq,
 
 			/* GPIO hierarchies stop at the PMC level */
 			if (!err && domain->parent)
- 				err = irq_domain_disconnect_hierarchy(domain->parent,
+				err = irq_domain_disconnect_hierarchy(domain->parent,
 								      virq);
 			break;
 		}
@@ -2885,16 +2904,45 @@ static int tegra_pmc_probe(struct platform_device *pdev)
 		pmc->scratch = base;
 	}
 
-	pmc->clk = devm_clk_get(&pdev->dev, "pclk");
-	if (IS_ERR(pmc->clk)) {
-		err = PTR_ERR(pmc->clk);
+	pmc->clk = devm_clk_get_optional(&pdev->dev, "pclk");
+	if (IS_ERR(pmc->clk))
+		return dev_err_probe(&pdev->dev, PTR_ERR(pmc->clk),
+				     "failed to get pclk\n");
 
-		if (err != -ENOENT) {
-			dev_err(&pdev->dev, "failed to get pclk: %d\n", err);
-			return err;
-		}
+	/*
+	 * PMC should be last resort for restarting since it soft-resets
+	 * CPU without resetting everything else.
+	 */
+	err = devm_register_reboot_notifier(&pdev->dev,
+					    &tegra_pmc_reboot_notifier);
+	if (err) {
+		dev_err(&pdev->dev, "unable to register reboot notifier, %d\n",
+			err);
+		return err;
+	}
 
-		pmc->clk = NULL;
+	err = devm_register_sys_off_handler(&pdev->dev,
+					    SYS_OFF_MODE_RESTART,
+					    SYS_OFF_PRIO_LOW,
+					    tegra_pmc_restart_handler, NULL);
+	if (err) {
+		dev_err(&pdev->dev, "failed to register sys-off handler: %d\n",
+			err);
+		return err;
+	}
+
+	/*
+	 * PMC should be primary power-off method if it soft-resets CPU,
+	 * asking bootloader to shutdown hardware.
+	 */
+	err = devm_register_sys_off_handler(&pdev->dev,
+					    SYS_OFF_MODE_POWER_OFF,
+					    SYS_OFF_PRIO_FIRMWARE,
+					    tegra_pmc_power_off_handler, NULL);
+	if (err) {
+		dev_err(&pdev->dev, "failed to register sys-off handler: %d\n",
+			err);
+		return err;
 	}
 
 	/*
@@ -3757,6 +3805,13 @@ static const struct tegra_wake_event tegra194_wake_events[] = {
 	TEGRA_WAKE_IRQ("pmu", 24, 209),
 	TEGRA_WAKE_GPIO("power", 29, 1, TEGRA194_AON_GPIO(EE, 4)),
 	TEGRA_WAKE_IRQ("rtc", 73, 10),
+	TEGRA_WAKE_SIMPLE("usb3-port-0", 76),
+	TEGRA_WAKE_SIMPLE("usb3-port-1", 77),
+	TEGRA_WAKE_SIMPLE("usb3-port-2-3", 78),
+	TEGRA_WAKE_SIMPLE("usb2-port-0", 79),
+	TEGRA_WAKE_SIMPLE("usb2-port-1", 80),
+	TEGRA_WAKE_SIMPLE("usb2-port-2", 81),
+	TEGRA_WAKE_SIMPLE("usb2-port-3", 82),
 };
 
 static const struct tegra_pmc_soc tegra194_pmc_soc = {
@@ -4025,7 +4080,7 @@ static int __init tegra_pmc_early_init(void)
 		return -ENXIO;
 	}
 
-	if (np) {
+	if (of_device_is_available(np)) {
 		pmc->soc = match->data;
 
 		if (pmc->soc->maybe_tz_only)

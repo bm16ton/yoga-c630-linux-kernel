@@ -1,0 +1,1 @@
+cmd_sound/pci/lx6464es/snd-lx6464es.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/lx6464es/snd-lx6464es.ko sound/pci/lx6464es/snd-lx6464es.o sound/pci/lx6464es/snd-lx6464es.mod.o;  true

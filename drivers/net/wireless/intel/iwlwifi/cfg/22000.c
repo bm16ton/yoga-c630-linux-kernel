@@ -56,13 +56,23 @@
 #define IWL_BZ_A_GF4_A_FW_PRE		"iwlwifi-bz-a0-gf4-a0-"
 #define IWL_BZ_A_MR_A_FW_PRE		"iwlwifi-bz-a0-mr-a0-"
 #define IWL_BZ_A_FM_A_FW_PRE		"iwlwifi-bz-a0-fm-a0-"
+<<<<<<< HEAD
+#define IWL_BZ_A_FM4_A_FW_PRE		"iwlwifi-bz-a0-fm4-a0-"
 #define IWL_GL_A_FM_A_FW_PRE		"iwlwifi-gl-a0-fm-a0-"
+#define IWL_GL_B_FM_B_FW_PRE		"iwlwifi-gl-b0-fm-b0-"
+=======
+#define IWL_GL_A_FM_A_FW_PRE		"iwlwifi-gl-a0-fm-a0-"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define IWL_BZ_Z_GF_A_FW_PRE		"iwlwifi-bz-z0-gf-a0-"
 #define IWL_BNJ_A_FM_A_FW_PRE		"iwlwifi-BzBnj-a0-fm-a0-"
 #define IWL_BNJ_A_FM4_A_FW_PRE		"iwlwifi-BzBnj-a0-fm4-a0-"
 #define IWL_BNJ_A_GF_A_FW_PRE		"iwlwifi-BzBnj-a0-gf-a0-"
 #define IWL_BNJ_A_GF4_A_FW_PRE		"iwlwifi-BzBnj-a0-gf4-a0-"
 #define IWL_BNJ_A_HR_B_FW_PRE		"iwlwifi-BzBnj-a0-hr-b0-"
+<<<<<<< HEAD
+#define IWL_BNJ_B_FM_B_FW_PRE		"iwlwifi-BzBnj-b0-fm-b0-"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 
 #define IWL_QU_B_HR_B_MODULE_FIRMWARE(api) \
@@ -119,8 +129,17 @@
 	IWL_BZ_A_MR_A_FW_PRE __stringify(api) ".ucode"
 #define IWL_BZ_A_FM_A_MODULE_FIRMWARE(api) \
 		IWL_BZ_A_FM_A_FW_PRE __stringify(api) ".ucode"
+<<<<<<< HEAD
+#define IWL_BZ_A_FM4_A_MODULE_FIRMWARE(api) \
+		IWL_BZ_A_FM4_A_FW_PRE __stringify(api) ".ucode"
 #define IWL_GL_A_FM_A_MODULE_FIRMWARE(api) \
 		IWL_GL_A_FM_A_FW_PRE __stringify(api) ".ucode"
+#define IWL_GL_B_FM_B_MODULE_FIRMWARE(api) \
+		IWL_GL_B_FM_B_FW_PRE __stringify(api) ".ucode"
+=======
+#define IWL_GL_A_FM_A_MODULE_FIRMWARE(api) \
+		IWL_GL_A_FM_A_FW_PRE __stringify(api) ".ucode"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define IWL_BNJ_A_FM_A_MODULE_FIRMWARE(api) \
 	IWL_BNJ_A_FM_A_FW_PRE __stringify(api) ".ucode"
 #define IWL_BNJ_A_FM4_A_MODULE_FIRMWARE(api) \
@@ -131,6 +150,11 @@
 	IWL_BNJ_A_GF4_A_FW_PRE __stringify(api) ".ucode"
 #define IWL_BNJ_A_HR_B_MODULE_FIRMWARE(api) \
 	IWL_BNJ_A_HR_B_FW_PRE __stringify(api) ".ucode"
+<<<<<<< HEAD
+#define IWL_BNJ_B_FM_B_MODULE_FIRMWARE(api) \
+	IWL_BNJ_B_FM_B_FW_PRE __stringify(api) ".ucode"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct iwl_base_params iwl_22000_base_params = {
 	.eeprom_size = OTP_LOW_IMAGE_SIZE_32K,
@@ -225,6 +249,7 @@ static const struct iwl_ht_params iwl_22000_ht_params = {
 	.min_txq_size = 128,						\
 	.gp2_reg_addr = 0xd02c68,					\
 	.min_ba_txq_size = IWL_DEFAULT_QUEUE_SIZE_HE,		\
+<<<<<<< HEAD
 	.mon_dram_regs = {						\
 		.write_ptr = {						\
 			.addr = DBGC_CUR_DBGBUF_STATUS,			\
@@ -237,6 +262,72 @@ static const struct iwl_ht_params iwl_22000_ht_params = {
 		.cur_frag = {						\
 			.addr = DBGC_CUR_DBGBUF_STATUS,			\
 			.mask = DBGC_CUR_DBGBUF_STATUS_IDX_MSK,		\
+		},							\
+	}
+
+#define IWL_DEVICE_BZ							\
+	.ucode_api_max = IWL_22000_UCODE_API_MAX,			\
+	.ucode_api_min = IWL_22000_UCODE_API_MIN,			\
+	.led_mode = IWL_LED_RF_STATE,					\
+	.nvm_hw_section_num = 10,					\
+	.non_shared_ant = ANT_B,					\
+	.dccm_offset = IWL_22000_DCCM_OFFSET,				\
+	.dccm_len = IWL_22000_DCCM_LEN,					\
+	.dccm2_offset = IWL_22000_DCCM2_OFFSET,				\
+	.dccm2_len = IWL_22000_DCCM2_LEN,				\
+	.smem_offset = IWL_22000_SMEM_OFFSET,				\
+	.smem_len = IWL_22000_SMEM_LEN,					\
+	.features = IWL_TX_CSUM_NETIF_FLAGS_BZ | NETIF_F_RXCSUM,	\
+	.apmg_not_supported = true,					\
+	.trans.mq_rx_supported = true,					\
+	.vht_mu_mimo_supported = true,					\
+	.mac_addr_from_csr = 0x30,					\
+	.ht_params = &iwl_22000_ht_params,				\
+	.nvm_ver = IWL_22000_NVM_VERSION,				\
+	.trans.use_tfh = true,						\
+	.trans.rf_id = true,						\
+	.trans.gen2 = true,						\
+	.nvm_type = IWL_NVM_EXT,					\
+	.dbgc_supported = true,						\
+	.min_umac_error_event_table = 0x400000,				\
+	.d3_debug_data_base_addr = 0x401000,				\
+	.d3_debug_data_length = 60 * 1024,				\
+	.mon_smem_regs = {						\
+		.write_ptr = {						\
+			.addr = LDBG_M2S_BUF_WPTR,			\
+			.mask = LDBG_M2S_BUF_WPTR_VAL_MSK,		\
+	},								\
+		.cycle_cnt = {						\
+			.addr = LDBG_M2S_BUF_WRAP_CNT,			\
+			.mask = LDBG_M2S_BUF_WRAP_CNT_VAL_MSK,		\
+		},							\
+	},								\
+	.trans.umac_prph_offset = 0x300000,				\
+	.trans.device_family = IWL_DEVICE_FAMILY_BZ,			\
+	.trans.base_params = &iwl_ax210_base_params,			\
+	.min_txq_size = 128,						\
+	.gp2_reg_addr = 0xd02c68,					\
+	.min_ba_txq_size = IWL_DEFAULT_QUEUE_SIZE_EHT,			\
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	.mon_dram_regs = {						\
+		.write_ptr = {						\
+			.addr = DBGC_CUR_DBGBUF_STATUS,			\
+			.mask = DBGC_CUR_DBGBUF_STATUS_OFFSET_MSK,	\
+		},							\
+		.cycle_cnt = {						\
+			.addr = DBGC_DBGBUF_WRAP_AROUND,		\
+			.mask = 0xffffffff,				\
+		},							\
+		.cur_frag = {						\
+			.addr = DBGC_CUR_DBGBUF_STATUS,			\
+			.mask = DBGC_CUR_DBGBUF_STATUS_IDX_MSK,		\
+		},							\
+	},								\
+	.mon_dbgi_regs = {						\
+		.write_ptr = {						\
+			.addr = DBGI_SRAM_FIFO_POINTERS,		\
+			.mask = DBGI_SRAM_FIFO_POINTERS_WR_PTR_MSK,	\
 		},							\
 	}
 
@@ -387,8 +478,26 @@ const struct iwl_cfg_trans_params iwl_so_long_latency_trans_cfg = {
 	.umac_prph_offset = 0x300000,
 	.integrated = true,
 	.low_latency_xtal = true,
+<<<<<<< HEAD
+=======
 	.xtal_latency = 12000,
 	.ltr_delay = IWL_CFG_TRANS_LTR_DELAY_2500US,
+};
+
+const struct iwl_cfg_trans_params iwl_so_long_latency_imr_trans_cfg = {
+	.mq_rx_supported = true,
+	.use_tfh = true,
+	.rf_id = true,
+	.gen2 = true,
+	.device_family = IWL_DEVICE_FAMILY_AX210,
+	.base_params = &iwl_ax210_base_params,
+	.umac_prph_offset = 0x300000,
+	.integrated = true,
+	.low_latency_xtal = true,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	.xtal_latency = 12000,
+	.ltr_delay = IWL_CFG_TRANS_LTR_DELAY_2500US,
+	.imr_enabled = true,
 };
 
 const struct iwl_cfg_trans_params iwl_so_long_latency_imr_trans_cfg = {
@@ -926,6 +1035,16 @@ const struct iwl_cfg iwl_cfg_bz_a0_fm_a0 = {
 	.num_rbds = IWL_NUM_RBDS_AX210_HE,
 };
 
+<<<<<<< HEAD
+const struct iwl_cfg iwl_cfg_bz_a0_fm4_a0 = {
+	.fw_name_pre = IWL_BZ_A_FM4_A_FW_PRE,
+	.uhb_supported = true,
+	IWL_DEVICE_BZ,
+	.num_rbds = IWL_NUM_RBDS_AX210_HE,
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct iwl_cfg iwl_cfg_gl_a0_fm_a0 = {
 	.fw_name_pre = IWL_GL_A_FM_A_FW_PRE,
 	.uhb_supported = true,
@@ -933,6 +1052,16 @@ const struct iwl_cfg iwl_cfg_gl_a0_fm_a0 = {
 	.num_rbds = IWL_NUM_RBDS_AX210_HE,
 };
 
+<<<<<<< HEAD
+const struct iwl_cfg iwl_cfg_gl_b0_fm_b0 = {
+	.fw_name_pre = IWL_GL_B_FM_B_FW_PRE,
+	.uhb_supported = true,
+	IWL_DEVICE_BZ,
+	.num_rbds = IWL_NUM_RBDS_AX210_HE,
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct iwl_cfg iwl_cfg_bz_z0_gf_a0 = {
 	.fw_name_pre = IWL_BZ_Z_GF_A_FW_PRE,
 	.uhb_supported = true,
@@ -974,6 +1103,16 @@ const struct iwl_cfg iwl_cfg_bnj_a0_hr_b0 = {
 	IWL_DEVICE_BZ,
 	.num_rbds = IWL_NUM_RBDS_AX210_HE,
 };
+<<<<<<< HEAD
+
+const struct iwl_cfg iwl_cfg_bnj_b0_fm_b0 = {
+	.fw_name_pre = IWL_BNJ_B_FM_B_FW_PRE,
+	.uhb_supported = true,
+	IWL_DEVICE_BZ,
+	.num_rbds = IWL_NUM_RBDS_AX210_HE,
+};
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_FIRMWARE(IWL_QU_B_HR_B_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
 MODULE_FIRMWARE(IWL_QNJ_B_HR_B_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
 MODULE_FIRMWARE(IWL_QU_C_HR_B_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
@@ -1007,3 +1146,9 @@ MODULE_FIRMWARE(IWL_BNJ_A_FM4_A_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
 MODULE_FIRMWARE(IWL_BNJ_A_GF_A_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
 MODULE_FIRMWARE(IWL_BNJ_A_GF4_A_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
 MODULE_FIRMWARE(IWL_BNJ_A_HR_B_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
+<<<<<<< HEAD
+MODULE_FIRMWARE(IWL_BZ_A_FM4_A_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
+MODULE_FIRMWARE(IWL_GL_B_FM_B_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
+MODULE_FIRMWARE(IWL_BNJ_B_FM_B_MODULE_FIRMWARE(IWL_22000_UCODE_API_MAX));
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

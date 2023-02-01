@@ -2,24 +2,53 @@
 #ifndef PARSE_CTX_H
 #define PARSE_CTX_H 1
 
+<<<<<<< HEAD
+#ifdef HAVE_LIBBPF_SUPPORT
+#include <bpf/hashmap.h>
+#else
+=======
 // There are fixes that need to land upstream before we can use libbpf's headers,
 // for now use our copy unconditionally, since the data structures at this point
 // are exactly the same, no problem.
 //#ifdef HAVE_LIBBPF_SUPPORT
 //#include <bpf/hashmap.h>
 //#else
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "util/hashmap.h"
-//#endif
+#endif
 
 struct metric_ref;
 
+<<<<<<< HEAD
+struct expr_scanner_ctx {
+	char *user_requested_cpu_list;
+	int runtime;
+	bool system_wide;
+};
+
+struct expr_parse_ctx {
+	struct hashmap	*ids;
+	struct expr_scanner_ctx sctx;
+=======
 struct expr_parse_ctx {
 	struct hashmap	*ids;
 	int runtime;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct expr_id_data;
 
+<<<<<<< HEAD
+struct hashmap *ids__new(void);
+void ids__free(struct hashmap *ids);
+int ids__insert(struct hashmap *ids, const char *id);
+/*
+ * Union two sets of ids (hashmaps) and construct a third, freeing ids1 and
+ * ids2.
+ */
+struct hashmap *ids__union(struct hashmap *ids1, struct hashmap *ids2);
+
+=======
 struct expr_scanner_ctx {
 	int runtime;
 };
@@ -33,6 +62,7 @@ int ids__insert(struct hashmap *ids, const char *id);
  */
 struct hashmap *ids__union(struct hashmap *ids1, struct hashmap *ids2);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct expr_parse_ctx *expr__ctx_new(void);
 void expr__ctx_clear(struct expr_parse_ctx *ctx);
 void expr__ctx_free(struct expr_parse_ctx *ctx);
@@ -58,6 +88,10 @@ int expr__find_ids(const char *expr, const char *one,
 
 double expr_id_data__value(const struct expr_id_data *data);
 double expr_id_data__source_count(const struct expr_id_data *data);
+<<<<<<< HEAD
+double expr__get_literal(const char *literal, const struct expr_scanner_ctx *ctx);
+=======
 double expr__get_literal(const char *literal);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

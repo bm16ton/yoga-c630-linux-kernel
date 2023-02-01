@@ -1,0 +1,1 @@
+cmd_drivers/perf/built-in.a := rm -f drivers/perf/built-in.a;  printf "drivers/perf/%s " arm-cci.o arm-ccn.o arm_pmu.o arm_pmu_platform.o arm_pmu_acpi.o hisilicon/built-in.a qcom_l2_pmu.o qcom_l3_pmu.o xgene_pmu.o | xargs ar cDPrST drivers/perf/built-in.a

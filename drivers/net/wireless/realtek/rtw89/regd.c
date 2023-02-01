@@ -346,7 +346,11 @@ void rtw89_regd_notifier(struct wiphy *wiphy, struct regulatory_request *request
 	rtw89_debug_regd(rtwdev, rtwdev->regd, "get from initiator %d, alpha2",
 			 request->initiator);
 
+<<<<<<< HEAD
+	rtw89_core_set_chip_txpwr(rtwdev);
+=======
 	rtw89_chip_set_txpwr(rtwdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 exit:
 	mutex_unlock(&rtwdev->mutex);

@@ -403,13 +403,9 @@ struct pwm_device *of_pwm_single_xlate(struct pwm_chip *pc,
 				       const struct of_phandle_args *args);
 
 struct pwm_device *pwm_get(struct device *dev, const char *con_id);
-struct pwm_device *of_pwm_get(struct device *dev, struct device_node *np,
-			      const char *con_id);
 void pwm_put(struct pwm_device *pwm);
 
 struct pwm_device *devm_pwm_get(struct device *dev, const char *con_id);
-struct pwm_device *devm_of_pwm_get(struct device *dev, struct device_node *np,
-				   const char *con_id);
 struct pwm_device *devm_fwnode_pwm_get(struct device *dev,
 				       struct fwnode_handle *fwnode,
 				       const char *con_id);
@@ -494,6 +490,8 @@ static inline struct pwm_device *pwm_get(struct device *dev,
 					 const char *consumer)
 {
 	might_sleep();
+<<<<<<< HEAD
+=======
 	return ERR_PTR(-ENODEV);
 }
 
@@ -502,6 +500,7 @@ static inline struct pwm_device *of_pwm_get(struct device *dev,
 					    const char *con_id)
 {
 	might_sleep();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ERR_PTR(-ENODEV);
 }
 
@@ -514,6 +513,8 @@ static inline struct pwm_device *devm_pwm_get(struct device *dev,
 					      const char *consumer)
 {
 	might_sleep();
+<<<<<<< HEAD
+=======
 	return ERR_PTR(-ENODEV);
 }
 
@@ -522,6 +523,7 @@ static inline struct pwm_device *devm_of_pwm_get(struct device *dev,
 						 const char *con_id)
 {
 	might_sleep();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ERR_PTR(-ENODEV);
 }
 

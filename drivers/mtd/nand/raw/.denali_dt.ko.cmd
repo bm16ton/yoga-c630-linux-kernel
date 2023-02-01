@@ -1,0 +1,1 @@
+cmd_drivers/mtd/nand/raw/denali_dt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/nand/raw/denali_dt.ko drivers/mtd/nand/raw/denali_dt.o drivers/mtd/nand/raw/denali_dt.mod.o;  true

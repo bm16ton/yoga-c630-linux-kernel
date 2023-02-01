@@ -1,0 +1,1 @@
+cmd_drivers/leds/leds-spi-byte.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/leds-spi-byte.ko drivers/leds/leds-spi-byte.o drivers/leds/leds-spi-byte.mod.o;  true

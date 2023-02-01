@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/mb862xx/mb862xxfb.mod := printf '%s\n'   mb862xxfbdrv.o mb862xxfb_accel.o mb862xx-i2c.o | awk '!x[$$0]++ { print("drivers/video/fbdev/mb862xx/"$$0) }' > drivers/video/fbdev/mb862xx/mb862xxfb.mod

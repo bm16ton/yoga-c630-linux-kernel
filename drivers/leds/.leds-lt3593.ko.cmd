@@ -1,0 +1,1 @@
+cmd_drivers/leds/leds-lt3593.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/leds-lt3593.ko drivers/leds/leds-lt3593.o drivers/leds/leds-lt3593.mod.o;  true

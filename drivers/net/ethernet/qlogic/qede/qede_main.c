@@ -1214,7 +1214,11 @@ static int __qede_probe(struct pci_dev *pdev, u32 dp_module, u8 dp_level,
 	/* Start the Slowpath-process */
 	memset(&sp_params, 0, sizeof(sp_params));
 	sp_params.int_mode = QED_INT_MODE_MSIX;
+<<<<<<< HEAD
+	strscpy(sp_params.name, "qede LAN", QED_DRV_VER_STR_SIZE);
+=======
 	strlcpy(sp_params.name, "qede LAN", QED_DRV_VER_STR_SIZE);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rc = qed_ops->common->slowpath_start(cdev, &sp_params);
 	if (rc) {
 		pr_notice("Cannot start slowpath\n");
@@ -1904,8 +1908,7 @@ static void qede_napi_add_enable(struct qede_dev *edev)
 
 	/* Add NAPI objects */
 	for_each_queue(i) {
-		netif_napi_add(edev->ndev, &edev->fp_array[i].napi,
-			       qede_poll, NAPI_POLL_WEIGHT);
+		netif_napi_add(edev->ndev, &edev->fp_array[i].napi, qede_poll);
 		napi_enable(&edev->fp_array[i].napi);
 	}
 }

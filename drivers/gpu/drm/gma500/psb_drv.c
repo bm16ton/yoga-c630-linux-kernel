@@ -169,12 +169,20 @@ static void psb_driver_unload(struct drm_device *dev)
 
 	/* TODO: Kill vblank etc here */
 
+<<<<<<< HEAD
+	gma_backlight_exit(dev);
+	psb_modeset_cleanup(dev);
+
+	gma_irq_uninstall(dev);
+
+=======
 	if (dev_priv->backlight_device)
 		gma_backlight_exit(dev);
 	psb_modeset_cleanup(dev);
 
 	gma_irq_uninstall(dev);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (dev_priv->ops->chip_teardown)
 		dev_priv->ops->chip_teardown(dev);
 
@@ -399,6 +407,8 @@ static int psb_driver_load(struct drm_device *dev, unsigned long flags)
 		if (gma_encoder->type == INTEL_OUTPUT_LVDS ||
 		    gma_encoder->type == INTEL_OUTPUT_MIPI) {
 			ret = gma_backlight_init(dev);
+			if (ret == 0)
+				acpi_video_register_backlight();
 			break;
 		}
 	}
@@ -407,11 +417,14 @@ static int psb_driver_load(struct drm_device *dev, unsigned long flags)
 	if (ret)
 		return ret;
 	psb_intel_opregion_enable_asle(dev);
+<<<<<<< HEAD
+=======
 #if 0
 	/* Enable runtime pm at last */
 	pm_runtime_enable(dev->dev);
 	pm_runtime_set_active(dev->dev);
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return devm_add_action_or_reset(dev->dev, psb_device_release, dev);
 
@@ -420,6 +433,8 @@ out_err:
 	return ret;
 }
 
+<<<<<<< HEAD
+=======
 static inline void get_brightness(struct backlight_device *bd)
 {
 #ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
@@ -447,6 +462,7 @@ static long psb_unlocked_ioctl(struct file *filp, unsigned int cmd,
 	/* FIXME: do we need to wrap the other side of this */
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int psb_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 {
 	struct drm_psb_private *dev_priv;
@@ -493,22 +509,13 @@ static void psb_pci_remove(struct pci_dev *pdev)
 	drm_dev_unregister(dev);
 }
 
-static const struct dev_pm_ops psb_pm_ops = {
-	.resume = gma_power_resume,
-	.suspend = gma_power_suspend,
-	.thaw = gma_power_thaw,
-	.freeze = gma_power_freeze,
-	.restore = gma_power_restore,
-	.runtime_suspend = psb_runtime_suspend,
-	.runtime_resume = psb_runtime_resume,
-	.runtime_idle = psb_runtime_idle,
-};
+static DEFINE_RUNTIME_DEV_PM_OPS(psb_pm_ops, gma_power_suspend, gma_power_resume, NULL);
 
 static const struct file_operations psb_gem_fops = {
 	.owner = THIS_MODULE,
 	.open = drm_open,
 	.release = drm_release,
-	.unlocked_ioctl = psb_unlocked_ioctl,
+	.unlocked_ioctl = drm_ioctl,
 	.compat_ioctl = drm_compat_ioctl,
 	.mmap = drm_gem_mmap,
 	.poll = drm_poll,

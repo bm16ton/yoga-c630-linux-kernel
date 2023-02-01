@@ -1,0 +1,1 @@
+cmd_drivers/input/keyboard/lm8323.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/keyboard/lm8323.ko drivers/input/keyboard/lm8323.o drivers/input/keyboard/lm8323.mod.o;  true

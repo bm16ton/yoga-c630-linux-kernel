@@ -1,0 +1,1 @@
+cmd_drivers/staging/iio/impedance-analyzer/ad5933.mod := printf '%s\n'   ad5933.o | awk '!x[$$0]++ { print("drivers/staging/iio/impedance-analyzer/"$$0) }' > drivers/staging/iio/impedance-analyzer/ad5933.mod

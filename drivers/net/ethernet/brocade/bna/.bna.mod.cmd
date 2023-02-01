@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/brocade/bna/bna.mod := printf '%s\n'   bnad.o bnad_ethtool.o bnad_debugfs.o bna_enet.o bna_tx_rx.o bfa_msgq.o bfa_ioc.o bfa_ioc_ct.o bfa_cee.o cna_fwimg.o | awk '!x[$$0]++ { print("drivers/net/ethernet/brocade/bna/"$$0) }' > drivers/net/ethernet/brocade/bna/bna.mod

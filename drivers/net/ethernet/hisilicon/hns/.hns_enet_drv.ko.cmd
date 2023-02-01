@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns/hns_enet_drv.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/hisilicon/hns/hns_enet_drv.ko drivers/net/ethernet/hisilicon/hns/hns_enet_drv.o drivers/net/ethernet/hisilicon/hns/hns_enet_drv.mod.o;  true

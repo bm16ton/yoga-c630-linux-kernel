@@ -5,8 +5,11 @@
 
 #include "../include/osdep_service.h"
 #include "../include/drv_types.h"
+<<<<<<< HEAD
+=======
 #include "../include/xmit_osdep.h"
 #include "../include/recv_osdep.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../include/hal_intf.h"
 #include "../include/rtw_ioctl.h"
 #include "../include/usb_osintf.h"
@@ -17,14 +20,21 @@
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Realtek Wireless Lan Driver");
 MODULE_AUTHOR("Realtek Semiconductor Corp.");
+<<<<<<< HEAD
+MODULE_FIRMWARE(FW_RTL8188EU);
+=======
 MODULE_VERSION(DRIVERVERSION);
 MODULE_FIRMWARE("rtlwifi/rtl8188eufw.bin");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define CONFIG_BR_EXT_BRNAME "br0"
 #define RTW_NOTCH_FILTER 0 /* 0:Disable, 1:Enable, */
 
 /* module param defaults */
+<<<<<<< HEAD
+=======
 static int rtw_chip_version = 0x00;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int rtw_rfintfs = HWPI;
 static int rtw_lbkmode;/* RTL8712_AIR_TRX; */
 static int rtw_network_mode = Ndis802_11IBSS;/* Ndis802_11Infrastructure; infra, ad-hoc, auto */
@@ -67,9 +77,15 @@ static int rtw_uapsd_acvo_en;
 
 static int rtw_led_enable = 1;
 
+<<<<<<< HEAD
+static int rtw_ht_enable = 1;
+static int rtw_cbw40_enable = 3; /*  0 :disable, bit(0): enable 2.4g, bit(1): enable 5g */
+static int rtw_ampdu_enable = 1;/* for enable tx_ampdu */
+=======
 int rtw_ht_enable = 1;
 int rtw_cbw40_enable = 3; /*  0 :disable, bit(0): enable 2.4g, bit(1): enable 5g */
 int rtw_ampdu_enable = 1;/* for enable tx_ampdu */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int rtw_rx_stbc = 1;/*  0: disable, bit(0):enable 2.4g, bit(1):enable 5g, default is set to enable 2.4GHZ for IOT issue with bufflao's AP at 5GHZ */
 static int rtw_ampdu_amsdu;/*  0: disabled, 1:enabled, 2:auto */
 
@@ -106,7 +122,10 @@ char *rtw_initmac;  /*  temp mac address if users want to use instead of the mac
 
 module_param(rtw_initmac, charp, 0644);
 module_param(rtw_channel_plan, int, 0644);
+<<<<<<< HEAD
+=======
 module_param(rtw_chip_version, int, 0644);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 module_param(rtw_rfintfs, int, 0644);
 module_param(rtw_lbkmode, int, 0644);
 module_param(rtw_network_mode, int, 0644);
@@ -153,7 +172,10 @@ static uint loadparam(struct adapter *padapter)
 {
 	struct registry_priv  *registry_par = &padapter->registrypriv;
 
+<<<<<<< HEAD
+=======
 	registry_par->chip_version = (u8)rtw_chip_version;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	registry_par->rfintfs = (u8)rtw_rfintfs;
 	registry_par->lbkmode = (u8)rtw_lbkmode;
 	registry_par->network_mode  = (u8)rtw_network_mode;
@@ -622,7 +644,11 @@ void netdev_br_init(struct net_device *netdev)
 	rcu_read_unlock();
 }
 
+<<<<<<< HEAD
+static int _netdev_open(struct net_device *pnetdev)
+=======
 int _netdev_open(struct net_device *pnetdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	uint status;
 	struct adapter *padapter = (struct adapter *)rtw_netdev_priv(pnetdev);
@@ -636,7 +662,11 @@ int _netdev_open(struct net_device *pnetdev)
 		if (status == _FAIL)
 			goto netdev_open_error;
 
+<<<<<<< HEAD
+		netdev_dbg(pnetdev, "MAC Address = %pM\n", pnetdev->dev_addr);
+=======
 		pr_info("MAC Address = %pM\n", pnetdev->dev_addr);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		status = rtw_start_drv_threads(padapter);
 		if (status == _FAIL) {

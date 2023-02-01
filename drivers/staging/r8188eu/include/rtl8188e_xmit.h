@@ -83,12 +83,15 @@
 /* OFFSET 20 */
 #define	RTY_LMT_EN		BIT(17)
 
+<<<<<<< HEAD
+=======
 enum TXDESC_SC {
 	SC_DONT_CARE = 0x00,
 	SC_UPPER = 0x01,
 	SC_LOWER = 0x02,
 	SC_DUPLICATE = 0x03
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* OFFSET 20 */
 #define SGI			BIT(6)
 #define USB_TXAGG_NUM_SHT	24
@@ -147,6 +150,9 @@ bool rtl8188eu_xmitframe_complete(struct adapter *padapter,
 				 struct xmit_priv *pxmitpriv,
 				 struct xmit_buf *pxmitbuf);
 
+<<<<<<< HEAD
+=======
 void handle_txrpt_ccx_88e(struct adapter *adapter, u8 *buf);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __RTL8188E_XMIT_H__ */

@@ -40,7 +40,11 @@ void enable_dio_dp_link_output(struct dc_link *link,
 		enum signal_type signal,
 		enum clock_source_id clock_source,
 		const struct dc_link_settings *link_settings);
+<<<<<<< HEAD
+void disable_dio_link_output(struct dc_link *link,
+=======
 void disable_dio_dp_link_output(struct dc_link *link,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		const struct link_resource *link_res,
 		enum signal_type signal);
 void set_dio_dp_link_test_pattern(struct dc_link *link,

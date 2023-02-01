@@ -1,0 +1,1 @@
+cmd_sound/core/seq/snd-seq-midi-emul.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/core/seq/snd-seq-midi-emul.ko sound/core/seq/snd-seq-midi-emul.o sound/core/seq/snd-seq-midi-emul.mod.o;  true

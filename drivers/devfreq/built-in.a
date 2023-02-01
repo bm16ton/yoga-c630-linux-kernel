@@ -1,0 +1,9 @@
+!<thin>
+//                                              56        `
+devfreq.o/
+devfreq-event.o/
+governor_simpleondemand.o/
+
+/0              0           0     0     644     75168     `
+/11             0           0     0     644     19832     `
+/28             0           0     0     644     5248      `

@@ -1,0 +1,1 @@
+cmd_sound/pci/lola/snd-lola.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/lola/snd-lola.ko sound/pci/lola/snd-lola.o sound/pci/lola/snd-lola.mod.o;  true

@@ -200,6 +200,10 @@ int msm_submitqueue_create(struct drm_device *drm, struct msm_file_private *ctx,
 		*id = queue->id;
 
 	idr_init(&queue->fence_idr);
+<<<<<<< HEAD
+	mutex_init(&queue->idr_lock);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_init(&queue->lock);
 
 	list_add_tail(&queue->node, &ctx->submitqueues);

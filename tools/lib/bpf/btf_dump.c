@@ -219,6 +219,17 @@ static int btf_dump_resize(struct btf_dump *d)
 	return 0;
 }
 
+static void btf_dump_free_names(struct hashmap *map)
+{
+	size_t bkt;
+	struct hashmap_entry *cur;
+
+	hashmap__for_each_entry(map, cur, bkt)
+		free((void *)cur->key);
+
+	hashmap__free(map);
+}
+
 void btf_dump__free(struct btf_dump *d)
 {
 	int i;
@@ -237,8 +248,8 @@ void btf_dump__free(struct btf_dump *d)
 	free(d->cached_names);
 	free(d->emit_queue);
 	free(d->decl_stack);
-	hashmap__free(d->type_names);
-	hashmap__free(d->ident_names);
+	btf_dump_free_names(d->type_names);
+	btf_dump_free_names(d->ident_names);
 
 	free(d);
 }
@@ -990,12 +1001,43 @@ static void btf_dump_emit_enum32_val(struct btf_dump *d,
 	const struct btf_enum *v = btf_enum(t);
 	bool is_signed = btf_kflag(t);
 	const char *fmt_str;
+<<<<<<< HEAD
 	const char *name;
 	size_t dup_cnt;
 	int i;
 
 	for (i = 0; i < vlen; i++, v++) {
 		name = btf_name_of(d, v->name_off);
+		/* enumerators share namespace with typedef idents */
+		dup_cnt = btf_dump_name_dups(d, d->ident_names, name);
+		if (dup_cnt > 1) {
+			fmt_str = is_signed ? "\n%s%s___%zd = %d," : "\n%s%s___%zd = %u,";
+			btf_dump_printf(d, fmt_str, pfx(lvl + 1), name, dup_cnt, v->val);
+		} else {
+			fmt_str = is_signed ? "\n%s%s = %d," : "\n%s%s = %u,";
+			btf_dump_printf(d, fmt_str, pfx(lvl + 1), name, v->val);
+		}
+	}
+}
+
+static void btf_dump_emit_enum64_val(struct btf_dump *d,
+				     const struct btf_type *t,
+				     int lvl, __u16 vlen)
+{
+	const struct btf_enum64 *v = btf_enum64(t);
+	bool is_signed = btf_kflag(t);
+	const char *fmt_str;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	const char *name;
+	size_t dup_cnt;
+	__u64 val;
+	int i;
+
+	for (i = 0; i < vlen; i++, v++) {
+		name = btf_name_of(d, v->name_off);
+<<<<<<< HEAD
+=======
 		/* enumerators share namespace with typedef idents */
 		dup_cnt = btf_dump_name_dups(d, d->ident_names, name);
 		if (dup_cnt > 1) {
@@ -1022,6 +1064,7 @@ static void btf_dump_emit_enum64_val(struct btf_dump *d,
 
 	for (i = 0; i < vlen; i++, v++) {
 		name = btf_name_of(d, v->name_off);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dup_cnt = btf_dump_name_dups(d, d->ident_names, name);
 		val = btf_enum64_value(v);
 		if (dup_cnt > 1) {
@@ -1520,11 +1563,23 @@ static void btf_dump_emit_type_cast(struct btf_dump *d, __u32 id,
 static size_t btf_dump_name_dups(struct btf_dump *d, struct hashmap *name_map,
 				 const char *orig_name)
 {
+	char *old_name, *new_name;
 	size_t dup_cnt = 0;
+	int err;
+
+	new_name = strdup(orig_name);
+	if (!new_name)
+		return 1;
 
 	hashmap__find(name_map, orig_name, (void **)&dup_cnt);
 	dup_cnt++;
-	hashmap__set(name_map, orig_name, (void *)dup_cnt, NULL, NULL);
+
+	err = hashmap__set(name_map, new_name, (void *)dup_cnt,
+			   (const void **)&old_name, NULL);
+	if (err)
+		free(new_name);
+
+	free(old_name);
 
 	return dup_cnt;
 }

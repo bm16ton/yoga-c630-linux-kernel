@@ -263,7 +263,7 @@ p9_virtio_request(struct p9_client *client, struct p9_req_t *req)
 
 	p9_debug(P9_DEBUG_TRANS, "9p debug: virtio request\n");
 
-	req->status = REQ_STATUS_SENT;
+	WRITE_ONCE(req->status, REQ_STATUS_SENT);
 req_retry:
 	spin_lock_irqsave(&chan->lock, flags);
 
@@ -469,7 +469,7 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
 			inlen = n;
 		}
 	}
-	req->status = REQ_STATUS_SENT;
+	WRITE_ONCE(req->status, REQ_STATUS_SENT);
 req_retry_pinned:
 	spin_lock_irqsave(&chan->lock, flags);
 
@@ -532,9 +532,16 @@ req_retry_pinned:
 	spin_unlock_irqrestore(&chan->lock, flags);
 	kicked = 1;
 	p9_debug(P9_DEBUG_TRANS, "virtio request kicked\n");
+<<<<<<< HEAD
+	err = wait_event_killable(req->wq,
+			          READ_ONCE(req->status) >= REQ_STATUS_RCVD);
+	// RERROR needs reply (== error string) in static data
+	if (READ_ONCE(req->status) == REQ_STATUS_RCVD &&
+=======
 	err = wait_event_killable(req->wq, req->status >= REQ_STATUS_RCVD);
 	// RERROR needs reply (== error string) in static data
 	if (req->status == REQ_STATUS_RCVD &&
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    unlikely(req->rc.sdata[4] == P9_RERROR))
 		handle_rerror(req, in_hdr_len, offs, in_pages);
 
@@ -802,6 +809,7 @@ static struct p9_trans_module p9_virtio_trans = {
 	 * page in zero copy.
 	 */
 	.maxsize = PAGE_SIZE * (VIRTQUEUE_NUM - 3),
+	.pooled_rbuffers = false,
 	.def = 1,
 	.owner = THIS_MODULE,
 };

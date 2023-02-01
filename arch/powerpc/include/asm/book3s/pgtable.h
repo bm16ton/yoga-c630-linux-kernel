@@ -25,7 +25,12 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
 				     unsigned long size, pgprot_t vma_prot);
 #define __HAVE_PHYS_MEM_ACCESS_PROT
 
+<<<<<<< HEAD
+void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address, pte_t *ptep);
+
+=======
 #if defined(CONFIG_PPC32) || defined(CONFIG_PPC_64S_HASH_MMU)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * This gets called at the end of handling a page fault, when
  * the kernel has put a new PTE into the page table for the process.
@@ -35,10 +40,21 @@ extern pgprot_t phys_mem_access_prot(struct file *file, unsigned long pfn,
  * corresponding HPTE into the hash table ahead of time, instead of
  * waiting for the inevitable extra hash-table miss exception.
  */
+<<<<<<< HEAD
+static inline void update_mmu_cache(struct vm_area_struct *vma, unsigned long address, pte_t *ptep)
+{
+	if (IS_ENABLED(CONFIG_PPC32) && !mmu_has_feature(MMU_FTR_HPTE_TABLE))
+		return;
+	if (radix_enabled())
+		return;
+	__update_mmu_cache(vma, address, ptep);
+}
+=======
 void update_mmu_cache(struct vm_area_struct *vma, unsigned long address, pte_t *ptep);
 #else
 static inline void update_mmu_cache(struct vm_area_struct *vma, unsigned long address, pte_t *ptep) {}
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* __ASSEMBLY__ */
 #endif

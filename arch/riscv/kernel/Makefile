@@ -28,9 +28,13 @@ KASAN_SANITIZE_cpufeature.o := n
 endif
 endif
 
+<<<<<<< HEAD
+=======
 extra-y += head.o
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extra-y += vmlinux.lds
 
+obj-y	+= head.o
 obj-y	+= soc.o
 obj-$(CONFIG_RISCV_ALTERNATIVE) += alternative.o
 obj-y	+= cpu.o

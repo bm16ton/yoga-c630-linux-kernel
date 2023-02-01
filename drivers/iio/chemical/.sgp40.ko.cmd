@@ -1,0 +1,1 @@
+cmd_drivers/iio/chemical/sgp40.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/chemical/sgp40.ko drivers/iio/chemical/sgp40.o drivers/iio/chemical/sgp40.mod.o;  true

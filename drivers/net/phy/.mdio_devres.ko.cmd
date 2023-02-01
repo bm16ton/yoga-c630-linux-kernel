@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/mdio_devres.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/mdio_devres.ko drivers/net/phy/mdio_devres.o drivers/net/phy/mdio_devres.mod.o;  true

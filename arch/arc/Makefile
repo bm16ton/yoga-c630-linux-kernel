@@ -82,8 +82,11 @@ KBUILD_CFLAGS	+= $(cflags-y)
 KBUILD_AFLAGS	+= $(KBUILD_CFLAGS)
 KBUILD_LDFLAGS	+= $(ldflags-y)
 
+<<<<<<< HEAD
+=======
 head-y		:= arch/arc/kernel/head.o
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # w/o this dtb won't embed into kernel binary
 core-y		+= arch/arc/boot/dts/
 

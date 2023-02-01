@@ -1,0 +1,1 @@
+cmd_drivers/staging/media/sunxi/cedrus/sunxi-cedrus.mod := printf '%s\n'   cedrus.o cedrus_video.o cedrus_hw.o cedrus_dec.o cedrus_mpeg2.o cedrus_h264.o cedrus_h265.o cedrus_vp8.o | awk '!x[$$0]++ { print("drivers/staging/media/sunxi/cedrus/"$$0) }' > drivers/staging/media/sunxi/cedrus/sunxi-cedrus.mod

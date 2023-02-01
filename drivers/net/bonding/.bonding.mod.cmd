@@ -1,0 +1,1 @@
+cmd_drivers/net/bonding/bonding.mod := printf '%s\n'   bond_main.o bond_3ad.o bond_alb.o bond_sysfs.o bond_sysfs_slave.o bond_debugfs.o bond_netlink.o bond_options.o bond_procfs.o | awk '!x[$$0]++ { print("drivers/net/bonding/"$$0) }' > drivers/net/bonding/bonding.mod

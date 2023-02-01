@@ -6,7 +6,11 @@ config DRM_HDLCD
 	depends on DRM && OF && (ARM || ARM64 || COMPILE_TEST)
 	depends on COMMON_CLK
 	select DRM_KMS_HELPER
+<<<<<<< HEAD
+	select DRM_GEM_DMA_HELPER
+=======
 	select DRM_GEM_CMA_HELPER
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Choose this option if you have an ARM High Definition Colour LCD
 	  controller.
@@ -27,7 +31,11 @@ config DRM_MALI_DISPLAY
 	depends on DRM && OF && (ARM || ARM64 || COMPILE_TEST)
 	depends on COMMON_CLK
 	select DRM_KMS_HELPER
+<<<<<<< HEAD
+	select DRM_GEM_DMA_HELPER
+=======
 	select DRM_GEM_CMA_HELPER
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select VIDEOMODE_HELPERS
 	help
 	  Choose this option if you want to compile the ARM Mali Display

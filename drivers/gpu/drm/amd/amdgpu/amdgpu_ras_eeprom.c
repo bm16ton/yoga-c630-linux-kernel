@@ -38,6 +38,10 @@
 #define EEPROM_I2C_MADDR_ARCTURUS_D342  0x0
 #define EEPROM_I2C_MADDR_SIENNA_CICHLID 0x0
 #define EEPROM_I2C_MADDR_ALDEBARAN      0x0
+<<<<<<< HEAD
+#define EEPROM_I2C_MADDR_SMU_13_0_0     (0x54UL << 16)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * The 2 macros bellow represent the actual size in bytes that
@@ -154,6 +158,15 @@ static bool __get_eeprom_i2c_addr(struct amdgpu_device *adev,
 
 	default:
 		return false;
+	}
+
+	switch (adev->ip_versions[MP1_HWIP][0]) {
+	case IP_VERSION(13, 0, 0):
+		control->i2c_address = EEPROM_I2C_MADDR_SMU_13_0_0;
+		break;
+
+	default:
+		break;
 	}
 
 	return true;
@@ -285,6 +298,7 @@ int amdgpu_ras_eeprom_reset_table(struct amdgpu_ras_eeprom_control *control)
 
 	control->ras_num_recs = 0;
 	control->ras_fri = 0;
+<<<<<<< HEAD
 
 	amdgpu_dpm_send_hbm_bad_pages_num(adev, control->ras_num_recs);
 
@@ -296,6 +310,19 @@ int amdgpu_ras_eeprom_reset_table(struct amdgpu_ras_eeprom_control *control)
 
 	mutex_unlock(&control->ras_tbl_mutex);
 
+=======
+
+	amdgpu_dpm_send_hbm_bad_pages_num(adev, control->ras_num_recs);
+
+	control->bad_channel_bitmap = 0;
+	amdgpu_dpm_send_hbm_bad_channel_flag(adev, control->bad_channel_bitmap);
+	con->update_channel_flag = false;
+
+	amdgpu_ras_debugfs_set_ret_size(control);
+
+	mutex_unlock(&control->ras_tbl_mutex);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return res;
 }
 
@@ -419,6 +446,7 @@ static int __amdgpu_ras_eeprom_write(struct amdgpu_ras_eeprom_control *control,
 
 	return res;
 }
+<<<<<<< HEAD
 
 static int
 amdgpu_ras_eeprom_append_table(struct amdgpu_ras_eeprom_control *control,
@@ -434,6 +462,23 @@ amdgpu_ras_eeprom_append_table(struct amdgpu_ras_eeprom_control *control,
 	if (!buf)
 		return -ENOMEM;
 
+=======
+
+static int
+amdgpu_ras_eeprom_append_table(struct amdgpu_ras_eeprom_control *control,
+			       struct eeprom_table_record *record,
+			       const u32 num)
+{
+	struct amdgpu_ras *con = amdgpu_ras_get_context(to_amdgpu_device(control));
+	u32 a, b, i;
+	u8 *buf, *pp;
+	int res;
+
+	buf = kcalloc(num, RAS_TABLE_RECORD_SIZE, GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Encode all of them in one go.
 	 */
 	pp = buf;
@@ -787,6 +832,7 @@ uint32_t amdgpu_ras_eeprom_max_record_count(void)
 {
 	return RAS_MAX_RECORD_COUNT;
 }
+<<<<<<< HEAD
 
 static ssize_t
 amdgpu_ras_debugfs_eeprom_size_read(struct file *f, char __user *buf,
@@ -801,6 +847,22 @@ amdgpu_ras_debugfs_eeprom_size_read(struct file *f, char __user *buf,
 	if (!size)
 		return size;
 
+=======
+
+static ssize_t
+amdgpu_ras_debugfs_eeprom_size_read(struct file *f, char __user *buf,
+				    size_t size, loff_t *pos)
+{
+	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
+	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
+	struct amdgpu_ras_eeprom_control *control = ras ? &ras->eeprom_control : NULL;
+	u8 data[50];
+	int res;
+
+	if (!size)
+		return size;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ras || !control) {
 		res = snprintf(data, sizeof(data), "Not supported\n");
 	} else {
@@ -882,6 +944,7 @@ static ssize_t amdgpu_ras_debugfs_table_read(struct file *f, char __user *buf,
 		buf += data_len;
 		size -= data_len;
 		*pos += data_len;
+<<<<<<< HEAD
 	}
 
 	data_len = strlen(tbl_hdr_str) + tbl_hdr_fmt_size;
@@ -927,6 +990,53 @@ static ssize_t amdgpu_ras_debugfs_table_read(struct file *f, char __user *buf,
 		struct eeprom_table_record record;
 		int s, r;
 
+=======
+	}
+
+	data_len = strlen(tbl_hdr_str) + tbl_hdr_fmt_size;
+	if (*pos < data_len && size > 0) {
+		u8 data[tbl_hdr_fmt_size + 1];
+		loff_t lpos;
+
+		snprintf(data, sizeof(data), tbl_hdr_fmt,
+			 control->tbl_hdr.header,
+			 control->tbl_hdr.version,
+			 control->tbl_hdr.first_rec_offset,
+			 control->tbl_hdr.tbl_size,
+			 control->tbl_hdr.checksum);
+
+		data_len -= *pos;
+		data_len = min_t(size_t, data_len, size);
+		lpos = *pos - strlen(tbl_hdr_str);
+		if (copy_to_user(buf, &data[lpos], data_len))
+			goto Out;
+		buf += data_len;
+		size -= data_len;
+		*pos += data_len;
+	}
+
+	data_len = strlen(tbl_hdr_str) + tbl_hdr_fmt_size + strlen(rec_hdr_str);
+	if (*pos < data_len && size > 0) {
+		loff_t lpos;
+
+		data_len -= *pos;
+		data_len = min_t(size_t, data_len, size);
+		lpos = *pos - strlen(tbl_hdr_str) - tbl_hdr_fmt_size;
+		if (copy_to_user(buf, &rec_hdr_str[lpos], data_len))
+			goto Out;
+		buf += data_len;
+		size -= data_len;
+		*pos += data_len;
+	}
+
+	data_len = amdgpu_ras_debugfs_table_size(control);
+	if (*pos < data_len && size > 0) {
+		u8 dare[RAS_TABLE_RECORD_SIZE];
+		u8 data[rec_hdr_fmt_size + 1];
+		struct eeprom_table_record record;
+		int s, r;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/* Find the starting record index
 		 */
 		s = *pos - strlen(tbl_hdr_str) - tbl_hdr_fmt_size -
@@ -981,6 +1091,7 @@ amdgpu_ras_debugfs_eeprom_table_read(struct file *f, char __user *buf,
 	struct amdgpu_ras_eeprom_control *control = ras ? &ras->eeprom_control : NULL;
 	u8 data[81];
 	int res;
+<<<<<<< HEAD
 
 	if (!size)
 		return size;
@@ -998,6 +1109,25 @@ amdgpu_ras_debugfs_eeprom_table_read(struct file *f, char __user *buf,
 
 		*pos += res;
 
+=======
+
+	if (!size)
+		return size;
+
+	if (!ras || !control) {
+		res = snprintf(data, sizeof(data), "Not supported\n");
+		if (*pos >= res)
+			return 0;
+
+		res -= *pos;
+		res = min_t(size_t, res, size);
+
+		if (copy_to_user(buf, &data[*pos], res))
+			return -EFAULT;
+
+		*pos += res;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return res;
 	} else {
 		return amdgpu_ras_debugfs_table_read(f, buf, size, pos);
@@ -1064,6 +1194,7 @@ int amdgpu_ras_eeprom_init(struct amdgpu_ras_eeprom_control *control,
 	struct amdgpu_ras_eeprom_table_header *hdr = &control->tbl_hdr;
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 	int res;
+<<<<<<< HEAD
 
 	*exceed_err_limit = false;
 
@@ -1077,6 +1208,21 @@ int amdgpu_ras_eeprom_init(struct amdgpu_ras_eeprom_control *control,
 	if (!__get_eeprom_i2c_addr(adev, control))
 		return -EINVAL;
 
+=======
+
+	*exceed_err_limit = false;
+
+	if (!__is_ras_eeprom_supported(adev))
+		return 0;
+
+	/* Verify i2c adapter is initialized */
+	if (!adev->pm.ras_eeprom_i2c_bus || !adev->pm.ras_eeprom_i2c_bus->algo)
+		return -ENOENT;
+
+	if (!__get_eeprom_i2c_addr(adev, control))
+		return -EINVAL;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	control->ras_header_offset = RAS_HDR_START;
 	control->ras_record_offset = RAS_RECORD_START;
 	control->ras_max_record_count  = RAS_MAX_RECORD_COUNT;

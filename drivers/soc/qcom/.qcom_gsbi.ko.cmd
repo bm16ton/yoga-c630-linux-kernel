@@ -1,0 +1,1 @@
+cmd_drivers/soc/qcom/qcom_gsbi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/soc/qcom/qcom_gsbi.ko drivers/soc/qcom/qcom_gsbi.o drivers/soc/qcom/qcom_gsbi.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/qcom-spmi-rradc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/qcom-spmi-rradc.ko drivers/iio/adc/qcom-spmi-rradc.o drivers/iio/adc/qcom-spmi-rradc.mod.o;  true

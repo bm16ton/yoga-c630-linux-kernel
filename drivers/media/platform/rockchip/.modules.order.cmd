@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/rockchip/modules.order := {   cat drivers/media/platform/rockchip/rga/modules.order;   cat drivers/media/platform/rockchip/rkisp1/modules.order; :; } > drivers/media/platform/rockchip/modules.order

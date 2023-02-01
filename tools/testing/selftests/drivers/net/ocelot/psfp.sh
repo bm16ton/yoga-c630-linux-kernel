@@ -181,7 +181,11 @@ setup_prepare()
 
 	# Set up swp1 as a master PHC for h1, synchronized to the local
 	# CLOCK_REALTIME.
+<<<<<<< HEAD
+	phc2sys_start ${UDS_ADDRESS_SWP1}
+=======
 	phc2sys_start ${swp1} ${UDS_ADDRESS_SWP1}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	# Assumption true for LS1028A: h1 and h2 use the same PHC. So by
 	# synchronizing h1 to swp1 via PTP, h2 is also implicitly synchronized

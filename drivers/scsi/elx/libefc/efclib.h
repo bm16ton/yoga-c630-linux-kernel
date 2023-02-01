@@ -58,10 +58,19 @@ enum efc_node_send_ls_acc {
 #define EFC_LINK_STATUS_UP		0
 #define EFC_LINK_STATUS_DOWN		1
 
+<<<<<<< HEAD
+enum efc_sm_event;
+
+/* State machine context header  */
+struct efc_sm_ctx {
+	void (*current_state)(struct efc_sm_ctx *ctx,
+			      enum efc_sm_event evt, void *arg);
+=======
 /* State machine context header  */
 struct efc_sm_ctx {
 	void (*current_state)(struct efc_sm_ctx *ctx,
 			      u32 evt, void *arg);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	const char	*description;
 	void		*app;
@@ -365,7 +374,11 @@ struct efc_node {
 	int			prev_evt;
 
 	void (*nodedb_state)(struct efc_sm_ctx *ctx,
+<<<<<<< HEAD
+			     enum efc_sm_event evt, void *arg);
+=======
 			     u32 evt, void *arg);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct timer_list	gidpt_delay_timer;
 	u64			time_last_gidpt_msec;
 

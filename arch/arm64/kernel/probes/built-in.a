@@ -1,0 +1,12 @@
+!<thin>
+//                                              76        `
+kprobes.o/
+decode-insn.o/
+kprobes_trampoline.o/
+simulate-insn.o/
+uprobes.o/
+/0              0           0     0     644     10472     `
+/11             0           0     0     644     3832      `
+/26             0           0     0     644     1080      `
+/48             0           0     0     644     2960      `
+/65             0           0     0     644     5760      `

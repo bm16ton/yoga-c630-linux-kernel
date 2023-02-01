@@ -1,0 +1,9 @@
+drivers/regulator/axp20x-regulator.ko
+drivers/regulator/fan53555.ko
+drivers/regulator/hi655x-regulator.ko
+drivers/regulator/max77620-regulator.ko
+drivers/regulator/rpi-panel-attiny-regulator.ko
+drivers/regulator/rk808-regulator.ko
+drivers/regulator/rt5120-regulator.ko
+drivers/regulator/tps6105x-regulator.ko
+drivers/regulator/vctrl-regulator.ko

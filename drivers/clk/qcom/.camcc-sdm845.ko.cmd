@@ -1,0 +1,1 @@
+cmd_drivers/clk/qcom/camcc-sdm845.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/clk/qcom/camcc-sdm845.ko drivers/clk/qcom/camcc-sdm845.o drivers/clk/qcom/camcc-sdm845.mod.o;  true

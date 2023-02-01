@@ -1,0 +1,3 @@
+drivers/thermal/qcom/qcom_tsens.ko
+drivers/thermal/qcom/qcom-spmi-adc-tm5.ko
+drivers/thermal/qcom/qcom-spmi-temp-alarm.ko

@@ -1245,11 +1245,19 @@ static int do_read_toc(struct fsg_common *common, struct fsg_buffhd *bh)
 			buf += 11;	/* go to next track descriptor */
 		}
 		buf -= 11;		/* go back to A2 descriptor */
+<<<<<<< HEAD
 
 		/* For A2, 7, 8, 9, 10 - zero, Pmin, Psec, Pframe of Lead out */
 		store_cdrom_address(&buf[7], msf, curlun->num_sectors);
 		return len;
 
+=======
+
+		/* For A2, 7, 8, 9, 10 - zero, Pmin, Psec, Pframe of Lead out */
+		store_cdrom_address(&buf[7], msf, curlun->num_sectors);
+		return len;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		/* PMA, ATIP, CD-TEXT not supported/required */
 		curlun->sense_data = SS_INVALID_FIELD_IN_CDB;
@@ -2662,10 +2670,22 @@ static ssize_t forced_eject_store(struct device *dev,
 }
 
 static DEVICE_ATTR_RW(nofua);
+<<<<<<< HEAD
+static DEVICE_ATTR_WO(forced_eject);
+
+/*
+ * Mode of the ro and file attribute files will be overridden in
+ * fsg_lun_dev_is_visible() depending on if this is a cdrom, or if it is a
+ * removable device.
+ */
+static DEVICE_ATTR_RW(ro);
+static DEVICE_ATTR_RW(file);
+=======
 /* mode wil be set in fsg_lun_attr_is_visible() */
 static DEVICE_ATTR(ro, 0, ro_show, ro_store);
 static DEVICE_ATTR(file, 0, file_show, file_store);
 static DEVICE_ATTR_WO(forced_eject);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /****************************** FSG COMMON ******************************/
 

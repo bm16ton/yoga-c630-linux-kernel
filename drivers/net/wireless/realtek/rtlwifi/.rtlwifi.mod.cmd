@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtlwifi.mod := printf '%s\n'   base.o cam.o core.o debug.o efuse.o ps.o rc.o regd.o stats.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtlwifi/"$$0) }' > drivers/net/wireless/realtek/rtlwifi/rtlwifi.mod

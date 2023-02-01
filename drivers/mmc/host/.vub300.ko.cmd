@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/vub300.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/vub300.ko drivers/mmc/host/vub300.o drivers/mmc/host/vub300.mod.o;  true

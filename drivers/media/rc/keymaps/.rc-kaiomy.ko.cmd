@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-kaiomy.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-kaiomy.ko drivers/media/rc/keymaps/rc-kaiomy.o drivers/media/rc/keymaps/rc-kaiomy.mod.o;  true

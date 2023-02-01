@@ -105,7 +105,11 @@ static int __init compat_mode_detect(void)
 	csr_write(CSR_STATUS, tmp);
 
 	pr_info("riscv: ELF compat mode %s",
+<<<<<<< HEAD
+			compat_mode_supported ? "supported" : "unsupported");
+=======
 			compat_mode_supported ? "supported" : "failed");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

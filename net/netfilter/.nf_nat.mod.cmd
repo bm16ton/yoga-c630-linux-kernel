@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_nat.mod := printf '%s\n'   nf_nat_core.o nf_nat_proto.o nf_nat_helper.o nf_nat_redirect.o nf_nat_masquerade.o | awk '!x[$$0]++ { print("net/netfilter/"$$0) }' > net/netfilter/nf_nat.mod

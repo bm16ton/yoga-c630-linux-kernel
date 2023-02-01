@@ -1,0 +1,1 @@
+cmd_net/openvswitch/openvswitch.mod := printf '%s\n'   actions.o datapath.o dp_notify.o flow.o flow_netlink.o flow_table.o meter.o openvswitch_trace.o vport.o vport-internal_dev.o vport-netdev.o conntrack.o | awk '!x[$$0]++ { print("net/openvswitch/"$$0) }' > net/openvswitch/openvswitch.mod

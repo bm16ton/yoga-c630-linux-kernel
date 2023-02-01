@@ -216,7 +216,11 @@ irq:
 }
 
 /* baytrail ops */
+<<<<<<< HEAD
+static struct snd_sof_dsp_ops sof_byt_ops = {
+=======
 static const struct snd_sof_dsp_ops sof_byt_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* device init */
 	.probe		= byt_acpi_probe,
 	.remove		= byt_remove,
@@ -245,7 +249,10 @@ static const struct snd_sof_dsp_ops sof_byt_ops = {
 
 	/* ipc */
 	.send_msg	= atom_send_msg,
+<<<<<<< HEAD
+=======
 	.fw_ready	= sof_fw_ready,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_mailbox_offset = atom_get_mailbox_offset,
 	.get_window_offset = atom_get_window_offset,
 
@@ -267,9 +274,12 @@ static const struct snd_sof_dsp_ops sof_byt_ops = {
 	/* stream callbacks */
 	.pcm_open	= sof_stream_pcm_open,
 	.pcm_close	= sof_stream_pcm_close,
+<<<<<<< HEAD
+=======
 
 	/* module loading */
 	.load_module	= snd_sof_parse_module_memcpy,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*Firmware loading */
 	.load_firmware	= snd_sof_load_firmware_memcpy,
@@ -295,10 +305,15 @@ static const struct snd_sof_dsp_ops sof_byt_ops = {
 static const struct sof_intel_dsp_desc byt_chip_info = {
 	.cores_num = 1,
 	.host_managed_cores_mask = 1,
+	.hw_ip_version = SOF_INTEL_BAYTRAIL,
 };
 
 /* cherrytrail and braswell ops */
+<<<<<<< HEAD
+static struct snd_sof_dsp_ops sof_cht_ops = {
+=======
 static const struct snd_sof_dsp_ops sof_cht_ops = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* device init */
 	.probe		= byt_acpi_probe,
 	.remove		= byt_remove,
@@ -327,7 +342,10 @@ static const struct snd_sof_dsp_ops sof_cht_ops = {
 
 	/* ipc */
 	.send_msg	= atom_send_msg,
+<<<<<<< HEAD
+=======
 	.fw_ready	= sof_fw_ready,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.get_mailbox_offset = atom_get_mailbox_offset,
 	.get_window_offset = atom_get_window_offset,
 
@@ -349,9 +367,12 @@ static const struct snd_sof_dsp_ops sof_cht_ops = {
 	/* stream callbacks */
 	.pcm_open	= sof_stream_pcm_open,
 	.pcm_close	= sof_stream_pcm_close,
+<<<<<<< HEAD
+=======
 
 	/* module loading */
 	.load_module	= snd_sof_parse_module_memcpy,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*Firmware loading */
 	.load_firmware	= snd_sof_load_firmware_memcpy,
@@ -378,7 +399,85 @@ static const struct snd_sof_dsp_ops sof_cht_ops = {
 static const struct sof_intel_dsp_desc cht_chip_info = {
 	.cores_num = 1,
 	.host_managed_cores_mask = 1,
+	.hw_ip_version = SOF_INTEL_BAYTRAIL,
 };
+
+/* BYTCR uses different IRQ index */
+static const struct sof_dev_desc sof_acpi_baytrailcr_desc = {
+	.machines = snd_soc_acpi_intel_baytrail_machines,
+	.resindex_lpe_base = 0,
+	.resindex_pcicfg_base = 1,
+	.resindex_imr_base = 2,
+	.irqindex_host_ipc = 0,
+	.chip_info = &byt_chip_info,
+	.ipc_supported_mask = BIT(SOF_IPC),
+	.ipc_default = SOF_IPC,
+	.default_fw_path = {
+		[SOF_IPC] = "intel/sof",
+	},
+	.default_tplg_path = {
+		[SOF_IPC] = "intel/sof-tplg",
+	},
+	.default_fw_filename = {
+		[SOF_IPC] = "sof-byt.ri",
+	},
+	.nocodec_tplg_filename = "sof-byt-nocodec.tplg",
+	.ops = &sof_byt_ops,
+};
+
+static const struct sof_dev_desc sof_acpi_baytrail_desc = {
+	.machines = snd_soc_acpi_intel_baytrail_machines,
+	.resindex_lpe_base = 0,
+	.resindex_pcicfg_base = 1,
+	.resindex_imr_base = 2,
+	.irqindex_host_ipc = 5,
+	.chip_info = &byt_chip_info,
+	.ipc_supported_mask = BIT(SOF_IPC),
+	.ipc_default = SOF_IPC,
+	.default_fw_path = {
+		[SOF_IPC] = "intel/sof",
+	},
+	.default_tplg_path = {
+		[SOF_IPC] = "intel/sof-tplg",
+	},
+	.default_fw_filename = {
+		[SOF_IPC] = "sof-byt.ri",
+	},
+	.nocodec_tplg_filename = "sof-byt-nocodec.tplg",
+	.ops = &sof_byt_ops,
+};
+
+static const struct sof_dev_desc sof_acpi_cherrytrail_desc = {
+	.machines = snd_soc_acpi_intel_cherrytrail_machines,
+	.resindex_lpe_base = 0,
+	.resindex_pcicfg_base = 1,
+	.resindex_imr_base = 2,
+	.irqindex_host_ipc = 5,
+	.chip_info = &cht_chip_info,
+	.ipc_supported_mask = BIT(SOF_IPC),
+	.ipc_default = SOF_IPC,
+	.default_fw_path = {
+		[SOF_IPC] = "intel/sof",
+	},
+	.default_tplg_path = {
+		[SOF_IPC] = "intel/sof-tplg",
+	},
+	.default_fw_filename = {
+		[SOF_IPC] = "sof-cht.ri",
+	},
+	.nocodec_tplg_filename = "sof-cht-nocodec.tplg",
+	.ops = &sof_cht_ops,
+};
+
+static const struct acpi_device_id sof_baytrail_match[] = {
+	{ "80860F28", (unsigned long)&sof_acpi_baytrail_desc },
+	{ "808622A8", (unsigned long)&sof_acpi_cherrytrail_desc },
+	{ }
+};
+<<<<<<< HEAD
+MODULE_DEVICE_TABLE(acpi, sof_baytrail_match);
+
+=======
 
 /* BYTCR uses different IRQ index */
 static const struct sof_dev_desc sof_acpi_baytrailcr_desc = {
@@ -430,6 +529,7 @@ static const struct acpi_device_id sof_baytrail_match[] = {
 };
 MODULE_DEVICE_TABLE(acpi, sof_baytrail_match);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int sof_baytrail_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
@@ -447,10 +547,14 @@ static int sof_baytrail_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
+<<<<<<< HEAD
+	desc = (const struct sof_dev_desc *)id->driver_data;
+=======
 	desc = device_get_match_data(&pdev->dev);
 	if (!desc)
 		return -ENODEV;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (desc == &sof_acpi_baytrail_desc && soc_intel_is_byt_cr(pdev))
 		desc = &sof_acpi_baytrailcr_desc;
 

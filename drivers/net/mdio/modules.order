@@ -1,0 +1,12 @@
+drivers/net/mdio/acpi_mdio.ko
+drivers/net/mdio/fwnode_mdio.ko
+drivers/net/mdio/of_mdio.ko
+drivers/net/mdio/mdio-bcm-unimac.ko
+drivers/net/mdio/mdio-cavium.ko
+drivers/net/mdio/mdio-hisi-femac.ko
+drivers/net/mdio/mdio-i2c.ko
+drivers/net/mdio/mdio-thunder.ko
+drivers/net/mdio/mdio-xgene.ko
+drivers/net/mdio/mdio-mux.ko
+drivers/net/mdio/mdio-mux-meson-g12a.ko
+drivers/net/mdio/mdio-mux-mmioreg.ko

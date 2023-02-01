@@ -3,6 +3,40 @@
 
 #include "../include/drv_types.h"
 
+<<<<<<< HEAD
+static u8 odm_query_rxpwrpercentage(s8 antpower)
+{
+	if ((antpower <= -100) || (antpower >= 20))
+		return 0;
+	else if (antpower >= 0)
+		return 100;
+	else
+		return 100 + antpower;
+}
+
+static s32 odm_signal_scale_mapping(struct odm_dm_struct *dm_odm, s32 currsig)
+{
+	s32 retsig;
+
+	if (currsig >= 51 && currsig <= 100)
+		retsig = 100;
+	else if (currsig >= 41 && currsig <= 50)
+		retsig = 80 + ((currsig - 40) * 2);
+	else if (currsig >= 31 && currsig <= 40)
+		retsig = 66 + (currsig - 30);
+	else if (currsig >= 21 && currsig <= 30)
+		retsig = 54 + (currsig - 20);
+	else if (currsig >= 10 && currsig <= 20)
+		retsig = 42 + (((currsig - 10) * 2) / 3);
+	else if (currsig >= 5 && currsig <= 9)
+		retsig = 22 + (((currsig - 5) * 3) / 2);
+	else if (currsig >= 1 && currsig <= 4)
+		retsig = 6 + (((currsig - 1) * 3) / 2);
+	else
+		retsig = currsig;
+
+	return retsig;
+=======
 static u8 odm_QueryRxPwrPercentage(s8 AntPower)
 {
 	if ((AntPower <= -100) || (AntPower >= 20))
@@ -35,6 +69,7 @@ static s32 odm_SignalScaleMapping(struct odm_dm_struct *dm_odm, s32 CurrSig)
 		RetSig = CurrSig;
 
 	return RetSig;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static u8 odm_evm_db_to_percentage(s8 value)
@@ -117,7 +152,11 @@ static void odm_RxPhyStatus92CSeries_Parsing(struct odm_dm_struct *dm_odm,
 			break;
 		}
 		rx_pwr_all += 6;
+<<<<<<< HEAD
+		PWDB_ALL = odm_query_rxpwrpercentage(rx_pwr_all);
+=======
 		PWDB_ALL = odm_QueryRxPwrPercentage(rx_pwr_all);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (!cck_highpwr) {
 			if (PWDB_ALL >= 80)
 				PWDB_ALL = ((PWDB_ALL - 80) << 1) + ((PWDB_ALL - 80) >> 1) + 80;
@@ -162,7 +201,11 @@ static void odm_RxPhyStatus92CSeries_Parsing(struct odm_dm_struct *dm_odm,
 			pPhyInfo->RxPwr[i] = rx_pwr[i];
 
 			/* Translate DBM to percentage. */
+<<<<<<< HEAD
+			RSSI = odm_query_rxpwrpercentage(rx_pwr[i]);
+=======
 			RSSI = odm_QueryRxPwrPercentage(rx_pwr[i]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			total_rssi += RSSI;
 
 			pPhyInfo->RxMIMOSignalStrength[i] = (u8)RSSI;
@@ -173,7 +216,11 @@ static void odm_RxPhyStatus92CSeries_Parsing(struct odm_dm_struct *dm_odm,
 		/*  (2)PWDB, Average PWDB calculated by hardware (for rate adaptive) */
 		rx_pwr_all = (((pPhyStaRpt->cck_sig_qual_ofdm_pwdb_all) >> 1) & 0x7f) - 110;
 
+<<<<<<< HEAD
+		PWDB_ALL = odm_query_rxpwrpercentage(rx_pwr_all);
+=======
 		PWDB_ALL = odm_QueryRxPwrPercentage(rx_pwr_all);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		pPhyInfo->RxPWDBAll = PWDB_ALL;
 		pPhyInfo->RxPower = rx_pwr_all;
@@ -200,10 +247,17 @@ static void odm_RxPhyStatus92CSeries_Parsing(struct odm_dm_struct *dm_odm,
 	/* UI BSS List signal strength(in percentage), make it good looking, from 0~100. */
 	/* It is assigned to the BSS List in GetValueFromBeaconOrProbeRsp(). */
 	if (isCCKrate) {
+<<<<<<< HEAD
+		pPhyInfo->SignalStrength = (u8)(odm_signal_scale_mapping(dm_odm, PWDB_ALL));/* PWDB_ALL; */
+	} else {
+		if (rf_rx_num != 0)
+			pPhyInfo->SignalStrength = (u8)(odm_signal_scale_mapping(dm_odm, total_rssi /= rf_rx_num));
+=======
 		pPhyInfo->SignalStrength = (u8)(odm_SignalScaleMapping(dm_odm, PWDB_ALL));/* PWDB_ALL; */
 	} else {
 		if (rf_rx_num != 0)
 			pPhyInfo->SignalStrength = (u8)(odm_SignalScaleMapping(dm_odm, total_rssi /= rf_rx_num));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* For 88E HW Antenna Diversity */
@@ -347,8 +401,11 @@ void ODM_PhyStatusQuery(struct odm_dm_struct *dm_odm,
 	odm_RxPhyStatus92CSeries_Parsing(dm_odm, pPhyInfo, pPhyStatus, pPktinfo, adapt);
 	odm_Process_RSSIForDM(dm_odm, pPhyInfo, pPktinfo);
 }
+<<<<<<< HEAD
+=======
 
 enum HAL_STATUS ODM_ConfigRFWithHeaderFile(struct odm_dm_struct *dm_odm)
 {
 	return ODM_ReadAndConfig_RadioA_1T_8188E(dm_odm);
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

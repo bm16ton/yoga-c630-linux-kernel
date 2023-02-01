@@ -113,7 +113,11 @@ show_uncore_perf_status(current_freq_khz);
 		struct uncore_data *data = container_of(attr, struct uncore_data,\
 							  member_name##_dev_attr);\
 									\
+<<<<<<< HEAD
+		return sysfs_emit(buf, "%u\n",				\
+=======
 		return scnprintf(buf, PAGE_SIZE, "%u\n",		\
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				 data->member_name);			\
 	}								\
 

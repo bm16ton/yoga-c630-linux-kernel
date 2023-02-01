@@ -1,0 +1,1 @@
+cmd_drivers/phy/tegra/phy-tegra-xusb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/tegra/phy-tegra-xusb.ko drivers/phy/tegra/phy-tegra-xusb.o drivers/phy/tegra/phy-tegra-xusb.mod.o;  true

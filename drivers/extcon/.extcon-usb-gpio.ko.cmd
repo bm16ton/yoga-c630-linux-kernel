@@ -1,0 +1,1 @@
+cmd_drivers/extcon/extcon-usb-gpio.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/extcon/extcon-usb-gpio.ko drivers/extcon/extcon-usb-gpio.o drivers/extcon/extcon-usb-gpio.mod.o;  true

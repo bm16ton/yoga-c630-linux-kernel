@@ -1,0 +1,1 @@
+cmd_drivers/char/hw_random/arm_smccc_trng.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/char/hw_random/arm_smccc_trng.ko drivers/char/hw_random/arm_smccc_trng.o drivers/char/hw_random/arm_smccc_trng.mod.o;  true

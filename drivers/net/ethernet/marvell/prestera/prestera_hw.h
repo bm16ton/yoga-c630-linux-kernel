@@ -146,6 +146,10 @@ struct prestera_counter_stats;
 struct prestera_iface;
 struct prestera_flood_domain;
 struct prestera_mdb_entry;
+<<<<<<< HEAD
+struct prestera_neigh_info;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Switch API */
 int prestera_hw_switch_init(struct prestera_switch *sw);
@@ -183,6 +187,11 @@ int prestera_hw_port_speed_get(const struct prestera_port *port, u32 *speed);
 int prestera_hw_port_learning_set(struct prestera_port *port, bool enable);
 int prestera_hw_port_uc_flood_set(const struct prestera_port *port, bool flood);
 int prestera_hw_port_mc_flood_set(const struct prestera_port *port, bool flood);
+<<<<<<< HEAD
+int prestera_hw_port_br_locked_set(const struct prestera_port *port,
+				   bool br_locked);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int prestera_hw_port_accept_frm_type(struct prestera_port *port,
 				     enum prestera_accept_frm_type type);
 /* Vlan API */
@@ -243,8 +252,14 @@ int prestera_hw_counter_clear(struct prestera_switch *sw, u32 block_id,
 
 /* SPAN API */
 int prestera_hw_span_get(const struct prestera_port *port, u8 *span_id);
+<<<<<<< HEAD
+int prestera_hw_span_bind(const struct prestera_port *port, u8 span_id,
+			  bool ingress);
+int prestera_hw_span_unbind(const struct prestera_port *port, bool ingress);
+=======
 int prestera_hw_span_bind(const struct prestera_port *port, u8 span_id);
 int prestera_hw_span_unbind(const struct prestera_port *port);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int prestera_hw_span_release(struct prestera_switch *sw, u8 span_id);
 
 /* Router API */
@@ -263,6 +278,19 @@ int prestera_hw_lpm_add(struct prestera_switch *sw, u16 vr_id,
 int prestera_hw_lpm_del(struct prestera_switch *sw, u16 vr_id,
 			__be32 dst, u32 dst_len);
 
+<<<<<<< HEAD
+/* NH API */
+int prestera_hw_nh_entries_set(struct prestera_switch *sw, int count,
+			       struct prestera_neigh_info *nhs, u32 grp_id);
+int prestera_hw_nhgrp_blk_get(struct prestera_switch *sw,
+			      u8 *hw_state, u32 buf_size /* Buffer in bytes */);
+int prestera_hw_nh_group_create(struct prestera_switch *sw, u16 nh_count,
+				u32 *grp_id);
+int prestera_hw_nh_group_delete(struct prestera_switch *sw, u16 nh_count,
+				u32 grp_id);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Event handlers */
 int prestera_hw_event_handler_register(struct prestera_switch *sw,
 				       enum prestera_event_type type,

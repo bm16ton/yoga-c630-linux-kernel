@@ -1,0 +1,1 @@
+cmd_drivers/thermal/armada_thermal.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/thermal/armada_thermal.ko drivers/thermal/armada_thermal.o drivers/thermal/armada_thermal.mod.o;  true

@@ -2,6 +2,8 @@
 /*
  * Common arm64 stack unwinder code.
  *
+<<<<<<< HEAD
+=======
  * To implement a new arm64 stack unwinder:
  *     1) Include this header
  *
@@ -9,6 +11,7 @@
  *        function, passing it the validation and translation callbacks
  *        (though the later can be NULL if no translation is required).
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * See: arch/arm64/kernel/stacktrace.c for the reference implementation.
  *
  * Copyright (C) 2012 ARM Ltd.
@@ -16,6 +19,18 @@
 #ifndef __ASM_STACKTRACE_COMMON_H
 #define __ASM_STACKTRACE_COMMON_H
 
+<<<<<<< HEAD
+#include <linux/kprobes.h>
+#include <linux/types.h>
+
+struct stack_info {
+	unsigned long low;
+	unsigned long high;
+};
+
+/**
+ * struct unwind_state - state used for robust unwinding.
+=======
 #include <linux/bitmap.h>
 #include <linux/bitops.h>
 #include <linux/kprobes.h>
@@ -41,10 +56,13 @@ struct stack_info {
 /*
  * A snapshot of a frame record or fp/lr register values, along with some
  * accounting information necessary for robust unwinding.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * @fp:          The fp value in the frame record (or the real fp)
  * @pc:          The lr value in the frame record (or the real lr)
  *
+<<<<<<< HEAD
+=======
  * @stacks_done: Stacks which have been entirely unwound, for which it is no
  *               longer valid to unwind to.
  *
@@ -55,22 +73,58 @@ struct stack_info {
  *               value of STACK_TYPE_UNKNOWN. This is used to detect a
  *               transition from one stack to another.
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
  *               associated with the most recently encountered replacement lr
  *               value.
  *
  * @task:        The task being unwound.
+<<<<<<< HEAD
+ *
+ * @stack:       The stack currently being unwound.
+ * @stacks:      An array of stacks which can be unwound.
+ * @nr_stacks:   The number of stacks in @stacks.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct unwind_state {
 	unsigned long fp;
 	unsigned long pc;
+<<<<<<< HEAD
+=======
 	DECLARE_BITMAP(stacks_done, __NR_STACK_TYPES);
 	unsigned long prev_fp;
 	enum stack_type prev_type;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_KRETPROBES
 	struct llist_node *kr_cur;
 #endif
 	struct task_struct *task;
+<<<<<<< HEAD
+
+	struct stack_info stack;
+	struct stack_info *stacks;
+	int nr_stacks;
+};
+
+static inline struct stack_info stackinfo_get_unknown(void)
+{
+	return (struct stack_info) {
+		.low = 0,
+		.high = 0,
+	};
+}
+
+static inline bool stackinfo_on_stack(const struct stack_info *info,
+				      unsigned long sp, unsigned long size)
+{
+	if (!info->low)
+		return false;
+
+	if (sp < info->low || sp + size < sp || sp + size > info->high)
+		return false;
+
+=======
 };
 
 static inline bool on_stack(unsigned long sp, unsigned long size,
@@ -88,6 +142,7 @@ static inline bool on_stack(unsigned long sp, unsigned long size,
 		info->high = high;
 		info->type = type;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return true;
 }
 
@@ -99,6 +154,103 @@ static inline void unwind_init_common(struct unwind_state *state,
 	state->kr_cur = NULL;
 #endif
 
+<<<<<<< HEAD
+	state->stack = stackinfo_get_unknown();
+}
+
+static struct stack_info *unwind_find_next_stack(const struct unwind_state *state,
+						 unsigned long sp,
+						 unsigned long size)
+{
+	for (int i = 0; i < state->nr_stacks; i++) {
+		struct stack_info *info = &state->stacks[i];
+
+		if (stackinfo_on_stack(info, sp, size))
+			return info;
+	}
+
+	return NULL;
+}
+
+/**
+ * unwind_consume_stack() - Check if an object is on an accessible stack,
+ * updating stack boundaries so that future unwind steps cannot consume this
+ * object again.
+ *
+ * @state: the current unwind state.
+ * @sp:    the base address of the object.
+ * @size:  the size of the object.
+ *
+ * Return: 0 upon success, an error code otherwise.
+ */
+static inline int unwind_consume_stack(struct unwind_state *state,
+				       unsigned long sp,
+				       unsigned long size)
+{
+	struct stack_info *next;
+
+	if (stackinfo_on_stack(&state->stack, sp, size))
+		goto found;
+
+	next = unwind_find_next_stack(state, sp, size);
+	if (!next)
+		return -EINVAL;
+
+	/*
+	 * Stack transitions are strictly one-way, and once we've
+	 * transitioned from one stack to another, it's never valid to
+	 * unwind back to the old stack.
+	 *
+	 * Remove the current stack from the list of stacks so that it cannot
+	 * be found on a subsequent transition.
+	 *
+	 * Note that stacks can nest in several valid orders, e.g.
+	 *
+	 *   TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
+	 *   TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
+	 *   HYP -> OVERFLOW
+	 *
+	 * ... so we do not check the specific order of stack
+	 * transitions.
+	 */
+	state->stack = *next;
+	*next = stackinfo_get_unknown();
+
+found:
+	/*
+	 * Future unwind steps can only consume stack above this frame record.
+	 * Update the current stack to start immediately above it.
+	 */
+	state->stack.low = sp + size;
+	return 0;
+}
+
+/**
+ * unwind_next_frame_record() - Unwind to the next frame record.
+ *
+ * @state:        the current unwind state.
+ *
+ * Return: 0 upon success, an error code otherwise.
+ */
+static inline int
+unwind_next_frame_record(struct unwind_state *state)
+{
+	unsigned long fp = state->fp;
+	int err;
+
+	if (fp & 0x7)
+		return -EINVAL;
+
+	err = unwind_consume_stack(state, fp, 16);
+	if (err)
+		return err;
+
+	/*
+	 * Record this frame record's values.
+	 */
+	state->fp = READ_ONCE(*(unsigned long *)(fp));
+	state->pc = READ_ONCE(*(unsigned long *)(fp + 8));
+=======
 	/*
 	 * Prime the first unwind.
 	 *
@@ -192,6 +344,7 @@ static inline int unwind_next_common(struct unwind_state *state,
 	state->pc = READ_ONCE(*(unsigned long *)(kern_fp + 8));
 	state->prev_fp = fp;
 	state->prev_type = info->type;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

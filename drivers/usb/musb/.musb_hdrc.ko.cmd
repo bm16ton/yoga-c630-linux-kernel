@@ -1,0 +1,1 @@
+cmd_drivers/usb/musb/musb_hdrc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/musb/musb_hdrc.ko drivers/usb/musb/musb_hdrc.o drivers/usb/musb/musb_hdrc.mod.o;  true

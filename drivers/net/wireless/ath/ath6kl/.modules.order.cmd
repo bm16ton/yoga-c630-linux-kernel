@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath6kl/modules.order := {   echo drivers/net/wireless/ath/ath6kl/ath6kl_core.ko;   echo drivers/net/wireless/ath/ath6kl/ath6kl_sdio.ko;   echo drivers/net/wireless/ath/ath6kl/ath6kl_usb.ko; :; } > drivers/net/wireless/ath/ath6kl/modules.order

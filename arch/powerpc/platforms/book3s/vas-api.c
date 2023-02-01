@@ -431,7 +431,11 @@ static vm_fault_t vas_mmap_fault(struct vm_fault *vmf)
 	 * The window may be inactive due to lost credit (Ex: core
 	 * removal with DLPAR). If the window is active again when
 	 * the credit is available, map the new paste address at the
+<<<<<<< HEAD
+	 * window virtual address.
+=======
 	 * the window virtual address.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 */
 	if (txwin->status == VAS_WIN_ACTIVE) {
 		paste_addr = cp_inst->coproc->vops->paste_addr(txwin);

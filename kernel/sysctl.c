@@ -81,10 +81,24 @@
 #ifdef CONFIG_RT_MUTEXES
 #include <linux/rtmutex.h>
 #endif
+<<<<<<< HEAD
+
+/* shared constants to be used in various sysctls */
+const int sysctl_vals[] = { 0, 1, 2, 3, 4, 100, 200, 1000, 3000, INT_MAX, 65535, -1 };
+EXPORT_SYMBOL(sysctl_vals);
+
+const unsigned long sysctl_long_vals[] = { 0, 1, LONG_MAX };
+EXPORT_SYMBOL_GPL(sysctl_long_vals);
+
+#if defined(CONFIG_SYSCTL)
+
+/* Constants used for minimum and maximum */
+=======
 
 #if defined(CONFIG_SYSCTL)
 
 /* Constants used for minimum and  maximum */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_PERF_EVENTS
 static const int six_hundred_forty_kb = 640 * 1024;
@@ -129,11 +143,14 @@ static enum sysctl_writes_mode sysctl_writes_strict = SYSCTL_WRITES_STRICT;
 int sysctl_legacy_va_layout;
 #endif
 
+<<<<<<< HEAD
+=======
 #ifdef CONFIG_COMPACTION
 /* min_extfrag_threshold is SYSCTL_ZERO */;
 static const int max_extfrag_threshold = 1000;
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* CONFIG_SYSCTL */
 
 /*
@@ -1052,9 +1069,9 @@ static int __do_proc_doulongvec_minmax(void *data, struct ctl_table *table,
 		return 0;
 	}
 
-	i = (unsigned long *) data;
-	min = (unsigned long *) table->extra1;
-	max = (unsigned long *) table->extra2;
+	i = data;
+	min = table->extra1;
+	max = table->extra2;
 	vleft = table->maxlen / sizeof(unsigned long);
 	left = *lenp;
 
@@ -1641,6 +1658,23 @@ static struct ctl_table kern_table[] = {
 		.extra1		= SYSCTL_ZERO,
 		.extra2		= SYSCTL_FOUR,
 	},
+<<<<<<< HEAD
+	{
+		.procname	= "numa_balancing_promote_rate_limit_MBps",
+		.data		= &sysctl_numa_balancing_promote_rate_limit,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= SYSCTL_ZERO,
+	},
+#endif /* CONFIG_NUMA_BALANCING */
+	{
+		.procname	= "panic",
+		.data		= &panic_timeout,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec,
+=======
 #endif /* CONFIG_NUMA_BALANCING */
 	{
 		.procname	= "panic",
@@ -1655,8 +1689,31 @@ static struct ctl_table kern_table[] = {
 		.maxlen 	= sizeof(long),
 		.mode		= 0644,
 		.proc_handler	= proc_taint,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	},
+#ifdef CONFIG_PROC_SYSCTL
+	{
+<<<<<<< HEAD
+		.procname	= "tainted",
+		.maxlen 	= sizeof(long),
+		.mode		= 0644,
+		.proc_handler	= proc_taint,
 	},
 	{
+		.procname	= "sysctl_writes_strict",
+		.data		= &sysctl_writes_strict,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= SYSCTL_NEG_ONE,
+		.extra2		= SYSCTL_ONE,
+	},
+#endif
+	{
+		.procname	= "print-fatal-signals",
+		.data		= &print_fatal_signals,
+		.maxlen		= sizeof(int),
+=======
 		.procname	= "sysctl_writes_strict",
 		.data		= &sysctl_writes_strict,
 		.maxlen		= sizeof(int),
@@ -1678,42 +1735,85 @@ static struct ctl_table kern_table[] = {
 		.procname	= "reboot-cmd",
 		.data		= reboot_command,
 		.maxlen		= 256,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		.mode		= 0644,
+		.proc_handler	= proc_dostring,
+	},
+#ifdef CONFIG_SPARC
+	{
+<<<<<<< HEAD
+		.procname	= "reboot-cmd",
+		.data		= reboot_command,
+		.maxlen		= 256,
+=======
+		.procname	= "stop-a",
+		.data		= &stop_a_enabled,
+		.maxlen		= sizeof (int),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.mode		= 0644,
 		.proc_handler	= proc_dostring,
 	},
 	{
+<<<<<<< HEAD
 		.procname	= "stop-a",
 		.data		= &stop_a_enabled,
+=======
+		.procname	= "scons-poweroff",
+		.data		= &scons_pwroff,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.maxlen		= sizeof (int),
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
+<<<<<<< HEAD
 	{
 		.procname	= "scons-poweroff",
 		.data		= &scons_pwroff,
-		.maxlen		= sizeof (int),
-		.mode		= 0644,
-		.proc_handler	= proc_dointvec,
-	},
+=======
 #endif
 #ifdef CONFIG_SPARC64
 	{
 		.procname	= "tsb-ratio",
 		.data		= &sysctl_tsb_ratio,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.maxlen		= sizeof (int),
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
 #endif
+<<<<<<< HEAD
+#ifdef CONFIG_SPARC64
+	{
+		.procname	= "tsb-ratio",
+		.data		= &sysctl_tsb_ratio,
+=======
 #ifdef CONFIG_PARISC
 	{
 		.procname	= "soft-power",
 		.data		= &pwrsw_enabled,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.maxlen		= sizeof (int),
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec,
 	},
 #endif
+<<<<<<< HEAD
+#ifdef CONFIG_PARISC
+	{
+		.procname	= "soft-power",
+		.data		= &pwrsw_enabled,
+=======
+#ifdef CONFIG_SYSCTL_ARCH_UNALIGN_ALLOW
+	{
+		.procname	= "unaligned-trap",
+		.data		= &unaligned_enabled,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		.maxlen		= sizeof (int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec,
+	},
+#endif
+<<<<<<< HEAD
 #ifdef CONFIG_SYSCTL_ARCH_UNALIGN_ALLOW
 	{
 		.procname	= "unaligned-trap",
@@ -1723,6 +1823,8 @@ static struct ctl_table kern_table[] = {
 		.proc_handler	= proc_dointvec,
 	},
 #endif
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef CONFIG_STACK_TRACER
 	{
 		.procname	= "stack_tracer_enabled",
@@ -2216,7 +2318,11 @@ static struct ctl_table vm_table[] = {
 		.mode		= 0644,
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= SYSCTL_ZERO,
+<<<<<<< HEAD
+		.extra2		= SYSCTL_ONE_THOUSAND,
+=======
 		.extra2		= (void *)&max_extfrag_threshold,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 	{
 		.procname	= "compact_unevictable_allowed",

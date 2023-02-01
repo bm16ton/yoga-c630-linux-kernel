@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/smsc/smc91x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/smsc/smc91x.ko drivers/net/ethernet/smsc/smc91x.o drivers/net/ethernet/smsc/smc91x.mod.o;  true

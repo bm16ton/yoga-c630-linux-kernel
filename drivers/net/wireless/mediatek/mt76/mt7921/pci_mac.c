@@ -53,6 +53,8 @@ int mt7921e_tx_prepare_skb(struct mt76_dev *mdev, void *txwi_ptr,
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
 static void
 mt7921_txwi_free(struct mt7921_dev *dev, struct mt76_txwi_cache *t,
 		 struct ieee80211_sta *sta, bool clear_status,
@@ -201,6 +203,7 @@ void mt7921e_queue_rx_skb(struct mt76_dev *mdev, enum mt76_rxq_id q,
 	}
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void mt7921_tx_token_put(struct mt7921_dev *dev)
 {
 	struct mt76_txwi_cache *txwi;

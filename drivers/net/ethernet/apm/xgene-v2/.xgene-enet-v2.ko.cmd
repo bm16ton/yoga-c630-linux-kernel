@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.ko drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.o drivers/net/ethernet/apm/xgene-v2/xgene-enet-v2.mod.o;  true

@@ -2,6 +2,7 @@
 /* Copyright 2002 Andi Kleen */
 
 #include <linux/linkage.h>
+#include <linux/cfi_types.h>
 #include <asm/errno.h>
 #include <asm/cpufeatures.h>
 #include <asm/alternative.h>
@@ -27,7 +28,11 @@
  * Output:
  * rax original destination
  */
+<<<<<<< HEAD
+SYM_TYPED_FUNC_START(__memcpy)
+=======
 SYM_FUNC_START(__memcpy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ALTERNATIVE_2 "jmp memcpy_orig", "", X86_FEATURE_REP_GOOD, \
 		      "jmp memcpy_erms", X86_FEATURE_ERMS
 

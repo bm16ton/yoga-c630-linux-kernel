@@ -80,6 +80,22 @@ int tcf_classify(struct sk_buff *skb,
 		 const struct tcf_block *block,
 		 const struct tcf_proto *tp, struct tcf_result *res,
 		 bool compat_mode);
+<<<<<<< HEAD
+
+static inline bool tc_cls_stats_dump(struct tcf_proto *tp,
+				     struct tcf_walker *arg,
+				     void *filter)
+{
+	if (arg->count >= arg->skip && arg->fn(tp, filter, arg) < 0) {
+		arg->stop = 1;
+		return false;
+	}
+
+	arg->count++;
+	return true;
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #else
 static inline bool tcf_block_shared(struct tcf_block *block)
@@ -195,6 +211,18 @@ tcf_unbind_filter(struct tcf_proto *tp, struct tcf_result *r)
 	if (!q)
 		return;
 	__tcf_unbind_filter(q, r);
+}
+
+static inline void tc_cls_bind_class(u32 classid, unsigned long cl,
+				     void *q, struct tcf_result *res,
+				     unsigned long base)
+{
+	if (res->classid == classid) {
+		if (cl)
+			__tcf_bind_filter(q, res, base);
+		else
+			__tcf_unbind_filter(q, res);
+	}
 }
 
 struct tcf_exts {

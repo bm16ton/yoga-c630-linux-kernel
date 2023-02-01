@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/legacy/g_mass_storage.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/legacy/g_mass_storage.ko drivers/usb/gadget/legacy/g_mass_storage.o drivers/usb/gadget/legacy/g_mass_storage.mod.o;  true

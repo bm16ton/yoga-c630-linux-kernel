@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/stmpe-adc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/stmpe-adc.ko drivers/iio/adc/stmpe-adc.o drivers/iio/adc/stmpe-adc.mod.o;  true

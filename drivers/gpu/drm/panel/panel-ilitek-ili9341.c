@@ -32,7 +32,11 @@
 #include <drm/drm_drv.h>
 #include <drm/drm_fb_helper.h>
 #include <drm/drm_gem_atomic_helper.h>
+<<<<<<< HEAD
+#include <drm/drm_gem_dma_helper.h>
+=======
 #include <drm/drm_gem_cma_helper.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_gem_framebuffer_helper.h>
 #include <drm/drm_mipi_dbi.h>
 #include <drm/drm_modes.h>
@@ -576,6 +580,10 @@ out_exit:
 }
 
 static const struct drm_simple_display_pipe_funcs ili9341_dbi_funcs = {
+<<<<<<< HEAD
+	.mode_valid = mipi_dbi_pipe_mode_valid,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.enable = ili9341_dbi_enable,
 	.disable = mipi_dbi_pipe_disable,
 	.update = mipi_dbi_pipe_update,
@@ -586,12 +594,20 @@ static const struct drm_display_mode ili9341_dbi_mode = {
 	DRM_SIMPLE_MODE(240, 320, 37, 49),
 };
 
+<<<<<<< HEAD
+DEFINE_DRM_GEM_DMA_FOPS(ili9341_dbi_fops);
+=======
 DEFINE_DRM_GEM_CMA_FOPS(ili9341_dbi_fops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct drm_driver ili9341_dbi_driver = {
 	.driver_features	= DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
 	.fops			= &ili9341_dbi_fops,
+<<<<<<< HEAD
+	DRM_GEM_DMA_DRIVER_OPS_VMAP,
+=======
 	DRM_GEM_CMA_DRIVER_OPS_VMAP,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.debugfs_init		= mipi_dbi_debugfs_init,
 	.name			= "ili9341",
 	.desc			= "Ilitek ILI9341",

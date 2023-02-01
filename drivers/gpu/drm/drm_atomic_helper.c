@@ -38,7 +38,10 @@
 #include <drm/drm_drv.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_atomic_helper.h>
+<<<<<<< HEAD
+=======
 #include <drm/drm_plane_helper.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_print.h>
 #include <drm/drm_self_refresh_helper.h>
 #include <drm/drm_vblank.h>
@@ -703,8 +706,12 @@ drm_atomic_helper_check_modeset(struct drm_device *dev,
 
 		if (funcs->atomic_check)
 			ret = funcs->atomic_check(connector, state);
-		if (ret)
+		if (ret) {
+			drm_dbg_atomic(dev,
+				       "[CONNECTOR:%d:%s] driver check failed\n",
+				       connector->base.id, connector->name);
 			return ret;
+		}
 
 		connectors_mask |= BIT(i);
 	}
@@ -746,8 +753,12 @@ drm_atomic_helper_check_modeset(struct drm_device *dev,
 
 		if (funcs->atomic_check)
 			ret = funcs->atomic_check(connector, state);
-		if (ret)
+		if (ret) {
+			drm_dbg_atomic(dev,
+				       "[CONNECTOR:%d:%s] driver check failed\n",
+				       connector->base.id, connector->name);
 			return ret;
+		}
 	}
 
 	/*
@@ -777,6 +788,45 @@ drm_atomic_helper_check_modeset(struct drm_device *dev,
 	return mode_fixup(state);
 }
 EXPORT_SYMBOL(drm_atomic_helper_check_modeset);
+
+/**
+ * drm_atomic_helper_check_wb_encoder_state() - Check writeback encoder state
+ * @encoder: encoder state to check
+ * @conn_state: connector state to check
+ *
+ * Checks if the writeback connector state is valid, and returns an error if it
+ * isn't.
+ *
+ * RETURNS:
+ * Zero for success or -errno
+ */
+int
+drm_atomic_helper_check_wb_encoder_state(struct drm_encoder *encoder,
+					 struct drm_connector_state *conn_state)
+{
+	struct drm_writeback_job *wb_job = conn_state->writeback_job;
+	struct drm_property_blob *pixel_format_blob;
+	struct drm_framebuffer *fb;
+	size_t i, nformats;
+	u32 *formats;
+
+	if (!wb_job || !wb_job->fb)
+		return 0;
+
+	pixel_format_blob = wb_job->connector->pixel_formats_blob_ptr;
+	nformats = pixel_format_blob->length / sizeof(u32);
+	formats = pixel_format_blob->data;
+	fb = wb_job->fb;
+
+	for (i = 0; i < nformats; i++)
+		if (fb->format->format == formats[i])
+			return 0;
+
+	drm_dbg_kms(encoder->dev, "Invalid pixel format %p4cc\n", &fb->format->format);
+
+	return -EINVAL;
+}
+EXPORT_SYMBOL(drm_atomic_helper_check_wb_encoder_state);
 
 /**
  * drm_atomic_helper_check_plane_state() - Check plane state for validity
@@ -899,7 +949,10 @@ int drm_atomic_helper_check_crtc_state(struct drm_crtc_state *crtc_state,
 				       bool can_disable_primary_planes)
 {
 	struct drm_device *dev = crtc_state->crtc->dev;
+<<<<<<< HEAD
+=======
 	struct drm_atomic_state *state = crtc_state->state;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!crtc_state->enable)
 		return 0;
@@ -910,6 +963,9 @@ int drm_atomic_helper_check_crtc_state(struct drm_crtc_state *crtc_state,
 		struct drm_plane *plane;
 
 		drm_for_each_plane_mask(plane, dev, crtc_state->plane_mask) {
+<<<<<<< HEAD
+			if (plane->type == DRM_PLANE_TYPE_PRIMARY) {
+=======
 			struct drm_plane_state *plane_state;
 
 			if (plane->type != DRM_PLANE_TYPE_PRIMARY)
@@ -918,6 +974,7 @@ int drm_atomic_helper_check_crtc_state(struct drm_crtc_state *crtc_state,
 			if (IS_ERR(plane_state))
 				return PTR_ERR(plane_state);
 			if (plane_state->fb && plane_state->crtc) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				has_primary_plane = true;
 				break;
 			}
@@ -1789,7 +1846,7 @@ int drm_atomic_helper_async_check(struct drm_device *dev,
 	struct drm_plane_state *old_plane_state = NULL;
 	struct drm_plane_state *new_plane_state = NULL;
 	const struct drm_plane_helper_funcs *funcs;
-	int i, n_planes = 0;
+	int i, ret, n_planes = 0;
 
 	for_each_new_crtc_in_state(state, crtc, crtc_state, i) {
 		if (drm_atomic_crtc_needs_modeset(crtc_state))
@@ -1800,19 +1857,34 @@ int drm_atomic_helper_async_check(struct drm_device *dev,
 		n_planes++;
 
 	/* FIXME: we support only single plane updates for now */
-	if (n_planes != 1)
+	if (n_planes != 1) {
+		drm_dbg_atomic(dev,
+			       "only single plane async updates are supported\n");
 		return -EINVAL;
+	}
 
 	if (!new_plane_state->crtc ||
-	    old_plane_state->crtc != new_plane_state->crtc)
+	    old_plane_state->crtc != new_plane_state->crtc) {
+		drm_dbg_atomic(dev,
+			       "[PLANE:%d:%s] async update cannot change CRTC\n",
+			       plane->base.id, plane->name);
 		return -EINVAL;
+	}
 
 	funcs = plane->helper_private;
-	if (!funcs->atomic_async_update)
+	if (!funcs->atomic_async_update) {
+		drm_dbg_atomic(dev,
+			       "[PLANE:%d:%s] driver does not support async updates\n",
+			       plane->base.id, plane->name);
 		return -EINVAL;
+	}
 
-	if (new_plane_state->fence)
+	if (new_plane_state->fence) {
+		drm_dbg_atomic(dev,
+			       "[PLANE:%d:%s] missing fence for async update\n",
+			       plane->base.id, plane->name);
 		return -EINVAL;
+	}
 
 	/*
 	 * Don't do an async update if there is an outstanding commit modifying
@@ -1827,7 +1899,16 @@ int drm_atomic_helper_async_check(struct drm_device *dev,
 		return -EBUSY;
 	}
 
+<<<<<<< HEAD
+	ret = funcs->atomic_async_check(plane, state);
+	if (ret != 0)
+		drm_dbg_atomic(dev,
+			       "[PLANE:%d:%s] driver async check failed\n",
+			       plane->base.id, plane->name);
+	return ret;
+=======
 	return funcs->atomic_async_check(plane, state);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(drm_atomic_helper_async_check);
 

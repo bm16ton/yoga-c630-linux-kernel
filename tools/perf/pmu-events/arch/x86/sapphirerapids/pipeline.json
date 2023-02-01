@@ -80,10 +80,17 @@
         "EventCode": "0xc1",
         "EventName": "ASSISTS.ANY",
         "PEBScounters": "0,1,2,3,4,5,6,7",
+<<<<<<< HEAD
+        "PublicDescription": "Counts the number of occurrences where a microcode assist is invoked by hardware. Examples include AD (page Access Dirty), FP and AVX related assists.",
+        "SampleAfterValue": "100003",
+        "Speculative": "1",
+        "UMask": "0x1b"
+=======
         "PublicDescription": "Counts the number of occurrences where a microcode assist is invoked by hardware Examples include AD (page Access Dirty), FP and AVX related assists.",
         "SampleAfterValue": "100003",
         "Speculative": "1",
         "UMask": "0x1f"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     },
     {
         "BriefDescription": "All branch instructions retired.",

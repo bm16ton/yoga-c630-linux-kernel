@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/microchip/wilc1000/wilc1000-spi.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/microchip/wilc1000/wilc1000-spi.o @drivers/net/wireless/microchip/wilc1000/wilc1000-spi.mod 

@@ -47,7 +47,10 @@ allow_join_initial_addr_port - BOOLEAN
 	Default: 1
 
 pm_type - INTEGER
+<<<<<<< HEAD
+=======
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	Set the default path manager type to use for each new MPTCP
 	socket. In-kernel path management will control subflow
 	connections and address advertisements according to

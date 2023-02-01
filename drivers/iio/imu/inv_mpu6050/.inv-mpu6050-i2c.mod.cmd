@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/inv_mpu6050/inv-mpu6050-i2c.mod := printf '%s\n'   inv_mpu_i2c.o inv_mpu_acpi.o | awk '!x[$$0]++ { print("drivers/iio/imu/inv_mpu6050/"$$0) }' > drivers/iio/imu/inv_mpu6050/inv-mpu6050-i2c.mod

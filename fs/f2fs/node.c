@@ -36,6 +36,7 @@ int f2fs_check_nid_range(struct f2fs_sb_info *sbi, nid_t nid)
 		set_sbi_flag(sbi, SBI_NEED_FSCK);
 		f2fs_warn(sbi, "%s: out-of-range nid=%x, run fsck to fix.",
 			  __func__, nid);
+		f2fs_handle_error(sbi, ERROR_CORRUPTED_INODE);
 		return -EFSCORRUPTED;
 	}
 	return 0;
@@ -1295,6 +1296,10 @@ struct page *f2fs_new_node_page(struct dnode_of_data *dn, unsigned int ofs)
 	if (unlikely(new_ni.blk_addr != NULL_ADDR)) {
 		err = -EFSCORRUPTED;
 		set_sbi_flag(sbi, SBI_NEED_FSCK);
+<<<<<<< HEAD
+		f2fs_handle_error(sbi, ERROR_INVALID_BLKADDR);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto fail;
 	}
 #endif
@@ -1358,8 +1363,12 @@ static int read_node_page(struct page *page, blk_opf_t op_flags)
 		return err;
 
 	/* NEW_ADDR can be seen, after cp_error drops some dirty node pages */
+<<<<<<< HEAD
+	if (unlikely(ni.blk_addr == NULL_ADDR || ni.blk_addr == NEW_ADDR)) {
+=======
 	if (unlikely(ni.blk_addr == NULL_ADDR || ni.blk_addr == NEW_ADDR) ||
 			is_sbi_flag_set(sbi, SBI_IS_SHUTDOWN)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ClearPageUptodate(page);
 		return -ENOENT;
 	}
@@ -1369,7 +1378,7 @@ static int read_node_page(struct page *page, blk_opf_t op_flags)
 	err = f2fs_submit_page_bio(&fio);
 
 	if (!err)
-		f2fs_update_iostat(sbi, FS_NODE_READ_IO, F2FS_BLKSIZE);
+		f2fs_update_iostat(sbi, NULL, FS_NODE_READ_IO, F2FS_BLKSIZE);
 
 	return err;
 }
@@ -2147,8 +2156,12 @@ static bool f2fs_dirty_node_folio(struct address_space *mapping,
 	if (IS_INODE(&folio->page))
 		f2fs_inode_chksum_set(F2FS_M_SB(mapping), &folio->page);
 #endif
+<<<<<<< HEAD
+	if (filemap_dirty_folio(mapping, folio)) {
+=======
 	if (!folio_test_dirty(folio)) {
 		filemap_dirty_folio(mapping, folio);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		inc_page_count(F2FS_M_SB(mapping), F2FS_DIRTY_NODES);
 		set_page_private_reference(&folio->page);
 		return true;

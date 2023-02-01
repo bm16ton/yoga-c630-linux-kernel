@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ti/wlcore/wlcore.mod := printf '%s\n'   main.o cmd.o io.o event.o tx.o rx.o ps.o acx.o boot.o init.o debugfs.o scan.o sysfs.o vendor_cmd.o testmode.o | awk '!x[$$0]++ { print("drivers/net/wireless/ti/wlcore/"$$0) }' > drivers/net/wireless/ti/wlcore/wlcore.mod

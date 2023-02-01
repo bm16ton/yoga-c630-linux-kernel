@@ -1,0 +1,1 @@
+cmd_sound/firewire/dice/snd-dice.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/firewire/dice/snd-dice.ko sound/firewire/dice/snd-dice.o sound/firewire/dice/snd-dice.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/crypto/inside-secure/crypto_safexcel.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/crypto/inside-secure/crypto_safexcel.ko drivers/crypto/inside-secure/crypto_safexcel.o drivers/crypto/inside-secure/crypto_safexcel.mod.o;  true

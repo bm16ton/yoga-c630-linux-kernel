@@ -1,0 +1,1 @@
+cmd_sound/firewire/oxfw/snd-oxfw.mod := printf '%s\n'   oxfw-command.o oxfw-stream.o oxfw-pcm.o oxfw-proc.o oxfw-midi.o oxfw-hwdep.o oxfw-spkr.o oxfw-scs1x.o oxfw.o | awk '!x[$$0]++ { print("sound/firewire/oxfw/"$$0) }' > sound/firewire/oxfw/snd-oxfw.mod

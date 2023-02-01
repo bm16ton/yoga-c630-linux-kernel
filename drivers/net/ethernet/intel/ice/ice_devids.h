@@ -24,6 +24,14 @@
 #define ICE_DEV_ID_E810C_SFP		0x1593
 #define ICE_SUBDEV_ID_E810T		0x000E
 #define ICE_SUBDEV_ID_E810T2		0x000F
+<<<<<<< HEAD
+#define ICE_SUBDEV_ID_E810T3		0x0010
+#define ICE_SUBDEV_ID_E810T4		0x0011
+#define ICE_SUBDEV_ID_E810T5		0x0012
+#define ICE_SUBDEV_ID_E810T6		0x02E9
+#define ICE_SUBDEV_ID_E810T7		0x02EA
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* Intel(R) Ethernet Controller E810-XXV for backplane */
 #define ICE_DEV_ID_E810_XXV_BACKPLANE	0x1599
 /* Intel(R) Ethernet Controller E810-XXV for QSFP */

@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ivtv/ivtv-alsa.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/ivtv/ivtv-alsa.ko drivers/media/pci/ivtv/ivtv-alsa.o drivers/media/pci/ivtv/ivtv-alsa.mod.o;  true

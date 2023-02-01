@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /*
  * Copyright 2014 Advanced Micro Devices, Inc.
  *
@@ -74,9 +75,12 @@ void amdgpu_amdkfd_device_probe(struct amdgpu_device *adev)
 		return;
 
 	adev->kfd.dev = kgd2kfd_probe(adev, vf);
+<<<<<<< HEAD
+=======
 
 	if (adev->kfd.dev)
 		amdgpu_amdkfd_total_mem_size += adev->gmc.real_vram_size;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -130,6 +134,10 @@ static void amdgpu_amdkfd_reset_work(struct work_struct *work)
 						  kfd.reset_work);
 
 	struct amdgpu_reset_context reset_context;
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memset(&reset_context, 0, sizeof(reset_context));
 
 	reset_context.method = AMD_RESET_METHOD_NONE;
@@ -198,6 +206,11 @@ void amdgpu_amdkfd_device_init(struct amdgpu_device *adev)
 		adev->kfd.init_complete = kgd2kfd_device_init(adev->kfd.dev,
 						adev_to_drm(adev), &gpu_resources);
 
+<<<<<<< HEAD
+		amdgpu_amdkfd_total_mem_size += adev->gmc.real_vram_size;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		INIT_WORK(&adev->kfd.reset_work, amdgpu_amdkfd_reset_work);
 	}
 }
@@ -207,6 +220,7 @@ void amdgpu_amdkfd_device_fini_sw(struct amdgpu_device *adev)
 	if (adev->kfd.dev) {
 		kgd2kfd_device_exit(adev->kfd.dev);
 		adev->kfd.dev = NULL;
+		amdgpu_amdkfd_total_mem_size -= adev->gmc.real_vram_size;
 	}
 }
 
@@ -573,6 +587,7 @@ int amdgpu_amdkfd_get_xgmi_bandwidth_mbytes(struct amdgpu_device *dst,
 
 	if (src)
 		peer_adev = src;
+<<<<<<< HEAD
 
 	/* num links returns 0 for indirect peers since indirect route is unknown. */
 	num_links = is_min ? 1 : amdgpu_xgmi_get_num_links(adev, peer_adev);
@@ -583,6 +598,18 @@ int amdgpu_amdkfd_get_xgmi_bandwidth_mbytes(struct amdgpu_device *dst,
 		num_links = 0;
 	}
 
+=======
+
+	/* num links returns 0 for indirect peers since indirect route is unknown. */
+	num_links = is_min ? 1 : amdgpu_xgmi_get_num_links(adev, peer_adev);
+	if (num_links < 0) {
+		DRM_ERROR("amdgpu: failed to get xgmi num links between node %d and %d. ret = %d\n",
+			adev->gmc.xgmi.physical_node_id,
+			peer_adev->gmc.xgmi.physical_node_id, num_links);
+		num_links = 0;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Aldebaran xGMI DPM is defeatured so assume x16 x 25Gbps for bandwidth. */
 	return (num_links * 16 * 25000)/BITS_PER_BYTE;
 }
@@ -683,6 +710,7 @@ int amdgpu_amdkfd_submit_ib(struct amdgpu_device *adev,
 	ib->length_dw = ib_len;
 	/* This works for NO_HWS. TODO: need to handle without knowing VMID */
 	job->vmid = vmid;
+	job->num_ibs = 1;
 
 	ret = amdgpu_ib_schedule(ring, 1, ib, job, &f);
 
@@ -759,11 +787,15 @@ void amdgpu_amdkfd_ras_poison_consumption_handler(struct amdgpu_device *adev, bo
 {
 	struct ras_err_data err_data = {0, 0, 0, NULL};
 
+<<<<<<< HEAD
+	amdgpu_umc_poison_handler(adev, &err_data, reset);
+=======
 	/* CPU MCA will handle page retirement if connected_to_cpu is 1 */
 	if (!adev->gmc.xgmi.connected_to_cpu)
 		amdgpu_umc_poison_handler(adev, &err_data, reset);
 	else if (reset)
 		amdgpu_amdkfd_gpu_reset(adev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 bool amdgpu_amdkfd_ras_query_utcl2_poison_status(struct amdgpu_device *adev)

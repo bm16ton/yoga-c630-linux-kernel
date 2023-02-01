@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/modules.order := {   echo drivers/usb/gadget/libcomposite.ko;   cat drivers/usb/gadget/udc/modules.order;   cat drivers/usb/gadget/function/modules.order;   cat drivers/usb/gadget/legacy/modules.order; :; } > drivers/usb/gadget/modules.order

@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/nzxt-smart2.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/nzxt-smart2.ko drivers/hwmon/nzxt-smart2.o drivers/hwmon/nzxt-smart2.mod.o;  true

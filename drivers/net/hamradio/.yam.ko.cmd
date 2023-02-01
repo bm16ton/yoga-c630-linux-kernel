@@ -1,0 +1,1 @@
+cmd_drivers/net/hamradio/yam.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/hamradio/yam.ko drivers/net/hamradio/yam.o drivers/net/hamradio/yam.mod.o;  true

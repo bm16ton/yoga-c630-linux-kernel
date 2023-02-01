@@ -1,0 +1,1 @@
+cmd_drivers/net/dsa/mv88e6xxx/mv88e6xxx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/dsa/mv88e6xxx/mv88e6xxx.ko drivers/net/dsa/mv88e6xxx/mv88e6xxx.o drivers/net/dsa/mv88e6xxx/mv88e6xxx.mod.o;  true

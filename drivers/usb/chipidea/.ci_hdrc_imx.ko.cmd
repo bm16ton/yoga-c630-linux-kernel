@@ -1,0 +1,1 @@
+cmd_drivers/usb/chipidea/ci_hdrc_imx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/chipidea/ci_hdrc_imx.ko drivers/usb/chipidea/ci_hdrc_imx.o drivers/usb/chipidea/ci_hdrc_imx.mod.o;  true

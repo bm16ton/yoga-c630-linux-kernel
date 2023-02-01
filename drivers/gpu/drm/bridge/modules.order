@@ -1,0 +1,12 @@
+drivers/gpu/drm/bridge/analogix/analogix-anx6345.ko
+drivers/gpu/drm/bridge/analogix/analogix_dp.ko
+drivers/gpu/drm/bridge/synopsys/dw-hdmi.ko
+drivers/gpu/drm/bridge/synopsys/dw-hdmi-i2s-audio.ko
+drivers/gpu/drm/bridge/display-connector.ko
+drivers/gpu/drm/bridge/lvds-codec.ko
+drivers/gpu/drm/bridge/nxp-ptn3460.ko
+drivers/gpu/drm/bridge/simple-bridge.ko
+drivers/gpu/drm/bridge/adv7511/adv7511.ko
+drivers/gpu/drm/bridge/ti-dlpc3433.ko
+drivers/gpu/drm/bridge/ti-sn65dsi86.ko
+drivers/gpu/drm/bridge/ti-tfp410.ko

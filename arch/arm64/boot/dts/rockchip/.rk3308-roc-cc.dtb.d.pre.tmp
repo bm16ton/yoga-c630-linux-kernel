@@ -1,0 +1,9 @@
+rk3308-roc-cc.o: arch/arm64/boot/dts/rockchip/rk3308-roc-cc.dts \
+ arch/arm64/boot/dts/rockchip/rk3308.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/rk3308-cru.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/rockchip.h \
+ scripts/dtc/include-prefixes/dt-bindings/soc/rockchip,boot-mode.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h

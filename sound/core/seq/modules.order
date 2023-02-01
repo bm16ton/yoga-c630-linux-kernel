@@ -1,0 +1,5 @@
+sound/core/seq/snd-seq.ko
+sound/core/seq/snd-seq-dummy.ko
+sound/core/seq/snd-seq-midi.ko
+sound/core/seq/snd-seq-midi-emul.ko
+sound/core/seq/snd-seq-midi-event.ko

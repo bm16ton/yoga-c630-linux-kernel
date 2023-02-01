@@ -1,0 +1,3 @@
+drivers/w1/masters/ds2490.ko
+drivers/w1/masters/ds2482.ko
+drivers/w1/masters/w1-gpio.ko

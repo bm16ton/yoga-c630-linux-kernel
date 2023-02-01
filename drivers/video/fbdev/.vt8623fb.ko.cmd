@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/vt8623fb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/fbdev/vt8623fb.ko drivers/video/fbdev/vt8623fb.o drivers/video/fbdev/vt8623fb.mod.o;  true

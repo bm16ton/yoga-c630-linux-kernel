@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/adv7170.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/i2c/adv7170.ko drivers/media/i2c/adv7170.o drivers/media/i2c/adv7170.mod.o;  true

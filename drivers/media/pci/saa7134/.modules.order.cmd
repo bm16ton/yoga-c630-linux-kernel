@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/saa7134/modules.order := {   echo drivers/media/pci/saa7134/saa7134.ko;   echo drivers/media/pci/saa7134/saa7134-empress.ko;   echo drivers/media/pci/saa7134/saa7134-alsa.ko;   echo drivers/media/pci/saa7134/saa7134-dvb.ko; :; } > drivers/media/pci/saa7134/modules.order

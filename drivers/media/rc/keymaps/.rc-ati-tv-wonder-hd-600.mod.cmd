@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-ati-tv-wonder-hd-600.mod := printf '%s\n'   rc-ati-tv-wonder-hd-600.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-ati-tv-wonder-hd-600.mod

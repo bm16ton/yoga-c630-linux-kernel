@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-viperboard.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-viperboard.ko drivers/gpio/gpio-viperboard.o drivers/gpio/gpio-viperboard.mod.o;  true

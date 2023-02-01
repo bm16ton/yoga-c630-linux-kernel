@@ -1,0 +1,1 @@
+cmd_drivers/leds/leds-mlxreg.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/leds-mlxreg.ko drivers/leds/leds-mlxreg.o drivers/leds/leds-mlxreg.mod.o;  true

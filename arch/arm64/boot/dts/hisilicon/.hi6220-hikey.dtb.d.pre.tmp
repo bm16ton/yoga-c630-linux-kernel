@@ -1,0 +1,11 @@
+hi6220-hikey.o: arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts \
+ arch/arm64/boot/dts/hisilicon/hi6220.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/hisi,hi6220-resets.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/hi6220-clock.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/hisi.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ arch/arm64/boot/dts/hisilicon/hi6220-coresight.dtsi \
+ arch/arm64/boot/dts/hisilicon/hikey-pinctrl.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h

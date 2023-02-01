@@ -159,6 +159,12 @@ int mt8192_dai_src_register(struct mtk_base_afe *afe);
 int mt8192_dai_pcm_register(struct mtk_base_afe *afe);
 int mt8192_dai_tdm_register(struct mtk_base_afe *afe);
 
+<<<<<<< HEAD
+int mt8192_dai_i2s_set_share(struct mtk_base_afe *afe, const char *main_i2s_name,
+			     const char *secondary_i2s_name);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned int mt8192_general_rate_transform(struct device *dev,
 					   unsigned int rate);
 unsigned int mt8192_rate_transform(struct device *dev,

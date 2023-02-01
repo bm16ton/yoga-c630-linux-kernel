@@ -1,0 +1,1 @@
+cmd_drivers/message/fusion/modules.order := {   echo drivers/message/fusion/mptbase.ko;   echo drivers/message/fusion/mptscsih.ko;   echo drivers/message/fusion/mptspi.ko;   echo drivers/message/fusion/mptfc.ko;   echo drivers/message/fusion/mptsas.ko;   echo drivers/message/fusion/mptctl.ko; :; } > drivers/message/fusion/modules.order

@@ -1,0 +1,1 @@
+cmd_drivers/mtd/maps/plat-ram.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/maps/plat-ram.ko drivers/mtd/maps/plat-ram.o drivers/mtd/maps/plat-ram.mod.o;  true

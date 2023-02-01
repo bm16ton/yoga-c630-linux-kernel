@@ -1,0 +1,1 @@
+cmd_drivers/iio/cdc/ad7150.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/cdc/ad7150.ko drivers/iio/cdc/ad7150.o drivers/iio/cdc/ad7150.mod.o;  true

@@ -256,7 +256,7 @@ pmd_t hash__pmdp_collapse_flush(struct vm_area_struct *vma, unsigned long addres
 	 * the __collapse_huge_page_copy can result in copying
 	 * the old content.
 	 */
-	flush_tlb_pmd_range(vma->vm_mm, &pmd, address);
+	flush_hash_table_pmd_range(vma->vm_mm, &pmd, address);
 	return pmd;
 }
 
@@ -404,7 +404,12 @@ EXPORT_SYMBOL_GPL(hash__has_transparent_hugepage);
 
 struct change_memory_parms {
 	unsigned long start, end, newpp;
+<<<<<<< HEAD
+	unsigned int step, nr_cpus;
+	atomic_t master_cpu;
+=======
 	unsigned int step, nr_cpus, master_cpu;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomic_t cpu_counter;
 };
 
@@ -478,7 +483,12 @@ static int change_memory_range_fn(void *data)
 {
 	struct change_memory_parms *parms = data;
 
+<<<<<<< HEAD
+	// First CPU goes through, all others wait.
+	if (atomic_xchg(&parms->master_cpu, 1) == 1)
+=======
 	if (parms->master_cpu != smp_processor_id())
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return chmem_secondary_loop(parms);
 
 	// Wait for all but one CPU (this one) to call-in
@@ -516,7 +526,11 @@ static bool hash__change_memory_range(unsigned long start, unsigned long end,
 		chmem_parms.end = end;
 		chmem_parms.step = step;
 		chmem_parms.newpp = newpp;
+<<<<<<< HEAD
+		atomic_set(&chmem_parms.master_cpu, 0);
+=======
 		chmem_parms.master_cpu = smp_processor_id();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		cpus_read_lock();
 
@@ -541,7 +555,7 @@ void hash__mark_rodata_ro(void)
 	unsigned long start, end, pp;
 
 	start = (unsigned long)_stext;
-	end = (unsigned long)__init_begin;
+	end = (unsigned long)__end_rodata;
 
 	pp = htab_convert_pte_flags(pgprot_val(PAGE_KERNEL_ROX), HPTE_USE_KERNEL_KEY);
 

@@ -1173,7 +1173,11 @@ int __init fimc_register_driver(void)
 	return platform_driver_register(&fimc_driver);
 }
 
+<<<<<<< HEAD
+void fimc_unregister_driver(void)
+=======
 void __exit fimc_unregister_driver(void)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	platform_driver_unregister(&fimc_driver);
 }

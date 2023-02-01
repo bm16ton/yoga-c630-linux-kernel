@@ -7,7 +7,10 @@
 #include <linux/iopoll.h>
 #include <linux/phy.h>
 #include <linux/of_net.h>
+<<<<<<< HEAD
+=======
 #include <linux/of_mdio.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/if_bridge.h>
 #include <linux/if_vlan.h>
 #include <linux/math.h>
@@ -128,6 +131,16 @@ static int lan937x_internal_phy_read(struct ksz_device *dev, int addr, int reg,
 	return ksz_read16(dev, REG_VPHY_IND_DATA__2, val);
 }
 
+<<<<<<< HEAD
+int lan937x_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
+{
+	return lan937x_internal_phy_read(dev, addr, reg, data);
+}
+
+int lan937x_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
+{
+	return lan937x_internal_phy_write(dev, addr, reg, val);
+=======
 void lan937x_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
 {
 	lan937x_internal_phy_read(dev, addr, reg, data);
@@ -203,6 +216,7 @@ static int lan937x_mdio_register(struct ksz_device *dev)
 	of_node_put(mdio_np);
 
 	return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int lan937x_reset_switch(struct ksz_device *dev)
@@ -225,6 +239,13 @@ int lan937x_reset_switch(struct ksz_device *dev)
 	if (ret < 0)
 		return ret;
 
+<<<<<<< HEAD
+	ret = ksz_write32(dev, REG_SW_INT_STATUS__4, POR_READY_INT);
+	if (ret < 0)
+		return ret;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ksz_write32(dev, REG_SW_PORT_INT_MASK__4, 0xFF);
 	if (ret < 0)
 		return ret;
@@ -244,10 +265,13 @@ void lan937x_port_setup(struct ksz_device *dev, int port, bool cpu_port)
 		lan937x_port_cfg(dev, port, REG_PORT_CTRL_0,
 				 PORT_TAIL_TAG_ENABLE, true);
 
+<<<<<<< HEAD
+=======
 	/* disable frame check length field */
 	lan937x_port_cfg(dev, port, REG_PORT_MAC_CTRL_0, PORT_CHECK_LENGTH,
 			 false);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* set back pressure for half duplex */
 	lan937x_port_cfg(dev, port, REG_PORT_MAC_CTRL_1, PORT_BACK_PRESSURE,
 			 true);
@@ -315,6 +339,26 @@ int lan937x_change_mtu(struct ksz_device *dev, int port, int new_mtu)
 	return 0;
 }
 
+<<<<<<< HEAD
+int lan937x_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
+{
+	u32 secs = msecs / 1000;
+	u32 value;
+	int ret;
+
+	value = FIELD_GET(SW_AGE_PERIOD_7_0_M, secs);
+
+	ret = ksz_write8(dev, REG_SW_AGE_PERIOD__1, value);
+	if (ret < 0)
+		return ret;
+
+	value = FIELD_GET(SW_AGE_PERIOD_19_8_M, secs);
+
+	return ksz_write16(dev, REG_SW_AGE_PERIOD__2, value);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void lan937x_set_tune_adj(struct ksz_device *dev, int port,
 				 u16 reg, u8 val)
 {
@@ -383,6 +427,16 @@ void lan937x_setup_rgmii_delay(struct ksz_device *dev, int port)
 	}
 }
 
+<<<<<<< HEAD
+int lan937x_switch_init(struct ksz_device *dev)
+{
+	dev->port_mask = (1 << dev->info->port_cnt) - 1;
+
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int lan937x_setup(struct dsa_switch *ds)
 {
 	struct ksz_device *dev = ds->priv;
@@ -395,12 +449,15 @@ int lan937x_setup(struct dsa_switch *ds)
 		return ret;
 	}
 
+<<<<<<< HEAD
+=======
 	ret = lan937x_mdio_register(dev);
 	if (ret < 0) {
 		dev_err(dev->dev, "failed to register the mdio");
 		return ret;
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* The VLAN aware is a global setting. Mixed vlan
 	 * filterings are not supported.
 	 */
@@ -426,11 +483,17 @@ int lan937x_setup(struct dsa_switch *ds)
 	return 0;
 }
 
+<<<<<<< HEAD
+void lan937x_teardown(struct dsa_switch *ds)
+{
+
+=======
 int lan937x_switch_init(struct ksz_device *dev)
 {
 	dev->port_mask = (1 << dev->info->port_cnt) - 1;
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void lan937x_switch_exit(struct ksz_device *dev)

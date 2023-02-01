@@ -1,0 +1,1 @@
+cmd_sound/core/seq/snd-seq.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/core/seq/snd-seq.ko sound/core/seq/snd-seq.o sound/core/seq/snd-seq.mod.o;  true

@@ -10,6 +10,7 @@
 #include <linux/math64.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
+#include <linux/property.h>
 #include <linux/sysfs.h>
 #include <asm/unaligned.h>
 
@@ -1152,6 +1153,83 @@ int occ_active(struct occ *occ, bool active)
 
 	if (rc)
 		return rc;
+<<<<<<< HEAD
+
+	if (active) {
+		if (occ->active) {
+			rc = -EALREADY;
+			goto unlock;
+		}
+
+		occ->error_count = 0;
+		occ->last_safe = 0;
+
+		rc = occ_poll(occ);
+		if (rc < 0) {
+			dev_err(occ->bus_dev,
+				"failed to get OCC poll response=%02x: %d\n",
+				occ->resp.return_status, rc);
+			goto unlock;
+		}
+
+		occ->active = true;
+		occ->next_update = jiffies + OCC_UPDATE_FREQUENCY;
+		occ_parse_poll_response(occ);
+
+		rc = occ_setup_sensor_attrs(occ);
+		if (rc) {
+			dev_err(occ->bus_dev,
+				"failed to setup sensor attrs: %d\n", rc);
+			goto unlock;
+		}
+
+		occ->hwmon = hwmon_device_register_with_groups(occ->bus_dev,
+							       "occ", occ,
+							       occ->groups);
+		if (IS_ERR(occ->hwmon)) {
+			rc = PTR_ERR(occ->hwmon);
+			occ->hwmon = NULL;
+			dev_err(occ->bus_dev,
+				"failed to register hwmon device: %d\n", rc);
+			goto unlock;
+		}
+	} else {
+		if (!occ->active) {
+			rc = -EALREADY;
+			goto unlock;
+		}
+
+		if (occ->hwmon)
+			hwmon_device_unregister(occ->hwmon);
+		occ->active = false;
+		occ->hwmon = NULL;
+	}
+
+unlock:
+	mutex_unlock(&occ->lock);
+	return rc;
+}
+
+int occ_setup(struct occ *occ)
+{
+	int rc;
+
+	mutex_init(&occ->lock);
+	occ->groups[0] = &occ->group;
+
+	rc = occ_setup_sysfs(occ);
+	if (rc) {
+		dev_err(occ->bus_dev, "failed to setup sysfs: %d\n", rc);
+		return rc;
+	}
+
+	if (!device_property_read_bool(occ->bus_dev, "ibm,no-poll-on-init")) {
+		rc = occ_active(occ, true);
+		if (rc)
+			occ_shutdown_sysfs(occ);
+	}
+
+=======
 
 	if (active) {
 		if (occ->active) {
@@ -1219,6 +1297,7 @@ int occ_setup(struct occ *occ)
 	if (rc)
 		dev_err(occ->bus_dev, "failed to setup sysfs: %d\n", rc);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return rc;
 }
 EXPORT_SYMBOL_GPL(occ_setup);

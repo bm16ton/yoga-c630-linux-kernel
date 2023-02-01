@@ -1,0 +1,1 @@
+cmd_net/netfilter/xt_ipcomp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/xt_ipcomp.ko net/netfilter/xt_ipcomp.o net/netfilter/xt_ipcomp.mod.o;  true

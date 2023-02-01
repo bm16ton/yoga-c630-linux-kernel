@@ -1,0 +1,1 @@
+cmd_drivers/media/common/b2c2/b2c2-flexcop.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/common/b2c2/b2c2-flexcop.ko drivers/media/common/b2c2/b2c2-flexcop.o drivers/media/common/b2c2/b2c2-flexcop.mod.o;  true

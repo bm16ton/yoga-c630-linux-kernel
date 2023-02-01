@@ -1,0 +1,15 @@
+drivers/gpu/drm/lima/lima_drv.o
+drivers/gpu/drm/lima/lima_device.o
+drivers/gpu/drm/lima/lima_pmu.o
+drivers/gpu/drm/lima/lima_l2_cache.o
+drivers/gpu/drm/lima/lima_mmu.o
+drivers/gpu/drm/lima/lima_gp.o
+drivers/gpu/drm/lima/lima_pp.o
+drivers/gpu/drm/lima/lima_gem.o
+drivers/gpu/drm/lima/lima_vm.o
+drivers/gpu/drm/lima/lima_sched.o
+drivers/gpu/drm/lima/lima_ctx.o
+drivers/gpu/drm/lima/lima_dlbu.o
+drivers/gpu/drm/lima/lima_bcast.o
+drivers/gpu/drm/lima/lima_trace.o
+drivers/gpu/drm/lima/lima_devfreq.o

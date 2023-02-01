@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/bmc150-accel-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/bmc150-accel-i2c.ko drivers/iio/accel/bmc150-accel-i2c.o drivers/iio/accel/bmc150-accel-i2c.mod.o;  true

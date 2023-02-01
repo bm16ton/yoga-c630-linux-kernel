@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/marvell/mvpp2/mvpp2.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/marvell/mvpp2/mvpp2.ko drivers/net/ethernet/marvell/mvpp2/mvpp2.o drivers/net/ethernet/marvell/mvpp2/mvpp2.mod.o;  true

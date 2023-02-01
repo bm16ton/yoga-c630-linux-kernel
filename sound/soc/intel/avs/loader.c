@@ -15,6 +15,10 @@
 #include "cldma.h"
 #include "messages.h"
 #include "registers.h"
+<<<<<<< HEAD
+#include "topology.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define AVS_ROM_STS_MASK		0xFF
 #define AVS_ROM_INIT_DONE		0x1
@@ -26,8 +30,13 @@
 #define APL_ROM_INIT_RETRIES		3
 
 #define AVS_FW_INIT_POLLING_US		500
+<<<<<<< HEAD
+#define AVS_FW_INIT_TIMEOUT_MS		3000
+#define AVS_FW_INIT_TIMEOUT_US		(AVS_FW_INIT_TIMEOUT_MS * 1000)
+=======
 #define AVS_FW_INIT_TIMEOUT_US		3000000
 #define AVS_FW_INIT_TIMEOUT_MS		3000
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define AVS_CLDMA_START_DELAY_MS	100
 
@@ -36,6 +45,11 @@
 #define AVS_EXT_MANIFEST_MAGIC		0x31454124
 #define SKL_MANIFEST_MAGIC		0x00000006
 #define SKL_ADSPFW_OFFSET		0x284
+<<<<<<< HEAD
+#define APL_MANIFEST_MAGIC		0x44504324
+#define APL_ADSPFW_OFFSET		0x2000
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Occasionally, engineering (release candidate) firmware is provided for testing. */
 static bool debug_ignore_fw_version;
@@ -86,6 +100,11 @@ static int avs_fw_manifest_offset(struct firmware *fw)
 	switch (magic) {
 	case SKL_MANIFEST_MAGIC:
 		return SKL_ADSPFW_OFFSET;
+<<<<<<< HEAD
+	case APL_MANIFEST_MAGIC:
+		return APL_ADSPFW_OFFSET;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return -EINVAL;
 	}
@@ -466,6 +485,74 @@ int avs_hda_transfer_modules(struct avs_dev *adev, bool load,
 	return 0;
 }
 
+<<<<<<< HEAD
+int avs_dsp_load_libraries(struct avs_dev *adev, struct avs_tplg_library *libs, u32 num_libs)
+{
+	int start, id, i = 0;
+	int ret;
+
+	/* Calculate the id to assign for the next lib. */
+	for (id = 0; id < adev->fw_cfg.max_libs_count; id++)
+		if (adev->lib_names[id][0] == '\0')
+			break;
+	if (id + num_libs >= adev->fw_cfg.max_libs_count)
+		return -EINVAL;
+
+	start = id;
+	while (i < num_libs) {
+		struct avs_fw_manifest *man;
+		const struct firmware *fw;
+		struct firmware stripped_fw;
+		char *filename;
+		int j;
+
+		filename = kasprintf(GFP_KERNEL, "%s/%s/%s", AVS_ROOT_DIR, adev->spec->name,
+				     libs[i].name);
+		if (!filename)
+			return -ENOMEM;
+
+		/*
+		 * If any call after this one fails, requested firmware is not released with
+		 * avs_release_last_firmware() as failing to load code results in need for reload
+		 * of entire driver module. And then avs_release_firmwares() is in place already.
+		 */
+		ret = avs_request_firmware(adev, &fw, filename);
+		kfree(filename);
+		if (ret < 0)
+			return ret;
+
+		stripped_fw = *fw;
+		ret = avs_fw_manifest_strip_verify(adev, &stripped_fw, NULL);
+		if (ret) {
+			dev_err(adev->dev, "invalid library data: %d\n", ret);
+			return ret;
+		}
+
+		ret = avs_fw_manifest_offset(&stripped_fw);
+		if (ret < 0)
+			return ret;
+		man = (struct avs_fw_manifest *)(stripped_fw.data + ret);
+
+		/* Don't load anything that's already in DSP memory. */
+		for (j = 0; j < id; j++)
+			if (!strncmp(adev->lib_names[j], man->name, AVS_LIB_NAME_SIZE))
+				goto next_lib;
+
+		ret = avs_dsp_op(adev, load_lib, &stripped_fw, id);
+		if (ret)
+			return ret;
+
+		strncpy(adev->lib_names[id], man->name, AVS_LIB_NAME_SIZE);
+		id++;
+next_lib:
+		i++;
+	}
+
+	return start == id ? 1 : 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int avs_dsp_load_basefw(struct avs_dev *adev)
 {
 	const struct avs_fw_version *min_req;
@@ -519,6 +606,10 @@ release_fw:
 
 int avs_dsp_boot_firmware(struct avs_dev *adev, bool purge)
 {
+<<<<<<< HEAD
+	struct avs_soc_component *acomp;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret, i;
 
 	/* Forgo full boot if flash from IMR succeeds. */
@@ -538,7 +629,24 @@ int avs_dsp_boot_firmware(struct avs_dev *adev, bool purge)
 	avs_hda_l1sen_enable(adev, false);
 
 	ret = avs_dsp_load_basefw(adev);
+<<<<<<< HEAD
+	if (ret)
+		goto reenable_gating;
 
+	mutex_lock(&adev->comp_list_mutex);
+	list_for_each_entry(acomp, &adev->comp_list, node) {
+		struct avs_tplg *tplg = acomp->tplg;
+
+		ret = avs_dsp_load_libraries(adev, tplg->libs, tplg->num_libs);
+		if (ret < 0)
+			break;
+	}
+	mutex_unlock(&adev->comp_list_mutex);
+
+reenable_gating:
+=======
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	avs_hda_l1sen_enable(adev, true);
 	avs_hda_clock_gating_enable(adev, true);
 

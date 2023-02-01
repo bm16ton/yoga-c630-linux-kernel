@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/sdhci-pci.mod := printf '%s\n'   sdhci-pci-core.o sdhci-pci-o2micro.o sdhci-pci-arasan.o sdhci-pci-dwc-mshc.o sdhci-pci-gli.o | awk '!x[$$0]++ { print("drivers/mmc/host/"$$0) }' > drivers/mmc/host/sdhci-pci.mod

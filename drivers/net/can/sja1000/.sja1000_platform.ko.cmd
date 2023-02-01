@@ -1,0 +1,1 @@
+cmd_drivers/net/can/sja1000/sja1000_platform.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/can/sja1000/sja1000_platform.ko drivers/net/can/sja1000/sja1000_platform.o drivers/net/can/sja1000/sja1000_platform.mod.o;  true

@@ -132,6 +132,10 @@ struct pseries_vas_window {
 	u64 flags;
 	char *name;
 	int fault_virq;
+<<<<<<< HEAD
+	atomic_t pending_faults; /* Number of pending faults */
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 int sysfs_add_vas_caps(struct vas_cop_feat_caps *caps);
@@ -140,10 +144,21 @@ int __init sysfs_pseries_vas_init(struct vas_all_caps *vas_caps);
 
 #ifdef CONFIG_PPC_VAS
 int vas_migration_handler(int action);
+<<<<<<< HEAD
+int pseries_vas_dlpar_cpu(void);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #else
 static inline int vas_migration_handler(int action)
 {
 	return 0;
 }
+<<<<<<< HEAD
+static inline int pseries_vas_dlpar_cpu(void)
+{
+	return 0;
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 #endif /* _VAS_H */

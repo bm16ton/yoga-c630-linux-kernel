@@ -1,0 +1,1 @@
+cmd_drivers/char/tpm/modules.order := {   echo drivers/char/tpm/tpm.ko;   echo drivers/char/tpm/tpm_tis_core.ko;   echo drivers/char/tpm/tpm_tis_spi.ko;   echo drivers/char/tpm/tpm_i2c_infineon.ko;   echo drivers/char/tpm/tpm_vtpm_proxy.ko; :; } > drivers/char/tpm/modules.order

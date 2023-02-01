@@ -4,7 +4,11 @@ config DRM_STI
 	depends on OF && DRM && (ARCH_STI || ARCH_MULTIPLATFORM)
 	select RESET_CONTROLLER
 	select DRM_KMS_HELPER
+<<<<<<< HEAD
+	select DRM_GEM_DMA_HELPER
+=======
 	select DRM_GEM_CMA_HELPER
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select DRM_PANEL
 	select FW_LOADER
 	select SND_SOC_HDMI_CODEC if SND_SOC

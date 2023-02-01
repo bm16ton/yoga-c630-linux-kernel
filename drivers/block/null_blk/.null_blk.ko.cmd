@@ -1,0 +1,1 @@
+cmd_drivers/block/null_blk/null_blk.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/block/null_blk/null_blk.ko drivers/block/null_blk/null_blk.o drivers/block/null_blk/null_blk.mod.o;  true

@@ -192,6 +192,7 @@ static int uclogic_probe(struct hid_device *hdev,
 	 * than the pen, so use QUIRK_MULTI_INPUT for all tablets.
 	 */
 	hdev->quirks |= HID_QUIRK_MULTI_INPUT;
+	hdev->quirks |= HID_QUIRK_HIDINPUT_FORCE;
 
 	/* Allocate and assign driver data */
 	drvdata = devm_kzalloc(&hdev->dev, sizeof(*drvdata), GFP_KERNEL);
@@ -445,6 +446,7 @@ static int uclogic_raw_event(struct hid_device *hdev,
 				continue;
 			} else {
 				return uclogic_raw_event_pen(drvdata, data, size);
+<<<<<<< HEAD
 			}
 		}
 
@@ -457,6 +459,20 @@ static int uclogic_raw_event(struct hid_device *hdev,
 			}
 		}
 
+=======
+			}
+		}
+
+		/* Tweak frame control reports, if necessary */
+		for (i = 0; i < ARRAY_SIZE(params->frame_list); i++) {
+			if (report_id == params->frame_list[i].id) {
+				return uclogic_raw_event_frame(
+					drvdata, &params->frame_list[i],
+					data, size);
+			}
+		}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	}
 
@@ -511,6 +527,8 @@ static const struct hid_device_id uclogic_devices[] = {
 	{ HID_USB_DEVICE(USB_VENDOR_ID_UGTIZER,
 				USB_DEVICE_ID_UGTIZER_TABLET_GT5040) },
 	{ HID_USB_DEVICE(USB_VENDOR_ID_UGEE,
+				USB_DEVICE_ID_UGEE_PARBLO_A610_PRO) },
+	{ HID_USB_DEVICE(USB_VENDOR_ID_UGEE,
 				USB_DEVICE_ID_UGEE_TABLET_G5) },
 	{ HID_USB_DEVICE(USB_VENDOR_ID_UGEE,
 				USB_DEVICE_ID_UGEE_TABLET_EX07S) },
@@ -525,6 +543,11 @@ static const struct hid_device_id uclogic_devices[] = {
 	{ HID_USB_DEVICE(USB_VENDOR_ID_UGEE,
 				USB_DEVICE_ID_UGEE_XPPEN_TABLET_DECO_L) },
 	{ HID_USB_DEVICE(USB_VENDOR_ID_UGEE,
+<<<<<<< HEAD
+				USB_DEVICE_ID_UGEE_XPPEN_TABLET_DECO_PRO_S) },
+	{ HID_USB_DEVICE(USB_VENDOR_ID_UGEE,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				USB_DEVICE_ID_UGEE_XPPEN_TABLET_STAR06) },
 	{ }
 };

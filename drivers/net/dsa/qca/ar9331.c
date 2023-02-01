@@ -1115,6 +1115,18 @@ static void ar9331_sw_shutdown(struct mdio_device *mdiodev)
 	dev_set_drvdata(&mdiodev->dev, NULL);
 }
 
+static void ar9331_sw_shutdown(struct mdio_device *mdiodev)
+{
+	struct ar9331_sw_priv *priv = dev_get_drvdata(&mdiodev->dev);
+
+	if (!priv)
+		return;
+
+	dsa_switch_shutdown(&priv->ds);
+
+	dev_set_drvdata(&mdiodev->dev, NULL);
+}
+
 static const struct of_device_id ar9331_sw_of_match[] = {
 	{ .compatible = "qca,ar9331-switch" },
 	{ },

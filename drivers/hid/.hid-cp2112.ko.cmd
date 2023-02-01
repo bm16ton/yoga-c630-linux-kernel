@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-cp2112.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-cp2112.ko drivers/hid/hid-cp2112.o drivers/hid/hid-cp2112.mod.o;  true

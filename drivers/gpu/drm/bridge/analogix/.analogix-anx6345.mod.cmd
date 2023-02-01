@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/bridge/analogix/analogix-anx6345.mod := printf '%s\n'   analogix-anx6345.o | awk '!x[$$0]++ { print("drivers/gpu/drm/bridge/analogix/"$$0) }' > drivers/gpu/drm/bridge/analogix/analogix-anx6345.mod

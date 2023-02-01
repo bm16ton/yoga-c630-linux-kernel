@@ -1,0 +1,1 @@
+cmd_drivers/net/team/team_mode_random.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/team/team_mode_random.ko drivers/net/team/team_mode_random.o drivers/net/team/team_mode_random.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/leds/trigger/ledtrig-netdev.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/trigger/ledtrig-netdev.ko drivers/leds/trigger/ledtrig-netdev.o drivers/leds/trigger/ledtrig-netdev.mod.o;  true

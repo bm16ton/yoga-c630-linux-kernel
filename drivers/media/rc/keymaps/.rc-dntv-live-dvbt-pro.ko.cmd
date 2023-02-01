@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-dntv-live-dvbt-pro.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-dntv-live-dvbt-pro.ko drivers/media/rc/keymaps/rc-dntv-live-dvbt-pro.o drivers/media/rc/keymaps/rc-dntv-live-dvbt-pro.mod.o;  true

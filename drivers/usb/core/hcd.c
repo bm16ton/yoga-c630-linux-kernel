@@ -1474,7 +1474,7 @@ int usb_hcd_map_urb_for_dma(struct usb_hcd *hcd, struct urb *urb,
 						urb->sg,
 						urb->num_sgs,
 						dir);
-				if (n <= 0)
+				if (!n)
 					ret = -EAGAIN;
 				else
 					urb->transfer_flags |= URB_DMA_MAP_SG;
@@ -2158,13 +2158,20 @@ static struct urb *request_single_step_set_feature_urb(
 {
 	struct urb *urb;
 	struct usb_hcd *hcd = bus_to_hcd(udev->bus);
+<<<<<<< HEAD
+=======
 	struct usb_host_endpoint *ep;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	urb = usb_alloc_urb(0, GFP_KERNEL);
 	if (!urb)
 		return NULL;
 
 	urb->pipe = usb_rcvctrlpipe(udev, 0);
+<<<<<<< HEAD
+
+	urb->ep = &udev->ep0;
+=======
 	ep = (usb_pipein(urb->pipe) ? udev->ep_in : udev->ep_out)
 				[usb_pipeendpoint(urb->pipe)];
 	if (!ep) {
@@ -2173,6 +2180,7 @@ static struct urb *request_single_step_set_feature_urb(
 	}
 
 	urb->ep = ep;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	urb->dev = udev;
 	urb->setup_packet = (void *)dr;
 	urb->transfer_buffer = buf;
@@ -3140,8 +3148,16 @@ int usb_hcd_setup_local_mem(struct usb_hcd *hcd, phys_addr_t phys_addr,
 					     GFP_KERNEL,
 					     DMA_ATTR_WRITE_COMBINE);
 
+<<<<<<< HEAD
+	if (IS_ERR_OR_NULL(local_mem)) {
+		if (!local_mem)
+			return -ENOMEM;
+
+=======
 	if (IS_ERR(local_mem))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return PTR_ERR(local_mem);
+	}
 
 	/*
 	 * Here we pass a dma_addr_t but the arg type is a phys_addr_t.

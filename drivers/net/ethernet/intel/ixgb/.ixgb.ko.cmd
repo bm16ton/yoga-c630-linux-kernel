@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/ixgb/ixgb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/intel/ixgb/ixgb.ko drivers/net/ethernet/intel/ixgb/ixgb.o drivers/net/ethernet/intel/ixgb/ixgb.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8192se/rtl8192se.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/realtek/rtlwifi/rtl8192se/rtl8192se.o @drivers/net/wireless/realtek/rtlwifi/rtl8192se/rtl8192se.mod 

@@ -1,0 +1,1 @@
+cmd_net/bridge/netfilter/ebt_arpreply.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/bridge/netfilter/ebt_arpreply.ko net/bridge/netfilter/ebt_arpreply.o net/bridge/netfilter/ebt_arpreply.mod.o;  true

@@ -1073,7 +1073,11 @@ static int sx9324_probe(struct i2c_client *client)
 	return sx_common_probe(client, &sx9324_chip_info, &sx9324_regmap_config);
 }
 
+<<<<<<< HEAD
+static int sx9324_suspend(struct device *dev)
+=======
 static int __maybe_unused sx9324_suspend(struct device *dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sx_common_data *data = iio_priv(dev_get_drvdata(dev));
 	unsigned int regval;
@@ -1098,7 +1102,11 @@ out:
 	return ret;
 }
 
+<<<<<<< HEAD
+static int sx9324_resume(struct device *dev)
+=======
 static int __maybe_unused sx9324_resume(struct device *dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct sx_common_data *data = iio_priv(dev_get_drvdata(dev));
 	int ret;
@@ -1114,7 +1122,11 @@ static int __maybe_unused sx9324_resume(struct device *dev)
 	return 0;
 }
 
+<<<<<<< HEAD
+static DEFINE_SIMPLE_DEV_PM_OPS(sx9324_pm_ops, sx9324_suspend, sx9324_resume);
+=======
 static SIMPLE_DEV_PM_OPS(sx9324_pm_ops, sx9324_suspend, sx9324_resume);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static const struct acpi_device_id sx9324_acpi_match[] = {
 	{ "STH9324", SX9324_WHOAMI_VALUE },
@@ -1139,7 +1151,11 @@ static struct i2c_driver sx9324_driver = {
 		.name	= "sx9324",
 		.acpi_match_table = sx9324_acpi_match,
 		.of_match_table = sx9324_of_match,
+<<<<<<< HEAD
+		.pm = pm_sleep_ptr(&sx9324_pm_ops),
+=======
 		.pm = &sx9324_pm_ops,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/*
 		 * Lots of i2c transfers in probe + over 200 ms waiting in

@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/pmbus_core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/pmbus_core.ko drivers/hwmon/pmbus/pmbus_core.o drivers/hwmon/pmbus/pmbus_core.mod.o;  true

@@ -1187,6 +1187,10 @@ static int wm8997_probe(struct platform_device *pdev)
 err_spk_irqs:
 	arizona_free_spk_irqs(arizona);
 err_jack_codec_dev:
+<<<<<<< HEAD
+	pm_runtime_disable(&pdev->dev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	arizona_jack_codec_dev_remove(&wm8997->core);
 
 	return ret;

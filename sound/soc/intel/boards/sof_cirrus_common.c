@@ -10,6 +10,12 @@
 #include "../../codecs/cs35l41.h"
 #include "sof_cirrus_common.h"
 
+<<<<<<< HEAD
+#define CS35L41_HID "CSC3541"
+#define CS35L41_MAX_AMPS 4
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * Cirrus Logic CS35L41/CS35L53
  */
@@ -35,6 +41,14 @@ static const struct snd_soc_dapm_route cs35l41_dapm_routes[] = {
 	{"TR Spk", NULL, "TR SPK"},
 };
 
+<<<<<<< HEAD
+static struct snd_soc_dai_link_component cs35l41_components[CS35L41_MAX_AMPS];
+
+/*
+ * Mapping between ACPI instance id and speaker position.
+ */
+static struct snd_soc_codec_conf cs35l41_codec_conf[CS35L41_MAX_AMPS];
+=======
 static struct snd_soc_dai_link_component cs35l41_components[] = {
 	{
 		.name = CS35L41_DEV0_NAME,
@@ -72,6 +86,7 @@ static struct snd_soc_codec_conf cs35l41_codec_conf[] = {
 		.name_prefix = "TR",
 	},
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int cs35l41_init(struct snd_soc_pcm_runtime *rtd)
 {
@@ -101,6 +116,24 @@ static int cs35l41_init(struct snd_soc_pcm_runtime *rtd)
 	return ret;
 }
 
+<<<<<<< HEAD
+/*
+ * Channel map:
+ *
+ * TL/WL: ASPRX1 on slot 0, ASPRX2 on slot 1 (default)
+ * TR/WR: ASPRX1 on slot 1, ASPRX2 on slot 0
+ */
+static const struct {
+	unsigned int rx[2];
+} cs35l41_channel_map[] = {
+	{.rx = {0, 1}}, /* WL */
+	{.rx = {1, 0}}, /* WR */
+	{.rx = {0, 1}}, /* TL */
+	{.rx = {1, 0}}, /* TR */
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int cs35l41_hw_params(struct snd_pcm_substream *substream,
 			     struct snd_pcm_hw_params *params)
 {
@@ -134,6 +167,19 @@ static int cs35l41_hw_params(struct snd_pcm_substream *substream,
 				ret);
 			return ret;
 		}
+<<<<<<< HEAD
+
+		/* setup channel map */
+		ret = snd_soc_dai_set_channel_map(codec_dai, 0, NULL,
+						  ARRAY_SIZE(cs35l41_channel_map[i].rx),
+						  (unsigned int *)cs35l41_channel_map[i].rx);
+		if (ret < 0) {
+			dev_err(codec_dai->dev, "fail to set channel map, ret %d\n",
+				ret);
+			return ret;
+		}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	return 0;
@@ -143,10 +189,58 @@ static const struct snd_soc_ops cs35l41_ops = {
 	.hw_params = cs35l41_hw_params,
 };
 
+<<<<<<< HEAD
+static const char * const cs35l41_name_prefixes[] = { "WL", "WR", "TL", "TR" };
+
+/*
+ * Expected UIDs are integers (stored as strings).
+ * UID Mapping is fixed:
+ * UID 0x0 -> WL
+ * UID 0x1 -> WR
+ * UID 0x2 -> TL
+ * UID 0x3 -> TR
+ * Note: If there are less than 4 Amps, UIDs still map to WL/WR/TL/TR. Dynamic code will only create
+ * dai links for UIDs which exist, and ignore non-existant ones. Only 2 or 4 amps are expected.
+ * Return number of codecs found.
+ */
+static int cs35l41_compute_codec_conf(void)
+{
+	const char * const uid_strings[] = { "0", "1", "2", "3" };
+	unsigned int uid, sz = 0;
+	struct acpi_device *adev;
+	struct device *physdev;
+
+	for (uid = 0; uid < CS35L41_MAX_AMPS; uid++) {
+		adev = acpi_dev_get_first_match_dev(CS35L41_HID, uid_strings[uid], -1);
+		if (!adev) {
+			pr_devel("Cannot find match for HID %s UID %u (%s)\n", CS35L41_HID, uid,
+				 cs35l41_name_prefixes[uid]);
+			continue;
+		}
+		physdev = get_device(acpi_get_first_physical_node(adev));
+		cs35l41_components[sz].name = dev_name(physdev);
+		cs35l41_components[sz].dai_name = CS35L41_CODEC_DAI;
+		cs35l41_codec_conf[sz].dlc.name = dev_name(physdev);
+		cs35l41_codec_conf[sz].name_prefix = cs35l41_name_prefixes[uid];
+		acpi_dev_put(adev);
+		sz++;
+	}
+
+	if (sz != 2 && sz != 4)
+		pr_warn("Invalid number of cs35l41 amps found: %d, expected 2 or 4\n", sz);
+	return sz;
+}
+
+void cs35l41_set_dai_link(struct snd_soc_dai_link *link)
+{
+	link->num_codecs = cs35l41_compute_codec_conf();
+	link->codecs = cs35l41_components;
+=======
 void cs35l41_set_dai_link(struct snd_soc_dai_link *link)
 {
 	link->codecs = cs35l41_components;
 	link->num_codecs = ARRAY_SIZE(cs35l41_components);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	link->init = cs35l41_init;
 	link->ops = &cs35l41_ops;
 }

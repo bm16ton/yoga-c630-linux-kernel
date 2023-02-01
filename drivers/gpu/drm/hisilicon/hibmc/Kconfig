@@ -2,6 +2,10 @@
 config DRM_HISI_HIBMC
 	tristate "DRM Support for Hisilicon Hibmc"
 	depends on DRM && PCI && (ARM64 || COMPILE_TEST)
+<<<<<<< HEAD
+	depends on MMU
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	select DRM_KMS_HELPER
 	select DRM_VRAM_HELPER
 	select DRM_TTM

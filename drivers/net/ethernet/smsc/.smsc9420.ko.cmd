@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/smsc/smsc9420.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/smsc/smsc9420.ko drivers/net/ethernet/smsc/smsc9420.o drivers/net/ethernet/smsc/smsc9420.mod.o;  true

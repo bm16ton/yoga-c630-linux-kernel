@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/ucd9200.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/ucd9200.ko drivers/hwmon/pmbus/ucd9200.o drivers/hwmon/pmbus/ucd9200.mod.o;  true

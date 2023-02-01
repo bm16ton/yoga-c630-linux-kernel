@@ -1,0 +1,1 @@
+cmd_drivers/mmc/core/sdio_uart.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/core/sdio_uart.ko drivers/mmc/core/sdio_uart.o drivers/mmc/core/sdio_uart.mod.o;  true

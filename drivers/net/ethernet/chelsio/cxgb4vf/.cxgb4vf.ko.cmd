@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/chelsio/cxgb4vf/cxgb4vf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/chelsio/cxgb4vf/cxgb4vf.ko drivers/net/ethernet/chelsio/cxgb4vf/cxgb4vf.o drivers/net/ethernet/chelsio/cxgb4vf/cxgb4vf.mod.o;  true

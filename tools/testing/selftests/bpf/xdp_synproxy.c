@@ -104,7 +104,12 @@ static void parse_options(int argc, char *argv[], unsigned int *ifindex, __u32 *
 		{ "tc", no_argument, NULL, 'c' },
 		{ NULL, 0, NULL, 0 },
 	};
+<<<<<<< HEAD
+	unsigned long mss4, wscale, ttl;
+	unsigned long long mss6;
+=======
 	unsigned long mss4, mss6, wscale, ttl;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int tcpipopts_mask = 0;
 
 	if (argc < 2)
@@ -193,7 +198,11 @@ static int syncookie_attach(const char *argv0, unsigned int ifindex, bool tc)
 	int prog_fd;
 	int err;
 
+<<<<<<< HEAD
+	snprintf(xdp_filename, sizeof(xdp_filename), "%s_kern.bpf.o", argv0);
+=======
 	snprintf(xdp_filename, sizeof(xdp_filename), "%s_kern.o", argv0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	obj = bpf_object__open_file(xdp_filename, NULL);
 	err = libbpf_get_error(obj);
 	if (err < 0) {
@@ -286,7 +295,11 @@ static int syncookie_open_bpf_maps(__u32 prog_id, int *values_map_fd, int *ports
 
 	prog_info = (struct bpf_prog_info) {
 		.nr_map_ids = 8,
+<<<<<<< HEAD
+		.map_ids = (__u64)(unsigned long)map_ids,
+=======
 		.map_ids = (__u64)map_ids,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	info_len = sizeof(prog_info);
 

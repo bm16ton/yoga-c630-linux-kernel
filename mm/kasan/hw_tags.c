@@ -30,6 +30,19 @@ enum kasan_arg_mode {
 	KASAN_ARG_MODE_SYNC,
 	KASAN_ARG_MODE_ASYNC,
 	KASAN_ARG_MODE_ASYMM,
+<<<<<<< HEAD
+};
+
+enum kasan_arg_vmalloc {
+	KASAN_ARG_VMALLOC_DEFAULT,
+	KASAN_ARG_VMALLOC_OFF,
+	KASAN_ARG_VMALLOC_ON,
+};
+
+static enum kasan_arg kasan_arg __ro_after_init;
+static enum kasan_arg_mode kasan_arg_mode __ro_after_init;
+static enum kasan_arg_vmalloc kasan_arg_vmalloc __initdata;
+=======
 };
 
 enum kasan_arg_vmalloc {
@@ -48,6 +61,7 @@ static enum kasan_arg kasan_arg __ro_after_init;
 static enum kasan_arg_mode kasan_arg_mode __ro_after_init;
 static enum kasan_arg_vmalloc kasan_arg_vmalloc __initdata;
 static enum kasan_arg_stacktrace kasan_arg_stacktrace __initdata;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Whether KASAN is enabled at all.
@@ -62,12 +76,18 @@ EXPORT_SYMBOL(kasan_flag_enabled);
  */
 enum kasan_mode kasan_mode __ro_after_init;
 EXPORT_SYMBOL_GPL(kasan_mode);
+<<<<<<< HEAD
+
+/* Whether to enable vmalloc tagging. */
+DEFINE_STATIC_KEY_TRUE(kasan_flag_vmalloc);
+=======
 
 /* Whether to enable vmalloc tagging. */
 DEFINE_STATIC_KEY_TRUE(kasan_flag_vmalloc);
 
 /* Whether to collect alloc/free stack traces. */
 DEFINE_STATIC_KEY_TRUE(kasan_flag_stacktrace);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* kasan=off/on */
 static int __init early_kasan_flag(char *arg)
@@ -88,6 +108,8 @@ early_param("kasan", early_kasan_flag);
 
 /* kasan.mode=sync/async/asymm */
 static int __init early_kasan_mode(char *arg)
+<<<<<<< HEAD
+=======
 {
 	if (!arg)
 		return -EINVAL;
@@ -107,36 +129,73 @@ early_param("kasan.mode", early_kasan_mode);
 
 /* kasan.vmalloc=off/on */
 static int __init early_kasan_flag_vmalloc(char *arg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (!arg)
 		return -EINVAL;
 
+<<<<<<< HEAD
+	if (!strcmp(arg, "sync"))
+		kasan_arg_mode = KASAN_ARG_MODE_SYNC;
+	else if (!strcmp(arg, "async"))
+		kasan_arg_mode = KASAN_ARG_MODE_ASYNC;
+	else if (!strcmp(arg, "asymm"))
+		kasan_arg_mode = KASAN_ARG_MODE_ASYMM;
+=======
 	if (!strcmp(arg, "off"))
 		kasan_arg_vmalloc = KASAN_ARG_VMALLOC_OFF;
 	else if (!strcmp(arg, "on"))
 		kasan_arg_vmalloc = KASAN_ARG_VMALLOC_ON;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		return -EINVAL;
 
 	return 0;
 }
+<<<<<<< HEAD
+early_param("kasan.mode", early_kasan_mode);
+
+/* kasan.vmalloc=off/on */
+static int __init early_kasan_flag_vmalloc(char *arg)
+=======
 early_param("kasan.vmalloc", early_kasan_flag_vmalloc);
 
 /* kasan.stacktrace=off/on */
 static int __init early_kasan_flag_stacktrace(char *arg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	if (!arg)
 		return -EINVAL;
 
 	if (!strcmp(arg, "off"))
+<<<<<<< HEAD
+		kasan_arg_vmalloc = KASAN_ARG_VMALLOC_OFF;
+	else if (!strcmp(arg, "on"))
+		kasan_arg_vmalloc = KASAN_ARG_VMALLOC_ON;
+=======
 		kasan_arg_stacktrace = KASAN_ARG_STACKTRACE_OFF;
 	else if (!strcmp(arg, "on"))
 		kasan_arg_stacktrace = KASAN_ARG_STACKTRACE_ON;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		return -EINVAL;
 
 	return 0;
 }
+<<<<<<< HEAD
+early_param("kasan.vmalloc", early_kasan_flag_vmalloc);
+
+static inline const char *kasan_mode_info(void)
+{
+	if (kasan_mode == KASAN_MODE_ASYNC)
+		return "async";
+	else if (kasan_mode == KASAN_MODE_ASYMM)
+		return "asymm";
+	else
+		return "sync";
+}
+
+=======
 early_param("kasan.stacktrace", early_kasan_flag_stacktrace);
 
 static inline const char *kasan_mode_info(void)
@@ -149,6 +208,7 @@ static inline const char *kasan_mode_info(void)
 		return "sync";
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * kasan_init_hw_tags_cpu() is called for each CPU.
  * Not marked as __init as a CPU can be hot-plugged after boot.
@@ -189,6 +249,11 @@ void __init kasan_init_hw_tags(void)
 	switch (kasan_arg_mode) {
 	case KASAN_ARG_MODE_DEFAULT:
 		/* Default is specified by kasan_mode definition. */
+<<<<<<< HEAD
+		break;
+	case KASAN_ARG_MODE_SYNC:
+		kasan_mode = KASAN_MODE_SYNC;
+=======
 		break;
 	case KASAN_ARG_MODE_SYNC:
 		kasan_mode = KASAN_MODE_SYNC;
@@ -219,15 +284,39 @@ void __init kasan_init_hw_tags(void)
 		break;
 	case KASAN_ARG_STACKTRACE_OFF:
 		static_branch_disable(&kasan_flag_stacktrace);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
-	case KASAN_ARG_STACKTRACE_ON:
-		static_branch_enable(&kasan_flag_stacktrace);
+	case KASAN_ARG_MODE_ASYNC:
+		kasan_mode = KASAN_MODE_ASYNC;
+		break;
+	case KASAN_ARG_MODE_ASYMM:
+		kasan_mode = KASAN_MODE_ASYMM;
 		break;
 	}
+
+<<<<<<< HEAD
+	switch (kasan_arg_vmalloc) {
+	case KASAN_ARG_VMALLOC_DEFAULT:
+		/* Default is specified by kasan_flag_vmalloc definition. */
+		break;
+	case KASAN_ARG_VMALLOC_OFF:
+		static_branch_disable(&kasan_flag_vmalloc);
+		break;
+	case KASAN_ARG_VMALLOC_ON:
+		static_branch_enable(&kasan_flag_vmalloc);
+		break;
+	}
+
+	kasan_init_tags();
 
 	/* KASAN is now initialized, enable it. */
 	static_branch_enable(&kasan_flag_enabled);
 
+=======
+	/* KASAN is now initialized, enable it. */
+	static_branch_enable(&kasan_flag_enabled);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pr_info("KernelAddressSanitizer initialized (hw-tags, mode=%s, vmalloc=%s, stacktrace=%s)\n",
 		kasan_mode_info(),
 		kasan_vmalloc_enabled() ? "on" : "off",
@@ -329,6 +418,7 @@ void *__kasan_unpoison_vmalloc(const void *start, unsigned long size,
 	redzone_size = round_up(redzone_start, PAGE_SIZE) - redzone_start;
 	kasan_poison((void *)redzone_start, redzone_size, KASAN_TAG_INVALID,
 		     flags & KASAN_VMALLOC_INIT);
+<<<<<<< HEAD
 
 	/*
 	 * Set per-page tag flags to allow accessing physical memory for the
@@ -336,6 +426,15 @@ void *__kasan_unpoison_vmalloc(const void *start, unsigned long size,
 	 */
 	unpoison_vmalloc_pages(start, tag);
 
+=======
+
+	/*
+	 * Set per-page tag flags to allow accessing physical memory for the
+	 * vmalloc() mapping through page_address(vmalloc_to_page()).
+	 */
+	unpoison_vmalloc_pages(start, tag);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return (void *)start;
 }
 

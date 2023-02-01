@@ -388,7 +388,6 @@ static int phy_g12a_usb3_pcie_probe(struct platform_device *pdev)
 	struct phy_g12a_usb3_pcie_priv *priv;
 	struct phy_provider *phy_provider;
 	void __iomem *base;
-	int ret;
 
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv)
@@ -408,14 +407,17 @@ static int phy_g12a_usb3_pcie_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->regmap_cr))
 		return PTR_ERR(priv->regmap_cr);
 
-	priv->clk_ref = devm_clk_get(dev, "ref_clk");
+	priv->clk_ref = devm_clk_get_enabled(dev, "ref_clk");
 	if (IS_ERR(priv->clk_ref))
 		return PTR_ERR(priv->clk_ref);
 
+<<<<<<< HEAD
+=======
 	ret = clk_prepare_enable(priv->clk_ref);
 	if (ret)
 		return ret;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	priv->reset = devm_reset_control_array_get_exclusive(dev);
 	if (IS_ERR(priv->reset)) {
 		ret = PTR_ERR(priv->reset);
@@ -423,17 +425,25 @@ static int phy_g12a_usb3_pcie_probe(struct platform_device *pdev)
 	}
 
 	priv->phy = devm_phy_create(dev, np, &phy_g12a_usb3_pcie_ops);
+<<<<<<< HEAD
+	if (IS_ERR(priv->phy))
+		return dev_err_probe(dev, PTR_ERR(priv->phy), "failed to create PHY\n");
+=======
 	if (IS_ERR(priv->phy)) {
 		ret = PTR_ERR(priv->phy);
 		dev_err_probe(dev, ret, "failed to create PHY\n");
 		goto err_disable_clk_ref;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	phy_set_drvdata(priv->phy, priv);
 	dev_set_drvdata(dev, priv);
 
 	phy_provider = devm_of_phy_provider_register(dev,
 						     phy_g12a_usb3_pcie_xlate);
+<<<<<<< HEAD
+	return PTR_ERR_OR_ZERO(phy_provider);
+=======
 	if (IS_ERR(phy_provider)) {
 		ret = PTR_ERR(phy_provider);
 		goto err_disable_clk_ref;
@@ -445,6 +455,7 @@ err_disable_clk_ref:
 	clk_disable_unprepare(priv->clk_ref);
 
 	return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id phy_g12a_usb3_pcie_of_match[] = {

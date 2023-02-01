@@ -305,9 +305,12 @@ struct rxe_mr {
 	u32			rkey;
 	enum rxe_mr_state	state;
 	enum ib_mr_type		type;
+<<<<<<< HEAD
+=======
 	u64			va;
 	u64			iova;
 	size_t			length;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32			offset;
 	int			access;
 

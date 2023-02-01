@@ -120,6 +120,7 @@ static u32 __smu_cmn_poll_stat(struct smu_context *smu)
 
 	return reg;
 }
+<<<<<<< HEAD
 
 static void __smu_cmn_reg_print_error(struct smu_context *smu,
 				      u32 reg_c2pmsg_90,
@@ -233,6 +234,133 @@ static void __smu_cmn_send_msg(struct smu_context *smu,
 	WREG32(smu->msg_reg, msg);
 }
 
+static int __smu_cmn_send_debug_msg(struct smu_context *smu,
+			       u32 msg,
+			       u32 param)
+{
+	struct amdgpu_device *adev = smu->adev;
+
+	WREG32(smu->debug_param_reg, param);
+	WREG32(smu->debug_msg_reg, msg);
+	WREG32(smu->debug_resp_reg, 0);
+
+	return 0;
+}
+=======
+
+static void __smu_cmn_reg_print_error(struct smu_context *smu,
+				      u32 reg_c2pmsg_90,
+				      int msg_index,
+				      u32 param,
+				      enum smu_message_type msg)
+{
+	struct amdgpu_device *adev = smu->adev;
+	const char *message = smu_get_message_name(smu, msg);
+	u32 msg_idx, prm;
+
+	switch (reg_c2pmsg_90) {
+	case SMU_RESP_NONE: {
+		msg_idx = RREG32(smu->msg_reg);
+		prm     = RREG32(smu->param_reg);
+		dev_err_ratelimited(adev->dev,
+				    "SMU: I'm not done with your previous command: SMN_C2PMSG_66:0x%08X SMN_C2PMSG_82:0x%08X",
+				    msg_idx, prm);
+		}
+		break;
+	case SMU_RESP_OK:
+		/* The SMU executed the command. It completed with a
+		 * successful result.
+		 */
+		break;
+	case SMU_RESP_CMD_FAIL:
+		/* The SMU executed the command. It completed with an
+		 * unsuccessful result.
+		 */
+		break;
+	case SMU_RESP_CMD_UNKNOWN:
+		dev_err_ratelimited(adev->dev,
+				    "SMU: unknown command: index:%d param:0x%08X message:%s",
+				    msg_index, param, message);
+		break;
+	case SMU_RESP_CMD_BAD_PREREQ:
+		dev_err_ratelimited(adev->dev,
+				    "SMU: valid command, bad prerequisites: index:%d param:0x%08X message:%s",
+				    msg_index, param, message);
+		break;
+	case SMU_RESP_BUSY_OTHER:
+		dev_err_ratelimited(adev->dev,
+				    "SMU: I'm very busy for your command: index:%d param:0x%08X message:%s",
+				    msg_index, param, message);
+		break;
+	case SMU_RESP_DEBUG_END:
+		dev_err_ratelimited(adev->dev,
+				    "SMU: I'm debugging!");
+		break;
+	default:
+		dev_err_ratelimited(adev->dev,
+				    "SMU: response:0x%08X for index:%d param:0x%08X message:%s?",
+				    reg_c2pmsg_90, msg_index, param, message);
+		break;
+	}
+}
+
+static int __smu_cmn_reg2errno(struct smu_context *smu, u32 reg_c2pmsg_90)
+{
+	int res;
+
+	switch (reg_c2pmsg_90) {
+	case SMU_RESP_NONE:
+		/* The SMU is busy--still executing your command.
+		 */
+		res = -ETIME;
+		break;
+	case SMU_RESP_OK:
+		res = 0;
+		break;
+	case SMU_RESP_CMD_FAIL:
+		/* Command completed successfully, but the command
+		 * status was failure.
+		 */
+		res = -EIO;
+		break;
+	case SMU_RESP_CMD_UNKNOWN:
+		/* Unknown command--ignored by the SMU.
+		 */
+		res = -EOPNOTSUPP;
+		break;
+	case SMU_RESP_CMD_BAD_PREREQ:
+		/* Valid command--bad prerequisites.
+		 */
+		res = -EINVAL;
+		break;
+	case SMU_RESP_BUSY_OTHER:
+		/* The SMU is busy with other commands. The client
+		 * should retry in 10 us.
+		 */
+		res = -EBUSY;
+		break;
+	default:
+		/* Unknown or debug response from the SMU.
+		 */
+		res = -EREMOTEIO;
+		break;
+	}
+
+	return res;
+}
+
+static void __smu_cmn_send_msg(struct smu_context *smu,
+			       u16 msg,
+			       u32 param)
+{
+	struct amdgpu_device *adev = smu->adev;
+
+	WREG32(smu->resp_reg, 0);
+	WREG32(smu->param_reg, param);
+	WREG32(smu->msg_reg, msg);
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * smu_cmn_send_msg_without_waiting -- send the message; don't wait for status
  * @smu: pointer to an SMU context
@@ -384,6 +512,12 @@ int smu_cmn_send_smc_msg(struct smu_context *smu,
 					       msg,
 					       0,
 					       read_arg);
+}
+
+int smu_cmn_send_debug_smc_msg(struct smu_context *smu,
+			 uint32_t msg)
+{
+	return __smu_cmn_send_debug_msg(smu, msg, 0);
 }
 
 int smu_cmn_to_asic_specific_index(struct smu_context *smu,
@@ -969,6 +1103,12 @@ void smu_cmn_init_soft_gpu_metrics(void *table, uint8_t frev, uint8_t crev)
 	case METRICS_VERSION(2, 2):
 		structure_size = sizeof(struct gpu_metrics_v2_2);
 		break;
+<<<<<<< HEAD
+	case METRICS_VERSION(2, 3):
+		structure_size = sizeof(struct gpu_metrics_v2_3);
+		break;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return;
 	}

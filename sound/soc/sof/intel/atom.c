@@ -274,14 +274,31 @@ static const char *fixup_tplg_name(struct snd_sof_dev *sdev,
 				   const char *ssp_str)
 {
 	const char *tplg_filename = NULL;
+<<<<<<< HEAD
+	const char *split_ext;
+	char *filename, *tmp;
+
+	filename = kstrdup(sof_tplg_filename, GFP_KERNEL);
+=======
 	char *filename;
 	char *split_ext;
 
 	filename = devm_kstrdup(sdev->dev, sof_tplg_filename, GFP_KERNEL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!filename)
 		return NULL;
 
 	/* this assumes a .tplg extension */
+<<<<<<< HEAD
+	tmp = filename;
+	split_ext = strsep(&tmp, ".");
+	if (split_ext)
+		tplg_filename = devm_kasprintf(sdev->dev, GFP_KERNEL,
+					       "%s-%s.tplg",
+					       split_ext, ssp_str);
+	kfree(filename);
+
+=======
 	split_ext = strsep(&filename, ".");
 	if (split_ext) {
 		tplg_filename = devm_kasprintf(sdev->dev, GFP_KERNEL,
@@ -290,6 +307,7 @@ static const char *fixup_tplg_name(struct snd_sof_dev *sdev,
 		if (!tplg_filename)
 			return NULL;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return tplg_filename;
 }
 

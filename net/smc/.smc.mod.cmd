@@ -1,0 +1,1 @@
+cmd_net/smc/smc.mod := printf '%s\n'   af_smc.o smc_pnet.o smc_ib.o smc_clc.o smc_core.o smc_wr.o smc_llc.o smc_cdc.o smc_tx.o smc_rx.o smc_close.o smc_ism.o smc_netlink.o smc_stats.o smc_tracepoint.o smc_sysctl.o | awk '!x[$$0]++ { print("net/smc/"$$0) }' > net/smc/smc.mod

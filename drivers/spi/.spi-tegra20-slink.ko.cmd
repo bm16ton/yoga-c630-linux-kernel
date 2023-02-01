@@ -1,0 +1,1 @@
+cmd_drivers/spi/spi-tegra20-slink.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/spi/spi-tegra20-slink.ko drivers/spi/spi-tegra20-slink.o drivers/spi/spi-tegra20-slink.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/libertas/libertas_sdio.mod := printf '%s\n'   if_sdio.o | awk '!x[$$0]++ { print("drivers/net/wireless/marvell/libertas/"$$0) }' > drivers/net/wireless/marvell/libertas/libertas_sdio.mod

@@ -1,0 +1,1 @@
+cmd_drivers/phy/qualcomm/phy-qcom-usb-hsic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/qualcomm/phy-qcom-usb-hsic.ko drivers/phy/qualcomm/phy-qcom-usb-hsic.o drivers/phy/qualcomm/phy-qcom-usb-hsic.mod.o;  true

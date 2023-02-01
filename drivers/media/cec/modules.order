@@ -1,0 +1,3 @@
+drivers/media/cec/core/cec.ko
+drivers/media/cec/usb/pulse8/pulse8-cec.ko
+drivers/media/cec/usb/rainshadow/rainshadow-cec.ko

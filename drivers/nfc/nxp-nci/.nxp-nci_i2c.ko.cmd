@@ -1,0 +1,1 @@
+cmd_drivers/nfc/nxp-nci/nxp-nci_i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nfc/nxp-nci/nxp-nci_i2c.ko drivers/nfc/nxp-nci/nxp-nci_i2c.o drivers/nfc/nxp-nci/nxp-nci_i2c.mod.o;  true

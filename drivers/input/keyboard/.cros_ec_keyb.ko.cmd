@@ -1,0 +1,1 @@
+cmd_drivers/input/keyboard/cros_ec_keyb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/keyboard/cros_ec_keyb.ko drivers/input/keyboard/cros_ec_keyb.o drivers/input/keyboard/cros_ec_keyb.mod.o;  true

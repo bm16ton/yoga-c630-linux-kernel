@@ -2127,7 +2127,11 @@ void smc_llc_lgr_init(struct smc_link_group *lgr, struct smc_sock *smc)
 	init_waitqueue_head(&lgr->llc_flow_waiter);
 	init_waitqueue_head(&lgr->llc_msg_waiter);
 	mutex_init(&lgr->llc_conf_mutex);
+<<<<<<< HEAD
+	lgr->llc_testlink_time = READ_ONCE(net->smc.sysctl_smcr_testlink_time);
+=======
 	lgr->llc_testlink_time = READ_ONCE(net->ipv4.sysctl_tcp_keepalive_time);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* called after lgr was removed from lgr_list */

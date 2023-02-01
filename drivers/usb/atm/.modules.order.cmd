@@ -1,0 +1,1 @@
+cmd_drivers/usb/atm/modules.order := {   echo drivers/usb/atm/cxacru.ko;   echo drivers/usb/atm/speedtch.ko;   echo drivers/usb/atm/ueagle-atm.ko;   echo drivers/usb/atm/usbatm.ko;   echo drivers/usb/atm/xusbatm.ko; :; } > drivers/usb/atm/modules.order

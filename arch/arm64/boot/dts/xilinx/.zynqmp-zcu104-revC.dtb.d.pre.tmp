@@ -1,0 +1,10 @@
+zynqmp-zcu104-revC.o: arch/arm64/boot/dts/xilinx/zynqmp-zcu104-revC.dts \
+ arch/arm64/boot/dts/xilinx/zynqmp.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/dma/xlnx-zynqmp-dpdma.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/xlnx-zynqmp-power.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/xlnx-zynqmp-resets.h \
+ arch/arm64/boot/dts/xilinx/zynqmp-clk-ccf.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/xlnx-zynqmp-clk.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/pinctrl-zynqmp.h \
+ scripts/dtc/include-prefixes/dt-bindings/phy/phy.h

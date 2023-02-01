@@ -48,6 +48,8 @@ enum bkw_mmap_state {
 	BKW_MMAP_EMPTY,
 };
 
+struct event_enable_timer;
+
 struct evlist {
 	struct perf_evlist core;
 	bool		 enabled;
@@ -79,6 +81,7 @@ struct evlist {
 		int	ack;	/* ack file descriptor for control commands */
 		int	pos;	/* index at evlist core object to check signals */
 	} ctl_fd;
+	struct event_enable_timer *eet;
 };
 
 struct evsel_str_handler {
@@ -124,6 +127,10 @@ static inline struct evsel *evlist__add_dummy_on_all_cpus(struct evlist *evlist)
 {
 	return evlist__add_aux_dummy(evlist, true);
 }
+<<<<<<< HEAD
+struct evsel *evlist__add_sched_switch(struct evlist *evlist, bool system_wide);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int evlist__add_sb_event(struct evlist *evlist, struct perf_event_attr *attr,
 			 evsel__sb_cb_t cb, void *data);
@@ -205,6 +212,11 @@ void evlist__enable(struct evlist *evlist);
 void evlist__toggle_enable(struct evlist *evlist);
 void evlist__disable_evsel(struct evlist *evlist, char *evsel_name);
 void evlist__enable_evsel(struct evlist *evlist, char *evsel_name);
+<<<<<<< HEAD
+void evlist__disable_non_dummy(struct evlist *evlist);
+void evlist__enable_non_dummy(struct evlist *evlist);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void evlist__set_selected(struct evlist *evlist, struct evsel *evsel);
 
@@ -424,6 +436,12 @@ int evlist__ctlfd_ack(struct evlist *evlist);
 
 #define EVLIST_ENABLED_MSG "Events enabled\n"
 #define EVLIST_DISABLED_MSG "Events disabled\n"
+
+int evlist__parse_event_enable_time(struct evlist *evlist, struct record_opts *opts,
+				    const char *str, int unset);
+int event_enable_timer__start(struct event_enable_timer *eet);
+void event_enable_timer__exit(struct event_enable_timer **ep);
+int event_enable_timer__process(struct event_enable_timer *eet);
 
 struct evsel *evlist__find_evsel(struct evlist *evlist, int idx);
 

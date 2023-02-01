@@ -1,0 +1,1 @@
+cmd_drivers/platform/chrome/cros_ec_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/platform/chrome/cros_ec_spi.ko drivers/platform/chrome/cros_ec_spi.o drivers/platform/chrome/cros_ec_spi.mod.o;  true

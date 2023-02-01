@@ -24,9 +24,17 @@ properties:
     oneOf:
       - items:
           - enum:
+<<<<<<< HEAD
+              - qcom,sc7280-cpu-bwmon
               - qcom,sdm845-bwmon
           - const: qcom,msm8998-bwmon
       - const: qcom,msm8998-bwmon       # BWMON v4
+      - const: qcom,sc7280-llcc-bwmon   # BWMON v5
+=======
+              - qcom,sdm845-bwmon
+          - const: qcom,msm8998-bwmon
+      - const: qcom,msm8998-bwmon       # BWMON v4
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       - const: qcom,sdm845-llcc-bwmon   # BWMON v5
 
   interconnects:
@@ -36,7 +44,12 @@ properties:
     maxItems: 1
 
   operating-points-v2: true
+<<<<<<< HEAD
+  opp-table:
+    type: object
+=======
   opp-table: true
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   reg:
     # BWMON v4 (currently described) and BWMON v5 use one register address

@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/xilinx-ams.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/xilinx-ams.ko drivers/iio/adc/xilinx-ams.o drivers/iio/adc/xilinx-ams.mod.o;  true

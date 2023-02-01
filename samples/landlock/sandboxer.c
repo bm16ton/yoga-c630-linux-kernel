@@ -162,10 +162,16 @@ out_free_name:
 	LANDLOCK_ACCESS_FS_MAKE_SYM | \
 	LANDLOCK_ACCESS_FS_REFER)
 
+<<<<<<< HEAD
+/* clang-format on */
+
+#define LANDLOCK_ABI_LAST 2
+=======
 #define ACCESS_ABI_2 ( \
 	LANDLOCK_ACCESS_FS_REFER)
 
 /* clang-format on */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int main(const int argc, char *const argv[], char *const *const envp)
 {
@@ -196,8 +202,17 @@ int main(const int argc, char *const argv[], char *const *const envp)
 			"\nexample:\n"
 			"%s=\"/bin:/lib:/usr:/proc:/etc:/dev/urandom\" "
 			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
+<<<<<<< HEAD
+			"%s bash -i\n\n",
+			ENV_FS_RO_NAME, ENV_FS_RW_NAME, argv[0]);
+		fprintf(stderr,
+			"This sandboxer can use Landlock features "
+			"up to ABI version %d.\n",
+			LANDLOCK_ABI_LAST);
+=======
 			"%s bash -i\n",
 			ENV_FS_RO_NAME, ENV_FS_RW_NAME, argv[0]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return 1;
 	}
 
@@ -225,12 +240,39 @@ int main(const int argc, char *const argv[], char *const *const envp)
 		}
 		return 1;
 	}
+<<<<<<< HEAD
+
+	/* Best-effort security. */
+	switch (abi) {
+	case 1:
+		/* Removes LANDLOCK_ACCESS_FS_REFER for ABI < 2 */
+		ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_REFER;
+
+		fprintf(stderr,
+			"Hint: You should update the running kernel "
+			"to leverage Landlock features "
+			"provided by ABI version %d (instead of %d).\n",
+			LANDLOCK_ABI_LAST, abi);
+		__attribute__((fallthrough));
+	case LANDLOCK_ABI_LAST:
+		break;
+	default:
+		fprintf(stderr,
+			"Hint: You should update this sandboxer "
+			"to leverage Landlock features "
+			"provided by ABI version %d (instead of %d).\n",
+			abi, LANDLOCK_ABI_LAST);
+	}
+	access_fs_ro &= ruleset_attr.handled_access_fs;
+	access_fs_rw &= ruleset_attr.handled_access_fs;
+=======
 	/* Best-effort security. */
 	if (abi < 2) {
 		ruleset_attr.handled_access_fs &= ~ACCESS_ABI_2;
 		access_fs_ro &= ~ACCESS_ABI_2;
 		access_fs_rw &= ~ACCESS_ABI_2;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ruleset_fd =
 		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);

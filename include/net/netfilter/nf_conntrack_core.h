@@ -86,10 +86,13 @@ extern spinlock_t nf_conntrack_expect_lock;
 
 /* ctnetlink code shared by both ctnetlink and nf_conntrack_bpf */
 
+<<<<<<< HEAD
+=======
 #if (IS_BUILTIN(CONFIG_NF_CONNTRACK) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF)) || \
     (IS_MODULE(CONFIG_NF_CONNTRACK) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF_MODULES) || \
     IS_ENABLED(CONFIG_NF_CT_NETLINK))
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline void __nf_ct_set_timeout(struct nf_conn *ct, u64 timeout)
 {
 	if (timeout > INT_MAX)
@@ -101,6 +104,9 @@ int __nf_ct_change_timeout(struct nf_conn *ct, u64 cta_timeout);
 void __nf_ct_change_status(struct nf_conn *ct, unsigned long on, unsigned long off);
 int nf_ct_change_status_common(struct nf_conn *ct, unsigned int status);
 
+<<<<<<< HEAD
+=======
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _NF_CONNTRACK_CORE_H */

@@ -203,6 +203,7 @@ static inline bool is_cxl(struct acpi_pci_root *root)
 
 static u8 pci_osc_uuid_str[] = "33DB4D5B-1FF7-401C-9657-7441C03DD766";
 static u8 cxl_osc_uuid_str[] = "68F2D50B-C469-4d8A-BD3D-941A103FD3FC";
+<<<<<<< HEAD
 
 static char *to_uuid(struct acpi_pci_root *root)
 {
@@ -211,6 +212,16 @@ static char *to_uuid(struct acpi_pci_root *root)
 	return pci_osc_uuid_str;
 }
 
+=======
+
+static char *to_uuid(struct acpi_pci_root *root)
+{
+	if (is_cxl(root))
+		return cxl_osc_uuid_str;
+	return pci_osc_uuid_str;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int cap_length(struct acpi_pci_root *root)
 {
 	if (is_cxl(root))
@@ -312,76 +323,26 @@ struct acpi_handle_node {
  */
 struct pci_dev *acpi_get_pci_dev(acpi_handle handle)
 {
-	int dev, fn;
-	unsigned long long adr;
-	acpi_status status;
-	acpi_handle phandle;
-	struct pci_bus *pbus;
-	struct pci_dev *pdev = NULL;
-	struct acpi_handle_node *node, *tmp;
-	struct acpi_pci_root *root;
-	LIST_HEAD(device_list);
+	struct acpi_device *adev = acpi_fetch_acpi_dev(handle);
+	struct acpi_device_physical_node *pn;
+	struct pci_dev *pci_dev = NULL;
 
-	/*
-	 * Walk up the ACPI CA namespace until we reach a PCI root bridge.
-	 */
-	phandle = handle;
-	while (!acpi_is_root_bridge(phandle)) {
-		node = kzalloc(sizeof(struct acpi_handle_node), GFP_KERNEL);
-		if (!node)
-			goto out;
+	if (!adev)
+		return NULL;
 
-		INIT_LIST_HEAD(&node->node);
-		node->handle = phandle;
-		list_add(&node->node, &device_list);
+	mutex_lock(&adev->physical_node_lock);
 
-		status = acpi_get_parent(phandle, &phandle);
-		if (ACPI_FAILURE(status))
-			goto out;
-	}
-
-	root = acpi_pci_find_root(phandle);
-	if (!root)
-		goto out;
-
-	pbus = root->bus;
-
-	/*
-	 * Now, walk back down the PCI device tree until we return to our
-	 * original handle. Assumes that everything between the PCI root
-	 * bridge and the device we're looking for must be a P2P bridge.
-	 */
-	list_for_each_entry(node, &device_list, node) {
-		acpi_handle hnd = node->handle;
-		status = acpi_evaluate_integer(hnd, "_ADR", NULL, &adr);
-		if (ACPI_FAILURE(status))
-			goto out;
-		dev = (adr >> 16) & 0xffff;
-		fn  = adr & 0xffff;
-
-		pdev = pci_get_slot(pbus, PCI_DEVFN(dev, fn));
-		if (!pdev || hnd == handle)
-			break;
-
-		pbus = pdev->subordinate;
-		pci_dev_put(pdev);
-
-		/*
-		 * This function may be called for a non-PCI device that has a
-		 * PCI parent (eg. a disk under a PCI SATA controller).  In that
-		 * case pdev->subordinate will be NULL for the parent.
-		 */
-		if (!pbus) {
-			dev_dbg(&pdev->dev, "Not a PCI-to-PCI bridge\n");
-			pdev = NULL;
+	list_for_each_entry(pn, &adev->physical_node_list, node) {
+		if (dev_is_pci(pn->dev)) {
+			get_device(pn->dev);
+			pci_dev = to_pci_dev(pn->dev);
 			break;
 		}
 	}
-out:
-	list_for_each_entry_safe(node, tmp, &device_list, node)
-		kfree(node);
 
-	return pdev;
+	mutex_unlock(&adev->physical_node_lock);
+
+	return pci_dev;
 }
 EXPORT_SYMBOL_GPL(acpi_get_pci_dev);
 

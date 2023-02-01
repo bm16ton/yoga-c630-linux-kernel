@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtw88/rtw88_8723d.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/realtek/rtw88/rtw88_8723d.o @drivers/net/wireless/realtek/rtw88/rtw88_8723d.mod 

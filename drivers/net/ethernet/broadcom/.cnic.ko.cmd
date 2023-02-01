@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/broadcom/cnic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/broadcom/cnic.ko drivers/net/ethernet/broadcom/cnic.o drivers/net/ethernet/broadcom/cnic.mod.o;  true

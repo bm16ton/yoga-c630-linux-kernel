@@ -1,0 +1,1 @@
+cmd_sound/soc/qcom/snd-soc-apq8016-sbc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/qcom/snd-soc-apq8016-sbc.ko sound/soc/qcom/snd-soc-apq8016-sbc.o sound/soc/qcom/snd-soc-apq8016-sbc.mod.o;  true

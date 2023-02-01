@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/dp83848.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/dp83848.ko drivers/net/phy/dp83848.o drivers/net/phy/dp83848.mod.o;  true

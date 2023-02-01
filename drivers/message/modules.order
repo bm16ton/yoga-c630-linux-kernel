@@ -1,0 +1,6 @@
+drivers/message/fusion/mptbase.ko
+drivers/message/fusion/mptscsih.ko
+drivers/message/fusion/mptspi.ko
+drivers/message/fusion/mptfc.ko
+drivers/message/fusion/mptsas.ko
+drivers/message/fusion/mptctl.ko

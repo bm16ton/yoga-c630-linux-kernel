@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/arm/mali-dp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/arm/mali-dp.ko drivers/gpu/drm/arm/mali-dp.o drivers/gpu/drm/arm/mali-dp.mod.o;  true

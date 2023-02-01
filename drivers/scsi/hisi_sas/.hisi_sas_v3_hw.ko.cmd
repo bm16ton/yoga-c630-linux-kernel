@@ -1,0 +1,1 @@
+cmd_drivers/scsi/hisi_sas/hisi_sas_v3_hw.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/hisi_sas/hisi_sas_v3_hw.ko drivers/scsi/hisi_sas/hisi_sas_v3_hw.o drivers/scsi/hisi_sas/hisi_sas_v3_hw.mod.o;  true

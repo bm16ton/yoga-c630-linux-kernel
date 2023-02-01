@@ -1,0 +1,1 @@
+cmd_drivers/firmware/google/modules.order := {   echo drivers/firmware/google/coreboot_table.ko;   echo drivers/firmware/google/memconsole.ko;   echo drivers/firmware/google/memconsole-coreboot.ko; :; } > drivers/firmware/google/modules.order

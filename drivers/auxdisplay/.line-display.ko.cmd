@@ -1,0 +1,1 @@
+cmd_drivers/auxdisplay/line-display.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/auxdisplay/line-display.ko drivers/auxdisplay/line-display.o drivers/auxdisplay/line-display.mod.o;  true

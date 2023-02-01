@@ -1,0 +1,1 @@
+cmd_sound/core/seq/snd-seq.mod := printf '%s\n'   seq.o seq_lock.o seq_clientmgr.o seq_memory.o seq_queue.o seq_fifo.o seq_prioq.o seq_timer.o seq_system.o seq_ports.o seq_info.o | awk '!x[$$0]++ { print("sound/core/seq/"$$0) }' > sound/core/seq/snd-seq.mod

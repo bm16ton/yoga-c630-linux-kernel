@@ -1159,6 +1159,13 @@ static int rnbd_rdma_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
 {
 	struct rnbd_queue *q = hctx->driver_data;
 	struct rnbd_clt_dev *dev = q->dev;
+<<<<<<< HEAD
+
+	return rtrs_clt_rdma_cq_direct(dev->sess->rtrs, hctx->queue_num);
+}
+
+static void rnbd_rdma_map_queues(struct blk_mq_tag_set *set)
+=======
 	int cnt;
 
 	cnt = rtrs_clt_rdma_cq_direct(dev->sess->rtrs, hctx->queue_num);
@@ -1166,6 +1173,7 @@ static int rnbd_rdma_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
 }
 
 static int rnbd_rdma_map_queues(struct blk_mq_tag_set *set)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct rnbd_clt_session *sess = set->driver_data;
 
@@ -1194,8 +1202,11 @@ static int rnbd_rdma_map_queues(struct blk_mq_tag_set *set)
 			set->map[HCTX_TYPE_DEFAULT].nr_queues,
 			set->map[HCTX_TYPE_READ].nr_queues);
 	}
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct blk_mq_ops rnbd_mq_ops = {
@@ -1406,10 +1417,17 @@ static int rnbd_client_setup_device(struct rnbd_clt_dev *dev,
 				    struct rnbd_msg_open_rsp *rsp)
 {
 	int idx = dev->clt_device_id;
+<<<<<<< HEAD
 
 	dev->size = le64_to_cpu(rsp->nsectors) *
 			le16_to_cpu(rsp->logical_block_size);
 
+=======
+
+	dev->size = le64_to_cpu(rsp->nsectors) *
+			le16_to_cpu(rsp->logical_block_size);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev->gd = blk_mq_alloc_disk(&dev->sess->tag_set, dev);
 	if (IS_ERR(dev->gd))
 		return PTR_ERR(dev->gd);

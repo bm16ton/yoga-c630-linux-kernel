@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/meson/meson-drm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/meson/meson-drm.ko drivers/gpu/drm/meson/meson-drm.o drivers/gpu/drm/meson/meson-drm.mod.o;  true

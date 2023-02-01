@@ -65,10 +65,13 @@ linux,uefi-mmap-desc-size   32-bit   Size in bytes of each entry in the UEFI
 
 linux,uefi-mmap-desc-ver    32-bit   Version of the mmap descriptor format.
 
+<<<<<<< HEAD
+=======
 linux,initrd-start          64-bit   Physical start address of an initrd
 
 linux,initrd-end            64-bit   Physical end address of an initrd
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 kaslr-seed                  64-bit   Entropy used to randomize the kernel image
                                      base address location.
 ==========================  ======   ===========================================

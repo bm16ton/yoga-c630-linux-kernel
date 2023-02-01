@@ -1527,7 +1527,11 @@ int dm_drm_plane_get_property(struct drm_plane *plane,
 static const struct drm_plane_funcs dm_plane_funcs = {
 	.update_plane	= drm_atomic_helper_update_plane,
 	.disable_plane	= drm_atomic_helper_disable_plane,
+<<<<<<< HEAD
+	.destroy	= drm_plane_helper_destroy,
+=======
 	.destroy	= drm_primary_helper_destroy,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.reset = dm_drm_plane_reset,
 	.atomic_duplicate_state = dm_drm_plane_duplicate_state,
 	.atomic_destroy_state = dm_drm_plane_destroy_state,

@@ -1,0 +1,1 @@
+cmd_drivers/staging/qlge/qlge.mod := printf '%s\n'   qlge_main.o qlge_dbg.o qlge_mpi.o qlge_ethtool.o qlge_devlink.o | awk '!x[$$0]++ { print("drivers/staging/qlge/"$$0) }' > drivers/staging/qlge/qlge.mod

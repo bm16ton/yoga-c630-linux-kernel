@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/built-in.a := rm -f drivers/video/fbdev/built-in.a;  printf "drivers/video/fbdev/%s " core/built-in.a amba-clcd.o omap/built-in.a omap2/built-in.a xen-fbfront.o efifb.o | xargs ar cDPrST drivers/video/fbdev/built-in.a

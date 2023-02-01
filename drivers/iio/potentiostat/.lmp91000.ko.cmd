@@ -1,0 +1,1 @@
+cmd_drivers/iio/potentiostat/lmp91000.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/potentiostat/lmp91000.ko drivers/iio/potentiostat/lmp91000.o drivers/iio/potentiostat/lmp91000.mod.o;  true

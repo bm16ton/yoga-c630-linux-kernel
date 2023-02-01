@@ -1,0 +1,1 @@
+cmd_drivers/net/can/spi/mcp251xfd/mcp251xfd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/can/spi/mcp251xfd/mcp251xfd.ko drivers/net/can/spi/mcp251xfd/mcp251xfd.o drivers/net/can/spi/mcp251xfd/mcp251xfd.mod.o;  true

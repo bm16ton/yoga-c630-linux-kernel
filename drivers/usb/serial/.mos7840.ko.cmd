@@ -1,0 +1,1 @@
+cmd_drivers/usb/serial/mos7840.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/serial/mos7840.ko drivers/usb/serial/mos7840.o drivers/usb/serial/mos7840.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ivtv/ivtv.mod := printf '%s\n'   ivtv-routing.o ivtv-cards.o ivtv-controls.o ivtv-driver.o ivtv-fileops.o ivtv-firmware.o ivtv-gpio.o ivtv-i2c.o ivtv-ioctl.o ivtv-irq.o ivtv-mailbox.o ivtv-queue.o ivtv-streams.o ivtv-udma.o ivtv-vbi.o ivtv-yuv.o | awk '!x[$$0]++ { print("drivers/media/pci/ivtv/"$$0) }' > drivers/media/pci/ivtv/ivtv.mod

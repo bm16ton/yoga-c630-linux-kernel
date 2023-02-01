@@ -1,0 +1,1 @@
+cmd_drivers/accessibility/speakup/speakup_dectlk.mod := printf '%s\n'   speakup_dectlk.o | awk '!x[$$0]++ { print("drivers/accessibility/speakup/"$$0) }' > drivers/accessibility/speakup/speakup_dectlk.mod

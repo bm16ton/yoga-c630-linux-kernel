@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/lima/lima.mod := printf '%s\n'   lima_drv.o lima_device.o lima_pmu.o lima_l2_cache.o lima_mmu.o lima_gp.o lima_pp.o lima_gem.o lima_vm.o lima_sched.o lima_ctx.o lima_dlbu.o lima_bcast.o lima_trace.o lima_devfreq.o | awk '!x[$$0]++ { print("drivers/gpu/drm/lima/"$$0) }' > drivers/gpu/drm/lima/lima.mod

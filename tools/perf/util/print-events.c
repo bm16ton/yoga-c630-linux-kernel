@@ -22,7 +22,10 @@
 #include "probe-file.h"
 #include "string2.h"
 #include "strlist.h"
+<<<<<<< HEAD
+=======
 #include "thread_map.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "tracepoint.h"
 #include "pfm.h"
 #include "pmu-hybrid.h"
@@ -239,6 +242,8 @@ void print_sdt_events(const char *subsys_glob, const char *event_glob,
 	strlist__delete(sdtlist);
 }
 
+<<<<<<< HEAD
+=======
 static bool is_event_supported(u8 type, unsigned int config)
 {
 	bool ret = true;
@@ -277,6 +282,7 @@ static bool is_event_supported(u8 type, unsigned int config)
 	return ret;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int print_hwcache_events(const char *event_glob, bool name_only)
 {
 	unsigned int type, op, i, evt_i = 0, evt_num = 0, npmus = 0;

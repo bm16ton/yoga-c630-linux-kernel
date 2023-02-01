@@ -1,0 +1,1 @@
+cmd_drivers/mfd/viperboard.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mfd/viperboard.ko drivers/mfd/viperboard.o drivers/mfd/viperboard.mod.o;  true

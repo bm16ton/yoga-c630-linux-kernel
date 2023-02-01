@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/liquidio/liquidio_vf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/cavium/liquidio/liquidio_vf.ko drivers/net/ethernet/cavium/liquidio/liquidio_vf.o drivers/net/ethernet/cavium/liquidio/liquidio_vf.mod.o;  true

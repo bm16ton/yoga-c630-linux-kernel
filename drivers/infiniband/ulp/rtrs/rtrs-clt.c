@@ -16,6 +16,7 @@
 
 #include "rtrs-clt.h"
 #include "rtrs-log.h"
+#include "rtrs-clt-trace.h"
 
 #define RTRS_CONNECT_TIMEOUT_MS 30000
 /*
@@ -53,7 +54,14 @@ static inline bool rtrs_clt_is_connected(const struct rtrs_clt_sess *clt)
 
 	rcu_read_lock();
 	list_for_each_entry_rcu(clt_path, &clt->paths_list, s.entry)
+<<<<<<< HEAD
+		if (READ_ONCE(clt_path->state) == RTRS_CLT_CONNECTED) {
+			connected = true;
+			break;
+		}
+=======
 		connected |= READ_ONCE(clt_path->state) == RTRS_CLT_CONNECTED;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rcu_read_unlock();
 
 	return connected;
@@ -302,6 +310,11 @@ static void rtrs_rdma_error_recovery(struct rtrs_clt_con *con)
 {
 	struct rtrs_clt_path *clt_path = to_clt_path(con->c.path);
 
+<<<<<<< HEAD
+	trace_rtrs_rdma_error_recovery(clt_path);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (rtrs_clt_change_state_from_to(clt_path,
 					   RTRS_CLT_CONNECTED,
 					   RTRS_CLT_RECONNECTING)) {
@@ -1511,8 +1524,12 @@ static void rtrs_clt_err_recovery_work(struct work_struct *work)
 	rtrs_clt_stop_and_destroy_conns(clt_path);
 	queue_delayed_work(rtrs_wq, &clt_path->reconnect_dwork,
 			   msecs_to_jiffies(delay_ms +
+<<<<<<< HEAD
+					    prandom_u32_max(RTRS_RECONNECT_SEED)));
+=======
 					    prandom_u32() %
 					    RTRS_RECONNECT_SEED));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct rtrs_clt_path *alloc_path(struct rtrs_clt_sess *clt,
@@ -1943,6 +1960,11 @@ static int rtrs_rdma_conn_rejected(struct rtrs_clt_con *con,
 
 void rtrs_clt_close_conns(struct rtrs_clt_path *clt_path, bool wait)
 {
+<<<<<<< HEAD
+	trace_rtrs_clt_close_conns(clt_path);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (rtrs_clt_change_state_get_old(clt_path, RTRS_CLT_CLOSING, NULL))
 		queue_work(rtrs_wq, &clt_path->close_work);
 	if (wait)
@@ -2213,6 +2235,8 @@ static void rtrs_clt_stop_and_destroy_conns(struct rtrs_clt_path *clt_path)
 	}
 }
 
+<<<<<<< HEAD
+=======
 static inline bool xchg_paths(struct rtrs_clt_path __rcu **rcu_ppcpu_path,
 			      struct rtrs_clt_path *clt_path,
 			      struct rtrs_clt_path *next)
@@ -2224,6 +2248,7 @@ static inline bool xchg_paths(struct rtrs_clt_path __rcu **rcu_ppcpu_path,
 	return clt_path == cmpxchg(ppcpu_path, clt_path, next);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtrs_clt_remove_path_from_arr(struct rtrs_clt_path *clt_path)
 {
 	struct rtrs_clt_sess *clt = clt_path->clt;
@@ -2298,7 +2323,12 @@ static void rtrs_clt_remove_path_from_arr(struct rtrs_clt_path *clt_path)
 		 * We race with IO code path, which also changes pointer,
 		 * thus we have to be careful not to overwrite it.
 		 */
+<<<<<<< HEAD
+		if (try_cmpxchg((struct rtrs_clt_path **)ppcpu_path, &clt_path,
+				next))
+=======
 		if (xchg_paths(ppcpu_path, clt_path, next))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			/*
 			 * @ppcpu_path was successfully replaced with @next,
 			 * that means that someone could also pick up the
@@ -2648,6 +2678,11 @@ static void rtrs_clt_reconnect_work(struct work_struct *work)
 	clt_path = container_of(to_delayed_work(work), struct rtrs_clt_path,
 				reconnect_dwork);
 	clt = clt_path->clt;
+<<<<<<< HEAD
+
+	trace_rtrs_clt_reconnect_work(clt_path);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (READ_ONCE(clt_path->state) != RTRS_CLT_RECONNECTING)
 		return;

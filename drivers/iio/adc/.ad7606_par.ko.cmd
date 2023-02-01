@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/ad7606_par.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/ad7606_par.ko drivers/iio/adc/ad7606_par.o drivers/iio/adc/ad7606_par.mod.o;  true

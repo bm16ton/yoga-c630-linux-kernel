@@ -181,7 +181,11 @@ static int rtw_mlcst2unicst(struct adapter *padapter, struct sk_buff *skb)
 	return true;
 }
 
+<<<<<<< HEAD
+void _rtw_xmit_entry(struct sk_buff *pkt, struct net_device *pnetdev)
+=======
 int _rtw_xmit_entry(struct sk_buff *pkt, struct net_device *pnetdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct adapter *padapter = rtw_netdev_priv(pnetdev);
 	struct xmit_priv *pxmitpriv = &padapter->xmitpriv;
@@ -202,7 +206,11 @@ int _rtw_xmit_entry(struct sk_buff *pkt, struct net_device *pnetdev)
 		if (pxmitpriv->free_xmitframe_cnt > (NR_XMITFRAME / 4)) {
 			res = rtw_mlcst2unicst(padapter, pkt);
 			if (res)
+<<<<<<< HEAD
+				return;
+=======
 				goto exit;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -210,11 +218,23 @@ int _rtw_xmit_entry(struct sk_buff *pkt, struct net_device *pnetdev)
 	if (res < 0)
 		goto drop_packet;
 
+<<<<<<< HEAD
+	return;
+=======
 	goto exit;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 drop_packet:
 	pxmitpriv->tx_drop++;
 	dev_kfree_skb_any(pkt);
+<<<<<<< HEAD
+}
+
+netdev_tx_t rtw_xmit_entry(struct sk_buff *pkt, struct net_device *pnetdev)
+{
+	if (pkt)
+		_rtw_xmit_entry(pkt, pnetdev);
+=======
 
 exit:
 	return 0;
@@ -226,6 +246,7 @@ int rtw_xmit_entry(struct sk_buff *pkt, struct net_device *pnetdev)
 
 	if (pkt)
 		ret = _rtw_xmit_entry(pkt, pnetdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return ret;
+	return NETDEV_TX_OK;
 }

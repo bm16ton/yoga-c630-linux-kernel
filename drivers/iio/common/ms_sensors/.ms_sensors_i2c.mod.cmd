@@ -1,0 +1,1 @@
+cmd_drivers/iio/common/ms_sensors/ms_sensors_i2c.mod := printf '%s\n'   ms_sensors_i2c.o | awk '!x[$$0]++ { print("drivers/iio/common/ms_sensors/"$$0) }' > drivers/iio/common/ms_sensors/ms_sensors_i2c.mod

@@ -1,0 +1,10 @@
+rk3328-evb.o: arch/arm64/boot/dts/rockchip/rk3328-evb.dts \
+ arch/arm64/boot/dts/rockchip/rk3328.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/rk3328-cru.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/rockchip.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/rk3328-power.h \
+ scripts/dtc/include-prefixes/dt-bindings/soc/rockchip,boot-mode.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h

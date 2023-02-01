@@ -363,6 +363,10 @@ ice_gnss_tty_write(struct tty_struct *tty, const unsigned char *buf, int count)
 	/* Send the data out to a hardware port */
 	write_buf = kzalloc(sizeof(*write_buf), GFP_KERNEL);
 	if (!write_buf) {
+<<<<<<< HEAD
+		kfree(cmd_buf);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		err = -ENOMEM;
 		goto exit;
 	}
@@ -460,6 +464,12 @@ static struct tty_driver *ice_gnss_create_tty_driver(struct ice_pf *pf)
 	for (i = 0; i < ICE_GNSS_TTY_MINOR_DEVICES; i++) {
 		pf->gnss_tty_port[i] = kzalloc(sizeof(*pf->gnss_tty_port[i]),
 					       GFP_KERNEL);
+<<<<<<< HEAD
+		if (!pf->gnss_tty_port[i])
+			goto err_out;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pf->gnss_serial[i] = NULL;
 
 		tty_port_init(pf->gnss_tty_port[i]);
@@ -469,6 +479,9 @@ static struct tty_driver *ice_gnss_create_tty_driver(struct ice_pf *pf)
 	err = tty_register_driver(tty_driver);
 	if (err) {
 		dev_err(dev, "Failed to register TTY driver err=%d\n", err);
+<<<<<<< HEAD
+		goto err_out;
+=======
 
 		for (i = 0; i < ICE_GNSS_TTY_MINOR_DEVICES; i++) {
 			tty_port_destroy(pf->gnss_tty_port[i]);
@@ -478,12 +491,26 @@ static struct tty_driver *ice_gnss_create_tty_driver(struct ice_pf *pf)
 		tty_driver_kref_put(pf->ice_gnss_tty_driver);
 
 		return NULL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	for (i = 0; i < ICE_GNSS_TTY_MINOR_DEVICES; i++)
 		dev_info(dev, "%s%d registered\n", ttydrv_name, i);
 
 	return tty_driver;
+<<<<<<< HEAD
+
+err_out:
+	while (i--) {
+		tty_port_destroy(pf->gnss_tty_port[i]);
+		kfree(pf->gnss_tty_port[i]);
+	}
+	kfree(ttydrv_name);
+	tty_driver_kref_put(pf->ice_gnss_tty_driver);
+
+	return NULL;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**

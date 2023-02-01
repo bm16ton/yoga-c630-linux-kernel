@@ -1,0 +1,13 @@
+drivers/net/dsa/mv88e6xxx/chip.o
+drivers/net/dsa/mv88e6xxx/devlink.o
+drivers/net/dsa/mv88e6xxx/global1.o
+drivers/net/dsa/mv88e6xxx/global1_atu.o
+drivers/net/dsa/mv88e6xxx/global1_vtu.o
+drivers/net/dsa/mv88e6xxx/global2.o
+drivers/net/dsa/mv88e6xxx/global2_avb.o
+drivers/net/dsa/mv88e6xxx/global2_scratch.o
+drivers/net/dsa/mv88e6xxx/phy.o
+drivers/net/dsa/mv88e6xxx/port.o
+drivers/net/dsa/mv88e6xxx/port_hidden.o
+drivers/net/dsa/mv88e6xxx/serdes.o
+drivers/net/dsa/mv88e6xxx/smi.o

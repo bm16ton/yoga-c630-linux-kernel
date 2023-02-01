@@ -46,6 +46,12 @@ int ethtool_get_max_rxfh_channel(struct net_device *dev, u32 *max);
 int __ethtool_get_ts_info(struct net_device *dev, struct ethtool_ts_info *info);
 
 extern const struct ethtool_phy_ops *ethtool_phy_ops;
+extern const struct ethtool_pse_ops *ethtool_pse_ops;
+
+int ethtool_get_module_info_call(struct net_device *dev,
+				 struct ethtool_modinfo *modinfo);
+int ethtool_get_module_eeprom_call(struct net_device *dev,
+				   struct ethtool_eeprom *ee, u8 *data);
 
 int ethtool_get_module_info_call(struct net_device *dev,
 				 struct ethtool_modinfo *modinfo);

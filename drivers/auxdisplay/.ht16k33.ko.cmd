@@ -1,0 +1,1 @@
+cmd_drivers/auxdisplay/ht16k33.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/auxdisplay/ht16k33.ko drivers/auxdisplay/ht16k33.o drivers/auxdisplay/ht16k33.mod.o;  true

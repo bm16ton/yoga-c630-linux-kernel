@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/st_uvis25_i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/st_uvis25_i2c.ko drivers/iio/light/st_uvis25_i2c.o drivers/iio/light/st_uvis25_i2c.mod.o;  true

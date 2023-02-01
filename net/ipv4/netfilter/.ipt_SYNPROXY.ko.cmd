@@ -1,0 +1,1 @@
+cmd_net/ipv4/netfilter/ipt_SYNPROXY.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/ipv4/netfilter/ipt_SYNPROXY.ko net/ipv4/netfilter/ipt_SYNPROXY.o net/ipv4/netfilter/ipt_SYNPROXY.mod.o;  true

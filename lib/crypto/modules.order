@@ -1,0 +1,7 @@
+lib/crypto/libchacha.ko
+lib/crypto/libarc4.ko
+lib/crypto/libchacha20poly1305.ko
+lib/crypto/libcurve25519-generic.ko
+lib/crypto/libcurve25519.ko
+lib/crypto/libdes.ko
+lib/crypto/libpoly1305.ko

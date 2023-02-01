@@ -1,0 +1,1 @@
+cmd_drivers/misc/apds9802als.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/apds9802als.ko drivers/misc/apds9802als.o drivers/misc/apds9802als.mod.o;  true

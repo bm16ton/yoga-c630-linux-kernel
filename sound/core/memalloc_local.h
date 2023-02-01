@@ -13,8 +13,11 @@ struct snd_malloc_ops {
 	void (*sync)(struct snd_dma_buffer *dmab, enum snd_dma_sync_mode mode);
 };
 
+<<<<<<< HEAD
+=======
 #ifdef CONFIG_SND_DMA_SGBUF
 extern const struct snd_malloc_ops snd_dma_sg_ops;
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __MEMALLOC_LOCAL_H */

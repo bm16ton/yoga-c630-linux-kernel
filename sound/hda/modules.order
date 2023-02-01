@@ -1,0 +1,3 @@
+sound/hda/snd-hda-core.ko
+sound/hda/snd-intel-dspcfg.ko
+sound/hda/snd-intel-sdw-acpi.ko

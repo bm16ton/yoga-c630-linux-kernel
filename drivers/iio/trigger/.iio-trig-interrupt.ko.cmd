@@ -1,0 +1,1 @@
+cmd_drivers/iio/trigger/iio-trig-interrupt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/trigger/iio-trig-interrupt.ko drivers/iio/trigger/iio-trig-interrupt.o drivers/iio/trigger/iio-trig-interrupt.mod.o;  true

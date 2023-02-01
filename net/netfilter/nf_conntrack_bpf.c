@@ -6,12 +6,23 @@
  * are exposed through to BPF programs is explicitly unstable.
  */
 
+<<<<<<< HEAD
+#include <linux/bpf_verifier.h>
+#include <linux/bpf.h>
+#include <linux/btf.h>
+#include <linux/filter.h>
+#include <linux/mutex.h>
+#include <linux/types.h>
+#include <linux/btf_ids.h>
+#include <linux/net_namespace.h>
+=======
 #include <linux/bpf.h>
 #include <linux/btf.h>
 #include <linux/types.h>
 #include <linux/btf_ids.h>
 #include <linux/net_namespace.h>
 #include <net/netfilter/nf_conntrack.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <net/netfilter/nf_conntrack_bpf.h>
 #include <net/netfilter/nf_conntrack_core.h>
 
@@ -134,7 +145,10 @@ __bpf_nf_ct_alloc_entry(struct net *net, struct bpf_sock_tuple *bpf_tuple,
 
 	memset(&ct->proto, 0, sizeof(ct->proto));
 	__nf_ct_set_timeout(ct, timeout * HZ);
+<<<<<<< HEAD
+=======
 	ct->status |= IPS_CONFIRMED;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	if (opts->netns_id >= 0)
@@ -184,14 +198,68 @@ static struct nf_conn *__bpf_nf_ct_lookup(struct net *net,
 	return ct;
 }
 
+<<<<<<< HEAD
+BTF_ID_LIST(btf_nf_conn_ids)
+BTF_ID(struct, nf_conn)
+BTF_ID(struct, nf_conn___init)
+
+/* Check writes into `struct nf_conn` */
+static int _nf_conntrack_btf_struct_access(struct bpf_verifier_log *log,
+					   const struct btf *btf,
+					   const struct btf_type *t, int off,
+					   int size, enum bpf_access_type atype,
+					   u32 *next_btf_id,
+					   enum bpf_type_flag *flag)
+{
+	const struct btf_type *ncit;
+	const struct btf_type *nct;
+	size_t end;
+
+	ncit = btf_type_by_id(btf, btf_nf_conn_ids[1]);
+	nct = btf_type_by_id(btf, btf_nf_conn_ids[0]);
+
+	if (t != nct && t != ncit) {
+		bpf_log(log, "only read is supported\n");
+		return -EACCES;
+	}
+
+	/* `struct nf_conn` and `struct nf_conn___init` have the same layout
+	 * so we are safe to simply merge offset checks here
+	 */
+	switch (off) {
+#if defined(CONFIG_NF_CONNTRACK_MARK)
+	case offsetof(struct nf_conn, mark):
+		end = offsetofend(struct nf_conn, mark);
+		break;
+#endif
+	default:
+		bpf_log(log, "no write support to nf_conn at off %d\n", off);
+		return -EACCES;
+	}
+
+	if (off + size > end) {
+		bpf_log(log,
+			"write access at off %d with size %d beyond the member of nf_conn ended at %zu\n",
+			off, size, end);
+		return -EACCES;
+	}
+
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 __diag_push();
 __diag_ignore_all("-Wmissing-prototypes",
 		  "Global functions as their definitions will be in nf_conntrack BTF");
 
+<<<<<<< HEAD
+=======
 struct nf_conn___init {
 	struct nf_conn ct;
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* bpf_xdp_ct_alloc - Allocate a new CT entry
  *
  * Parameters:
@@ -339,6 +407,10 @@ struct nf_conn *bpf_ct_insert_entry(struct nf_conn___init *nfct_i)
 	struct nf_conn *nfct = (struct nf_conn *)nfct_i;
 	int err;
 
+<<<<<<< HEAD
+	nfct->status |= IPS_CONFIRMED;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	err = nf_conntrack_hash_check_insert(nfct);
 	if (err < 0) {
 		nf_conntrack_free(nfct);
@@ -449,5 +521,23 @@ int register_nf_conntrack_bpf(void)
 	int ret;
 
 	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &nf_conntrack_kfunc_set);
+<<<<<<< HEAD
+	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &nf_conntrack_kfunc_set);
+	if (!ret) {
+		mutex_lock(&nf_conn_btf_access_lock);
+		nfct_btf_struct_access = _nf_conntrack_btf_struct_access;
+		mutex_unlock(&nf_conn_btf_access_lock);
+	}
+
+	return ret;
+}
+
+void cleanup_nf_conntrack_bpf(void)
+{
+	mutex_lock(&nf_conn_btf_access_lock);
+	nfct_btf_struct_access = NULL;
+	mutex_unlock(&nf_conn_btf_access_lock);
+=======
 	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &nf_conntrack_kfunc_set);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }

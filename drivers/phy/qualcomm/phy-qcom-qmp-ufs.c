@@ -28,6 +28,17 @@
 #define SW_RESET				BIT(0)
 /* QPHY_POWER_DOWN_CONTROL */
 #define SW_PWRDN				BIT(0)
+<<<<<<< HEAD
+/* QPHY_START_CONTROL bits */
+#define SERDES_START				BIT(0)
+#define PCS_START				BIT(1)
+/* QPHY_PCS_STATUS bit */
+#define PHYSTATUS				BIT(6)
+/* QPHY_PCS_READY_STATUS bit */
+#define PCS_READY				BIT(0)
+
+#define PHY_INIT_COMPLETE_TIMEOUT		10000
+=======
 #define REFCLK_DRV_DSBL				BIT(1)
 /* QPHY_START_CONTROL bits */
 #define SERDES_START				BIT(0)
@@ -75,6 +86,7 @@
 
 /* Define the assumed distance between lanes for underspecified device trees. */
 #define QMP_PHY_LEGACY_LANE_STRIDE		0x400
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 struct qmp_phy_init_tbl {
 	unsigned int offset;
@@ -115,15 +127,21 @@ struct qmp_phy_init_tbl {
 
 /* set of registers with offsets different per-PHY */
 enum qphy_reg_layout {
+<<<<<<< HEAD
+=======
 	/* Common block control registers */
 	QPHY_COM_SW_RESET,
 	QPHY_COM_POWER_DOWN_CONTROL,
 	QPHY_COM_START_CONTROL,
 	QPHY_COM_PCS_READY_STATUS,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* PCS registers */
 	QPHY_SW_RESET,
 	QPHY_START_CTRL,
 	QPHY_PCS_READY_STATUS,
+<<<<<<< HEAD
+	QPHY_PCS_POWER_DOWN_CONTROL,
+=======
 	QPHY_PCS_STATUS,
 	QPHY_PCS_AUTONOMOUS_MODE_CTRL,
 	QPHY_PCS_LFPS_RXTERM_IRQ_CLEAR,
@@ -131,6 +149,7 @@ enum qphy_reg_layout {
 	QPHY_PCS_POWER_DOWN_CONTROL,
 	/* PCS_MISC registers */
 	QPHY_PCS_MISC_TYPEC_CTRL,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Keep last to ensure regs_layout arrays are properly initialized */
 	QPHY_LAYOUT_SIZE
 };
@@ -580,6 +599,11 @@ static const struct qmp_phy_init_tbl sm8350_ufsphy_pcs_tbl[] = {
 	QMP_PHY_INIT_CFG(QPHY_V5_PCS_UFS_MULTI_LANE_CTRL1, 0x02),
 };
 
+<<<<<<< HEAD
+/* struct qmp_phy_cfg - per-PHY initialization config */
+struct qmp_phy_cfg {
+	int lanes;
+=======
 struct qmp_phy;
 
 /* struct qmp_phy_cfg - per-PHY initialization config */
@@ -588,6 +612,7 @@ struct qmp_phy_cfg {
 	unsigned int type;
 	/* number of lanes provided by phy */
 	int nlanes;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Init sequence for PHY blocks - serdes, tx, rx, pcs */
 	const struct qmp_phy_init_tbl *serdes_tbl;
@@ -614,9 +639,12 @@ struct qmp_phy_cfg {
 	/* bit offset of PHYSTATUS in QPHY_PCS_STATUS register */
 	unsigned int phy_status;
 
+<<<<<<< HEAD
+=======
 	/* true, if PHY has secondary tx/rx lanes to be configured */
 	bool is_dual_lane_phy;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* true, if PCS block has no separate SW_RESET register */
 	bool no_pcs_sw_reset;
 };
@@ -633,9 +661,13 @@ struct qmp_phy_cfg {
  * @tx2: iomapped memory space for second lane's tx (in dual lane PHYs)
  * @rx2: iomapped memory space for second lane's rx (in dual lane PHYs)
  * @pcs_misc: iomapped memory space for lane's pcs_misc
+<<<<<<< HEAD
+ * @qmp: QMP phy to which this lane belongs
+=======
  * @index: lane index
  * @qmp: QMP phy to which this lane belongs
  * @mode: current PHY mode
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 struct qmp_phy {
 	struct phy *phy;
@@ -647,9 +679,13 @@ struct qmp_phy {
 	void __iomem *tx2;
 	void __iomem *rx2;
 	void __iomem *pcs_misc;
+<<<<<<< HEAD
+	struct qcom_qmp *qmp;
+=======
 	unsigned int index;
 	struct qcom_qmp *qmp;
 	enum phy_mode mode;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /**
@@ -719,8 +755,12 @@ static const char * const qmp_phy_vreg_l[] = {
 };
 
 static const struct qmp_phy_cfg msm8996_ufs_cfg = {
+<<<<<<< HEAD
+	.lanes			= 1,
+=======
 	.type			= PHY_TYPE_UFS,
 	.nlanes			= 1,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.serdes_tbl		= msm8996_ufs_serdes_tbl,
 	.serdes_tbl_num		= ARRAY_SIZE(msm8996_ufs_serdes_tbl),
@@ -745,8 +785,12 @@ static const struct qmp_phy_cfg msm8996_ufs_cfg = {
 };
 
 static const struct qmp_phy_cfg sdm845_ufsphy_cfg = {
+<<<<<<< HEAD
+	.lanes			= 2,
+=======
 	.type			= PHY_TYPE_UFS,
 	.nlanes			= 2,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.serdes_tbl		= sdm845_ufsphy_serdes_tbl,
 	.serdes_tbl_num		= ARRAY_SIZE(sdm845_ufsphy_serdes_tbl),
@@ -766,13 +810,20 @@ static const struct qmp_phy_cfg sdm845_ufsphy_cfg = {
 	.pwrdn_ctrl		= SW_PWRDN,
 	.phy_status		= PHYSTATUS,
 
+<<<<<<< HEAD
+=======
 	.is_dual_lane_phy	= true,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.no_pcs_sw_reset	= true,
 };
 
 static const struct qmp_phy_cfg sm6115_ufsphy_cfg = {
+<<<<<<< HEAD
+	.lanes			= 1,
+=======
 	.type			= PHY_TYPE_UFS,
 	.nlanes			= 1,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.serdes_tbl		= sm6115_ufsphy_serdes_tbl,
 	.serdes_tbl_num		= ARRAY_SIZE(sm6115_ufsphy_serdes_tbl),
@@ -795,8 +846,12 @@ static const struct qmp_phy_cfg sm6115_ufsphy_cfg = {
 };
 
 static const struct qmp_phy_cfg sm8150_ufsphy_cfg = {
+<<<<<<< HEAD
+	.lanes			= 2,
+=======
 	.type			= PHY_TYPE_UFS,
 	.nlanes			= 2,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.serdes_tbl		= sm8150_ufsphy_serdes_tbl,
 	.serdes_tbl_num		= ARRAY_SIZE(sm8150_ufsphy_serdes_tbl),
@@ -815,6 +870,12 @@ static const struct qmp_phy_cfg sm8150_ufsphy_cfg = {
 	.start_ctrl		= SERDES_START,
 	.pwrdn_ctrl		= SW_PWRDN,
 	.phy_status		= PHYSTATUS,
+<<<<<<< HEAD
+};
+
+static const struct qmp_phy_cfg sm8350_ufsphy_cfg = {
+	.lanes			= 2,
+=======
 
 	.is_dual_lane_phy	= true,
 };
@@ -822,6 +883,7 @@ static const struct qmp_phy_cfg sm8150_ufsphy_cfg = {
 static const struct qmp_phy_cfg sm8350_ufsphy_cfg = {
 	.type			= PHY_TYPE_UFS,
 	.nlanes			= 2,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.serdes_tbl		= sm8350_ufsphy_serdes_tbl,
 	.serdes_tbl_num		= ARRAY_SIZE(sm8350_ufsphy_serdes_tbl),
@@ -840,6 +902,12 @@ static const struct qmp_phy_cfg sm8350_ufsphy_cfg = {
 	.start_ctrl		= SERDES_START,
 	.pwrdn_ctrl		= SW_PWRDN,
 	.phy_status		= PHYSTATUS,
+<<<<<<< HEAD
+};
+
+static const struct qmp_phy_cfg sm8450_ufsphy_cfg = {
+	.lanes			= 2,
+=======
 
 	.is_dual_lane_phy	= true,
 };
@@ -847,6 +915,7 @@ static const struct qmp_phy_cfg sm8350_ufsphy_cfg = {
 static const struct qmp_phy_cfg sm8450_ufsphy_cfg = {
 	.type			= PHY_TYPE_UFS,
 	.nlanes			= 2,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	.serdes_tbl		= sm8350_ufsphy_serdes_tbl,
 	.serdes_tbl_num		= ARRAY_SIZE(sm8350_ufsphy_serdes_tbl),
@@ -865,11 +934,17 @@ static const struct qmp_phy_cfg sm8450_ufsphy_cfg = {
 	.start_ctrl		= SERDES_START,
 	.pwrdn_ctrl		= SW_PWRDN,
 	.phy_status		= PHYSTATUS,
+<<<<<<< HEAD
+};
+
+static void qmp_ufs_configure_lane(void __iomem *base,
+=======
 
 	.is_dual_lane_phy	= true,
 };
 
 static void qcom_qmp_phy_ufs_configure_lane(void __iomem *base,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					const unsigned int *regs,
 					const struct qmp_phy_init_tbl tbl[],
 					int num,
@@ -892,27 +967,46 @@ static void qcom_qmp_phy_ufs_configure_lane(void __iomem *base,
 	}
 }
 
+<<<<<<< HEAD
+static void qmp_ufs_configure(void __iomem *base,
+=======
 static void qcom_qmp_phy_ufs_configure(void __iomem *base,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				   const unsigned int *regs,
 				   const struct qmp_phy_init_tbl tbl[],
 				   int num)
 {
+<<<<<<< HEAD
+	qmp_ufs_configure_lane(base, regs, tbl, num, 0xff);
+}
+
+static int qmp_ufs_serdes_init(struct qmp_phy *qphy)
+=======
 	qcom_qmp_phy_ufs_configure_lane(base, regs, tbl, num, 0xff);
 }
 
 static int qcom_qmp_phy_ufs_serdes_init(struct qmp_phy *qphy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
 	void __iomem *serdes = qphy->serdes;
 	const struct qmp_phy_init_tbl *serdes_tbl = cfg->serdes_tbl;
 	int serdes_tbl_num = cfg->serdes_tbl_num;
 
+<<<<<<< HEAD
+	qmp_ufs_configure(serdes, cfg->regs, serdes_tbl, serdes_tbl_num);
+=======
 	qcom_qmp_phy_ufs_configure(serdes, cfg->regs, serdes_tbl, serdes_tbl_num);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_com_init(struct qmp_phy *qphy)
+=======
 static int qcom_qmp_phy_ufs_com_init(struct qmp_phy *qphy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = qphy->qmp;
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
@@ -946,7 +1040,11 @@ err_disable_regulators:
 	return ret;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_com_exit(struct qmp_phy *qphy)
+=======
 static int qcom_qmp_phy_ufs_com_exit(struct qmp_phy *qphy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = qphy->qmp;
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
@@ -960,7 +1058,11 @@ static int qcom_qmp_phy_ufs_com_exit(struct qmp_phy *qphy)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_init(struct phy *phy)
+=======
 static int qcom_qmp_phy_ufs_init(struct phy *phy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 	struct qcom_qmp *qmp = qphy->qmp;
@@ -995,14 +1097,22 @@ static int qcom_qmp_phy_ufs_init(struct phy *phy)
 			return ret;
 	}
 
+<<<<<<< HEAD
+	ret = qmp_ufs_com_init(qphy);
+=======
 	ret = qcom_qmp_phy_ufs_com_init(qphy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_power_on(struct phy *phy)
+=======
 static int qcom_qmp_phy_ufs_power_on(struct phy *phy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 	struct qcom_qmp *qmp = qphy->qmp;
@@ -1014,6 +1124,26 @@ static int qcom_qmp_phy_ufs_power_on(struct phy *phy)
 	unsigned int mask, val, ready;
 	int ret;
 
+<<<<<<< HEAD
+	qmp_ufs_serdes_init(qphy);
+
+	/* Tx, Rx, and PCS configurations */
+	qmp_ufs_configure_lane(tx, cfg->regs, cfg->tx_tbl, cfg->tx_tbl_num, 1);
+
+	if (cfg->lanes >= 2) {
+		qmp_ufs_configure_lane(qphy->tx2, cfg->regs,
+					cfg->tx_tbl, cfg->tx_tbl_num, 2);
+	}
+
+	qmp_ufs_configure_lane(rx, cfg->regs, cfg->rx_tbl, cfg->rx_tbl_num, 1);
+
+	if (cfg->lanes >= 2) {
+		qmp_ufs_configure_lane(qphy->rx2, cfg->regs,
+					cfg->rx_tbl, cfg->rx_tbl_num, 2);
+	}
+
+	qmp_ufs_configure(pcs, cfg->regs, cfg->pcs_tbl, cfg->pcs_tbl_num);
+=======
 	qcom_qmp_phy_ufs_serdes_init(qphy);
 
 	/* Tx, Rx, and PCS configurations */
@@ -1035,6 +1165,7 @@ static int qcom_qmp_phy_ufs_power_on(struct phy *phy)
 	}
 
 	qcom_qmp_phy_ufs_configure(pcs, cfg->regs, cfg->pcs_tbl, cfg->pcs_tbl_num);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = reset_control_deassert(qmp->ufs_reset);
 	if (ret)
@@ -1060,7 +1191,11 @@ static int qcom_qmp_phy_ufs_power_on(struct phy *phy)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_power_off(struct phy *phy)
+=======
 static int qcom_qmp_phy_ufs_power_off(struct phy *phy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 	const struct qmp_phy_cfg *cfg = qphy->cfg;
@@ -1084,15 +1219,36 @@ static int qcom_qmp_phy_ufs_power_off(struct phy *phy)
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_exit(struct phy *phy)
+{
+	struct qmp_phy *qphy = phy_get_drvdata(phy);
+
+	qmp_ufs_com_exit(qphy);
+=======
 static int qcom_qmp_phy_ufs_exit(struct phy *phy)
 {
 	struct qmp_phy *qphy = phy_get_drvdata(phy);
 
 	qcom_qmp_phy_ufs_com_exit(qphy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_enable(struct phy *phy)
+{
+	int ret;
+
+	ret = qmp_ufs_init(phy);
+	if (ret)
+		return ret;
+
+	ret = qmp_ufs_power_on(phy);
+	if (ret)
+		qmp_ufs_exit(phy);
+=======
 static int qcom_qmp_phy_ufs_enable(struct phy *phy)
 {
 	int ret;
@@ -1104,10 +1260,24 @@ static int qcom_qmp_phy_ufs_enable(struct phy *phy)
 	ret = qcom_qmp_phy_ufs_power_on(phy);
 	if (ret)
 		qcom_qmp_phy_ufs_exit(phy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_disable(struct phy *phy)
+{
+	int ret;
+
+	ret = qmp_ufs_power_off(phy);
+	if (ret)
+		return ret;
+	return qmp_ufs_exit(phy);
+}
+
+static int qmp_ufs_vreg_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+=======
 static int qcom_qmp_phy_ufs_disable(struct phy *phy)
 {
 	int ret;
@@ -1129,6 +1299,7 @@ static int qcom_qmp_phy_ufs_set_mode(struct phy *phy,
 }
 
 static int qcom_qmp_phy_ufs_vreg_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = dev_get_drvdata(dev);
 	int num = cfg->num_vregs;
@@ -1144,7 +1315,11 @@ static int qcom_qmp_phy_ufs_vreg_init(struct device *dev, const struct qmp_phy_c
 	return devm_regulator_bulk_get(dev, num, qmp->vregs);
 }
 
+<<<<<<< HEAD
+static int qmp_ufs_clk_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+=======
 static int qcom_qmp_phy_ufs_clk_init(struct device *dev, const struct qmp_phy_cfg *cfg)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp = dev_get_drvdata(dev);
 	int num = cfg->num_clks;
@@ -1161,6 +1336,14 @@ static int qcom_qmp_phy_ufs_clk_init(struct device *dev, const struct qmp_phy_cf
 }
 
 static const struct phy_ops qcom_qmp_ufs_ops = {
+<<<<<<< HEAD
+	.power_on	= qmp_ufs_enable,
+	.power_off	= qmp_ufs_disable,
+	.owner		= THIS_MODULE,
+};
+
+static int qmp_ufs_create(struct device *dev, struct device_node *np, int id,
+=======
 	.power_on	= qcom_qmp_phy_ufs_enable,
 	.power_off	= qcom_qmp_phy_ufs_disable,
 	.set_mode	= qcom_qmp_phy_ufs_set_mode,
@@ -1169,6 +1352,7 @@ static const struct phy_ops qcom_qmp_ufs_ops = {
 
 static
 int qcom_qmp_phy_ufs_create(struct device *dev, struct device_node *np, int id,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			void __iomem *serdes, const struct qmp_phy_cfg *cfg)
 {
 	struct qcom_qmp *qmp = dev_get_drvdata(dev);
@@ -1188,6 +1372,35 @@ int qcom_qmp_phy_ufs_create(struct device *dev, struct device_node *np, int id,
 	 * For dual lane PHYs: tx2 -> 3, rx2 -> 4, pcs_misc (optional) -> 5
 	 * For single lane PHYs: pcs_misc (optional) -> 3.
 	 */
+<<<<<<< HEAD
+	qphy->tx = devm_of_iomap(dev, np, 0, NULL);
+	if (IS_ERR(qphy->tx))
+		return PTR_ERR(qphy->tx);
+
+	qphy->rx = devm_of_iomap(dev, np, 1, NULL);
+	if (IS_ERR(qphy->rx))
+		return PTR_ERR(qphy->rx);
+
+	qphy->pcs = devm_of_iomap(dev, np, 2, NULL);
+	if (IS_ERR(qphy->pcs))
+		return PTR_ERR(qphy->pcs);
+
+	if (cfg->lanes >= 2) {
+		qphy->tx2 = devm_of_iomap(dev, np, 3, NULL);
+		if (IS_ERR(qphy->tx2))
+			return PTR_ERR(qphy->tx2);
+
+		qphy->rx2 = devm_of_iomap(dev, np, 4, NULL);
+		if (IS_ERR(qphy->rx2))
+			return PTR_ERR(qphy->rx2);
+
+		qphy->pcs_misc = devm_of_iomap(dev, np, 5, NULL);
+	} else {
+		qphy->pcs_misc = devm_of_iomap(dev, np, 3, NULL);
+	}
+
+	if (IS_ERR(qphy->pcs_misc))
+=======
 	qphy->tx = of_iomap(np, 0);
 	if (!qphy->tx)
 		return -ENOMEM;
@@ -1227,6 +1440,7 @@ int qcom_qmp_phy_ufs_create(struct device *dev, struct device_node *np, int id,
 	}
 
 	if (!qphy->pcs_misc)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_vdbg(dev, "PHY pcs_misc-reg not used\n");
 
 	generic_phy = devm_phy_create(dev, np, &qcom_qmp_ufs_ops);
@@ -1237,7 +1451,10 @@ int qcom_qmp_phy_ufs_create(struct device *dev, struct device_node *np, int id,
 	}
 
 	qphy->phy = generic_phy;
+<<<<<<< HEAD
+=======
 	qphy->index = id;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qphy->qmp = qmp;
 	qmp->phys[id] = qphy;
 	phy_set_drvdata(generic_phy, qphy);
@@ -1245,7 +1462,11 @@ int qcom_qmp_phy_ufs_create(struct device *dev, struct device_node *np, int id,
 	return 0;
 }
 
+<<<<<<< HEAD
+static const struct of_device_id qmp_ufs_of_match_table[] = {
+=======
 static const struct of_device_id qcom_qmp_phy_ufs_of_match_table[] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{
 		.compatible = "qcom,msm8996-qmp-ufs-phy",
 		.data = &msm8996_ufs_cfg,
@@ -1282,9 +1503,15 @@ static const struct of_device_id qcom_qmp_phy_ufs_of_match_table[] = {
 	},
 	{ },
 };
+<<<<<<< HEAD
+MODULE_DEVICE_TABLE(of, qmp_ufs_of_match_table);
+
+static int qmp_ufs_probe(struct platform_device *pdev)
+=======
 MODULE_DEVICE_TABLE(of, qcom_qmp_phy_ufs_of_match_table);
 
 static int qcom_qmp_phy_ufs_probe(struct platform_device *pdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct qcom_qmp *qmp;
 	struct device *dev = &pdev->dev;
@@ -1312,6 +1539,16 @@ static int qcom_qmp_phy_ufs_probe(struct platform_device *pdev)
 	if (IS_ERR(serdes))
 		return PTR_ERR(serdes);
 
+<<<<<<< HEAD
+	ret = qmp_ufs_clk_init(dev, cfg);
+	if (ret)
+		return ret;
+
+	ret = qmp_ufs_vreg_init(dev, cfg);
+	if (ret)
+		return dev_err_probe(dev, ret,
+				     "failed to get regulator supplies\n");
+=======
 	ret = qcom_qmp_phy_ufs_clk_init(dev, cfg);
 	if (ret)
 		return ret;
@@ -1323,6 +1560,7 @@ static int qcom_qmp_phy_ufs_probe(struct platform_device *pdev)
 				ret);
 		return ret;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	num = of_get_available_child_count(dev->of_node);
 	/* do we have a rogue child node ? */
@@ -1333,6 +1571,12 @@ static int qcom_qmp_phy_ufs_probe(struct platform_device *pdev)
 	if (!qmp->phys)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	id = 0;
+	for_each_available_child_of_node(dev->of_node, child) {
+		/* Create per-lane phy */
+		ret = qmp_ufs_create(dev, child, id, serdes, cfg);
+=======
 	pm_runtime_set_active(dev);
 	pm_runtime_enable(dev);
 	/*
@@ -1345,6 +1589,7 @@ static int qcom_qmp_phy_ufs_probe(struct platform_device *pdev)
 	for_each_available_child_of_node(dev->of_node, child) {
 		/* Create per-lane phy */
 		ret = qcom_qmp_phy_ufs_create(dev, child, id, serdes, cfg);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (ret) {
 			dev_err(dev, "failed to create lane%d phy, %d\n",
 				id, ret);
@@ -1355,19 +1600,36 @@ static int qcom_qmp_phy_ufs_probe(struct platform_device *pdev)
 	}
 
 	phy_provider = devm_of_phy_provider_register(dev, of_phy_simple_xlate);
+<<<<<<< HEAD
+=======
 	if (!IS_ERR(phy_provider))
 		dev_info(dev, "Registered Qcom-QMP phy\n");
 	else
 		pm_runtime_disable(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return PTR_ERR_OR_ZERO(phy_provider);
 
 err_node_put:
+<<<<<<< HEAD
+=======
 	pm_runtime_disable(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	of_node_put(child);
 	return ret;
 }
 
+<<<<<<< HEAD
+static struct platform_driver qmp_ufs_driver = {
+	.probe		= qmp_ufs_probe,
+	.driver = {
+		.name	= "qcom-qmp-ufs-phy",
+		.of_match_table = qmp_ufs_of_match_table,
+	},
+};
+
+module_platform_driver(qmp_ufs_driver);
+=======
 static struct platform_driver qcom_qmp_phy_ufs_driver = {
 	.probe		= qcom_qmp_phy_ufs_probe,
 	.driver = {
@@ -1377,6 +1639,7 @@ static struct platform_driver qcom_qmp_phy_ufs_driver = {
 };
 
 module_platform_driver(qcom_qmp_phy_ufs_driver);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MODULE_AUTHOR("Vivek Gautam <vivek.gautam@codeaurora.org>");
 MODULE_DESCRIPTION("Qualcomm QMP UFS PHY driver");

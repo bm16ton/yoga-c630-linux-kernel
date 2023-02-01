@@ -1788,7 +1788,11 @@ static int xprt_alloc_id(struct rpc_xprt *xprt)
 {
 	int id;
 
+<<<<<<< HEAD
+	id = ida_alloc(&rpc_xprt_ids, GFP_KERNEL);
+=======
 	id = ida_simple_get(&rpc_xprt_ids, 0, 0, GFP_KERNEL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (id < 0)
 		return id;
 
@@ -1798,7 +1802,11 @@ static int xprt_alloc_id(struct rpc_xprt *xprt)
 
 static void xprt_free_id(struct rpc_xprt *xprt)
 {
+<<<<<<< HEAD
+	ida_free(&rpc_xprt_ids, xprt->id);
+=======
 	ida_simple_remove(&rpc_xprt_ids, xprt->id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 struct rpc_xprt *xprt_alloc(struct net *net, size_t size,
@@ -1822,10 +1830,7 @@ struct rpc_xprt *xprt_alloc(struct net *net, size_t size,
 			goto out_free;
 		list_add(&req->rq_list, &xprt->free);
 	}
-	if (max_alloc > num_prealloc)
-		xprt->max_reqs = max_alloc;
-	else
-		xprt->max_reqs = num_prealloc;
+	xprt->max_reqs = max_t(unsigned int, max_alloc, num_prealloc);
 	xprt->min_reqs = num_prealloc;
 	xprt->num_reqs = num_prealloc;
 
@@ -1868,7 +1873,7 @@ xprt_alloc_xid(struct rpc_xprt *xprt)
 static void
 xprt_init_xid(struct rpc_xprt *xprt)
 {
-	xprt->xid = prandom_u32();
+	xprt->xid = get_random_u32();
 }
 
 static void

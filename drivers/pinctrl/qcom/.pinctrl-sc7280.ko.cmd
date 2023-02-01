@@ -1,0 +1,1 @@
+cmd_drivers/pinctrl/qcom/pinctrl-sc7280.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/pinctrl/qcom/pinctrl-sc7280.ko drivers/pinctrl/qcom/pinctrl-sc7280.o drivers/pinctrl/qcom/pinctrl-sc7280.mod.o;  true

@@ -7,6 +7,14 @@
 
 /dts-v1/;
 
+<<<<<<< HEAD
+#include "sc7280-herobrine-villager.dtsi"
+#include "sc7280-herobrine-lte-sku.dtsi"
+
+/ {
+	model = "Google Villager (rev0)";
+	compatible = "google,villager-rev0", "qcom,sc7280";
+=======
 #include "sc7280-herobrine.dtsi"
 
 / {
@@ -330,4 +338,5 @@ ts_i2c: &i2c13 {
 			  "",
 			  "",
 			  "";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

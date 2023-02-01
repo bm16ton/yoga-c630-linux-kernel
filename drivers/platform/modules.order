@@ -1,0 +1,14 @@
+drivers/platform/chrome/cros_ec.ko
+drivers/platform/chrome/cros_ec_i2c.ko
+drivers/platform/chrome/cros_typec_switch.ko
+drivers/platform/chrome/cros_ec_spi.ko
+drivers/platform/chrome/cros_ec_typec.ko
+drivers/platform/chrome/cros_kbd_led_backlight.ko
+drivers/platform/chrome/cros_ec_chardev.ko
+drivers/platform/chrome/cros_ec_lightbar.ko
+drivers/platform/chrome/cros_ec_vbc.ko
+drivers/platform/chrome/cros_ec_debugfs.ko
+drivers/platform/chrome/cros-ec-sensorhub.ko
+drivers/platform/chrome/cros_ec_sysfs.ko
+drivers/platform/chrome/cros_usbpd_logger.ko
+drivers/platform/chrome/cros_usbpd_notify.ko

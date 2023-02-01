@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/tiny/panel-mipi-dbi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/tiny/panel-mipi-dbi.ko drivers/gpu/drm/tiny/panel-mipi-dbi.o drivers/gpu/drm/tiny/panel-mipi-dbi.mod.o;  true

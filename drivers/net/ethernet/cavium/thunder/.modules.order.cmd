@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/thunder/modules.order := {   echo drivers/net/ethernet/cavium/thunder/thunder_xcv.ko;   echo drivers/net/ethernet/cavium/thunder/thunder_bgx.ko;   echo drivers/net/ethernet/cavium/thunder/nicpf.ko;   echo drivers/net/ethernet/cavium/thunder/nicvf.ko; :; } > drivers/net/ethernet/cavium/thunder/modules.order

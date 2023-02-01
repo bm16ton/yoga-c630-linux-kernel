@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pcf8591.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pcf8591.ko drivers/hwmon/pcf8591.o drivers/hwmon/pcf8591.mod.o;  true

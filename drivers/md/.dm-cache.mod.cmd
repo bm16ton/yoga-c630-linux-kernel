@@ -1,0 +1,1 @@
+cmd_drivers/md/dm-cache.mod := printf '%s\n'   dm-cache-target.o dm-cache-metadata.o dm-cache-policy.o dm-cache-background-tracker.o | awk '!x[$$0]++ { print("drivers/md/"$$0) }' > drivers/md/dm-cache.mod

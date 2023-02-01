@@ -1,0 +1,1 @@
+cmd_drivers/iio/chemical/scd30_core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/chemical/scd30_core.ko drivers/iio/chemical/scd30_core.o drivers/iio/chemical/scd30_core.mod.o;  true

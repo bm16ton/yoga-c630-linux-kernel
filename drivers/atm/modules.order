@@ -1,0 +1,7 @@
+drivers/atm/nicstar.ko
+drivers/atm/iphase.ko
+drivers/atm/suni.ko
+drivers/atm/fore_200e.ko
+drivers/atm/solos-pci.ko
+drivers/atm/idt77105.ko
+drivers/atm/adummy.ko

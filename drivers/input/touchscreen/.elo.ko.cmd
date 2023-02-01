@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/elo.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/elo.ko drivers/input/touchscreen/elo.o drivers/input/touchscreen/elo.mod.o;  true

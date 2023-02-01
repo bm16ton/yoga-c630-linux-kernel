@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/st/cw1200/cw1200_wlan_sdio.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/st/cw1200/cw1200_wlan_sdio.o @drivers/net/wireless/st/cw1200/cw1200_wlan_sdio.mod 

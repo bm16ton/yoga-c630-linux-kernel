@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/rtsx_usb_sdmmc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/rtsx_usb_sdmmc.ko drivers/mmc/host/rtsx_usb_sdmmc.o drivers/mmc/host/rtsx_usb_sdmmc.mod.o;  true

@@ -94,6 +94,13 @@ static __init int sysfb_init(void)
 		name = "efi-framebuffer";
 	else if (si->orig_video_isVGA == VIDEO_TYPE_VLFB)
 		name = "vesa-framebuffer";
+<<<<<<< HEAD
+	else if (si->orig_video_isVGA == VIDEO_TYPE_VGAC)
+		name = "vga-framebuffer";
+	else if (si->orig_video_isVGA == VIDEO_TYPE_EGAC)
+		name = "ega-framebuffer";
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		name = "platform-framebuffer";
 

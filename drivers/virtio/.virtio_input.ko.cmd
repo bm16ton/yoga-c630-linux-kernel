@@ -1,0 +1,1 @@
+cmd_drivers/virtio/virtio_input.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/virtio/virtio_input.ko drivers/virtio/virtio_input.o drivers/virtio/virtio_input.mod.o;  true

@@ -3,6 +3,10 @@
  */
 
 #include "cam.h"
+<<<<<<< HEAD
+#include "chan.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "coex.h"
 #include "debug.h"
 #include "fw.h"
@@ -12,6 +16,10 @@
 #include "reg.h"
 #include "sar.h"
 #include "ser.h"
+<<<<<<< HEAD
+#include "util.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void rtw89_ops_tx(struct ieee80211_hw *hw,
 			 struct ieee80211_tx_control *control,
@@ -85,8 +93,16 @@ static int rtw89_ops_config(struct ieee80211_hw *hw, u32 changed)
 		}
 	}
 
+<<<<<<< HEAD
+	if (changed & IEEE80211_CONF_CHANGE_CHANNEL) {
+		rtw89_config_entity_chandef(rtwdev, RTW89_SUB_ENTITY_0,
+					    &hw->conf.chandef);
+		rtw89_set_channel(rtwdev);
+	}
+=======
 	if (changed & IEEE80211_CONF_CHANGE_CHANNEL)
 		rtw89_set_channel(rtwdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if ((changed & IEEE80211_CONF_CHANGE_IDLE) &&
 	    (hw->conf.flags & IEEE80211_CONF_IDLE))
@@ -104,6 +120,12 @@ static int rtw89_ops_add_interface(struct ieee80211_hw *hw,
 	struct rtw89_vif *rtwvif = (struct rtw89_vif *)vif->drv_priv;
 	int ret = 0;
 
+<<<<<<< HEAD
+	rtw89_debug(rtwdev, RTW89_DBG_STATE, "add vif %pM type %d, p2p %d\n",
+		    vif->addr, vif->type, vif->p2p);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_lock(&rtwdev->mutex);
 	rtwvif->rtwdev = rtwdev;
 	list_add_tail(&rtwvif->list, &rtwdev->rtwvifs_list);
@@ -146,6 +168,12 @@ static void rtw89_ops_remove_interface(struct ieee80211_hw *hw,
 	struct rtw89_dev *rtwdev = hw->priv;
 	struct rtw89_vif *rtwvif = (struct rtw89_vif *)vif->drv_priv;
 
+<<<<<<< HEAD
+	rtw89_debug(rtwdev, RTW89_DBG_STATE, "remove vif %pM type %d p2p %d\n",
+		    vif->addr, vif->type, vif->p2p);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cancel_work_sync(&rtwvif->update_beacon_work);
 
 	mutex_lock(&rtwdev->mutex);
@@ -157,6 +185,26 @@ static void rtw89_ops_remove_interface(struct ieee80211_hw *hw,
 	mutex_unlock(&rtwdev->mutex);
 }
 
+<<<<<<< HEAD
+static int rtw89_ops_change_interface(struct ieee80211_hw *hw,
+				      struct ieee80211_vif *vif,
+				      enum nl80211_iftype type, bool p2p)
+{
+	struct rtw89_dev *rtwdev = hw->priv;
+
+	rtw89_debug(rtwdev, RTW89_DBG_STATE, "change vif %pM (%d)->(%d), p2p (%d)->(%d)\n",
+		    vif->addr, vif->type, type, vif->p2p, p2p);
+
+	rtw89_ops_remove_interface(hw, vif);
+
+	vif->type = type;
+	vif->p2p = p2p;
+
+	return rtw89_ops_add_interface(hw, vif);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtw89_ops_configure_filter(struct ieee80211_hw *hw,
 				       unsigned int changed_flags,
 				       unsigned int *new_flags,
@@ -235,11 +283,19 @@ static u8 rtw89_aifsn_to_aifs(struct rtw89_dev *rtwdev,
 			      struct rtw89_vif *rtwvif, u8 aifsn)
 {
 	struct ieee80211_vif *vif = rtwvif_to_vif(rtwvif);
+<<<<<<< HEAD
+	const struct rtw89_chan *chan = rtw89_chan_get(rtwdev, RTW89_SUB_ENTITY_0);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 slot_time;
 	u8 sifs;
 
 	slot_time = vif->bss_conf.use_short_slot ? 9 : 20;
+<<<<<<< HEAD
+	sifs = chan->band_type == RTW89_BAND_5G ? 16 : 10;
+=======
 	sifs = rtwdev->hal.current_band_type == RTW89_BAND_5G ? 16 : 10;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return aifsn * slot_time + sifs;
 }
@@ -350,6 +406,10 @@ static void rtw89_ops_bss_info_changed(struct ieee80211_hw *hw,
 			rtw89_phy_set_bss_color(rtwdev, vif);
 			rtw89_chip_cfg_txpwr_ul_tb_offset(rtwdev, vif);
 			rtw89_mac_port_update(rtwdev, rtwvif);
+<<<<<<< HEAD
+			rtw89_mac_set_he_obss_narrow_bw_ru(rtwdev, vif);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			rtw89_store_op_chan(rtwdev, true);
 		} else {
 			/* Abort ongoing scan if cancel_scan isn't issued
@@ -378,6 +438,12 @@ static void rtw89_ops_bss_info_changed(struct ieee80211_hw *hw,
 	if (changed & BSS_CHANGED_MU_GROUPS)
 		rtw89_mac_bf_set_gid_table(rtwdev, vif, conf);
 
+<<<<<<< HEAD
+	if (changed & BSS_CHANGED_P2P_PS)
+		rtw89_process_p2p_ps(rtwdev, vif);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&rtwdev->mutex);
 }
 
@@ -605,6 +671,23 @@ static void rtw89_ops_sta_statistics(struct ieee80211_hw *hw,
 	sinfo->filled |= BIT_ULL(NL80211_STA_INFO_TX_BITRATE);
 }
 
+<<<<<<< HEAD
+static
+void __rtw89_drop_packets(struct rtw89_dev *rtwdev, struct ieee80211_vif *vif)
+{
+	struct rtw89_vif *rtwvif;
+
+	if (vif) {
+		rtwvif = (struct rtw89_vif *)vif->drv_priv;
+		rtw89_mac_pkt_drop_vif(rtwdev, rtwvif);
+	} else {
+		rtw89_for_each_rtwvif(rtwdev, rtwvif)
+			rtw89_mac_pkt_drop_vif(rtwdev, rtwvif);
+	}
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void rtw89_ops_flush(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 			    u32 queues, bool drop)
 {
@@ -613,7 +696,16 @@ static void rtw89_ops_flush(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	mutex_lock(&rtwdev->mutex);
 	rtw89_leave_lps(rtwdev);
 	rtw89_hci_flush_queues(rtwdev, queues, drop);
+<<<<<<< HEAD
+
+	if (drop && RTW89_CHK_FW_FEATURE(PACKET_DROP, &rtwdev->fw))
+		__rtw89_drop_packets(rtwdev, vif);
+	else
+		rtw89_mac_flush_txq(rtwdev, queues, drop);
+
+=======
 	rtw89_mac_flush_txq(rtwdev, queues, drop);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&rtwdev->mutex);
 }
 
@@ -629,7 +721,11 @@ static void rtw89_ra_mask_info_update_iter(void *data, struct ieee80211_sta *sta
 	struct rtw89_sta *rtwsta = (struct rtw89_sta *)sta->drv_priv;
 	struct ieee80211_vif *vif = rtwvif_to_vif(rtwsta->rtwvif);
 
+<<<<<<< HEAD
+	if (vif != br_data->vif || vif->p2p)
+=======
 	if (vif != br_data->vif)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	rtwsta->use_cfg_mask = true;
@@ -669,12 +765,20 @@ int rtw89_ops_set_antenna(struct ieee80211_hw *hw, u32 tx_ant, u32 rx_ant)
 	struct rtw89_dev *rtwdev = hw->priv;
 	struct rtw89_hal *hal = &rtwdev->hal;
 
+<<<<<<< HEAD
+	if (rx_ant != hw->wiphy->available_antennas_rx && rx_ant != hal->antenna_rx)
+=======
 	if (rx_ant != hw->wiphy->available_antennas_rx)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	mutex_lock(&rtwdev->mutex);
 	hal->antenna_tx = tx_ant;
 	hal->antenna_rx = rx_ant;
+<<<<<<< HEAD
+	hal->tx_path_diversity = false;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&rtwdev->mutex);
 
 	return 0;
@@ -772,6 +876,100 @@ static void rtw89_ops_sta_rc_update(struct ieee80211_hw *hw,
 	rtw89_phy_ra_updata_sta(rtwdev, sta, changed);
 }
 
+<<<<<<< HEAD
+static int rtw89_ops_add_chanctx(struct ieee80211_hw *hw,
+				 struct ieee80211_chanctx_conf *ctx)
+{
+	struct rtw89_dev *rtwdev = hw->priv;
+	int ret;
+
+	mutex_lock(&rtwdev->mutex);
+	ret = rtw89_chanctx_ops_add(rtwdev, ctx);
+	mutex_unlock(&rtwdev->mutex);
+
+	return ret;
+}
+
+static void rtw89_ops_remove_chanctx(struct ieee80211_hw *hw,
+				     struct ieee80211_chanctx_conf *ctx)
+{
+	struct rtw89_dev *rtwdev = hw->priv;
+
+	mutex_lock(&rtwdev->mutex);
+	rtw89_chanctx_ops_remove(rtwdev, ctx);
+	mutex_unlock(&rtwdev->mutex);
+}
+
+static void rtw89_ops_change_chanctx(struct ieee80211_hw *hw,
+				     struct ieee80211_chanctx_conf *ctx,
+				     u32 changed)
+{
+	struct rtw89_dev *rtwdev = hw->priv;
+
+	mutex_lock(&rtwdev->mutex);
+	rtw89_chanctx_ops_change(rtwdev, ctx, changed);
+	mutex_unlock(&rtwdev->mutex);
+}
+
+static int rtw89_ops_assign_vif_chanctx(struct ieee80211_hw *hw,
+					struct ieee80211_vif *vif,
+					struct ieee80211_bss_conf *link_conf,
+					struct ieee80211_chanctx_conf *ctx)
+{
+	struct rtw89_dev *rtwdev = hw->priv;
+	struct rtw89_vif *rtwvif = (struct rtw89_vif *)vif->drv_priv;
+	int ret;
+
+	mutex_lock(&rtwdev->mutex);
+	ret = rtw89_chanctx_ops_assign_vif(rtwdev, rtwvif, ctx);
+	mutex_unlock(&rtwdev->mutex);
+
+	return ret;
+}
+
+static void rtw89_ops_unassign_vif_chanctx(struct ieee80211_hw *hw,
+					   struct ieee80211_vif *vif,
+					   struct ieee80211_bss_conf *link_conf,
+					   struct ieee80211_chanctx_conf *ctx)
+{
+	struct rtw89_dev *rtwdev = hw->priv;
+	struct rtw89_vif *rtwvif = (struct rtw89_vif *)vif->drv_priv;
+
+	mutex_lock(&rtwdev->mutex);
+	rtw89_chanctx_ops_unassign_vif(rtwdev, rtwvif, ctx);
+	mutex_unlock(&rtwdev->mutex);
+}
+
+static void rtw89_set_tid_config_iter(void *data, struct ieee80211_sta *sta)
+{
+	struct cfg80211_tid_config *tid_config = data;
+	struct rtw89_sta *rtwsta = (struct rtw89_sta *)sta->drv_priv;
+	struct rtw89_dev *rtwdev = rtwsta->rtwvif->rtwdev;
+
+	rtw89_core_set_tid_config(rtwdev, sta, tid_config);
+}
+
+static int rtw89_ops_set_tid_config(struct ieee80211_hw *hw,
+				    struct ieee80211_vif *vif,
+				    struct ieee80211_sta *sta,
+				    struct cfg80211_tid_config *tid_config)
+{
+	struct rtw89_dev *rtwdev = hw->priv;
+
+	mutex_lock(&rtwdev->mutex);
+	if (sta)
+		rtw89_core_set_tid_config(rtwdev, sta, tid_config);
+	else
+		ieee80211_iterate_stations_atomic(rtwdev->hw,
+						  rtw89_set_tid_config_iter,
+						  tid_config);
+	mutex_unlock(&rtwdev->mutex);
+
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 const struct ieee80211_ops rtw89_ops = {
 	.tx			= rtw89_ops_tx,
 	.wake_tx_queue		= rtw89_ops_wake_tx_queue,
@@ -779,6 +977,10 @@ const struct ieee80211_ops rtw89_ops = {
 	.stop			= rtw89_ops_stop,
 	.config			= rtw89_ops_config,
 	.add_interface		= rtw89_ops_add_interface,
+<<<<<<< HEAD
+	.change_interface       = rtw89_ops_change_interface,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.remove_interface	= rtw89_ops_remove_interface,
 	.configure_filter	= rtw89_ops_configure_filter,
 	.bss_info_changed	= rtw89_ops_bss_info_changed,
@@ -800,7 +1002,18 @@ const struct ieee80211_ops rtw89_ops = {
 	.reconfig_complete	= rtw89_ops_reconfig_complete,
 	.hw_scan		= rtw89_ops_hw_scan,
 	.cancel_hw_scan		= rtw89_ops_cancel_hw_scan,
+<<<<<<< HEAD
+	.add_chanctx		= rtw89_ops_add_chanctx,
+	.remove_chanctx		= rtw89_ops_remove_chanctx,
+	.change_chanctx		= rtw89_ops_change_chanctx,
+	.assign_vif_chanctx	= rtw89_ops_assign_vif_chanctx,
+	.unassign_vif_chanctx	= rtw89_ops_unassign_vif_chanctx,
 	.set_sar_specs		= rtw89_ops_set_sar_specs,
 	.sta_rc_update		= rtw89_ops_sta_rc_update,
+	.set_tid_config		= rtw89_ops_set_tid_config,
+=======
+	.set_sar_specs		= rtw89_ops_set_sar_specs,
+	.sta_rc_update		= rtw89_ops_sta_rc_update,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL(rtw89_ops);

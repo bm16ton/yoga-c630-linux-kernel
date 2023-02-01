@@ -274,7 +274,11 @@ config VMD
 
 config PCIE_BRCMSTB
 	tristate "Broadcom Brcmstb PCIe host controller"
+<<<<<<< HEAD
+	depends on ARCH_BRCMSTB || ARCH_BCM2835 || ARCH_BCMBCA || \
+=======
 	depends on ARCH_BRCMSTB || ARCH_BCM2835 || ARCH_BCM4908 || \
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		   BMIPS_GENERIC || COMPILE_TEST
 	depends on OF
 	depends on PCI_MSI_IRQ_DOMAIN

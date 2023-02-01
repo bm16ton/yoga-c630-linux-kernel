@@ -1,0 +1,1 @@
+cmd_sound/hda/snd-hda-core.mod := printf '%s\n'   hda_bus_type.o hdac_bus.o hdac_device.o hdac_sysfs.o hdac_regmap.o hdac_controller.o hdac_stream.o array.o hdmi_chmap.o trace.o | awk '!x[$$0]++ { print("sound/hda/"$$0) }' > sound/hda/snd-hda-core.mod

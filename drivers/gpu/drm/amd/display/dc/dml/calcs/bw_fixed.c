@@ -25,9 +25,14 @@
 #include "dm_services.h"
 #include "bw_fixed.h"
 
+<<<<<<< HEAD
+#define MAX_I64 \
+	((int64_t)((1ULL << 63) - 1))
+=======
 
 #define MAX_I64 \
 	(int64_t)((1ULL << 63) - 1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define MIN_I64 \
 	(-MAX_I64 - 1)
@@ -49,6 +54,10 @@ static uint64_t abs_i64(int64_t arg)
 struct bw_fixed bw_int_to_fixed_nonconst(int64_t value)
 {
 	struct bw_fixed res;
+<<<<<<< HEAD
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ASSERT(value < BW_FIXED_MAX_I32 && value > BW_FIXED_MIN_I32);
 	res.value = value << BW_FIXED_BITS_PER_FRACTIONAL_PART;
 	return res;
@@ -78,14 +87,22 @@ struct bw_fixed bw_frc_to_fixed(int64_t numerator, int64_t denominator)
 	{
 		uint32_t i = BW_FIXED_BITS_PER_FRACTIONAL_PART;
 
+<<<<<<< HEAD
+		do {
+=======
 		do
 		{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			remainder <<= 1;
 
 			res_value <<= 1;
 
+<<<<<<< HEAD
+			if (remainder >= arg2_value) {
+=======
 			if (remainder >= arg2_value)
 			{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				res_value |= 1;
 				remainder -= arg2_value;
 			}

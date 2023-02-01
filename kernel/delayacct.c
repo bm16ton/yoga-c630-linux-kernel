@@ -41,7 +41,52 @@ void delayacct_init(void)
 	delayacct_cache = KMEM_CACHE(task_delay_info, SLAB_PANIC|SLAB_ACCOUNT);
 	delayacct_tsk_init(&init_task);
 	set_delayacct(delayacct_on);
+<<<<<<< HEAD
 }
+
+#ifdef CONFIG_PROC_SYSCTL
+static int sysctl_delayacct(struct ctl_table *table, int write, void *buffer,
+		     size_t *lenp, loff_t *ppos)
+{
+	int state = delayacct_on;
+	struct ctl_table t;
+	int err;
+
+	if (write && !capable(CAP_SYS_ADMIN))
+		return -EPERM;
+
+	t = *table;
+	t.data = &state;
+	err = proc_dointvec_minmax(&t, write, buffer, lenp, ppos);
+	if (err < 0)
+		return err;
+	if (write)
+		set_delayacct(state);
+	return err;
+}
+
+static struct ctl_table kern_delayacct_table[] = {
+	{
+		.procname       = "task_delayacct",
+		.data           = NULL,
+		.maxlen         = sizeof(unsigned int),
+		.mode           = 0644,
+		.proc_handler   = sysctl_delayacct,
+		.extra1         = SYSCTL_ZERO,
+		.extra2         = SYSCTL_ONE,
+	},
+	{ }
+};
+
+static __init int kernel_delayacct_sysctls_init(void)
+{
+	register_sysctl_init("kernel", kern_delayacct_table);
+	return 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+}
+late_initcall(kernel_delayacct_sysctls_init);
+#endif
 
 #ifdef CONFIG_PROC_SYSCTL
 static int sysctl_delayacct(struct ctl_table *table, int write, void *buffer,
@@ -214,13 +259,25 @@ void __delayacct_freepages_end(void)
 		      &current->delays->freepages_count);
 }
 
-void __delayacct_thrashing_start(void)
+void __delayacct_thrashing_start(bool *in_thrashing)
 {
+<<<<<<< HEAD
+	*in_thrashing = !!current->in_thrashing;
+	if (*in_thrashing)
+		return;
+
+	current->in_thrashing = 1;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	current->delays->thrashing_start = local_clock();
 }
 
-void __delayacct_thrashing_end(void)
+void __delayacct_thrashing_end(bool *in_thrashing)
 {
+	if (*in_thrashing)
+		return;
+
+	current->in_thrashing = 0;
 	delayacct_end(&current->delays->lock,
 		      &current->delays->thrashing_start,
 		      &current->delays->thrashing_delay,

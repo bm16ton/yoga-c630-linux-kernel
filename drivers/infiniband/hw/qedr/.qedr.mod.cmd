@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/hw/qedr/qedr.mod := printf '%s\n'   main.o verbs.o qedr_roce_cm.o qedr_iw_cm.o | awk '!x[$$0]++ { print("drivers/infiniband/hw/qedr/"$$0) }' > drivers/infiniband/hw/qedr/qedr.mod

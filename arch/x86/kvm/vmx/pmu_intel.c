@@ -68,14 +68,17 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
 	}
 }
 
-/* function is called when global control register has been updated. */
-static void global_ctrl_changed(struct kvm_pmu *pmu, u64 data)
+static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
 {
 	int bit;
+<<<<<<< HEAD
+	struct kvm_pmc *pmc;
+=======
 	u64 diff = pmu->global_ctrl ^ data;
 	struct kvm_pmc *pmc;
 
 	pmu->global_ctrl = data;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
@@ -397,7 +400,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 	struct kvm_pmc *pmc;
 	u32 msr = msr_info->index;
 	u64 data = msr_info->data;
+<<<<<<< HEAD
+	u64 reserved_bits, diff;
+=======
 	u64 reserved_bits;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (msr) {
 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
@@ -418,7 +425,9 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		if (pmu->global_ctrl == data)
 			return 0;
 		if (kvm_valid_perf_global_ctrl(pmu, data)) {
-			global_ctrl_changed(pmu, data);
+			diff = pmu->global_ctrl ^ data;
+			pmu->global_ctrl = data;
+			reprogram_counters(pmu, diff);
 			return 0;
 		}
 		break;
@@ -433,7 +442,13 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		if (pmu->pebs_enable == data)
 			return 0;
 		if (!(data & pmu->pebs_enable_mask)) {
+<<<<<<< HEAD
+			diff = pmu->pebs_enable ^ data;
 			pmu->pebs_enable = data;
+			reprogram_counters(pmu, diff);
+=======
+			pmu->pebs_enable = data;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return 0;
 		}
 		break;
@@ -617,7 +632,7 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
 
-	for (i = 0; i < INTEL_PMC_MAX_GENERIC; i++) {
+	for (i = 0; i < KVM_INTEL_PMC_MAX_GENERIC; i++) {
 		pmu->gp_counters[i].type = KVM_PMC_GP;
 		pmu->gp_counters[i].vcpu = vcpu;
 		pmu->gp_counters[i].idx = i;
@@ -643,7 +658,7 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
 	struct kvm_pmc *pmc = NULL;
 	int i;
 
-	for (i = 0; i < INTEL_PMC_MAX_GENERIC; i++) {
+	for (i = 0; i < KVM_INTEL_PMC_MAX_GENERIC; i++) {
 		pmc = &pmu->gp_counters[i];
 
 		pmc_stop_counter(pmc);
@@ -776,13 +791,29 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
 void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
 {
 	struct kvm_pmc *pmc = NULL;
+<<<<<<< HEAD
+	int bit, hw_idx;
+=======
 	int bit;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	for_each_set_bit(bit, (unsigned long *)&pmu->global_ctrl,
 			 X86_PMC_IDX_MAX) {
 		pmc = intel_pmc_idx_to_pmc(pmu, bit);
 
 		if (!pmc || !pmc_speculative_in_use(pmc) ||
+<<<<<<< HEAD
+		    !intel_pmc_is_enabled(pmc) || !pmc->perf_event)
+			continue;
+
+		/*
+		 * A negative index indicates the event isn't mapped to a
+		 * physical counter in the host, e.g. due to contention.
+		 */
+		hw_idx = pmc->perf_event->hw.idx;
+		if (hw_idx != pmc->idx && hw_idx > -1)
+			pmu->host_cross_mapped_mask |= BIT_ULL(hw_idx);
+=======
 		    !intel_pmc_is_enabled(pmc))
 			continue;
 
@@ -790,6 +821,7 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
 			pmu->host_cross_mapped_mask |=
 				BIT_ULL(pmc->perf_event->hw.idx);
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 

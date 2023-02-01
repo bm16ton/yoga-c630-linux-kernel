@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/purelifi/plfxlc/plfxlc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/purelifi/plfxlc/plfxlc.ko drivers/net/wireless/purelifi/plfxlc/plfxlc.o drivers/net/wireless/purelifi/plfxlc/plfxlc.mod.o;  true

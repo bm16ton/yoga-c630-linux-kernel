@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns/hns_enet_drv.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/ethernet/hisilicon/hns/hns_enet_drv.o @drivers/net/ethernet/hisilicon/hns/hns_enet_drv.mod 

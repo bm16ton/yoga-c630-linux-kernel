@@ -144,8 +144,13 @@ static int snd_proto_probe(struct platform_device *pdev)
 	if (ret)
 		dev_err_probe(&pdev->dev, ret,
 			"snd_soc_register_card() failed\n");
+<<<<<<< HEAD
 
 
+=======
+
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 put_cpu_node:
 	of_node_put(bitclkmaster);
 	of_node_put(framemaster);
@@ -157,7 +162,9 @@ put_codec_node:
 
 static int snd_proto_remove(struct platform_device *pdev)
 {
-	return snd_soc_unregister_card(&snd_proto);
+	snd_soc_unregister_card(&snd_proto);
+
+	return 0;
 }
 
 static const struct of_device_id snd_proto_of_match[] = {

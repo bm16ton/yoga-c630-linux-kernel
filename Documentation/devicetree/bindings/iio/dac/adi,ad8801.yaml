@@ -19,6 +19,11 @@ properties:
   reg:
     maxItems: 1
 
+<<<<<<< HEAD
+  vrefh-supply: true
+  vrefl-supply: true
+
+=======
   spi-max-frequency: true
 
   vrefh-supply: true
@@ -26,12 +31,17 @@ properties:
 
 additionalProperties: false
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg
   - vrefh-supply
 
 allOf:
+<<<<<<< HEAD
+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   - if:
       properties:
         compatible:
@@ -44,6 +54,11 @@ allOf:
       properties:
         vrefl-supply: false
 
+<<<<<<< HEAD
+unevaluatedProperties: false
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 examples:
   - |
     spi {

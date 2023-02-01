@@ -344,9 +344,12 @@
 	snps,reset-active-low;
 	snps,reset-delays-us = <0 11000 70000>;
 
+<<<<<<< HEAD
+=======
 	snps,ptp-ref-clk-rate = <250000000>;
 	snps,ptp-req-clk-rate = <96000000>;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snps,mtl-rx-config = <&mtl_rx_setup>;
 	snps,mtl-tx-config = <&mtl_tx_setup>;
 

@@ -1,0 +1,11 @@
+!<thin>
+//                                              100       `
+host1x/context_bus.o/
+drm/drm_nomodeset.o/
+drm/drm_panel_orientation_quirks.o/
+drm/drm_mipi_dsi.o/
+
+/0              0           0     0     644     3760      `
+/22             0           0     0     644     3688      `
+/43             0           0     0     644     18464     `
+/79             0           0     0     644     45184     `

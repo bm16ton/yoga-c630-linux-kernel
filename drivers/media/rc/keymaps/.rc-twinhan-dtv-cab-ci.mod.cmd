@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-twinhan-dtv-cab-ci.mod := printf '%s\n'   rc-twinhan-dtv-cab-ci.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-twinhan-dtv-cab-ci.mod

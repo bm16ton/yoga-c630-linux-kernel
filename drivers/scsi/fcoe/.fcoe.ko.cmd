@@ -1,0 +1,1 @@
+cmd_drivers/scsi/fcoe/fcoe.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/fcoe/fcoe.ko drivers/scsi/fcoe/fcoe.o drivers/scsi/fcoe/fcoe.mod.o;  true

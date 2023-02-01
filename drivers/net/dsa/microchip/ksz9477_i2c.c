@@ -52,16 +52,19 @@ static int ksz9477_i2c_probe(struct i2c_client *i2c,
 	return 0;
 }
 
-static int ksz9477_i2c_remove(struct i2c_client *i2c)
+static void ksz9477_i2c_remove(struct i2c_client *i2c)
 {
 	struct ksz_device *dev = i2c_get_clientdata(i2c);
 
 	if (dev)
 		ksz_switch_remove(dev);
+<<<<<<< HEAD
+=======
 
 	i2c_set_clientdata(i2c, NULL);
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ksz9477_i2c_shutdown(struct i2c_client *i2c)
@@ -92,6 +95,13 @@ static const struct of_device_id ksz9477_dt_ids[] = {
 		.data = &ksz_switch_chips[KSZ9477]
 	},
 	{
+<<<<<<< HEAD
+		.compatible = "microchip,ksz9896",
+		.data = &ksz_switch_chips[KSZ9896]
+	},
+	{
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.compatible = "microchip,ksz9897",
 		.data = &ksz_switch_chips[KSZ9897]
 	},

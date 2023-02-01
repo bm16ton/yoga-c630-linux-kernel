@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/w83627ehf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/w83627ehf.ko drivers/hwmon/w83627ehf.o drivers/hwmon/w83627ehf.mod.o;  true

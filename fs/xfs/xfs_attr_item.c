@@ -86,8 +86,11 @@ xfs_attri_log_nameval_alloc(
 	 */
 	nv = xlog_kvmalloc(sizeof(struct xfs_attri_log_nameval) +
 					name_len + value_len);
+<<<<<<< HEAD
+=======
 	if (!nv)
 		return nv;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	nv->name.i_addr = nv + 1;
 	nv->name.i_len = name_len;
@@ -247,6 +250,8 @@ xfs_attri_init(
 	return attrip;
 }
 
+<<<<<<< HEAD
+=======
 /*
  * Copy an attr format buffer from the given buf, and into the destination attr
  * format structure.
@@ -269,6 +274,7 @@ xfs_attri_copy_format(
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline struct xfs_attrd_log_item *ATTRD_ITEM(struct xfs_log_item *lip)
 {
 	return container_of(lip, struct xfs_attrd_log_item, attrd_item);
@@ -441,8 +447,11 @@ xfs_attr_create_intent(
 		attr->xattri_nameval = xfs_attri_log_nameval_alloc(args->name,
 				args->namelen, args->value, args->valuelen);
 	}
+<<<<<<< HEAD
+=======
 	if (!attr->xattri_nameval)
 		return ERR_PTR(-ENOMEM);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	attrip = xfs_attri_init(mp, attr->xattri_nameval);
 	xfs_trans_add_item(tp, &attrip->attri_item);
@@ -735,24 +744,68 @@ xlog_recover_attri_commit_pass2(
 	struct xfs_attri_log_nameval	*nv;
 	const void			*attr_value = NULL;
 	const void			*attr_name;
+<<<<<<< HEAD
+	size_t				len;
+=======
 	int                             error;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	attri_formatp = item->ri_buf[0].i_addr;
 	attr_name = item->ri_buf[1].i_addr;
 
 	/* Validate xfs_attri_log_format before the large memory allocation */
+<<<<<<< HEAD
+	len = sizeof(struct xfs_attri_log_format);
+	if (item->ri_buf[0].i_len != len) {
+		XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, mp,
+				item->ri_buf[0].i_addr, item->ri_buf[0].i_len);
+		return -EFSCORRUPTED;
+	}
+
+	if (!xfs_attri_validate(mp, attri_formatp)) {
+		XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, mp,
+				item->ri_buf[0].i_addr, item->ri_buf[0].i_len);
+		return -EFSCORRUPTED;
+	}
+
+	/* Validate the attr name */
+	if (item->ri_buf[1].i_len !=
+			xlog_calc_iovec_len(attri_formatp->alfi_name_len)) {
+		XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, mp,
+				item->ri_buf[0].i_addr, item->ri_buf[0].i_len);
+=======
 	if (!xfs_attri_validate(mp, attri_formatp)) {
 		XFS_ERROR_REPORT(__func__, XFS_ERRLEVEL_LOW, mp);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFSCORRUPTED;
 	}
 
 	if (!xfs_attr_namecheck(attr_name, attri_formatp->alfi_name_len)) {
+<<<<<<< HEAD
+		XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, mp,
+				item->ri_buf[1].i_addr, item->ri_buf[1].i_len);
+		return -EFSCORRUPTED;
+	}
+
+	/* Validate the attr value, if present */
+	if (attri_formatp->alfi_value_len != 0) {
+		if (item->ri_buf[2].i_len != xlog_calc_iovec_len(attri_formatp->alfi_value_len)) {
+			XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, mp,
+					item->ri_buf[0].i_addr,
+					item->ri_buf[0].i_len);
+			return -EFSCORRUPTED;
+		}
+
+		attr_value = item->ri_buf[2].i_addr;
+	}
+=======
 		XFS_ERROR_REPORT(__func__, XFS_ERRLEVEL_LOW, mp);
 		return -EFSCORRUPTED;
 	}
 
 	if (attri_formatp->alfi_value_len)
 		attr_value = item->ri_buf[2].i_addr;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Memory alloc failure will cause replay to abort.  We attach the
@@ -762,6 +815,11 @@ xlog_recover_attri_commit_pass2(
 	nv = xfs_attri_log_nameval_alloc(attr_name,
 			attri_formatp->alfi_name_len, attr_value,
 			attri_formatp->alfi_value_len);
+<<<<<<< HEAD
+
+	attrip = xfs_attri_init(mp, nv);
+	memcpy(&attrip->attri_format, attri_formatp, len);
+=======
 	if (!nv)
 		return -ENOMEM;
 
@@ -769,6 +827,7 @@ xlog_recover_attri_commit_pass2(
 	error = xfs_attri_copy_format(&item->ri_buf[0], &attrip->attri_format);
 	if (error)
 		goto out;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * The ATTRI has two references. One for the ATTRD and one for ATTRI to
@@ -780,10 +839,13 @@ xlog_recover_attri_commit_pass2(
 	xfs_attri_release(attrip);
 	xfs_attri_log_nameval_put(nv);
 	return 0;
+<<<<<<< HEAD
+=======
 out:
 	xfs_attri_item_free(attrip);
 	xfs_attri_log_nameval_put(nv);
 	return error;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /*
@@ -848,7 +910,12 @@ xlog_recover_attrd_commit_pass2(
 
 	attrd_formatp = item->ri_buf[0].i_addr;
 	if (item->ri_buf[0].i_len != sizeof(struct xfs_attrd_log_format)) {
+<<<<<<< HEAD
+		XFS_CORRUPTION_ERROR(__func__, XFS_ERRLEVEL_LOW, log->l_mp,
+				item->ri_buf[0].i_addr, item->ri_buf[0].i_len);
+=======
 		XFS_ERROR_REPORT(__func__, XFS_ERRLEVEL_LOW, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EFSCORRUPTED;
 	}
 

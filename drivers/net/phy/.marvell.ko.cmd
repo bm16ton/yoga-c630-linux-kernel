@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/marvell.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/marvell.ko drivers/net/phy/marvell.o drivers/net/phy/marvell.mod.o;  true

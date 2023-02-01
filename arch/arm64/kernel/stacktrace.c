@@ -23,8 +23,13 @@
  *
  * The regs must be on a stack currently owned by the calling task.
  */
+<<<<<<< HEAD
+static __always_inline void unwind_init_from_regs(struct unwind_state *state,
+						  struct pt_regs *regs)
+=======
 static inline void unwind_init_from_regs(struct unwind_state *state,
 					 struct pt_regs *regs)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unwind_init_common(state, current);
 
@@ -58,14 +63,21 @@ static __always_inline void unwind_init_from_caller(struct unwind_state *state)
  * duration of the unwind, or the unwind will be bogus. It is never valid to
  * call this for the current task.
  */
+<<<<<<< HEAD
+static __always_inline void unwind_init_from_task(struct unwind_state *state,
+						  struct task_struct *task)
+=======
 static inline void unwind_init_from_task(struct unwind_state *state,
 					 struct task_struct *task)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	unwind_init_common(state, task);
 
 	state->fp = thread_saved_fp(task);
 	state->pc = thread_saved_pc(task);
 }
+<<<<<<< HEAD
+=======
 
 /*
  * We can only safely access per-cpu stacks from current in a non-preemptible
@@ -91,6 +103,7 @@ static bool on_accessible_stack(const struct task_struct *tsk,
 
 	return false;
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Unwind from one frame record (A) to the next frame record (B).
@@ -103,14 +116,21 @@ static int notrace unwind_next(struct unwind_state *state)
 {
 	struct task_struct *tsk = state->task;
 	unsigned long fp = state->fp;
+<<<<<<< HEAD
+=======
 	struct stack_info info;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int err;
 
 	/* Final frame; nothing to unwind */
 	if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
 		return -ENOENT;
 
+<<<<<<< HEAD
+	err = unwind_next_frame_record(state);
+=======
 	err = unwind_next_common(state, &info, on_accessible_stack, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -190,11 +210,55 @@ void show_stack(struct task_struct *tsk, unsigned long *sp, const char *loglvl)
 	barrier();
 }
 
+<<<<<<< HEAD
+/*
+ * Per-cpu stacks are only accessible when unwinding the current task in a
+ * non-preemptible context.
+ */
+#define STACKINFO_CPU(name)					\
+	({							\
+		((task == current) && !preemptible())		\
+			? stackinfo_get_##name()		\
+			: stackinfo_get_unknown();		\
+	})
+
+/*
+ * SDEI stacks are only accessible when unwinding the current task in an NMI
+ * context.
+ */
+#define STACKINFO_SDEI(name)					\
+	({							\
+		((task == current) && in_nmi())			\
+			? stackinfo_get_sdei_##name()		\
+			: stackinfo_get_unknown();		\
+	})
+
+noinline noinstr void arch_stack_walk(stack_trace_consume_fn consume_entry,
+			      void *cookie, struct task_struct *task,
+			      struct pt_regs *regs)
+{
+	struct stack_info stacks[] = {
+		stackinfo_get_task(task),
+		STACKINFO_CPU(irq),
+#if defined(CONFIG_VMAP_STACK)
+		STACKINFO_CPU(overflow),
+#endif
+#if defined(CONFIG_VMAP_STACK) && defined(CONFIG_ARM_SDE_INTERFACE)
+		STACKINFO_SDEI(normal),
+		STACKINFO_SDEI(critical),
+#endif
+	};
+	struct unwind_state state = {
+		.stacks = stacks,
+		.nr_stacks = ARRAY_SIZE(stacks),
+	};
+=======
 noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
 			      void *cookie, struct task_struct *task,
 			      struct pt_regs *regs)
 {
 	struct unwind_state state;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (regs) {
 		if (task != current)

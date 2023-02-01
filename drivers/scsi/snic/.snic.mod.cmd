@@ -1,0 +1,1 @@
+cmd_drivers/scsi/snic/snic.mod := printf '%s\n'   snic_attrs.o snic_main.o snic_res.o snic_isr.o snic_ctl.o snic_io.o snic_scsi.o snic_disc.o vnic_cq.o vnic_intr.o vnic_dev.o vnic_wq.o | awk '!x[$$0]++ { print("drivers/scsi/snic/"$$0) }' > drivers/scsi/snic/snic.mod

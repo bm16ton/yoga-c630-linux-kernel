@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/panel/panel-innolux-p079zca.mod := printf '%s\n'   panel-innolux-p079zca.o | awk '!x[$$0]++ { print("drivers/gpu/drm/panel/"$$0) }' > drivers/gpu/drm/panel/panel-innolux-p079zca.mod

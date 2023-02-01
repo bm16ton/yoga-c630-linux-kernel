@@ -1,0 +1,1 @@
+cmd_drivers/tee/optee/optee.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/tee/optee/optee.ko drivers/tee/optee/optee.o drivers/tee/optee/optee.mod.o;  true

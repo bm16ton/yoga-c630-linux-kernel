@@ -51,6 +51,10 @@ properties:
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/$defs/port-base
+<<<<<<< HEAD
+        unevaluatedProperties: false
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         description: |
           For LVDS encoders, port 0 is the parallel input
           For LVDS decoders, port 0 is the LVDS input

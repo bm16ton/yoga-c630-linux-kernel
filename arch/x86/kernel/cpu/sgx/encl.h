@@ -107,8 +107,11 @@ bool current_is_ksgxd(void);
 void sgx_encl_release(struct kref *ref);
 int sgx_encl_mm_add(struct sgx_encl *encl, struct mm_struct *mm);
 const cpumask_t *sgx_encl_cpumask(struct sgx_encl *encl);
+<<<<<<< HEAD
+=======
 int sgx_encl_lookup_backing(struct sgx_encl *encl, unsigned long page_index,
 			    struct sgx_backing *backing);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int sgx_encl_alloc_backing(struct sgx_encl *encl, unsigned long page_index,
 			   struct sgx_backing *backing);
 void sgx_encl_put_backing(struct sgx_backing *backing);

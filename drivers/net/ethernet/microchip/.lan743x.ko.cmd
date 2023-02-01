@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/microchip/lan743x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/microchip/lan743x.ko drivers/net/ethernet/microchip/lan743x.o drivers/net/ethernet/microchip/lan743x.mod.o;  true

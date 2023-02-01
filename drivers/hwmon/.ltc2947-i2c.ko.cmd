@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/ltc2947-i2c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/ltc2947-i2c.ko drivers/hwmon/ltc2947-i2c.o drivers/hwmon/ltc2947-i2c.mod.o;  true

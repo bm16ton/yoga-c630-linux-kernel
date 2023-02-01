@@ -1,0 +1,1 @@
+cmd_drivers/usb/core/ledtrig-usbport.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/core/ledtrig-usbport.ko drivers/usb/core/ledtrig-usbport.o drivers/usb/core/ledtrig-usbport.mod.o;  true

@@ -108,9 +108,15 @@ static void vfio_fsl_mc_close_device(struct vfio_device *core_vdev)
 	/* reset the device before cleaning up the interrupts */
 	ret = vfio_fsl_mc_reset_device(vdev);
 
+<<<<<<< HEAD
+	if (ret)
+		dev_warn(&mc_cont->dev,
+			 "VFIO_FSL_MC: reset device has failed (%d)\n", ret);
+=======
 	if (WARN_ON(ret))
 		dev_warn(&mc_cont->dev,
 			 "VFIO_FLS_MC: reset device has failed (%d)\n", ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	vfio_fsl_mc_irqs_cleanup(vdev);
 
@@ -418,6 +424,9 @@ static int vfio_fsl_mc_mmap(struct vfio_device *core_vdev,
 	return vfio_fsl_mc_mmap_mmio(vdev->regions[index], vma);
 }
 
+<<<<<<< HEAD
+static const struct vfio_device_ops vfio_fsl_mc_ops;
+=======
 static const struct vfio_device_ops vfio_fsl_mc_ops = {
 	.name		= "vfio-fsl-mc",
 	.open_device	= vfio_fsl_mc_open_device,
@@ -428,6 +437,7 @@ static const struct vfio_device_ops vfio_fsl_mc_ops = {
 	.mmap		= vfio_fsl_mc_mmap,
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int vfio_fsl_mc_bus_notifier(struct notifier_block *nb,
 				    unsigned long action, void *data)
 {
@@ -518,8 +528,15 @@ static void vfio_fsl_uninit_device(struct vfio_fsl_mc_device *vdev)
 	bus_unregister_notifier(&fsl_mc_bus_type, &vdev->nb);
 }
 
-static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+static int vfio_fsl_mc_init_dev(struct vfio_device *core_vdev)
 {
+<<<<<<< HEAD
+	struct vfio_fsl_mc_device *vdev =
+		container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
+	struct fsl_mc_device *mc_dev = to_fsl_mc_device(core_vdev->dev);
+	int ret;
+
+=======
 	struct vfio_fsl_mc_device *vdev;
 	struct device *dev = &mc_dev->dev;
 	int ret;
@@ -529,24 +546,49 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
 		return -ENOMEM;
 
 	vfio_init_group_dev(&vdev->vdev, dev, &vfio_fsl_mc_ops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vdev->mc_dev = mc_dev;
 	mutex_init(&vdev->igate);
 
 	if (is_fsl_mc_bus_dprc(mc_dev))
+<<<<<<< HEAD
+		ret = vfio_assign_device_set(core_vdev, &mc_dev->dev);
+	else
+		ret = vfio_assign_device_set(core_vdev, mc_dev->dev.parent);
+=======
 		ret = vfio_assign_device_set(&vdev->vdev, &mc_dev->dev);
 	else
 		ret = vfio_assign_device_set(&vdev->vdev, mc_dev->dev.parent);
 	if (ret)
 		goto out_uninit;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	ret = vfio_fsl_mc_init_device(vdev);
 	if (ret)
+<<<<<<< HEAD
+		return ret;
+
+	/* device_set is released by vfio core if @init fails */
+	return vfio_fsl_mc_init_device(vdev);
+}
+
+static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+{
+	struct vfio_fsl_mc_device *vdev;
+	struct device *dev = &mc_dev->dev;
+	int ret;
+
+	vdev = vfio_alloc_device(vfio_fsl_mc_device, vdev, dev,
+				 &vfio_fsl_mc_ops);
+	if (IS_ERR(vdev))
+		return PTR_ERR(vdev);
+=======
 		goto out_uninit;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = vfio_register_group_dev(&vdev->vdev);
 	if (ret) {
 		dev_err(dev, "VFIO_FSL_MC: Failed to add to vfio group\n");
-		goto out_device;
+		goto out_put_vdev;
 	}
 
 	ret = vfio_fsl_mc_scan_container(mc_dev);
@@ -557,16 +599,39 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
 
 out_group_dev:
 	vfio_unregister_group_dev(&vdev->vdev);
+<<<<<<< HEAD
+out_put_vdev:
+	vfio_put_device(&vdev->vdev);
+=======
 out_device:
 	vfio_fsl_uninit_device(vdev);
 out_uninit:
 	vfio_uninit_group_dev(&vdev->vdev);
 	kfree(vdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
+}
+
+static void vfio_fsl_mc_release_dev(struct vfio_device *core_vdev)
+{
+<<<<<<< HEAD
+	struct vfio_fsl_mc_device *vdev =
+		container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
+
+	vfio_fsl_uninit_device(vdev);
+	mutex_destroy(&vdev->igate);
+	vfio_free_device(core_vdev);
 }
 
 static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
 {
+	struct device *dev = &mc_dev->dev;
+	struct vfio_fsl_mc_device *vdev = dev_get_drvdata(dev);
+
+	vfio_unregister_group_dev(&vdev->vdev);
+	dprc_remove_devices(mc_dev, NULL, 0);
+	vfio_put_device(&vdev->vdev);
+=======
 	struct device *dev = &mc_dev->dev;
 	struct vfio_fsl_mc_device *vdev = dev_get_drvdata(dev);
 
@@ -578,8 +643,21 @@ static int vfio_fsl_mc_remove(struct fsl_mc_device *mc_dev)
 
 	vfio_uninit_group_dev(&vdev->vdev);
 	kfree(vdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
+
+static const struct vfio_device_ops vfio_fsl_mc_ops = {
+	.name		= "vfio-fsl-mc",
+	.init		= vfio_fsl_mc_init_dev,
+	.release	= vfio_fsl_mc_release_dev,
+	.open_device	= vfio_fsl_mc_open_device,
+	.close_device	= vfio_fsl_mc_close_device,
+	.ioctl		= vfio_fsl_mc_ioctl,
+	.read		= vfio_fsl_mc_read,
+	.write		= vfio_fsl_mc_write,
+	.mmap		= vfio_fsl_mc_mmap,
+};
 
 static struct fsl_mc_driver vfio_fsl_mc_driver = {
 	.probe		= vfio_fsl_mc_probe,

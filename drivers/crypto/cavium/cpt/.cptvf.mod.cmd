@@ -1,0 +1,1 @@
+cmd_drivers/crypto/cavium/cpt/cptvf.mod := printf '%s\n'   cptvf_main.o cptvf_reqmanager.o cptvf_mbox.o cptvf_algs.o | awk '!x[$$0]++ { print("drivers/crypto/cavium/cpt/"$$0) }' > drivers/crypto/cavium/cpt/cptvf.mod

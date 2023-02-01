@@ -193,6 +193,14 @@ int ksz9477_reset_switch(struct ksz_device *dev)
 	ksz_write32(dev, REG_SW_PORT_INT_MASK__4, 0x7F);
 	ksz_read32(dev, REG_SW_PORT_INT_STATUS__4, &data32);
 
+<<<<<<< HEAD
+	/* KSZ9893 compatible chips do not support refclk configuration */
+	if (dev->chip_id == KSZ9893_CHIP_ID ||
+	    dev->chip_id == KSZ8563_CHIP_ID)
+		return 0;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	data8 = SW_ENABLE_REFCLKO;
 	if (dev->synclko_disable)
 		data8 = 0;
@@ -264,9 +272,25 @@ void ksz9477_port_init_cnt(struct ksz_device *dev, int port)
 	mutex_unlock(&mib->cnt_mutex);
 }
 
+<<<<<<< HEAD
+static void ksz9477_r_phy_quirks(struct ksz_device *dev, u16 addr, u16 reg,
+				 u16 *data)
+{
+	/* KSZ8563R do not have extended registers but BMSR_ESTATEN and
+	 * BMSR_ERCAP bits are set.
+	 */
+	if (dev->chip_id == KSZ8563_CHIP_ID && reg == MII_BMSR)
+		*data &= ~(BMSR_ESTATEN | BMSR_ERCAP);
+}
+
+int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
+{
+=======
 void ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u16 val = 0xffff;
+	int ret;
 
 	/* No real PHY after this. Simulate the PHY.
 	 * A fixed PHY can be setup in the device tree, but this function is
@@ -274,7 +298,7 @@ void ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
 	 * For RGMII PHY there is no way to access it so the fixed PHY should
 	 * be used.  For SGMII PHY the supporting code will be added later.
 	 */
-	if (addr >= dev->phy_port_cnt) {
+	if (!dev->info->internal_phy[addr]) {
 		struct ksz_port *p = &dev->ports[addr];
 
 		switch (reg) {
@@ -307,9 +331,27 @@ void ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
 			break;
 		}
 	} else {
-		ksz_pread16(dev, addr, 0x100 + (reg << 1), &val);
+		ret = ksz_pread16(dev, addr, 0x100 + (reg << 1), &val);
+		if (ret)
+			return ret;
+
+<<<<<<< HEAD
+		ksz9477_r_phy_quirks(dev, addr, reg, &val);
 	}
 
+	*data = val;
+
+	return 0;
+}
+
+int ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
+{
+	/* No real PHY after this. */
+	if (!dev->info->internal_phy[addr])
+		return 0;
+
+	return ksz_pwrite16(dev, addr, 0x100 + (reg << 1), val);
+=======
 	*data = val;
 }
 
@@ -324,6 +366,7 @@ void ksz9477_w_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 val)
 		return;
 
 	ksz_pwrite16(dev, addr, 0x100 + (reg << 1), val);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void ksz9477_cfg_port_member(struct ksz_device *dev, int port, u8 member)
@@ -847,11 +890,19 @@ void ksz9477_port_mirror_del(struct ksz_device *dev, int port,
 	else
 		ksz_port_cfg(dev, port, P_MIRROR_CTRL, PORT_MIRROR_TX, false);
 
+<<<<<<< HEAD
 
 	/* Check if any of the port is still referring to sniffer port */
 	for (p = 0; p < dev->info->port_cnt; p++) {
 		ksz_pread8(dev, p, P_MIRROR_CTRL, &data);
 
+=======
+
+	/* Check if any of the port is still referring to sniffer port */
+	for (p = 0; p < dev->info->port_cnt; p++) {
+		ksz_pread8(dev, p, P_MIRROR_CTRL, &data);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if ((data & (PORT_MIRROR_RX | PORT_MIRROR_TX))) {
 			in_use = true;
 			break;
@@ -869,7 +920,7 @@ static phy_interface_t ksz9477_get_interface(struct ksz_device *dev, int port)
 	phy_interface_t interface;
 	bool gbit;
 
-	if (port < dev->phy_port_cnt)
+	if (dev->info->internal_phy[port])
 		return PHY_INTERFACE_MODE_NA;
 
 	gbit = ksz_get_gbit(dev, port);
@@ -914,7 +965,7 @@ static void ksz9477_phy_errata_setup(struct ksz_device *dev, int port)
 	/* Energy Efficient Ethernet (EEE) feature select must
 	 * be manually disabled (except on KSZ8565 which is 100Mbit)
 	 */
-	if (dev->features & GBIT_SUPPORT)
+	if (dev->info->gbit_capable[port])
 		ksz9477_port_mmd_write(dev, port, 0x07, 0x3c, 0x0000);
 
 	/* Register settings are required to meet data sheet
@@ -941,10 +992,42 @@ void ksz9477_get_caps(struct ksz_device *dev, int port,
 	config->mac_capabilities = MAC_10 | MAC_100 | MAC_ASYM_PAUSE |
 				   MAC_SYM_PAUSE;
 
+<<<<<<< HEAD
+	if (dev->info->gbit_capable[port])
+		config->mac_capabilities |= MAC_1000FD;
+}
+
+int ksz9477_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
+{
+	u32 secs = msecs / 1000;
+	u8 value;
+	u8 data;
+	int ret;
+
+	value = FIELD_GET(SW_AGE_PERIOD_7_0_M, secs);
+
+	ret = ksz_write8(dev, REG_SW_LUE_CTRL_3, value);
+	if (ret < 0)
+		return ret;
+
+	data = FIELD_GET(SW_AGE_PERIOD_10_8_M, secs);
+
+	ret = ksz_read8(dev, REG_SW_LUE_CTRL_0, &value);
+	if (ret < 0)
+		return ret;
+
+	value &= ~SW_AGE_CNT_M;
+	value |= FIELD_PREP(SW_AGE_CNT_M, data);
+
+	return ksz_write8(dev, REG_SW_LUE_CTRL_0, value);
+}
+
+=======
 	if (dev->features & GBIT_SUPPORT)
 		config->mac_capabilities |= MAC_1000FD;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
 {
 	struct dsa_switch *ds = dev->ds;
@@ -976,7 +1059,7 @@ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
 	/* enable 802.1p priority */
 	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_PRIO_ENABLE, true);
 
-	if (port < dev->phy_port_cnt) {
+	if (dev->info->internal_phy[port]) {
 		/* do not force flow control */
 		ksz_port_cfg(dev, port, REG_PORT_CTRL_0,
 			     PORT_FORCE_TX_FLOW_CTRL | PORT_FORCE_RX_FLOW_CTRL,
@@ -999,7 +1082,7 @@ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
 	ksz9477_cfg_port_member(dev, port, member);
 
 	/* clear pending interrupts */
-	if (port < dev->phy_port_cnt)
+	if (dev->info->internal_phy[port])
 		ksz_pread16(dev, port, REG_PORT_PHY_INT_ENABLE, &data16);
 }
 
@@ -1051,13 +1134,19 @@ void ksz9477_config_cpu_port(struct dsa_switch *ds)
 
 			/* enable cpu port */
 			ksz9477_port_setup(dev, i, true);
+<<<<<<< HEAD
+=======
 			p->on = 1;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
 	for (i = 0; i < dev->info->port_cnt; i++) {
 		if (i == dev->cpu_port)
 			continue;
+<<<<<<< HEAD
+		ksz_port_stp_state_set(ds, i, BR_STATE_DISABLED);
+=======
 		p = &dev->ports[i];
 
 		ksz_port_stp_state_set(ds, i, BR_STATE_DISABLED);
@@ -1070,6 +1159,7 @@ void ksz9477_config_cpu_port(struct dsa_switch *ds)
 			/* SGMII PHY detection code is not implemented yet. */
 			p->phy = 0;
 		}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 }
 
@@ -1158,6 +1248,8 @@ int ksz9477_switch_init(struct ksz_device *dev)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+=======
 	ret = ksz_read8(dev, REG_GLOBAL_OPTIONS, &data8);
 	if (ret)
 		return ret;
@@ -1181,6 +1273,7 @@ int ksz9477_switch_init(struct ksz_device *dev)
 			dev->features &= ~GBIT_SUPPORT;
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 

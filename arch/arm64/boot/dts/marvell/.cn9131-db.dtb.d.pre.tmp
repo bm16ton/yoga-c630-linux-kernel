@@ -1,0 +1,15 @@
+cn9131-db.o: arch/arm64/boot/dts/marvell/cn9131-db.dts \
+ arch/arm64/boot/dts/marvell/cn9131-db.dtsi \
+ arch/arm64/boot/dts/marvell/cn9130-db.dtsi \
+ arch/arm64/boot/dts/marvell/cn9130.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap807-quad.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap807.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap80x.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h \
+ arch/arm64/boot/dts/marvell/armada-cp115.dtsi \
+ arch/arm64/boot/dts/marvell/armada-cp11x.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/mvebu-icu.h \
+ arch/arm64/boot/dts/marvell/armada-common.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h

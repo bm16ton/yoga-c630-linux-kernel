@@ -1,0 +1,1 @@
+cmd_drivers/input/rmi4/rmi_core.mod := printf '%s\n'   rmi_bus.o rmi_driver.o rmi_f01.o rmi_2d_sensor.o rmi_f03.o rmi_f11.o rmi_f12.o rmi_f30.o rmi_f34.o rmi_f34v7.o rmi_f55.o | awk '!x[$$0]++ { print("drivers/input/rmi4/"$$0) }' > drivers/input/rmi4/rmi_core.mod

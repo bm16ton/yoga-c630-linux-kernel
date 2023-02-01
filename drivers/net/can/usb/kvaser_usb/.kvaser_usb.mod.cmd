@@ -1,0 +1,1 @@
+cmd_drivers/net/can/usb/kvaser_usb/kvaser_usb.mod := printf '%s\n'   kvaser_usb_core.o kvaser_usb_leaf.o kvaser_usb_hydra.o | awk '!x[$$0]++ { print("drivers/net/can/usb/kvaser_usb/"$$0) }' > drivers/net/can/usb/kvaser_usb/kvaser_usb.mod

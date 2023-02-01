@@ -1,0 +1,1 @@
+cmd_drivers/crypto/cavium/cpt/cptvf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/crypto/cavium/cpt/cptvf.ko drivers/crypto/cavium/cpt/cptvf.o drivers/crypto/cavium/cpt/cptvf.mod.o;  true

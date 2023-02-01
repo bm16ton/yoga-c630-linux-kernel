@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipset/ip_set_hash_netport.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/ipset/ip_set_hash_netport.ko net/netfilter/ipset/ip_set_hash_netport.o net/netfilter/ipset/ip_set_hash_netport.mod.o;  true

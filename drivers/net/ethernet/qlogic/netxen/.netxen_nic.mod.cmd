@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qlogic/netxen/netxen_nic.mod := printf '%s\n'   netxen_nic_hw.o netxen_nic_main.o netxen_nic_init.o netxen_nic_ethtool.o netxen_nic_ctx.o | awk '!x[$$0]++ { print("drivers/net/ethernet/qlogic/netxen/"$$0) }' > drivers/net/ethernet/qlogic/netxen/netxen_nic.mod

@@ -66,5 +66,8 @@ void ODM_PhyStatusQuery(struct odm_dm_struct *pDM_Odm,
 			struct odm_per_pkt_info *pPktinfo,
 			struct adapter *adapt);
 
+<<<<<<< HEAD
+=======
 enum HAL_STATUS ODM_ConfigRFWithHeaderFile(struct odm_dm_struct *pDM_Odm);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif

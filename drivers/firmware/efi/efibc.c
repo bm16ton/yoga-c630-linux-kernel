@@ -48,6 +48,12 @@ static int efibc_reboot_notifier_call(struct notifier_block *notifier,
 		return NOTIFY_DONE;
 
 	wdata = kmalloc(MAX_DATA_LEN * sizeof(efi_char16_t), GFP_KERNEL);
+<<<<<<< HEAD
+	if (!wdata)
+		return NOTIFY_DONE;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (l = 0; l < MAX_DATA_LEN - 1 && str[l] != '\0'; l++)
 		wdata[l] = str[l];
 	wdata[l] = L'\0';

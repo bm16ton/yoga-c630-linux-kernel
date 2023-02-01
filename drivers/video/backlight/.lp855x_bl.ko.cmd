@@ -1,0 +1,1 @@
+cmd_drivers/video/backlight/lp855x_bl.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/video/backlight/lp855x_bl.ko drivers/video/backlight/lp855x_bl.o drivers/video/backlight/lp855x_bl.mod.o;  true

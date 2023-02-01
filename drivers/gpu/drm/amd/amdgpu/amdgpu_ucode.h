@@ -124,6 +124,10 @@ enum psp_fw_type {
 	PSP_FW_TYPE_PSP_SOC_DRV,
 	PSP_FW_TYPE_PSP_INTF_DRV,
 	PSP_FW_TYPE_PSP_DBG_DRV,
+<<<<<<< HEAD
+	PSP_FW_TYPE_PSP_RAS_DRV,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* version_major=2, version_minor=0 */
@@ -260,8 +264,17 @@ struct rlc_firmware_header_v2_2 {
 /* version_major=2, version_minor=3 */
 struct rlc_firmware_header_v2_3 {
     struct rlc_firmware_header_v2_2 v2_2;
+<<<<<<< HEAD
+    uint32_t rlcp_ucode_version;
+    uint32_t rlcp_ucode_feature_version;
     uint32_t rlcp_ucode_size_bytes;
     uint32_t rlcp_ucode_offset_bytes;
+    uint32_t rlcv_ucode_version;
+    uint32_t rlcv_ucode_feature_version;
+=======
+    uint32_t rlcp_ucode_size_bytes;
+    uint32_t rlcp_ucode_offset_bytes;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     uint32_t rlcv_ucode_size_bytes;
     uint32_t rlcv_ucode_offset_bytes;
 };

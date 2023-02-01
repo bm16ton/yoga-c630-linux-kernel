@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hip04_eth.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/hisilicon/hip04_eth.ko drivers/net/ethernet/hisilicon/hip04_eth.o drivers/net/ethernet/hisilicon/hip04_eth.mod.o;  true

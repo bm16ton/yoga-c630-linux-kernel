@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ddbridge/ddbridge.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/ddbridge/ddbridge.ko drivers/media/pci/ddbridge/ddbridge.o drivers/media/pci/ddbridge/ddbridge.mod.o;  true

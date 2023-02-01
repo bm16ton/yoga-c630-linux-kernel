@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-khamsin.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-khamsin.ko drivers/media/rc/keymaps/rc-khamsin.o drivers/media/rc/keymaps/rc-khamsin.mod.o;  true

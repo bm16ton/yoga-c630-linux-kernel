@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/libertas/libertas.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/marvell/libertas/libertas.o @drivers/net/wireless/marvell/libertas/libertas.mod 

@@ -1,0 +1,1 @@
+cmd_net/bridge/netfilter/ebt_ip.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/bridge/netfilter/ebt_ip.ko net/bridge/netfilter/ebt_ip.o net/bridge/netfilter/ebt_ip.mod.o;  true

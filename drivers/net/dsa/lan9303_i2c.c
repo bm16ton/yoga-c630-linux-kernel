@@ -65,9 +65,23 @@ static int lan9303_i2c_probe(struct i2c_client *client,
 	return 0;
 }
 
-static int lan9303_i2c_remove(struct i2c_client *client)
+static void lan9303_i2c_remove(struct i2c_client *client)
 {
 	struct lan9303_i2c *sw_dev = i2c_get_clientdata(client);
+<<<<<<< HEAD
+
+	if (!sw_dev)
+		return;
+
+	lan9303_remove(&sw_dev->chip);
+}
+
+static void lan9303_i2c_shutdown(struct i2c_client *client)
+{
+	struct lan9303_i2c *sw_dev = i2c_get_clientdata(client);
+
+	if (!sw_dev)
+=======
 
 	if (!sw_dev)
 		return 0;
@@ -84,6 +98,7 @@ static void lan9303_i2c_shutdown(struct i2c_client *client)
 	struct lan9303_i2c *sw_dev = i2c_get_clientdata(client);
 
 	if (!sw_dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	lan9303_shutdown(&sw_dev->chip);

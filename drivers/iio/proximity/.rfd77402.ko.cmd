@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/rfd77402.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/rfd77402.ko drivers/iio/proximity/rfd77402.o drivers/iio/proximity/rfd77402.mod.o;  true

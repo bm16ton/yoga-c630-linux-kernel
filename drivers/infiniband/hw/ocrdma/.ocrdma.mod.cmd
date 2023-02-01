@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/hw/ocrdma/ocrdma.mod := printf '%s\n'   ocrdma_main.o ocrdma_verbs.o ocrdma_hw.o ocrdma_ah.o ocrdma_stats.o | awk '!x[$$0]++ { print("drivers/infiniband/hw/ocrdma/"$$0) }' > drivers/infiniband/hw/ocrdma/ocrdma.mod

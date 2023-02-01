@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/max1027.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/max1027.ko drivers/iio/adc/max1027.o drivers/iio/adc/max1027.mod.o;  true

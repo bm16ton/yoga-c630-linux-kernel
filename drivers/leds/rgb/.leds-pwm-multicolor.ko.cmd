@@ -1,0 +1,1 @@
+cmd_drivers/leds/rgb/leds-pwm-multicolor.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/leds/rgb/leds-pwm-multicolor.ko drivers/leds/rgb/leds-pwm-multicolor.o drivers/leds/rgb/leds-pwm-multicolor.mod.o;  true

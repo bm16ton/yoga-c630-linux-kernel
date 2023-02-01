@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/smipcie/smipcie.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/smipcie/smipcie.ko drivers/media/pci/smipcie/smipcie.o drivers/media/pci/smipcie/smipcie.mod.o;  true

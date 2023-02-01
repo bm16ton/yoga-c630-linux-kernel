@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/panel/panel-innolux-ej030na.mod := printf '%s\n'   panel-innolux-ej030na.o | awk '!x[$$0]++ { print("drivers/gpu/drm/panel/"$$0) }' > drivers/gpu/drm/panel/panel-innolux-ej030na.mod

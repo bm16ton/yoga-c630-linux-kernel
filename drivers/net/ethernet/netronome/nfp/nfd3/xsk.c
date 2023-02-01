@@ -84,7 +84,11 @@ static void nfp_nfd3_xsk_rx_skb(struct nfp_net_rx_ring *rx_ring,
 		nfp_net_xsk_rx_drop(r_vec, xrxbuf);
 		return;
 	}
+<<<<<<< HEAD
+	skb_put_data(skb, xrxbuf->xdp->data, pkt_len);
+=======
 	memcpy(skb_put(skb, pkt_len), xrxbuf->xdp->data, pkt_len);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	skb->mark = meta->mark;
 	skb_set_hash(skb, meta->hash, meta->hash_type);

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/sym53c8xx_2/sym53c8xx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/sym53c8xx_2/sym53c8xx.ko drivers/scsi/sym53c8xx_2/sym53c8xx.o drivers/scsi/sym53c8xx_2/sym53c8xx.mod.o;  true

@@ -1,0 +1,3 @@
+drivers/base/regmap/regmap-slimbus.ko
+drivers/base/regmap/regmap-spi.ko
+drivers/base/regmap/regmap-sdw.ko

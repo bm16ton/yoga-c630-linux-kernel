@@ -21,6 +21,57 @@
 
 #include <asm/stacktrace/nvhe.h>
 
+<<<<<<< HEAD
+static struct stack_info stackinfo_get_overflow(void)
+{
+	struct kvm_nvhe_stacktrace_info *stacktrace_info
+				= this_cpu_ptr_nvhe_sym(kvm_stacktrace_info);
+	unsigned long low = (unsigned long)stacktrace_info->overflow_stack_base;
+	unsigned long high = low + OVERFLOW_STACK_SIZE;
+
+	return (struct stack_info) {
+		.low = low,
+		.high = high,
+	};
+}
+
+static struct stack_info stackinfo_get_overflow_kern_va(void)
+{
+	unsigned long low = (unsigned long)this_cpu_ptr_nvhe_sym(overflow_stack);
+	unsigned long high = low + OVERFLOW_STACK_SIZE;
+
+	return (struct stack_info) {
+		.low = low,
+		.high = high,
+	};
+}
+
+static struct stack_info stackinfo_get_hyp(void)
+{
+	struct kvm_nvhe_stacktrace_info *stacktrace_info
+				= this_cpu_ptr_nvhe_sym(kvm_stacktrace_info);
+	unsigned long low = (unsigned long)stacktrace_info->stack_base;
+	unsigned long high = low + PAGE_SIZE;
+
+	return (struct stack_info) {
+		.low = low,
+		.high = high,
+	};
+}
+
+static struct stack_info stackinfo_get_hyp_kern_va(void)
+{
+	unsigned long low = (unsigned long)*this_cpu_ptr(&kvm_arm_hyp_stack_page);
+	unsigned long high = low + PAGE_SIZE;
+
+	return (struct stack_info) {
+		.low = low,
+		.high = high,
+	};
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * kvm_nvhe_stack_kern_va - Convert KVM nVHE HYP stack addresses to a kernel VAs
  *
@@ -34,6 +85,35 @@
  * Returns true on success and updates @addr to its corresponding kernel VA;
  * otherwise returns false.
  */
+<<<<<<< HEAD
+static bool kvm_nvhe_stack_kern_va(unsigned long *addr, unsigned long size)
+{
+	struct stack_info stack_hyp, stack_kern;
+
+	stack_hyp = stackinfo_get_hyp();
+	stack_kern = stackinfo_get_hyp_kern_va();
+	if (stackinfo_on_stack(&stack_hyp, *addr, size))
+		goto found;
+
+	stack_hyp = stackinfo_get_overflow();
+	stack_kern = stackinfo_get_overflow_kern_va();
+	if (stackinfo_on_stack(&stack_hyp, *addr, size))
+		goto found;
+
+	return false;
+
+found:
+	*addr = *addr - stack_hyp.low + stack_kern.low;
+	return true;
+}
+
+/*
+ * Convert a KVN nVHE HYP frame record address to a kernel VA
+ */
+static bool kvm_nvhe_stack_kern_record_va(unsigned long *addr)
+{
+	return kvm_nvhe_stack_kern_va(addr, 16);
+=======
 static bool kvm_nvhe_stack_kern_va(unsigned long *addr,
 				   enum stack_type type)
 {
@@ -93,14 +173,26 @@ static bool on_accessible_stack(const struct task_struct *tsk,
 
 	return (on_overflow_stack(sp, size, info) ||
 		on_hyp_stack(sp, size, info));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int unwind_next(struct unwind_state *state)
 {
+<<<<<<< HEAD
+	/*
+	 * The FP is in the hypervisor VA space. Convert it to the kernel VA
+	 * space so it can be unwound by the regular unwind functions.
+	 */
+	if (!kvm_nvhe_stack_kern_record_va(&state->fp))
+		return -EINVAL;
+
+	return unwind_next_frame_record(state);
+=======
 	struct stack_info info;
 
 	return unwind_next_common(state, &info, on_accessible_stack,
 				  kvm_nvhe_stack_kern_va);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void unwind(struct unwind_state *state,
@@ -158,7 +250,18 @@ static void kvm_nvhe_dump_backtrace_end(void)
 static void hyp_dump_backtrace(unsigned long hyp_offset)
 {
 	struct kvm_nvhe_stacktrace_info *stacktrace_info;
+<<<<<<< HEAD
+	struct stack_info stacks[] = {
+		stackinfo_get_overflow_kern_va(),
+		stackinfo_get_hyp_kern_va(),
+	};
+	struct unwind_state state = {
+		.stacks = stacks,
+		.nr_stacks = ARRAY_SIZE(stacks),
+	};
+=======
 	struct unwind_state state;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	stacktrace_info = this_cpu_ptr_nvhe_sym(kvm_stacktrace_info);
 

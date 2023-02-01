@@ -36,8 +36,11 @@ cflags-y				+= $(cpuflags-y)
 # BWX is most important, but we don't really want any emulation ever.
 KBUILD_CFLAGS += $(cflags-y) -Wa,-mev6
 
+<<<<<<< HEAD
+=======
 head-y := arch/alpha/kernel/head.o
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 libs-y				+= arch/alpha/lib/
 
 # export what is needed by arch/alpha/boot/Makefile

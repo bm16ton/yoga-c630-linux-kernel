@@ -1,0 +1,1 @@
+cmd_drivers/usb/serial/iuu_phoenix.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/serial/iuu_phoenix.ko drivers/usb/serial/iuu_phoenix.o drivers/usb/serial/iuu_phoenix.mod.o;  true

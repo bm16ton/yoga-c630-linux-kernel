@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/touchit213.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/touchit213.ko drivers/input/touchscreen/touchit213.o drivers/input/touchscreen/touchit213.mod.o;  true

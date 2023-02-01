@@ -1,0 +1,1 @@
+cmd_arch/arm64/kernel/pi/built-in.a := rm -f arch/arm64/kernel/pi/built-in.a;  printf "arch/arm64/kernel/pi/%s " kaslr_early.pi.o lib-fdt.pi.o lib-fdt_ro.pi.o | xargs ar cDPrST arch/arm64/kernel/pi/built-in.a

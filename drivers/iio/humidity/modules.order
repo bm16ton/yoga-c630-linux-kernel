@@ -1,0 +1,10 @@
+drivers/iio/humidity/am2315.ko
+drivers/iio/humidity/dht11.ko
+drivers/iio/humidity/hdc100x.ko
+drivers/iio/humidity/hdc2010.ko
+drivers/iio/humidity/hts221.ko
+drivers/iio/humidity/hts221_i2c.ko
+drivers/iio/humidity/hts221_spi.ko
+drivers/iio/humidity/htu21.ko
+drivers/iio/humidity/si7005.ko
+drivers/iio/humidity/si7020.ko

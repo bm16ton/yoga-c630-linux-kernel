@@ -51,8 +51,14 @@ patternProperties:
     oneOf:
       - $ref: "#/$defs/qcom-sm6125-tlmm-state"
       - patternProperties:
+<<<<<<< HEAD
+          "-pins$":
+            $ref: "#/$defs/qcom-sm6125-tlmm-state"
+        additionalProperties: false
+=======
           ".*":
             $ref: "#/$defs/qcom-sm6125-tlmm-state"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 $defs:
   qcom-sm6125-tlmm-state:
@@ -60,7 +66,10 @@ $defs:
     description:
       Pinctrl node's client devices use subnodes for desired pin configuration.
       Client device subnodes use below standard properties.
+<<<<<<< HEAD
+=======
     $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     properties:
       pins:
@@ -111,12 +120,61 @@ $defs:
 
     required:
       - pins
+<<<<<<< HEAD
+
+    allOf:
+      - $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
+      - if:
+          properties:
+            pins:
+              pattern: "^gpio[0-9]|[1-9][0-9]|1[0-2][0-9]|13[0-2]$"
+        then:
+          required:
+            - function
+=======
       - function
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     additionalProperties: false
 
 examples:
   - |
+<<<<<<< HEAD
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    pinctrl@500000 {
+        compatible = "qcom,sm6125-tlmm";
+        reg = <0x00500000 0x400000>,
+              <0x00900000 0x400000>,
+              <0x00d00000 0x400000>;
+        reg-names = "west", "south", "east";
+        interrupts = <GIC_SPI 227 IRQ_TYPE_LEVEL_HIGH>;
+        gpio-controller;
+        gpio-ranges = <&tlmm 0 0 134>;
+        #gpio-cells = <2>;
+        interrupt-controller;
+        #interrupt-cells = <2>;
+
+        sdc2-off-state {
+            clk-pins {
+                pins = "sdc2_clk";
+                drive-strength = <2>;
+                bias-disable;
+            };
+
+            cmd-pins {
+                pins = "sdc2_cmd";
+                drive-strength = <2>;
+                bias-pull-up;
+            };
+
+            data-pins {
+                pins = "sdc2_data";
+                drive-strength = <2>;
+                bias-pull-up;
+            };
+        };
+    };
+=======
         #include <dt-bindings/interrupt-controller/arm-gic.h>
         pinctrl@500000 {
                 compatible = "qcom,sm6125-tlmm";
@@ -131,3 +189,4 @@ examples:
                 interrupt-controller;
                 #interrupt-cells = <2>;
         };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

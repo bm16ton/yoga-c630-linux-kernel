@@ -34,9 +34,12 @@ struct io_file_table {
 	unsigned int alloc_hint;
 };
 
+<<<<<<< HEAD
+=======
 struct io_notif;
 struct io_notif_slot;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct io_hash_bucket {
 	spinlock_t		lock;
 	struct hlist_head	list;
@@ -184,6 +187,11 @@ struct io_ev_fd {
 	struct eventfd_ctx	*cq_ev_fd;
 	unsigned int		eventfd_async: 1;
 	struct rcu_head		rcu;
+<<<<<<< HEAD
+	atomic_t		refs;
+	atomic_t		ops;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct io_alloc_cache {
@@ -240,8 +248,11 @@ struct io_ring_ctx {
 		unsigned		nr_user_files;
 		unsigned		nr_user_bufs;
 		struct io_mapped_ubuf	**user_bufs;
+<<<<<<< HEAD
+=======
 		struct io_notif_slot	*notif_slots;
 		unsigned		nr_notif_slots;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		struct io_submit_state	submit_state;
 
@@ -301,6 +312,11 @@ struct io_ring_ctx {
 		struct io_hash_table	cancel_table;
 		bool			poll_multi_queue;
 
+<<<<<<< HEAD
+		struct llist_head	work_llist;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct list_head	io_buffers_comp;
 	} ____cacheline_aligned_in_smp;
 

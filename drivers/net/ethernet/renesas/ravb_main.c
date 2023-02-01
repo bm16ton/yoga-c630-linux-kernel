@@ -240,6 +240,14 @@ static void ravb_rx_ring_free_gbeth(struct net_device *ndev, int q)
 	struct ravb_private *priv = netdev_priv(ndev);
 	unsigned int ring_size;
 	unsigned int i;
+<<<<<<< HEAD
+
+	if (!priv->gbeth_rx_ring)
+		return;
+
+	for (i = 0; i < priv->num_rx_ring[q]; i++) {
+		struct ravb_rx_desc *desc = &priv->gbeth_rx_ring[i];
+=======
 
 	if (!priv->gbeth_rx_ring)
 		return;
@@ -271,6 +279,33 @@ static void ravb_rx_ring_free_rcar(struct net_device *ndev, int q)
 
 	for (i = 0; i < priv->num_rx_ring[q]; i++) {
 		struct ravb_ex_rx_desc *desc = &priv->rx_ring[q][i];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+		if (!dma_mapping_error(ndev->dev.parent,
+				       le32_to_cpu(desc->dptr)))
+			dma_unmap_single(ndev->dev.parent,
+					 le32_to_cpu(desc->dptr),
+<<<<<<< HEAD
+					 GBETH_RX_BUFF_MAX,
+					 DMA_FROM_DEVICE);
+	}
+	ring_size = sizeof(struct ravb_rx_desc) * (priv->num_rx_ring[q] + 1);
+	dma_free_coherent(ndev->dev.parent, ring_size, priv->gbeth_rx_ring,
+			  priv->rx_desc_dma[q]);
+	priv->gbeth_rx_ring = NULL;
+}
+
+static void ravb_rx_ring_free_rcar(struct net_device *ndev, int q)
+{
+	struct ravb_private *priv = netdev_priv(ndev);
+	unsigned int ring_size;
+	unsigned int i;
+
+	if (!priv->rx_ring[q])
+		return;
+
+	for (i = 0; i < priv->num_rx_ring[q]; i++) {
+		struct ravb_ex_rx_desc *desc = &priv->rx_ring[q][i];
 
 		if (!dma_mapping_error(ndev->dev.parent,
 				       le32_to_cpu(desc->dptr)))
@@ -279,6 +314,11 @@ static void ravb_rx_ring_free_rcar(struct net_device *ndev, int q)
 					 RX_BUF_SZ,
 					 DMA_FROM_DEVICE);
 	}
+=======
+					 RX_BUF_SZ,
+					 DMA_FROM_DEVICE);
+	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ring_size = sizeof(struct ravb_ex_rx_desc) *
 		    (priv->num_rx_ring[q] + 1);
 	dma_free_coherent(ndev->dev.parent, ring_size, priv->rx_ring[q],
@@ -540,7 +580,17 @@ static void ravb_emac_init_gbeth(struct net_device *ndev)
 	/* E-MAC interrupt enable register */
 	ravb_write(ndev, ECSIPR_ICDIP, ECSIPR);
 
+<<<<<<< HEAD
+	if (priv->phy_interface == PHY_INTERFACE_MODE_MII) {
+		ravb_modify(ndev, CXR31, CXR31_SEL_LINK0 | CXR31_SEL_LINK1, 0);
+		ravb_write(ndev, (1000 << 16) | CXR35_SEL_XMII_MII, CXR35);
+	} else {
+		ravb_modify(ndev, CXR31, CXR31_SEL_LINK0 | CXR31_SEL_LINK1,
+			    CXR31_SEL_LINK0);
+	}
+=======
 	ravb_modify(ndev, CXR31, CXR31_SEL_LINK0 | CXR31_SEL_LINK1, CXR31_SEL_LINK0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ravb_emac_init_rcar(struct net_device *ndev)
@@ -835,7 +885,11 @@ static bool ravb_rx_gbeth(struct net_device *ndev, int *quota, int q)
 				napi_gro_receive(&priv->napi[q],
 						 priv->rx_1st_skb);
 				stats->rx_packets++;
+<<<<<<< HEAD
+				stats->rx_bytes += pkt_len;
+=======
 				stats->rx_bytes += priv->rx_1st_skb->len;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				break;
 			}
 		}
@@ -1449,6 +1503,8 @@ static int ravb_phy_init(struct net_device *ndev)
 		phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
 	}
 
+	/* Indicate that the MAC is responsible for managing PHY PM */
+	phydev->mac_managed_pm = true;
 	phy_attached_info(phydev);
 
 	return 0;
@@ -2512,6 +2568,10 @@ static const struct of_device_id ravb_match_table[] = {
 	{ .compatible = "renesas,etheravb-rcar-gen2", .data = &ravb_gen2_hw_info },
 	{ .compatible = "renesas,etheravb-r8a7795", .data = &ravb_gen3_hw_info },
 	{ .compatible = "renesas,etheravb-rcar-gen3", .data = &ravb_gen3_hw_info },
+<<<<<<< HEAD
+	{ .compatible = "renesas,etheravb-rcar-gen4", .data = &ravb_gen3_hw_info },
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ .compatible = "renesas,etheravb-rzv2m", .data = &ravb_rzv2m_hw_info },
 	{ .compatible = "renesas,rzg2l-gbeth", .data = &gbeth_hw_info },
 	{ }
@@ -2638,10 +2698,17 @@ static int ravb_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	info = of_device_get_match_data(&pdev->dev);
+<<<<<<< HEAD
 
 	ndev->features = info->net_features;
 	ndev->hw_features = info->net_hw_features;
 
+=======
+
+	ndev->features = info->net_features;
+	ndev->hw_features = info->net_hw_features;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	reset_control_deassert(rstc);
 	pm_runtime_enable(&pdev->dev);
 	pm_runtime_get_sync(&pdev->dev);
@@ -2832,9 +2899,15 @@ static int ravb_probe(struct platform_device *pdev)
 		goto out_dma_free;
 	}
 
+<<<<<<< HEAD
+	netif_napi_add(ndev, &priv->napi[RAVB_BE], ravb_poll);
+	if (info->nc_queues)
+		netif_napi_add(ndev, &priv->napi[RAVB_NC], ravb_poll);
+=======
 	netif_napi_add(ndev, &priv->napi[RAVB_BE], ravb_poll, 64);
 	if (info->nc_queues)
 		netif_napi_add(ndev, &priv->napi[RAVB_NC], ravb_poll, 64);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Network device register */
 	error = register_netdev(ndev);
@@ -2894,12 +2967,12 @@ static int ravb_remove(struct platform_device *pdev)
 			  priv->desc_bat_dma);
 	/* Set reset mode */
 	ravb_write(ndev, CCC_OPC_RESET, CCC);
-	pm_runtime_put_sync(&pdev->dev);
 	unregister_netdev(ndev);
 	if (info->nc_queues)
 		netif_napi_del(&priv->napi[RAVB_NC]);
 	netif_napi_del(&priv->napi[RAVB_BE]);
 	ravb_mdio_release(priv);
+	pm_runtime_put_sync(&pdev->dev);
 	pm_runtime_disable(&pdev->dev);
 	reset_control_assert(priv->rstc);
 	free_netdev(ndev);

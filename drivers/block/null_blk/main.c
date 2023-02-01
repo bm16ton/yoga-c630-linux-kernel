@@ -1528,7 +1528,11 @@ static bool should_requeue_request(struct request *rq)
 	return false;
 }
 
+<<<<<<< HEAD
+static void null_map_queues(struct blk_mq_tag_set *set)
+=======
 static int null_map_queues(struct blk_mq_tag_set *set)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct nullb *nullb = set->driver_data;
 	int i, qoff;
@@ -1555,7 +1559,13 @@ static int null_map_queues(struct blk_mq_tag_set *set)
 		} else {
 			pr_warn("tag set has unexpected nr_hw_queues: %d\n",
 				set->nr_hw_queues);
+<<<<<<< HEAD
+			WARN_ON_ONCE(true);
+			submit_queues = 1;
+			poll_queues = 0;
+=======
 			return -EINVAL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -1577,8 +1587,11 @@ static int null_map_queues(struct blk_mq_tag_set *set)
 		qoff += map->nr_queues;
 		blk_mq_map_queues(map);
 	}
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)

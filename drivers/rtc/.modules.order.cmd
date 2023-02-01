@@ -1,0 +1,1 @@
+cmd_drivers/rtc/modules.order := {   echo drivers/rtc/rtc-armada38x.ko;   echo drivers/rtc/rtc-cros-ec.ko;   echo drivers/rtc/rtc-meson-vrtc.ko;   echo drivers/rtc/rtc-mv.ko;   echo drivers/rtc/rtc-pcf2127.ko;   echo drivers/rtc/rtc-pm8xxx.ko;   echo drivers/rtc/rtc-rk808.ko;   echo drivers/rtc/rtc-rv8803.ko; :; } > drivers/rtc/modules.order

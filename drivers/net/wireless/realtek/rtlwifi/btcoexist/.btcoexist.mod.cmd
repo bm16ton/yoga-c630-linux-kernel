@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/btcoexist/btcoexist.mod := printf '%s\n'   halbtc8192e2ant.o halbtc8723b1ant.o halbtc8723b2ant.o halbtc8821a1ant.o halbtc8821a2ant.o halbtcoutsrc.o rtl_btc.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtlwifi/btcoexist/"$$0) }' > drivers/net/wireless/realtek/rtlwifi/btcoexist/btcoexist.mod

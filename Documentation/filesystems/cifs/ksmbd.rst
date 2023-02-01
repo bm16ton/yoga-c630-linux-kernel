@@ -118,6 +118,46 @@ ksmbd/nfsd interoperability    Planned for future. The features that ksmbd
 How to run
 ==========
 
+<<<<<<< HEAD
+1. Download ksmbd-tools(https://github.com/cifsd-team/ksmbd-tools/releases) and
+   compile them.
+
+   - Refer README(https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md)
+     to know how to use ksmbd.mountd/adduser/addshare/control utils
+
+     $ ./autogen.sh
+     $ ./configure --with-rundir=/run
+     $ make && sudo make install
+
+2. Create /usr/local/etc/ksmbd/ksmbd.conf file, add SMB share in ksmbd.conf file.
+
+   - Refer ksmbd.conf.example in ksmbd-utils, See ksmbd.conf manpage
+     for details to configure shares.
+
+        $ man ksmbd.conf
+
+3. Create user/password for SMB share.
+
+   - See ksmbd.adduser manpage.
+
+     $ man ksmbd.adduser
+     $ sudo ksmbd.adduser -a <Enter USERNAME for SMB share access>
+
+4. Insert ksmbd.ko module after build your kernel. No need to load module
+   if ksmbd is built into the kernel.
+
+   - Set ksmbd in menuconfig(e.g. $ make menuconfig)
+       [*] Network File Systems  --->
+           <M> SMB3 server support (EXPERIMENTAL)
+
+	$ sudo modprobe ksmbd.ko
+
+5. Start ksmbd user space daemon
+
+	$ sudo ksmbd.mountd
+
+6. Access share from Windows or Linux using SMB3 client (cifs.ko or smbclient of samba)
+=======
 1. Download ksmbd-tools and compile them.
 	- https://github.com/cifsd-team/ksmbd-tools
 
@@ -138,6 +178,7 @@ How to run
 	# ksmbd.mountd
 
 6. Access share from Windows or Linux using CIFS
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 Shutdown KSMBD
 ==============

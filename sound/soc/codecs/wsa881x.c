@@ -749,11 +749,17 @@ static int wsa881x_put_pa_gain(struct snd_kcontrol *kc,
 	unsigned int mask = (1 << fls(max)) - 1;
 	int val, ret, min_gain, max_gain;
 
+<<<<<<< HEAD
+	ret = pm_runtime_resume_and_get(comp->dev);
+	if (ret < 0 && ret != -EACCES)
+		return ret;
+=======
 	ret = pm_runtime_get_sync(comp->dev);
 	if (ret < 0 && ret != -EACCES) {
 		pm_runtime_put_noidle(comp->dev);
 		return ret;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	max_gain = (max - ucontrol->value.integer.value[0]) & mask;
 	/*
@@ -1066,6 +1072,7 @@ static const struct snd_soc_component_driver wsa881x_component_drv = {
 	.num_dapm_widgets = ARRAY_SIZE(wsa881x_dapm_widgets),
 	.dapm_routes = wsa881x_audio_map,
 	.num_dapm_routes = ARRAY_SIZE(wsa881x_audio_map),
+	.endianness = 1,
 };
 
 static int wsa881x_update_status(struct sdw_slave *slave,
@@ -1174,11 +1181,25 @@ static int __maybe_unused wsa881x_runtime_resume(struct device *dev)
 	struct sdw_slave *slave = dev_to_sdw_dev(dev);
 	struct regmap *regmap = dev_get_regmap(dev, NULL);
 	struct wsa881x_priv *wsa881x = dev_get_drvdata(dev);
+<<<<<<< HEAD
+	unsigned long time;
+
+	gpiod_direction_output(wsa881x->sd_n, 1);
+
+	time = wait_for_completion_timeout(&slave->initialization_complete,
+					   msecs_to_jiffies(WSA881X_PROBE_TIMEOUT));
+	if (!time) {
+		dev_err(dev, "Initialization not complete, timed out\n");
+		gpiod_direction_output(wsa881x->sd_n, 0);
+		return -ETIMEDOUT;
+	}
+=======
 
 	gpiod_direction_output(wsa881x->sd_n, 1);
 
 	wait_for_completion_timeout(&slave->initialization_complete,
 				    msecs_to_jiffies(WSA881X_PROBE_TIMEOUT));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	regcache_cache_only(regmap, false);
 	regcache_sync(regmap);

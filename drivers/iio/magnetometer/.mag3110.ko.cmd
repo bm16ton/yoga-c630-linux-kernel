@@ -1,0 +1,1 @@
+cmd_drivers/iio/magnetometer/mag3110.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/magnetometer/mag3110.ko drivers/iio/magnetometer/mag3110.o drivers/iio/magnetometer/mag3110.mod.o;  true

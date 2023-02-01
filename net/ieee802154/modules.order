@@ -1,0 +1,3 @@
+net/ieee802154/6lowpan/ieee802154_6lowpan.ko
+net/ieee802154/ieee802154.ko
+net/ieee802154/ieee802154_socket.ko

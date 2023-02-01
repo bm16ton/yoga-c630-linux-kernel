@@ -1,0 +1,1 @@
+cmd_drivers/clocksource/built-in.a := rm -f drivers/clocksource/built-in.a;  printf "drivers/clocksource/%s " timer-of.o timer-probe.o mmio.o timer-rockchip.o timer-sun4i.o timer-tegra.o arm_arch_timer.o timer-sp804.o dummy_timer.o | xargs ar cDPrST drivers/clocksource/built-in.a

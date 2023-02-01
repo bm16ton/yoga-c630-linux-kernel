@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/sdhci-of-arasan.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/sdhci-of-arasan.ko drivers/mmc/host/sdhci-of-arasan.o drivers/mmc/host/sdhci-of-arasan.mod.o;  true

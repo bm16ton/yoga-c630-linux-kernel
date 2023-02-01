@@ -23,7 +23,10 @@
 #include "HalHWImg8188E_MAC.h"
 #include "HalHWImg8188E_RF.h"
 #include "HalHWImg8188E_BB.h"
+<<<<<<< HEAD
+=======
 #include "odm_RegConfig8188E.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "odm_RTL8188E.h"
 
 #define DRVINFO_SZ	4 /*  unit is 8bytes */
@@ -36,7 +39,10 @@
       0x2400 /* 9k for 88E nornal chip , MaxRxBuff=10k-max(TxReportSize(64*8),
 	      * WOLPattern(16*24)) */
 
+<<<<<<< HEAD
+=======
 #define TX_SELE_HQ			BIT(0)		/*  High Queue */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define TX_SELE_LQ			BIT(1)		/*  Low Queue */
 #define TX_SELE_NQ			BIT(2)		/*  Normal Queue */
 
@@ -51,12 +57,15 @@
 
 #define TX_PAGE_BOUNDARY_88E (TX_TOTAL_PAGE_NUMBER_88E + 1)
 
+<<<<<<< HEAD
+=======
 /* Note: For Normal Chip Setting ,modify later */
 #define WMM_NORMAL_TX_TOTAL_PAGE_NUMBER			\
 	TX_TOTAL_PAGE_NUMBER_88E  /* 0xA9 , 0xb0=>176=>22k */
 #define WMM_NORMAL_TX_PAGE_BOUNDARY_88E			\
 	(WMM_NORMAL_TX_TOTAL_PAGE_NUMBER + 1) /* 0xA9 */
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "HalVerDef.h"
 #include "hal_com.h"
 
@@ -155,8 +164,12 @@ struct hal_data_8188e {
 	u8	AntDivCfg;
 	u8	TRxAntDivType;
 
+<<<<<<< HEAD
+	u8	out_ep_extra_queues;
+=======
 	u8	OutEpQueueSel;
 	u8	OutEpNumber;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct P2P_PS_Offload_t	p2p_ps_offload;
 

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt76x0/mt76x0e.mod := printf '%s\n'   pci.o pci_mcu.o | awk '!x[$$0]++ { print("drivers/net/wireless/mediatek/mt76/mt76x0/"$$0) }' > drivers/net/wireless/mediatek/mt76/mt76x0/mt76x0e.mod

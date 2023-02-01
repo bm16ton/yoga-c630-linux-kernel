@@ -1,0 +1,6 @@
+drivers/input/tablet/acecad.ko
+drivers/input/tablet/aiptek.ko
+drivers/input/tablet/hanwang.ko
+drivers/input/tablet/kbtab.ko
+drivers/input/tablet/pegasus_notetaker.ko
+drivers/input/tablet/wacom_serial4.ko

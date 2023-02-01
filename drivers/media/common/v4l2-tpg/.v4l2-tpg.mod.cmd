@@ -1,0 +1,1 @@
+cmd_drivers/media/common/v4l2-tpg/v4l2-tpg.mod := printf '%s\n'   v4l2-tpg-core.o v4l2-tpg-colors.o | awk '!x[$$0]++ { print("drivers/media/common/v4l2-tpg/"$$0) }' > drivers/media/common/v4l2-tpg/v4l2-tpg.mod

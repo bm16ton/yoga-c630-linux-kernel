@@ -1,0 +1,16 @@
+net/netfilter/ipvs/ip_vs.ko
+net/netfilter/ipvs/ip_vs_rr.ko
+net/netfilter/ipvs/ip_vs_wrr.ko
+net/netfilter/ipvs/ip_vs_lc.ko
+net/netfilter/ipvs/ip_vs_wlc.ko
+net/netfilter/ipvs/ip_vs_fo.ko
+net/netfilter/ipvs/ip_vs_ovf.ko
+net/netfilter/ipvs/ip_vs_lblc.ko
+net/netfilter/ipvs/ip_vs_lblcr.ko
+net/netfilter/ipvs/ip_vs_dh.ko
+net/netfilter/ipvs/ip_vs_sh.ko
+net/netfilter/ipvs/ip_vs_mh.ko
+net/netfilter/ipvs/ip_vs_sed.ko
+net/netfilter/ipvs/ip_vs_nq.ko
+net/netfilter/ipvs/ip_vs_ftp.ko
+net/netfilter/ipvs/ip_vs_pe_sip.ko

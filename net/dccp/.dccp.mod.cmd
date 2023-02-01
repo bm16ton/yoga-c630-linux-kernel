@@ -1,0 +1,1 @@
+cmd_net/dccp/dccp.mod := printf '%s\n'   ccid.o feat.o input.o minisocks.o options.o output.o proto.o timer.o qpolicy.o ccids/ccid2.o ackvec.o ccids/ccid3.o ccids/lib/tfrc.o ccids/lib/tfrc_equation.o ccids/lib/packet_history.o ccids/lib/loss_interval.o sysctl.o | awk '!x[$$0]++ { print("net/dccp/"$$0) }' > net/dccp/dccp.mod

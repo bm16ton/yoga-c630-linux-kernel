@@ -1,0 +1,7 @@
+drivers/phy/rockchip/phy-rockchip-dp.ko
+drivers/phy/rockchip/phy-rockchip-emmc.ko
+drivers/phy/rockchip/phy-rockchip-inno-hdmi.ko
+drivers/phy/rockchip/phy-rockchip-inno-usb2.ko
+drivers/phy/rockchip/phy-rockchip-pcie.ko
+drivers/phy/rockchip/phy-rockchip-typec.ko
+drivers/phy/rockchip/phy-rockchip-usb.ko

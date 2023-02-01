@@ -2,6 +2,10 @@
 #include <linux/bpf.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
+<<<<<<< HEAD
+#include <stdbool.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 char _license[] SEC("license") = "GPL";
 
@@ -13,6 +17,19 @@ extern const void bpf_modify_return_test __ksym;
 extern const void bpf_fentry_test6 __ksym;
 extern const void bpf_fentry_test7 __ksym;
 
+<<<<<<< HEAD
+extern bool CONFIG_X86_KERNEL_IBT __kconfig __weak;
+
+/* This function is here to have CONFIG_X86_KERNEL_IBT
+ * used and added to object BTF.
+ */
+int unused(void)
+{
+	return CONFIG_X86_KERNEL_IBT ? 0 : 1;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 __u64 test1_result = 0;
 SEC("fentry/bpf_fentry_test1")
 int BPF_PROG(test1, int a)
@@ -64,11 +81,18 @@ int BPF_PROG(test5, int a, int *b, int ret)
 }
 
 __u64 test6_result = 0;
+<<<<<<< HEAD
+SEC("?kprobe")
+=======
 SEC("kprobe/bpf_fentry_test6+0x5")
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int test6(struct pt_regs *ctx)
 {
 	__u64 addr = bpf_get_func_ip(ctx);
 
+<<<<<<< HEAD
+	test6_result = (const void *) addr == 0;
+=======
 	test6_result = (const void *) addr == &bpf_fentry_test6 + 5;
 	return 0;
 }
@@ -80,5 +104,6 @@ int test7(struct pt_regs *ctx)
 	__u64 addr = bpf_get_func_ip(ctx);
 
 	test7_result = (const void *) addr == &bpf_fentry_test7 + 5;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }

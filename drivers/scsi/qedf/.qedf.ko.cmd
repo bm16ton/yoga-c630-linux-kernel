@@ -1,0 +1,1 @@
+cmd_drivers/scsi/qedf/qedf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/qedf/qedf.ko drivers/scsi/qedf/qedf.o drivers/scsi/qedf/qedf.mod.o;  true

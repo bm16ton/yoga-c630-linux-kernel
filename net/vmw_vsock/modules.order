@@ -1,0 +1,5 @@
+net/vmw_vsock/vsock.ko
+net/vmw_vsock/vsock_diag.ko
+net/vmw_vsock/vmw_vsock_virtio_transport.ko
+net/vmw_vsock/vmw_vsock_virtio_transport_common.ko
+net/vmw_vsock/vsock_loopback.ko

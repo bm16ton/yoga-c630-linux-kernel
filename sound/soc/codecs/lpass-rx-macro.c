@@ -596,7 +596,10 @@ struct rx_macro {
 	int rx_port_value[RX_MACRO_PORTS_MAX];
 	u16 prim_int_users[INTERP_MAX];
 	int rx_mclk_users;
+<<<<<<< HEAD
+=======
 	bool reset_swr;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int clsh_users;
 	int rx_mclk_cnt;
 	bool is_ear_mode_on;
@@ -3442,18 +3445,29 @@ static int swclk_gate_enable(struct clk_hw *hw)
 	}
 
 	rx_macro_mclk_enable(rx, true);
+<<<<<<< HEAD
+	regmap_update_bits(rx->regmap, CDC_RX_CLK_RST_CTRL_SWR_CONTROL,
+			   CDC_RX_SWR_RESET_MASK,
+			   CDC_RX_SWR_RESET);
+=======
 	if (rx->reset_swr)
 		regmap_update_bits(rx->regmap, CDC_RX_CLK_RST_CTRL_SWR_CONTROL,
 				   CDC_RX_SWR_RESET_MASK,
 				   CDC_RX_SWR_RESET);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	regmap_update_bits(rx->regmap, CDC_RX_CLK_RST_CTRL_SWR_CONTROL,
 			   CDC_RX_SWR_CLK_EN_MASK, 1);
 
+<<<<<<< HEAD
+	regmap_update_bits(rx->regmap, CDC_RX_CLK_RST_CTRL_SWR_CONTROL,
+			   CDC_RX_SWR_RESET_MASK, 0);
+=======
 	if (rx->reset_swr)
 		regmap_update_bits(rx->regmap, CDC_RX_CLK_RST_CTRL_SWR_CONTROL,
 				   CDC_RX_SWR_RESET_MASK, 0);
 	rx->reset_swr = false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -3579,7 +3593,10 @@ static int rx_macro_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(dev, rx);
 
+<<<<<<< HEAD
+=======
 	rx->reset_swr = true;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	rx->dev = dev;
 
 	/* set MCLK and NPL rates */
@@ -3659,6 +3676,11 @@ static int rx_macro_remove(struct platform_device *pdev)
 static const struct of_device_id rx_macro_dt_match[] = {
 	{ .compatible = "qcom,sc7280-lpass-rx-macro" },
 	{ .compatible = "qcom,sm8250-lpass-rx-macro" },
+<<<<<<< HEAD
+	{ .compatible = "qcom,sm8450-lpass-rx-macro" },
+	{ .compatible = "qcom,sc8280xp-lpass-rx-macro" },
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 MODULE_DEVICE_TABLE(of, rx_macro_dt_match);
@@ -3701,7 +3723,10 @@ static int __maybe_unused rx_macro_runtime_resume(struct device *dev)
 	}
 	regcache_cache_only(rx->regmap, false);
 	regcache_sync(rx->regmap);
+<<<<<<< HEAD
+=======
 	rx->reset_swr = true;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 err_fsgen:

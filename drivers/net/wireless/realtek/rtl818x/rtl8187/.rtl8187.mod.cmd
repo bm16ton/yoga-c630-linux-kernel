@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtl818x/rtl8187/rtl8187.mod := printf '%s\n'   dev.o rtl8225.o leds.o rfkill.o | awk '!x[$$0]++ { print("drivers/net/wireless/realtek/rtl818x/rtl8187/"$$0) }' > drivers/net/wireless/realtek/rtl818x/rtl8187/rtl8187.mod

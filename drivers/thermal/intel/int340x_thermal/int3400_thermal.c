@@ -156,6 +156,7 @@ static ssize_t current_uuid_show(struct device *dev,
 					    "%s\n",
 					    int3400_thermal_uuids[i]);
 	}
+<<<<<<< HEAD
 
 	if (length)
 		return length;
@@ -184,6 +185,36 @@ static int int3400_thermal_run_osc(acpi_handle handle, char *uuid_str, int *enab
 		if (ret != *enable)
 			result = -EPERM;
 
+=======
+
+	if (length)
+		return length;
+
+	return sprintf(buf, "INVALID\n");
+}
+
+static int int3400_thermal_run_osc(acpi_handle handle, char *uuid_str, int *enable)
+{
+	u32 ret, buf[2];
+	acpi_status status;
+	int result = 0;
+	struct acpi_osc_context context = {
+		.uuid_str = uuid_str,
+		.rev = 1,
+		.cap.length = 8,
+		.cap.pointer = buf,
+	};
+
+	buf[OSC_QUERY_DWORD] = 0;
+	buf[OSC_SUPPORT_DWORD] = *enable;
+
+	status = acpi_run_osc(handle, &context);
+	if (ACPI_SUCCESS(status)) {
+		ret = *((u32 *)(context.ret.pointer + 4));
+		if (ret != *enable)
+			result = -EPERM;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(context.ret.pointer);
 	} else
 		result = -EPERM;
@@ -472,6 +503,7 @@ static int int3400_thermal_change_mode(struct thermal_zone_device *thermal,
 
 	if (mode != thermal->mode) {
 		int enabled;
+<<<<<<< HEAD
 
 		enabled = mode == THERMAL_DEVICE_ENABLED;
 
@@ -487,6 +519,23 @@ static int int3400_thermal_change_mode(struct thermal_zone_device *thermal,
 		    priv->current_uuid_index >= INT3400_THERMAL_MAXIMUM_UUID)
 			return -EINVAL;
 
+=======
+
+		enabled = mode == THERMAL_DEVICE_ENABLED;
+
+		if (priv->os_uuid_mask) {
+			if (!enabled) {
+				priv->os_uuid_mask = 0;
+				result = set_os_uuid_mask(priv, priv->os_uuid_mask);
+			}
+			goto eval_odvp;
+		}
+
+		if (priv->current_uuid_index < 0 ||
+		    priv->current_uuid_index >= INT3400_THERMAL_MAXIMUM_UUID)
+			return -EINVAL;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		result = int3400_thermal_run_osc(priv->adev->handle,
 						 int3400_thermal_uuids[priv->current_uuid_index],
 						 &enabled);
@@ -614,9 +663,14 @@ static int int3400_thermal_probe(struct platform_device *pdev)
 
 free_sysfs:
 	cleanup_odvp(priv);
+<<<<<<< HEAD
+	if (!ZERO_OR_NULL_PTR(priv->data_vault)) {
+		sysfs_remove_group(&pdev->dev.kobj, &data_attribute_group);
+=======
 	if (priv->data_vault) {
 		if (!ZERO_OR_NULL_PTR(priv->data_vault))
 			sysfs_remove_group(&pdev->dev.kobj, &data_attribute_group);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kfree(priv->data_vault);
 	}
 free_uuid:

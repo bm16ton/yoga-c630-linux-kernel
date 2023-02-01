@@ -28,12 +28,24 @@ properties:
       - const: hdmi_phy
 
   clocks:
+<<<<<<< HEAD
+    minItems: 2
+    maxItems: 3
+
+  clock-names:
+    minItems: 2
+    items:
+      - const: iface
+      - const: ref
+      - const: xo
+=======
     maxItems: 2
 
   clock-names:
     items:
       - const: iface
       - const: ref
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   power-domains:
     maxItems: 1
@@ -44,6 +56,12 @@ properties:
   vddio-supply:
     description: phandle to VDD I/O supply regulator
 
+<<<<<<< HEAD
+  '#clock-cells':
+    const: 0
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#phy-cells':
     const: 0
 
@@ -75,9 +93,18 @@ examples:
                   "hdmi_phy";
 
       clocks = <&mmcc 116>,
+<<<<<<< HEAD
+               <&gcc 214>,
+               <&xo_board>;
+      clock-names = "iface",
+                    "ref",
+                    "xo";
+      #clock-cells = <0>;
+=======
                <&gcc 214>;
       clock-names = "iface",
                     "ref";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       #phy-cells = <0>;
 
       vddio-supply = <&vreg_l12a_1p8>;

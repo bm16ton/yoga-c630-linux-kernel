@@ -1,0 +1,3 @@
+drivers/extcon/extcon-qcom-spmi-misc.ko
+drivers/extcon/extcon-usb-gpio.ko
+drivers/extcon/extcon-usbc-cros-ec.ko

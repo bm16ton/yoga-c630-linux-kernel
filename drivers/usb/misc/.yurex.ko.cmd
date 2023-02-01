@@ -1,0 +1,1 @@
+cmd_drivers/usb/misc/yurex.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/misc/yurex.ko drivers/usb/misc/yurex.o drivers/usb/misc/yurex.mod.o;  true

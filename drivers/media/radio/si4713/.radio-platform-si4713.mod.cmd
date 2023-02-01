@@ -1,0 +1,1 @@
+cmd_drivers/media/radio/si4713/radio-platform-si4713.mod := printf '%s\n'   radio-platform-si4713.o | awk '!x[$$0]++ { print("drivers/media/radio/si4713/"$$0) }' > drivers/media/radio/si4713/radio-platform-si4713.mod

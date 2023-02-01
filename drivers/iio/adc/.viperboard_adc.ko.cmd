@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/viperboard_adc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/viperboard_adc.ko drivers/iio/adc/viperboard_adc.o drivers/iio/adc/viperboard_adc.mod.o;  true

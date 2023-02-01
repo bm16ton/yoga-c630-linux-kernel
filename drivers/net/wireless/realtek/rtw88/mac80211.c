@@ -101,7 +101,8 @@ static int rtw_ops_config(struct ieee80211_hw *hw, u32 changed)
 		rtw_set_channel(rtwdev);
 
 	if ((changed & IEEE80211_CONF_CHANGE_IDLE) &&
-	    (hw->conf.flags & IEEE80211_CONF_IDLE))
+	    (hw->conf.flags & IEEE80211_CONF_IDLE) &&
+	    !test_bit(RTW_FLAG_SCANNING, rtwdev->flags))
 		rtw_enter_ips(rtwdev);
 
 out:
@@ -395,6 +396,10 @@ static void rtw_ops_bss_info_changed(struct ieee80211_hw *hw,
 	if (changed & BSS_CHANGED_BSSID) {
 		ether_addr_copy(rtwvif->bssid, conf->bssid);
 		config |= PORT_SET_BSSID;
+		if (is_zero_ether_addr(rtwvif->bssid))
+			rtw_clear_op_chan(rtwdev);
+		else
+			rtw_store_op_chan(rtwdev, true);
 	}
 
 	if (changed & BSS_CHANGED_BEACON_INT) {
@@ -434,7 +439,11 @@ static int rtw_ops_start_ap(struct ieee80211_hw *hw,
 			    struct ieee80211_bss_conf *link_conf)
 {
 	struct rtw_dev *rtwdev = hw->priv;
+<<<<<<< HEAD
+	const struct rtw_chip_info *chip = rtwdev->chip;
+=======
 	struct rtw_chip_info *chip = rtwdev->chip;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mutex_lock(&rtwdev->mutex);
 	chip->ops->phy_calibration(rtwdev);
@@ -752,7 +761,7 @@ static int rtw_ops_set_antenna(struct ieee80211_hw *hw,
 			       u32 rx_antenna)
 {
 	struct rtw_dev *rtwdev = hw->priv;
-	struct rtw_chip_info *chip = rtwdev->chip;
+	const struct rtw_chip_info *chip = rtwdev->chip;
 	int ret;
 
 	if (!chip->ops->set_antenna)
@@ -872,7 +881,13 @@ static int rtw_ops_set_sar_specs(struct ieee80211_hw *hw,
 {
 	struct rtw_dev *rtwdev = hw->priv;
 
+<<<<<<< HEAD
+	mutex_lock(&rtwdev->mutex);
 	rtw_set_sar_specs(rtwdev, sar);
+	mutex_unlock(&rtwdev->mutex);
+=======
+	rtw_set_sar_specs(rtwdev, sar);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

@@ -1,6 +1,10 @@
 # SPDX-License-Identifier: GPL-2.0-only
 /asn1_compiler
 /bin2c
+<<<<<<< HEAD
+/generate_rust_target
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /insert-sys-cert
 /kallsyms
 /module.lds

@@ -13,7 +13,14 @@
 #include "test_signals_utils.h"
 #include "testcases.h"
 
+<<<<<<< HEAD
+static union {
+	ucontext_t uc;
+	char buf[1024 * 64];
+} context;
+=======
 struct fake_sigframe sf;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static unsigned int vls[SVE_VQ_MAX];
 unsigned int nvls = 0;
 
@@ -55,8 +62,13 @@ static void setup_ssve_regs(void)
 static int do_one_sme_vl(struct tdescr *td, siginfo_t *si, ucontext_t *uc,
 			 unsigned int vl)
 {
+<<<<<<< HEAD
+	size_t offset;
+	struct _aarch64_ctx *head = GET_BUF_RESV_HEAD(context);
+=======
 	size_t resv_sz, offset;
 	struct _aarch64_ctx *head = GET_SF_RESV_HEAD(sf);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sve_context *ssve;
 	int ret;
 
@@ -73,11 +85,19 @@ static int do_one_sme_vl(struct tdescr *td, siginfo_t *si, ucontext_t *uc,
 	 * in it.
 	 */
 	setup_ssve_regs();
+<<<<<<< HEAD
+	if (!get_current_context(td, &context.uc, sizeof(context)))
+		return 1;
+
+	head = get_header(head, SVE_MAGIC, GET_BUF_RESV_SIZE(context),
+			  &offset);
+=======
 	if (!get_current_context(td, &sf.uc))
 		return 1;
 
 	resv_sz = GET_SF_RESV_SIZE(sf);
 	head = get_header(head, SVE_MAGIC, resv_sz, &offset);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!head) {
 		fprintf(stderr, "No SVE context\n");
 		return 1;
@@ -101,6 +121,8 @@ static int sme_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 	int i;
 
 	for (i = 0; i < nvls; i++) {
+<<<<<<< HEAD
+=======
 		/*
 		 * TODO: the signal test helpers can't currently cope
 		 * with signal frames bigger than struct sigcontext,
@@ -111,6 +133,7 @@ static int sme_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 			continue;
 		}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (do_one_sme_vl(td, si, uc, vls[i]))
 			return 1;
 	}

@@ -89,7 +89,11 @@ struct fileIdentDesc *udf_fileident_read(struct inode *dir, loff_t *nf_pos,
 					brelse(tmp);
 			}
 			if (num) {
+<<<<<<< HEAD
+				bh_readahead_batch(num, bha, REQ_RAHEAD);
+=======
 				ll_rw_block(REQ_OP_READ | REQ_RAHEAD, num, bha);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				for (i = 0; i < num; i++)
 					brelse(bha[i]);
 			}

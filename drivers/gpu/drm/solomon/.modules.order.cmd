@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/solomon/modules.order := {   echo drivers/gpu/drm/solomon/ssd130x.ko;   echo drivers/gpu/drm/solomon/ssd130x-i2c.ko;   echo drivers/gpu/drm/solomon/ssd130x-spi.ko; :; } > drivers/gpu/drm/solomon/modules.order

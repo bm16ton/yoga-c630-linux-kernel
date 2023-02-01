@@ -13,6 +13,8 @@
 #include <asm/ppc_asm.h>
 #include <asm/ptrace.h>
 
+<<<<<<< HEAD
+=======
 	.section	".toc","aw"
 SYS_CALL_TABLE:
 	.tc sys_call_table[TC],sys_call_table
@@ -23,6 +25,7 @@ COMPAT_SYS_CALL_TABLE:
 #endif
 	.previous
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.align 7
 
 .macro DEBUG_SRR_VALID srr
@@ -67,6 +70,13 @@ _ASM_NOKPROBE_SYMBOL(system_call_vectored_\name)
 	std	r0,GPR0(r1)
 	std	r10,GPR1(r1)
 	std	r2,GPR2(r1)
+<<<<<<< HEAD
+	LOAD_PACA_TOC()
+	mfcr	r12
+	li	r11,0
+	/* Save syscall parameters in r3-r8 */
+	SAVE_GPRS(3, 8, r1)
+=======
 	ld	r2,PACATOC(r13)
 	mfcr	r12
 	li	r11,0
@@ -77,6 +87,7 @@ _ASM_NOKPROBE_SYMBOL(system_call_vectored_\name)
 	std	r6,GPR6(r1)
 	std	r7,GPR7(r1)
 	std	r8,GPR8(r1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Zero r9-r12, this should only be required when restoring all GPRs */
 	std	r11,GPR9(r1)
 	std	r11,GPR10(r1)
@@ -91,9 +102,18 @@ _ASM_NOKPROBE_SYMBOL(system_call_vectored_\name)
 	li	r11,\trapnr
 	std	r11,_TRAP(r1)
 	std	r12,_CCR(r1)
+<<<<<<< HEAD
+	std	r3,ORIG_GPR3(r1)
+	/* Calling convention has r3 = regs, r4 = orig r0 */
+	addi	r3,r1,STACK_FRAME_OVERHEAD
+	mr	r4,r0
+	LOAD_REG_IMMEDIATE(r11, STACK_FRAME_REGS_MARKER)
+	std	r11,-16(r3)		/* "regshere" marker */
+=======
 	addi	r10,r1,STACK_FRAME_OVERHEAD
 	ld	r11,exception_marker@toc(r2)
 	std	r11,-16(r10)		/* "regshere" marker */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 BEGIN_FTR_SECTION
 	HMT_MEDIUM
@@ -108,8 +128,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	 * but this is the best we can do.
 	 */
 
+<<<<<<< HEAD
+=======
 	/* Calling convention has r9 = orig r0, r10 = regs */
 	mr	r9,r0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bl	system_call_exception
 
 .Lsyscall_vectored_\name\()_exit:
@@ -148,6 +171,12 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	/* Could zero these as per ABI, but we may consider a stricter ABI
 	 * which preserves these if libc implementations can benefit, so
 	 * restore them for now until further measurement is done. */
+<<<<<<< HEAD
+	REST_GPR(0, r1)
+	REST_GPRS(4, 8, r1)
+	/* Zero volatile regs that may contain sensitive kernel data */
+	ZEROIZE_GPRS(9, 12)
+=======
 	ld	r0,GPR0(r1)
 	ld	r4,GPR4(r1)
 	ld	r5,GPR5(r1)
@@ -159,6 +188,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	li	r10,0
 	li	r11,0
 	li	r12,0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mtspr	SPRN_XER,r0
 
 	/*
@@ -181,7 +211,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	ld	r5,_XER(r1)
 
 	REST_NVGPRS(r1)
+<<<<<<< HEAD
+	REST_GPR(0, r1)
+=======
 	ld	r0,GPR0(r1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mtcr	r2
 	mtctr	r3
 	mtlr	r4
@@ -195,7 +229,11 @@ syscall_vectored_\name\()_restart:
 _ASM_NOKPROBE_SYMBOL(syscall_vectored_\name\()_restart)
 	GET_PACA(r13)
 	ld	r1,PACA_EXIT_SAVE_R1(r13)
+<<<<<<< HEAD
+	LOAD_PACA_TOC()
+=======
 	ld	r2,PACATOC(r13)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ld	r3,RESULT(r1)
 	addi	r4,r1,STACK_FRAME_OVERHEAD
 	li	r11,IRQS_ALL_DISABLED
@@ -240,11 +278,22 @@ _ASM_NOKPROBE_SYMBOL(system_call_common)
 	std	r0,GPR0(r1)
 	std	r10,GPR1(r1)
 	std	r2,GPR2(r1)
+<<<<<<< HEAD
+#ifdef CONFIG_PPC_E500
+=======
 #ifdef CONFIG_PPC_FSL_BOOK3E
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 START_BTB_FLUSH_SECTION
 	BTB_FLUSH(r10)
 END_BTB_FLUSH_SECTION
 #endif
+<<<<<<< HEAD
+	LOAD_PACA_TOC()
+	mfcr	r12
+	li	r11,0
+	/* Save syscall parameters in r3-r8 */
+	SAVE_GPRS(3, 8, r1)
+=======
 	ld	r2,PACATOC(r13)
 	mfcr	r12
 	li	r11,0
@@ -255,6 +304,7 @@ END_BTB_FLUSH_SECTION
 	std	r6,GPR6(r1)
 	std	r7,GPR7(r1)
 	std	r8,GPR8(r1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Zero r9-r12, this should only be required when restoring all GPRs */
 	std	r11,GPR9(r1)
 	std	r11,GPR10(r1)
@@ -275,9 +325,18 @@ END_BTB_FLUSH_SECTION
 	std	r10,_LINK(r1)
 	std	r11,_TRAP(r1)
 	std	r12,_CCR(r1)
+<<<<<<< HEAD
+	std	r3,ORIG_GPR3(r1)
+	/* Calling convention has r3 = regs, r4 = orig r0 */
+	addi	r3,r1,STACK_FRAME_OVERHEAD
+	mr	r4,r0
+	LOAD_REG_IMMEDIATE(r11, STACK_FRAME_REGS_MARKER)
+	std	r11,-16(r3)		/* "regshere" marker */
+=======
 	addi	r10,r1,STACK_FRAME_OVERHEAD
 	ld	r11,exception_marker@toc(r2)
 	std	r11,-16(r10)		/* "regshere" marker */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_PPC_BOOK3S
 	li	r11,1
@@ -298,8 +357,11 @@ END_BTB_FLUSH_SECTION
 	wrteei	1
 #endif
 
+<<<<<<< HEAD
+=======
 	/* Calling convention has r9 = orig r0, r10 = regs */
 	mr	r9,r0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bl	system_call_exception
 
 .Lsyscall_exit:
@@ -343,6 +405,10 @@ END_FTR_SECTION_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	cmpdi	r3,0
 	bne	.Lsyscall_restore_regs
 	/* Zero volatile regs that may contain sensitive kernel data */
+<<<<<<< HEAD
+	ZEROIZE_GPR(0)
+	ZEROIZE_GPRS(4, 12)
+=======
 	li	r0,0
 	li	r4,0
 	li	r5,0
@@ -353,6 +419,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	li	r10,0
 	li	r11,0
 	li	r12,0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mtctr	r0
 	mtspr	SPRN_XER,r0
 .Lsyscall_restore_regs_cont:
@@ -378,7 +445,11 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	REST_NVGPRS(r1)
 	mtctr	r3
 	mtspr	SPRN_XER,r4
+<<<<<<< HEAD
+	REST_GPR(0, r1)
+=======
 	ld	r0,GPR0(r1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	REST_GPRS(4, 12, r1)
 	b	.Lsyscall_restore_regs_cont
 .Lsyscall_rst_end:
@@ -388,7 +459,11 @@ syscall_restart:
 _ASM_NOKPROBE_SYMBOL(syscall_restart)
 	GET_PACA(r13)
 	ld	r1,PACA_EXIT_SAVE_R1(r13)
+<<<<<<< HEAD
+	LOAD_PACA_TOC()
+=======
 	ld	r2,PACATOC(r13)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ld	r3,RESULT(r1)
 	addi	r4,r1,STACK_FRAME_OVERHEAD
 	li	r11,IRQS_ALL_DISABLED
@@ -535,7 +610,11 @@ interrupt_return_\srr\()_user_restart:
 _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\()_user_restart)
 	GET_PACA(r13)
 	ld	r1,PACA_EXIT_SAVE_R1(r13)
+<<<<<<< HEAD
+	LOAD_PACA_TOC()
+=======
 	ld	r2,PACATOC(r13)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	addi	r3,r1,STACK_FRAME_OVERHEAD
 	li	r11,IRQS_ALL_DISABLED
 	stb	r11,PACAIRQSOFTMASK(r13)
@@ -667,7 +746,11 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	mtspr	SPRN_XER,r5
 
 	/*
+<<<<<<< HEAD
+	 * Leaving a stale STACK_FRAME_REGS_MARKER on the stack can confuse
+=======
 	 * Leaving a stale exception_marker on the stack can confuse
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * the reliable stack unwinder later on. Clear it.
 	 */
 	std	r0,STACK_FRAME_OVERHEAD-16(r1)
@@ -716,7 +799,11 @@ interrupt_return_\srr\()_kernel_restart:
 _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\()_kernel_restart)
 	GET_PACA(r13)
 	ld	r1,PACA_EXIT_SAVE_R1(r13)
+<<<<<<< HEAD
+	LOAD_PACA_TOC()
+=======
 	ld	r2,PACATOC(r13)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	addi	r3,r1,STACK_FRAME_OVERHEAD
 	li	r11,IRQS_ALL_DISABLED
 	stb	r11,PACAIRQSOFTMASK(r13)

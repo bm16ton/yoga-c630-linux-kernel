@@ -21,6 +21,21 @@ static inline bool is_shared_processor(void)
 	return static_branch_unlikely(&shared_processor);
 }
 
+<<<<<<< HEAD
+#ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
+extern struct static_key paravirt_steal_enabled;
+extern struct static_key paravirt_steal_rq_enabled;
+
+u64 pseries_paravirt_steal_clock(int cpu);
+
+static inline u64 paravirt_steal_clock(int cpu)
+{
+	return pseries_paravirt_steal_clock(cpu);
+}
+#endif
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* If bit 0 is set, the cpu has been ceded, conferred, or preempted */
 static inline u32 yield_count_of(int cpu)
 {
@@ -111,6 +126,7 @@ static inline bool vcpu_is_preempted(int cpu)
 #ifdef CONFIG_PPC_SPLPAR
 	if (!is_kvm_guest()) {
 		int first_cpu;
+<<<<<<< HEAD
 
 		/*
 		 * The result of vcpu_is_preempted() is used in a
@@ -129,6 +145,26 @@ static inline bool vcpu_is_preempted(int cpu)
 		first_cpu = cpu_first_thread_sibling(raw_smp_processor_id());
 
 		/*
+=======
+
+		/*
+		 * The result of vcpu_is_preempted() is used in a
+		 * speculative way, and is always subject to invalidation
+		 * by events internal and external to Linux. While we can
+		 * be called in preemptable context (in the Linux sense),
+		 * we're not accessing per-cpu resources in a way that can
+		 * race destructively with Linux scheduler preemption and
+		 * migration, and callers can tolerate the potential for
+		 * error introduced by sampling the CPU index without
+		 * pinning the task to it. So it is permissible to use
+		 * raw_smp_processor_id() here to defeat the preempt debug
+		 * warnings that can arise from using smp_processor_id()
+		 * in arbitrary contexts.
+		 */
+		first_cpu = cpu_first_thread_sibling(raw_smp_processor_id());
+
+		/*
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		 * The PowerVM hypervisor dispatches VMs on a whole core
 		 * basis. So we know that a thread sibling of the local CPU
 		 * cannot have been preempted by the hypervisor, even if it

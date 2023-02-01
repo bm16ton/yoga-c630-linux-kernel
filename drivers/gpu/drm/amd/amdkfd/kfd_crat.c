@@ -1624,6 +1624,10 @@ static int kfd_fill_gpu_cache_info(struct kfd_dev *kdev,
 		case IP_VERSION(11, 0, 0):
 		case IP_VERSION(11, 0, 1):
 		case IP_VERSION(11, 0, 2):
+<<<<<<< HEAD
+		case IP_VERSION(11, 0, 3):
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			pcache_info = cache_info;
 			num_of_cache_types =
 				kfd_fill_gpu_cache_info_from_gfx_config(kdev, pcache_info);
@@ -2385,7 +2389,7 @@ static int kfd_create_vcrat_image_gpu(void *pcrat_image,
 
 	/* Fill in Subtype: IO_LINKS
 	 *  Only direct links are added here which is Link from GPU to
-	 *  to its NUMA node. Indirect links are added by userspace.
+	 *  its NUMA node. Indirect links are added by userspace.
 	 */
 	sub_type_hdr = (typeof(sub_type_hdr))((char *)sub_type_hdr +
 		cache_mem_filled);

@@ -1,0 +1,17 @@
+!<thin>
+//                                              136       `
+core/ufshcd.o/
+core/ufs-sysfs.o/
+core/ufs-debugfs.o/
+core/ufshcd-crypto.o/
+host/ufs-qcom.o/
+host/ufs-qcom-ice.o/
+host/ufshcd-pltfrm.o/
+
+/0              0           0     0     644     254136    `
+/15             0           0     0     644     110640    `
+/33             0           0     0     644     12840     `
+/53             0           0     0     644     7192      `
+/75             0           0     0     644     31872     `
+/92             0           0     0     644     5664      `
+/113            0           0     0     644     12656     `

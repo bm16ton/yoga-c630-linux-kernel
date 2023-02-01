@@ -24,9 +24,38 @@ TRACE_EVENT(ufs_mtk_event,
 		__entry->data = data;
 	),
 
+<<<<<<< HEAD
+	TP_printk("ufs: event=%u data=%u",
+		  __entry->type, __entry->data)
+);
+
+TRACE_EVENT(ufs_mtk_clk_scale,
+	TP_PROTO(const char *name, bool scale_up, unsigned long clk_rate),
+	TP_ARGS(name, scale_up, clk_rate),
+
+	TP_STRUCT__entry(
+		__field(const char*, name)
+		__field(bool, scale_up)
+		__field(unsigned long, clk_rate)
+	),
+
+	TP_fast_assign(
+		__entry->name = name;
+		__entry->scale_up = scale_up;
+		__entry->clk_rate = clk_rate;
+	),
+
+	TP_printk("ufs: clk (%s) scaled %s @ %lu",
+		  __entry->name,
+		  __entry->scale_up ? "up" : "down",
+		  __entry->clk_rate)
+);
+
+=======
 	TP_printk("ufs:event=%u data=%u",
 		  __entry->type, __entry->data)
 	);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #undef TRACE_INCLUDE_PATH

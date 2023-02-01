@@ -1,0 +1,2 @@
+drivers/scsi/aic7xxx/aic7xxx.ko
+drivers/scsi/aic7xxx/aic79xx.ko

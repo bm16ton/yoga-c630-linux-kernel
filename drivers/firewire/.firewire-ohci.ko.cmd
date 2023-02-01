@@ -1,0 +1,1 @@
+cmd_drivers/firewire/firewire-ohci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/firewire/firewire-ohci.ko drivers/firewire/firewire-ohci.o drivers/firewire/firewire-ohci.mod.o;  true

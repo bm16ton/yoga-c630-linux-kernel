@@ -1,0 +1,1 @@
+cmd_sound/usb/line6/snd-usb-toneport.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/usb/line6/snd-usb-toneport.ko sound/usb/line6/snd-usb-toneport.o sound/usb/line6/snd-usb-toneport.mod.o;  true

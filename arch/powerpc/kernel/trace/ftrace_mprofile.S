@@ -83,10 +83,15 @@
 #ifdef CONFIG_PPC64
 	/* Save callee's TOC in the ABI compliant location */
 	std	r2, STK_GOT(r1)
+<<<<<<< HEAD
+	LOAD_PACA_TOC()		/* get kernel TOC in r2 */
+	LOAD_REG_ADDR(r3, function_trace_op)
+=======
 	ld	r2,PACATOC(r13)	/* get kernel TOC in r2 */
 
 	addis	r3,r2,function_trace_op@toc@ha
 	addi	r3,r3,function_trace_op@toc@l
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ld	r5,0(r3)
 #else
 	lis	r3,function_trace_op@ha

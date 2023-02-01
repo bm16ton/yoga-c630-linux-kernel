@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/socionext/netsec.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/socionext/netsec.ko drivers/net/ethernet/socionext/netsec.o drivers/net/ethernet/socionext/netsec.mod.o;  true

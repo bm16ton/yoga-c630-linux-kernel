@@ -52,7 +52,10 @@ properties:
     minItems: 1
     maxItems: 8
     items:
+<<<<<<< HEAD
+=======
       minItems: 2
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
       maxItems: 2
 
   calxeda,tx-atten:

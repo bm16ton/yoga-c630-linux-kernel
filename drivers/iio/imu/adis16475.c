@@ -270,6 +270,7 @@ static int adis16475_get_freq(struct adis16475 *st, u32 *freq)
 		ret = __adis_read_reg_16(&st->adis, ADIS16475_REG_UP_SCALE, &sync_scale);
 		if (ret)
 			goto error;
+<<<<<<< HEAD
 
 		sample_rate = st->clk_freq * sync_scale;
 	}
@@ -280,6 +281,18 @@ static int adis16475_get_freq(struct adis16475 *st, u32 *freq)
 
 	adis_dev_unlock(&st->adis);
 
+=======
+
+		sample_rate = st->clk_freq * sync_scale;
+	}
+
+	ret = __adis_read_reg_16(&st->adis, ADIS16475_REG_DEC_RATE, &dec);
+	if (ret)
+		goto error;
+
+	adis_dev_unlock(&st->adis);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	*freq = DIV_ROUND_CLOSEST(sample_rate, dec + 1);
 
 	return 0;
@@ -1120,11 +1133,6 @@ check_burst32:
 	return IRQ_HANDLED;
 }
 
-static void adis16475_disable_clk(void *data)
-{
-	clk_disable_unprepare((struct clk *)data);
-}
-
 static int adis16475_config_sync_mode(struct adis16475 *st)
 {
 	int ret;
@@ -1150,18 +1158,10 @@ static int adis16475_config_sync_mode(struct adis16475 *st)
 
 	/* All the other modes require external input signal */
 	if (sync->sync_mode != ADIS16475_SYNC_OUTPUT) {
-		struct clk *clk = devm_clk_get(dev, NULL);
+		struct clk *clk = devm_clk_get_enabled(dev, NULL);
 
 		if (IS_ERR(clk))
 			return PTR_ERR(clk);
-
-		ret = clk_prepare_enable(clk);
-		if (ret)
-			return ret;
-
-		ret = devm_add_action_or_reset(dev, adis16475_disable_clk, clk);
-		if (ret)
-			return ret;
 
 		st->clk_freq = clk_get_rate(clk);
 		if (st->clk_freq < sync->min_rate ||

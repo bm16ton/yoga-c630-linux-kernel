@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/bmi088-accel-core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/bmi088-accel-core.ko drivers/iio/accel/bmi088-accel-core.o drivers/iio/accel/bmi088-accel-core.mod.o;  true

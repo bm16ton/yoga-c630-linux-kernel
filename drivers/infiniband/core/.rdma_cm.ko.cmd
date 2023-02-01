@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/core/rdma_cm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/infiniband/core/rdma_cm.ko drivers/infiniband/core/rdma_cm.o drivers/infiniband/core/rdma_cm.mod.o;  true

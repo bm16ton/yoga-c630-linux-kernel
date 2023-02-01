@@ -559,6 +559,11 @@ static int mdp5_kms_init(struct drm_device *dev)
 	int irq, i, ret;
 
 	ret = mdp5_init(to_platform_device(dev->dev), dev);
+<<<<<<< HEAD
+	if (ret)
+		return ret;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* priv->kms would have been populated by the MDP5 driver */
 	kms = priv->kms;
@@ -836,6 +841,9 @@ static int mdp5_init(struct platform_device *pdev, struct drm_device *dev)
 	 */
 	clk_set_rate(mdp5_kms->core_clk, 200000000);
 
+	/* set uninit-ed kms */
+	priv->kms = &mdp5_kms->base.base;
+
 	pm_runtime_enable(&pdev->dev);
 	mdp5_kms->rpm_enabled = true;
 
@@ -886,9 +894,6 @@ static int mdp5_init(struct platform_device *pdev, struct drm_device *dev)
 	ret = interface_init(mdp5_kms);
 	if (ret)
 		goto fail;
-
-	/* set uninit-ed kms */
-	priv->kms = &mdp5_kms->base.base;
 
 	return 0;
 fail:

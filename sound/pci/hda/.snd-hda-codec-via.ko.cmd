@@ -1,0 +1,1 @@
+cmd_sound/pci/hda/snd-hda-codec-via.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/hda/snd-hda-codec-via.ko sound/pci/hda/snd-hda-codec-via.o sound/pci/hda/snd-hda-codec-via.mod.o;  true

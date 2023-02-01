@@ -65,14 +65,38 @@ void send_event(struct v4l2_fh *fh, struct v4l2_ctrl *ctrl, u32 changes)
 			v4l2_event_queue_fh(sev->fh, &ev);
 }
 
+<<<<<<< HEAD
+bool v4l2_ctrl_type_op_equal(const struct v4l2_ctrl *ctrl,
+			     union v4l2_ctrl_ptr ptr1, union v4l2_ctrl_ptr ptr2)
+{
+	unsigned int i;
+
+=======
 static bool std_equal(const struct v4l2_ctrl *ctrl, u32 idx,
 		      union v4l2_ctrl_ptr ptr1,
 		      union v4l2_ctrl_ptr ptr2)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	switch (ctrl->type) {
 	case V4L2_CTRL_TYPE_BUTTON:
 		return false;
 	case V4L2_CTRL_TYPE_STRING:
+<<<<<<< HEAD
+		for (i = 0; i < ctrl->elems; i++) {
+			unsigned int idx = i * ctrl->elem_size;
+
+			/* strings are always 0-terminated */
+			if (strcmp(ptr1.p_char + idx, ptr2.p_char + idx))
+				return false;
+		}
+		return true;
+	default:
+		return !memcmp(ptr1.p_const, ptr2.p_const,
+			       ctrl->elems * ctrl->elem_size);
+	}
+}
+EXPORT_SYMBOL(v4l2_ctrl_type_op_equal);
+=======
 		idx *= ctrl->elem_size;
 		/* strings are always 0-terminated */
 		return !strcmp(ptr1.p_char + idx, ptr2.p_char + idx);
@@ -92,6 +116,7 @@ static bool std_equal(const struct v4l2_ctrl *ctrl, u32 idx,
 			       ctrl->elem_size);
 	}
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* Default intra MPEG-2 quantisation coefficients, from the specification. */
 static const u8 mpeg2_intra_quant_matrix[64] = {
@@ -181,6 +206,34 @@ static void std_init_compound(const struct v4l2_ctrl *ctrl, u32 idx,
 	}
 }
 
+<<<<<<< HEAD
+void v4l2_ctrl_type_op_init(const struct v4l2_ctrl *ctrl, u32 from_idx,
+			    union v4l2_ctrl_ptr ptr)
+{
+	unsigned int i;
+	u32 tot_elems = ctrl->elems;
+	u32 elems = tot_elems - from_idx;
+
+	if (from_idx >= tot_elems)
+		return;
+
+	switch (ctrl->type) {
+	case V4L2_CTRL_TYPE_STRING:
+		for (i = from_idx; i < tot_elems; i++) {
+			unsigned int offset = i * ctrl->elem_size;
+
+			memset(ptr.p_char + offset, ' ', ctrl->minimum);
+			ptr.p_char[offset + ctrl->minimum] = '\0';
+		}
+		break;
+	case V4L2_CTRL_TYPE_INTEGER64:
+		if (ctrl->default_value) {
+			for (i = from_idx; i < tot_elems; i++)
+				ptr.p_s64[i] = ctrl->default_value;
+		} else {
+			memset(ptr.p_s64 + from_idx, 0, elems * sizeof(s64));
+		}
+=======
 static void std_init(const struct v4l2_ctrl *ctrl, u32 idx,
 		     union v4l2_ctrl_ptr ptr)
 {
@@ -192,12 +245,54 @@ static void std_init(const struct v4l2_ctrl *ctrl, u32 idx,
 		break;
 	case V4L2_CTRL_TYPE_INTEGER64:
 		ptr.p_s64[idx] = ctrl->default_value;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case V4L2_CTRL_TYPE_INTEGER:
 	case V4L2_CTRL_TYPE_INTEGER_MENU:
 	case V4L2_CTRL_TYPE_MENU:
 	case V4L2_CTRL_TYPE_BITMASK:
 	case V4L2_CTRL_TYPE_BOOLEAN:
+<<<<<<< HEAD
+		if (ctrl->default_value) {
+			for (i = from_idx; i < tot_elems; i++)
+				ptr.p_s32[i] = ctrl->default_value;
+		} else {
+			memset(ptr.p_s32 + from_idx, 0, elems * sizeof(s32));
+		}
+		break;
+	case V4L2_CTRL_TYPE_BUTTON:
+	case V4L2_CTRL_TYPE_CTRL_CLASS:
+		memset(ptr.p_s32 + from_idx, 0, elems * sizeof(s32));
+		break;
+	case V4L2_CTRL_TYPE_U8:
+		memset(ptr.p_u8 + from_idx, ctrl->default_value, elems);
+		break;
+	case V4L2_CTRL_TYPE_U16:
+		if (ctrl->default_value) {
+			for (i = from_idx; i < tot_elems; i++)
+				ptr.p_u16[i] = ctrl->default_value;
+		} else {
+			memset(ptr.p_u16 + from_idx, 0, elems * sizeof(u16));
+		}
+		break;
+	case V4L2_CTRL_TYPE_U32:
+		if (ctrl->default_value) {
+			for (i = from_idx; i < tot_elems; i++)
+				ptr.p_u32[i] = ctrl->default_value;
+		} else {
+			memset(ptr.p_u32 + from_idx, 0, elems * sizeof(u32));
+		}
+		break;
+	default:
+		for (i = from_idx; i < tot_elems; i++)
+			std_init_compound(ctrl, i, ptr);
+		break;
+	}
+}
+EXPORT_SYMBOL(v4l2_ctrl_type_op_init);
+
+void v4l2_ctrl_type_op_log(const struct v4l2_ctrl *ctrl)
+=======
 		ptr.p_s32[idx] = ctrl->default_value;
 		break;
 	case V4L2_CTRL_TYPE_BUTTON:
@@ -220,6 +315,7 @@ static void std_init(const struct v4l2_ctrl *ctrl, u32 idx,
 }
 
 static void std_log(const struct v4l2_ctrl *ctrl)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	union v4l2_ctrl_ptr ptr = ctrl->p_cur;
 
@@ -327,6 +423,10 @@ static void std_log(const struct v4l2_ctrl *ctrl)
 		break;
 	}
 }
+<<<<<<< HEAD
+EXPORT_SYMBOL(v4l2_ctrl_type_op_log);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Round towards the closest legal value. Be careful when we are
@@ -520,7 +620,12 @@ validate_vp9_frame(struct v4l2_ctrl_vp9_frame *frame)
 
 /*
  * Compound controls validation requires setting unused fields/flags to zero
+<<<<<<< HEAD
+ * in order to properly detect unchanged controls with v4l2_ctrl_type_op_equal's
+ * memcmp.
+=======
  * in order to properly detect unchanged controls with std_equal's memcmp.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 static int std_validate_compound(const struct v4l2_ctrl *ctrl, u32 idx,
 				 union v4l2_ctrl_ptr ptr)
@@ -895,8 +1000,13 @@ static int std_validate_compound(const struct v4l2_ctrl *ctrl, u32 idx,
 	return 0;
 }
 
+<<<<<<< HEAD
+static int std_validate_elem(const struct v4l2_ctrl *ctrl, u32 idx,
+			     union v4l2_ctrl_ptr ptr)
+=======
 static int std_validate(const struct v4l2_ctrl *ctrl, u32 idx,
 			union v4l2_ctrl_ptr ptr)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	size_t len;
 	u64 offset;
@@ -966,11 +1076,51 @@ static int std_validate(const struct v4l2_ctrl *ctrl, u32 idx,
 	}
 }
 
+<<<<<<< HEAD
+int v4l2_ctrl_type_op_validate(const struct v4l2_ctrl *ctrl,
+			       union v4l2_ctrl_ptr ptr)
+{
+	unsigned int i;
+	int ret = 0;
+
+	switch ((u32)ctrl->type) {
+	case V4L2_CTRL_TYPE_U8:
+		if (ctrl->maximum == 0xff && ctrl->minimum == 0 && ctrl->step == 1)
+			return 0;
+		break;
+	case V4L2_CTRL_TYPE_U16:
+		if (ctrl->maximum == 0xffff && ctrl->minimum == 0 && ctrl->step == 1)
+			return 0;
+		break;
+	case V4L2_CTRL_TYPE_U32:
+		if (ctrl->maximum == 0xffffffff && ctrl->minimum == 0 && ctrl->step == 1)
+			return 0;
+		break;
+
+	case V4L2_CTRL_TYPE_BUTTON:
+	case V4L2_CTRL_TYPE_CTRL_CLASS:
+		memset(ptr.p_s32, 0, ctrl->new_elems * sizeof(s32));
+		return 0;
+	}
+
+	for (i = 0; !ret && i < ctrl->new_elems; i++)
+		ret = std_validate_elem(ctrl, i, ptr);
+	return ret;
+}
+EXPORT_SYMBOL(v4l2_ctrl_type_op_validate);
+
+static const struct v4l2_ctrl_type_ops std_type_ops = {
+	.equal = v4l2_ctrl_type_op_equal,
+	.init = v4l2_ctrl_type_op_init,
+	.log = v4l2_ctrl_type_op_log,
+	.validate = v4l2_ctrl_type_op_validate,
+=======
 static const struct v4l2_ctrl_type_ops std_type_ops = {
 	.equal = std_equal,
 	.init = std_init,
 	.log = std_log,
 	.validate = std_validate,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 void v4l2_ctrl_notify(struct v4l2_ctrl *ctrl, v4l2_ctrl_notify_fnc notify, void *priv)
@@ -1048,16 +1198,36 @@ void cur_to_new(struct v4l2_ctrl *ctrl)
 	ptr_to_ptr(ctrl, ctrl->p_cur, ctrl->p_new, ctrl->new_elems);
 }
 
+<<<<<<< HEAD
+static bool req_alloc_array(struct v4l2_ctrl_ref *ref, u32 elems)
+{
+	void *tmp;
+
+	if (elems == ref->p_req_array_alloc_elems)
+		return true;
+	if (ref->ctrl->is_dyn_array &&
+	    elems < ref->p_req_array_alloc_elems)
+=======
 static bool req_alloc_dyn_array(struct v4l2_ctrl_ref *ref, u32 elems)
 {
 	void *tmp;
 
 	if (elems < ref->p_req_dyn_alloc_elems)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return true;
 
 	tmp = kvmalloc(elems * ref->ctrl->elem_size, GFP_KERNEL);
 
 	if (!tmp) {
+<<<<<<< HEAD
+		ref->p_req_array_enomem = true;
+		return false;
+	}
+	ref->p_req_array_enomem = false;
+	kvfree(ref->p_req.p);
+	ref->p_req.p = tmp;
+	ref->p_req_array_alloc_elems = elems;
+=======
 		ref->p_req_dyn_enomem = true;
 		return false;
 	}
@@ -1065,6 +1235,7 @@ static bool req_alloc_dyn_array(struct v4l2_ctrl_ref *ref, u32 elems)
 	kvfree(ref->p_req.p);
 	ref->p_req.p = tmp;
 	ref->p_req_dyn_alloc_elems = elems;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return true;
 }
 
@@ -1077,7 +1248,11 @@ void new_to_req(struct v4l2_ctrl_ref *ref)
 		return;
 
 	ctrl = ref->ctrl;
+<<<<<<< HEAD
+	if (ctrl->is_array && !req_alloc_array(ref, ctrl->new_elems))
+=======
 	if (ctrl->is_dyn_array && !req_alloc_dyn_array(ref, ctrl->new_elems))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	ref->p_req_elems = ctrl->new_elems;
@@ -1094,7 +1269,11 @@ void cur_to_req(struct v4l2_ctrl_ref *ref)
 		return;
 
 	ctrl = ref->ctrl;
+<<<<<<< HEAD
+	if (ctrl->is_array && !req_alloc_array(ref, ctrl->elems))
+=======
 	if (ctrl->is_dyn_array && !req_alloc_dyn_array(ref, ctrl->elems))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	ref->p_req_elems = ctrl->elems;
@@ -1123,18 +1302,41 @@ int req_to_new(struct v4l2_ctrl_ref *ref)
 		return 0;
 	}
 
+<<<<<<< HEAD
+	/* Not an array, so just copy the request value */
+	if (!ctrl->is_array) {
+=======
 	/* Not a dynamic array, so just copy the request value */
 	if (!ctrl->is_dyn_array) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ptr_to_ptr(ctrl, ref->p_req, ctrl->p_new, ctrl->new_elems);
 		return 0;
 	}
 
 	/* Sanity check, should never happen */
+<<<<<<< HEAD
+	if (WARN_ON(!ref->p_req_array_alloc_elems))
+		return -ENOMEM;
+
+	if (!ctrl->is_dyn_array &&
+	    ref->p_req_elems != ctrl->p_array_alloc_elems)
+=======
 	if (WARN_ON(!ref->p_req_dyn_alloc_elems))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -ENOMEM;
 
 	/*
 	 * Check if the number of elements in the request is more than the
+<<<<<<< HEAD
+	 * elements in ctrl->p_array. If so, attempt to realloc ctrl->p_array.
+	 * Note that p_array is allocated with twice the number of elements
+	 * in the dynamic array since it has to store both the current and
+	 * new value of such a control.
+	 */
+	if (ref->p_req_elems > ctrl->p_array_alloc_elems) {
+		unsigned int sz = ref->p_req_elems * ctrl->elem_size;
+		void *old = ctrl->p_array;
+=======
 	 * elements in ctrl->p_dyn. If so, attempt to realloc ctrl->p_dyn.
 	 * Note that p_dyn is allocated with twice the number of elements
 	 * in the dynamic array since it has to store both the current and
@@ -1143,6 +1345,7 @@ int req_to_new(struct v4l2_ctrl_ref *ref)
 	if (ref->p_req_elems > ctrl->p_dyn_alloc_elems) {
 		unsigned int sz = ref->p_req_elems * ctrl->elem_size;
 		void *old = ctrl->p_dyn;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		void *tmp = kvzalloc(2 * sz, GFP_KERNEL);
 
 		if (!tmp)
@@ -1151,8 +1354,13 @@ int req_to_new(struct v4l2_ctrl_ref *ref)
 		memcpy(tmp + sz, ctrl->p_cur.p, ctrl->elems * ctrl->elem_size);
 		ctrl->p_new.p = tmp;
 		ctrl->p_cur.p = tmp + sz;
+<<<<<<< HEAD
+		ctrl->p_array = tmp;
+		ctrl->p_array_alloc_elems = ref->p_req_elems;
+=======
 		ctrl->p_dyn = tmp;
 		ctrl->p_dyn_alloc_elems = ref->p_req_elems;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kvfree(old);
 	}
 
@@ -1243,7 +1451,11 @@ void v4l2_ctrl_handler_free(struct v4l2_ctrl_handler *hdl)
 	/* Free all nodes */
 	list_for_each_entry_safe(ref, next_ref, &hdl->ctrl_refs, node) {
 		list_del(&ref->node);
+<<<<<<< HEAD
+		if (ref->p_req_array_alloc_elems)
+=======
 		if (ref->p_req_dyn_alloc_elems)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			kvfree(ref->p_req.p);
 		kfree(ref);
 	}
@@ -1252,7 +1464,11 @@ void v4l2_ctrl_handler_free(struct v4l2_ctrl_handler *hdl)
 		list_del(&ctrl->node);
 		list_for_each_entry_safe(sev, next_sev, &ctrl->ev_subs, node)
 			list_del(&sev->node);
+<<<<<<< HEAD
+		kvfree(ctrl->p_array);
+=======
 		kvfree(ctrl->p_dyn);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kvfree(ctrl);
 	}
 	kvfree(hdl->buckets);
@@ -1368,7 +1584,11 @@ int handler_new_ref(struct v4l2_ctrl_handler *hdl,
 	if (hdl->error)
 		return hdl->error;
 
+<<<<<<< HEAD
+	if (allocate_req && !ctrl->is_array)
+=======
 	if (allocate_req && !ctrl->is_dyn_array)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		size_extra_req = ctrl->elems * ctrl->elem_size;
 	new_ref = kzalloc(sizeof(*new_ref) + size_extra_req, GFP_KERNEL);
 	if (!new_ref)
@@ -1442,7 +1662,10 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
 	unsigned elems = 1;
 	bool is_array;
 	unsigned tot_ctrl_size;
+<<<<<<< HEAD
+=======
 	unsigned idx;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	void *data;
 	int err;
 
@@ -1584,11 +1807,18 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
 			V4L2_CTRL_FLAG_EXECUTE_ON_WRITE;
 	else if (type == V4L2_CTRL_TYPE_CTRL_CLASS)
 		flags |= V4L2_CTRL_FLAG_READ_ONLY;
+<<<<<<< HEAD
+	else if (!is_array &&
+		 (type == V4L2_CTRL_TYPE_INTEGER64 ||
+		  type == V4L2_CTRL_TYPE_STRING ||
+		  type >= V4L2_CTRL_COMPOUND_TYPES))
+=======
 	else if (!(flags & V4L2_CTRL_FLAG_DYNAMIC_ARRAY) &&
 		 (type == V4L2_CTRL_TYPE_INTEGER64 ||
 		  type == V4L2_CTRL_TYPE_STRING ||
 		  type >= V4L2_CTRL_COMPOUND_TYPES ||
 		  is_array))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		sz_extra += 2 * tot_ctrl_size;
 
 	if (type >= V4L2_CTRL_COMPOUND_TYPES && p_def.p_const)
@@ -1632,6 +1862,16 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
 	ctrl->cur.val = ctrl->val = def;
 	data = &ctrl[1];
 
+<<<<<<< HEAD
+	if (ctrl->is_array) {
+		ctrl->p_array_alloc_elems = elems;
+		ctrl->p_array = kvzalloc(2 * elems * elem_size, GFP_KERNEL);
+		if (!ctrl->p_array) {
+			kvfree(ctrl);
+			return NULL;
+		}
+		data = ctrl->p_array;
+=======
 	if (ctrl->is_dyn_array) {
 		ctrl->p_dyn_alloc_elems = elems;
 		ctrl->p_dyn = kvzalloc(2 * elems * elem_size, GFP_KERNEL);
@@ -1640,6 +1880,7 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
 			return NULL;
 		}
 		data = ctrl->p_dyn;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (!ctrl->is_int) {
@@ -1651,13 +1892,24 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
 	}
 
 	if (type >= V4L2_CTRL_COMPOUND_TYPES && p_def.p_const) {
+<<<<<<< HEAD
+		if (ctrl->is_array)
+=======
 		if (ctrl->is_dyn_array)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ctrl->p_def.p = &ctrl[1];
 		else
 			ctrl->p_def.p = ctrl->p_cur.p + tot_ctrl_size;
 		memcpy(ctrl->p_def.p, p_def.p_const, elem_size);
 	}
 
+<<<<<<< HEAD
+	ctrl->type_ops->init(ctrl, 0, ctrl->p_cur);
+	cur_to_new(ctrl);
+
+	if (handler_new_ref(hdl, ctrl, NULL, false, false)) {
+		kvfree(ctrl->p_array);
+=======
 	for (idx = 0; idx < elems; idx++) {
 		ctrl->type_ops->init(ctrl, idx, ctrl->p_cur);
 		ctrl->type_ops->init(ctrl, idx, ctrl->p_new);
@@ -1665,6 +1917,7 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
 
 	if (handler_new_ref(hdl, ctrl, NULL, false, false)) {
 		kvfree(ctrl->p_dyn);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kvfree(ctrl);
 		return NULL;
 	}
@@ -1762,7 +2015,11 @@ struct v4l2_ctrl *v4l2_ctrl_new_std_menu(struct v4l2_ctrl_handler *hdl,
 	else if (type == V4L2_CTRL_TYPE_INTEGER_MENU)
 		qmenu_int = v4l2_ctrl_get_int_menu(id, &qmenu_int_len);
 
+<<<<<<< HEAD
+	if ((!qmenu && !qmenu_int) || (qmenu_int && max >= qmenu_int_len)) {
+=======
 	if ((!qmenu && !qmenu_int) || (qmenu_int && max > qmenu_int_len)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		handler_set_err(hdl, -EINVAL);
 		return NULL;
 	}
@@ -1978,7 +2235,10 @@ void update_from_auto_cluster(struct v4l2_ctrl *master)
 static int cluster_changed(struct v4l2_ctrl *master)
 {
 	bool changed = false;
+<<<<<<< HEAD
+=======
 	unsigned int idx;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int i;
 
 	for (i = 0; i < master->ncontrols; i++) {
@@ -2004,9 +2264,14 @@ static int cluster_changed(struct v4l2_ctrl *master)
 
 		if (ctrl->elems != ctrl->new_elems)
 			ctrl_changed = true;
+<<<<<<< HEAD
+		if (!ctrl_changed)
+			ctrl_changed = !ctrl->type_ops->equal(ctrl,
+=======
 
 		for (idx = 0; !ctrl_changed && idx < ctrl->elems; idx++)
 			ctrl_changed = !ctrl->type_ops->equal(ctrl, idx,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				ctrl->p_cur, ctrl->p_new);
 		ctrl->has_changed = ctrl_changed;
 		changed |= ctrl->has_changed;

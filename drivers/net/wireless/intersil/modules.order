@@ -1,0 +1,6 @@
+drivers/net/wireless/intersil/hostap/hostap.ko
+drivers/net/wireless/intersil/hostap/hostap_plx.ko
+drivers/net/wireless/intersil/hostap/hostap_pci.ko
+drivers/net/wireless/intersil/p54/p54common.ko
+drivers/net/wireless/intersil/p54/p54usb.ko
+drivers/net/wireless/intersil/p54/p54pci.ko

@@ -911,7 +911,12 @@ static struct snd_soc_dai_driver fsl_xcvr_dai = {
 };
 
 static const struct snd_soc_component_driver fsl_xcvr_comp = {
+<<<<<<< HEAD
+	.name			= "fsl-xcvr-dai",
+	.legacy_dai_naming	= 1,
+=======
 	.name = "fsl-xcvr-dai",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct reg_default fsl_xcvr_reg_defaults[] = {
@@ -1228,6 +1233,10 @@ static int fsl_xcvr_probe(struct platform_device *pdev)
 	 */
 	ret = devm_snd_dmaengine_pcm_register(dev, NULL, 0);
 	if (ret) {
+<<<<<<< HEAD
+		pm_runtime_disable(dev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(dev, "failed to pcm register\n");
 		return ret;
 	}
@@ -1235,6 +1244,10 @@ static int fsl_xcvr_probe(struct platform_device *pdev)
 	ret = devm_snd_soc_register_component(dev, &fsl_xcvr_comp,
 					      &fsl_xcvr_dai, 1);
 	if (ret) {
+<<<<<<< HEAD
+		pm_runtime_disable(dev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dev_err(dev, "failed to register component %s\n",
 			fsl_xcvr_comp.name);
 	}
@@ -1242,6 +1255,15 @@ static int fsl_xcvr_probe(struct platform_device *pdev)
 	return ret;
 }
 
+<<<<<<< HEAD
+static int fsl_xcvr_remove(struct platform_device *pdev)
+{
+	pm_runtime_disable(&pdev->dev);
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static __maybe_unused int fsl_xcvr_runtime_suspend(struct device *dev)
 {
 	struct fsl_xcvr *xcvr = dev_get_drvdata(dev);
@@ -1370,6 +1392,10 @@ static struct platform_driver fsl_xcvr_driver = {
 		.pm = &fsl_xcvr_pm_ops,
 		.of_match_table = fsl_xcvr_dt_ids,
 	},
+<<<<<<< HEAD
+	.remove = fsl_xcvr_remove,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 module_platform_driver(fsl_xcvr_driver);
 

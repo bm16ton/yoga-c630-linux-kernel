@@ -235,6 +235,10 @@ xfs_rmap_get_rec(
 			goto out_bad_rec;
 	} else {
 		/* check for valid extent range, including overflow */
+<<<<<<< HEAD
+		if (!xfs_verify_agbext(pag, irec->rm_startblock,
+					    irec->rm_blockcount))
+=======
 		if (!xfs_verify_agbno(pag, irec->rm_startblock))
 			goto out_bad_rec;
 		if (irec->rm_startblock >
@@ -242,6 +246,7 @@ xfs_rmap_get_rec(
 			goto out_bad_rec;
 		if (!xfs_verify_agbno(pag,
 				irec->rm_startblock + irec->rm_blockcount - 1))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			goto out_bad_rec;
 	}
 

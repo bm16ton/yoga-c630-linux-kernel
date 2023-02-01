@@ -43,8 +43,12 @@ static const struct of_device_id drv_name##_irqchip_match_table[] = {
 
 #define IRQCHIP_MATCH(compat, fn) { .compatible = compat,		\
 				    .data = typecheck_irq_init_cb(fn), },
+<<<<<<< HEAD
 
-#define IRQCHIP_PLATFORM_DRIVER_END(drv_name)				\
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+
+#define IRQCHIP_PLATFORM_DRIVER_END(drv_name, ...)			\
 	{},								\
 };									\
 MODULE_DEVICE_TABLE(of, drv_name##_irqchip_match_table);		\
@@ -56,6 +60,7 @@ static struct platform_driver drv_name##_driver = {			\
 		.owner = THIS_MODULE,					\
 		.of_match_table = drv_name##_irqchip_match_table,	\
 		.suppress_bind_attrs = true,				\
+		__VA_ARGS__						\
 	},								\
 };									\
 builtin_platform_driver(drv_name##_driver)

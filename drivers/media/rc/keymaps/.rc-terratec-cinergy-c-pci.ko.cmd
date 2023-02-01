@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-terratec-cinergy-c-pci.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-terratec-cinergy-c-pci.ko drivers/media/rc/keymaps/rc-terratec-cinergy-c-pci.o drivers/media/rc/keymaps/rc-terratec-cinergy-c-pci.mod.o;  true

@@ -205,9 +205,14 @@ found:
 }
 
 /**
+<<<<<<< HEAD
+ * qcom_scm_call() - Invoke a syscall in the secure world
+ * @dev:	device
+=======
  * __qcom_scm_call() - Invoke a syscall in the secure world
  * @dev:	Device. Depending on the command and number of arguments, this
  *		is optional.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @desc:	Descriptor structure containing arguments and return values
  * @res:        Structure containing results from SMC/HVC call
  *
@@ -252,8 +257,12 @@ EXPORT_SYMBOL_GPL(qcom_scm_call);
 
 /**
  * qcom_scm_call_atomic() - atomic variation of qcom_scm_call()
+<<<<<<< HEAD
+ * @dev:	device
+=======
  * @dev:	Device. Depending on the command and number of arguments, this
  *		is optional.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @desc:	Descriptor structure containing arguments and return values
  * @res:	Structure containing results from SMC/HVC call
  *
@@ -347,7 +356,11 @@ static int qcom_scm_set_boot_addr(void *entry, const u8 *cpu_bits)
 	desc.args[0] = flags;
 	desc.args[1] = virt_to_phys(entry);
 
+<<<<<<< HEAD
+	return qcom_scm_call_atomic(__scm ? __scm->dev : NULL, &desc, NULL);
+=======
 	return __qcom_scm_call_atomic(__scm ? __scm->dev : NULL, &desc, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int qcom_scm_set_boot_addr_mc(void *entry, unsigned int flags)
@@ -369,7 +382,11 @@ static int qcom_scm_set_boot_addr_mc(void *entry, unsigned int flags)
 	if (!__scm || __get_convention() == SMC_CONVENTION_LEGACY)
 		return -EOPNOTSUPP;
 
+<<<<<<< HEAD
+	return qcom_scm_call(__scm->dev, &desc, NULL);
+=======
 	return __qcom_scm_call(__scm->dev, &desc, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /**
@@ -600,7 +617,11 @@ int qcom_scm_pas_mem_setup(u32 peripheral, phys_addr_t addr, phys_addr_t size)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	ret = qcom_scm_call(__scm->dev, &desc, &res);
+=======
 	ret = qcom_scm_call(&desc, &res);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qcom_scm_bw_disable();
 	qcom_scm_clk_disable();
 
@@ -635,7 +656,11 @@ int qcom_scm_pas_auth_and_reset(u32 peripheral)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	ret = qcom_scm_call(__scm->dev, &desc, &res);
+=======
 	ret = qcom_scm_call(&desc, &res);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qcom_scm_bw_disable();
 	qcom_scm_clk_disable();
 
@@ -668,9 +693,15 @@ int qcom_scm_pas_shutdown(u32 peripheral)
 	ret = qcom_scm_bw_enable();
 	if (ret)
 		return ret;
+<<<<<<< HEAD
+
+	ret = qcom_scm_call(__scm->dev, &desc, &res);
+
+=======
 
 	ret = qcom_scm_call(&desc, &res);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	qcom_scm_bw_disable();
 	qcom_scm_clk_disable();
 
@@ -850,7 +881,11 @@ int qcom_scm_iommu_secure_ptbl_init(u64 addr, u32 size, u32 spare)
 	};
 	int ret;
 
+<<<<<<< HEAD
+	ret = qcom_scm_call(__scm->dev, &desc, NULL);
+=======
 	ret = qcom_scm_call(&desc, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* the pg table has been initialized already, ignore the error */
 	if (ret == -EPERM)
@@ -871,7 +906,11 @@ int qcom_scm_iommu_set_cp_pool_size(u32 spare, u32 size)
 		.owner = ARM_SMCCC_OWNER_SIP,
 	};
 
+<<<<<<< HEAD
+	return qcom_scm_call(__scm->dev, &desc, NULL);
+=======
 	return qcom_scm_call(&desc, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(qcom_scm_iommu_set_cp_pool_size);
 
@@ -1253,7 +1292,11 @@ int qcom_scm_iommu_set_pt_format(u32 sec_id, u32 ctx_num, u32 pt_fmt)
 		.owner = ARM_SMCCC_OWNER_SIP,
 	};
 
+<<<<<<< HEAD
+	return qcom_scm_call(__scm->dev, &desc, NULL);
+=======
 	return qcom_scm_call(&desc, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL(qcom_scm_iommu_set_pt_format);
 

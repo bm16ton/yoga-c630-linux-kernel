@@ -1,0 +1,1 @@
+cmd_sound/pci/echoaudio/snd-darla20.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/pci/echoaudio/snd-darla20.ko sound/pci/echoaudio/snd-darla20.o sound/pci/echoaudio/snd-darla20.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/libertas_tf/libertas_tf.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/marvell/libertas_tf/libertas_tf.o @drivers/net/wireless/marvell/libertas_tf/libertas_tf.mod 

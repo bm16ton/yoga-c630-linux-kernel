@@ -517,7 +517,11 @@ static int truly_nt35521_probe(struct mipi_dsi_device *dsi)
 	return 0;
 }
 
+<<<<<<< HEAD
+static void truly_nt35521_remove(struct mipi_dsi_device *dsi)
+=======
 static int truly_nt35521_remove(struct mipi_dsi_device *dsi)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct truly_nt35521 *ctx = mipi_dsi_get_drvdata(dsi);
 	int ret;
@@ -527,8 +531,11 @@ static int truly_nt35521_remove(struct mipi_dsi_device *dsi)
 		dev_err(&dsi->dev, "Failed to detach from DSI host: %d\n", ret);
 
 	drm_panel_remove(&ctx->panel);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct of_device_id truly_nt35521_of_match[] = {

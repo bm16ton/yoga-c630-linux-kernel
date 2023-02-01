@@ -1,0 +1,1 @@
+cmd_drivers/net/can/slcan/slcan.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/can/slcan/slcan.ko drivers/net/can/slcan/slcan.o drivers/net/can/slcan/slcan.mod.o;  true

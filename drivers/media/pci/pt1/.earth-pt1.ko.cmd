@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/pt1/earth-pt1.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/pci/pt1/earth-pt1.ko drivers/media/pci/pt1/earth-pt1.o drivers/media/pci/pt1/earth-pt1.mod.o;  true

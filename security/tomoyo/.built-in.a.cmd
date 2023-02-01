@@ -1,0 +1,1 @@
+cmd_security/tomoyo/built-in.a := rm -f security/tomoyo/built-in.a;  printf "security/tomoyo/%s " audit.o common.o condition.o domain.o environ.o file.o gc.o group.o load_policy.o memory.o mount.o network.o realpath.o securityfs_if.o tomoyo.o util.o | xargs ar cDPrST security/tomoyo/built-in.a

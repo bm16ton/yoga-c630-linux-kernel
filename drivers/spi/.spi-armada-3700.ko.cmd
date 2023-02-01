@@ -1,0 +1,1 @@
+cmd_drivers/spi/spi-armada-3700.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/spi/spi-armada-3700.ko drivers/spi/spi-armada-3700.o drivers/spi/spi-armada-3700.mod.o;  true

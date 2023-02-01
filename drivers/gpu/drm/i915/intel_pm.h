@@ -8,6 +8,9 @@
 
 #include <linux/types.h>
 
+<<<<<<< HEAD
+struct drm_i915_private;
+=======
 #include "display/intel_display.h"
 #include "display/intel_global_state.h"
 
@@ -19,11 +22,9 @@ struct i915_request;
 struct intel_atomic_state;
 struct intel_bw_state;
 struct intel_crtc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct intel_crtc_state;
-struct intel_plane;
-struct skl_ddb_entry;
-struct skl_pipe_wm;
-struct skl_wm_level;
+struct intel_plane_state;
 
 void intel_init_clock_gating(struct drm_i915_private *dev_priv);
 void intel_suspend_hw(struct drm_i915_private *dev_priv);
@@ -34,6 +35,10 @@ void intel_pm_setup(struct drm_i915_private *dev_priv);
 void g4x_wm_get_hw_state(struct drm_i915_private *dev_priv);
 void vlv_wm_get_hw_state(struct drm_i915_private *dev_priv);
 void ilk_wm_get_hw_state(struct drm_i915_private *dev_priv);
+<<<<<<< HEAD
+void g4x_wm_sanitize(struct drm_i915_private *dev_priv);
+void vlv_wm_sanitize(struct drm_i915_private *dev_priv);
+=======
 void skl_wm_get_hw_state(struct drm_i915_private *dev_priv);
 void intel_wm_state_verify(struct intel_crtc *crtc,
 			   struct intel_crtc_state *new_crtc_state);
@@ -55,12 +60,17 @@ void skl_write_plane_wm(struct intel_plane *plane,
 			const struct intel_crtc_state *crtc_state);
 void skl_write_cursor_wm(struct intel_plane *plane,
 			 const struct intel_crtc_state *crtc_state);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bool ilk_disable_lp_wm(struct drm_i915_private *dev_priv);
-void intel_init_ipc(struct drm_i915_private *dev_priv);
-void intel_enable_ipc(struct drm_i915_private *dev_priv);
+bool intel_wm_plane_visible(const struct intel_crtc_state *crtc_state,
+			    const struct intel_plane_state *plane_state);
+void intel_print_wm_latency(struct drm_i915_private *dev_priv,
+			    const char *name, const u16 wm[]);
 
 bool intel_set_memory_cxsr(struct drm_i915_private *dev_priv, bool enable);
 
+<<<<<<< HEAD
+=======
 struct intel_dbuf_state {
 	struct intel_global_state base;
 
@@ -86,4 +96,5 @@ void intel_dbuf_pre_plane_update(struct intel_atomic_state *state);
 void intel_dbuf_post_plane_update(struct intel_atomic_state *state);
 void intel_mbus_dbox_update(struct intel_atomic_state *state);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* __INTEL_PM_H__ */

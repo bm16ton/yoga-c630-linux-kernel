@@ -1,0 +1,1 @@
+cmd_drivers/misc/altera-stapl/altera-stapl.mod := printf '%s\n'   altera-lpt.o altera-jtag.o altera-comp.o altera.o | awk '!x[$$0]++ { print("drivers/misc/altera-stapl/"$$0) }' > drivers/misc/altera-stapl/altera-stapl.mod

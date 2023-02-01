@@ -25,7 +25,11 @@ void intel_pxp_irq_handler(struct intel_pxp *pxp, u16 iir)
 	if (GEM_WARN_ON(!intel_pxp_is_enabled(pxp)))
 		return;
 
+<<<<<<< HEAD
+	lockdep_assert_held(gt->irq_lock);
+=======
 	lockdep_assert_held(&gt->irq_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (unlikely(!iir))
 		return;
@@ -55,16 +59,26 @@ static inline void __pxp_set_interrupts(struct intel_gt *gt, u32 interrupts)
 
 static inline void pxp_irq_reset(struct intel_gt *gt)
 {
+<<<<<<< HEAD
+	spin_lock_irq(gt->irq_lock);
+	gen11_gt_reset_one_iir(gt, 0, GEN11_KCR);
+	spin_unlock_irq(gt->irq_lock);
+=======
 	spin_lock_irq(&gt->irq_lock);
 	gen11_gt_reset_one_iir(gt, 0, GEN11_KCR);
 	spin_unlock_irq(&gt->irq_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void intel_pxp_irq_enable(struct intel_pxp *pxp)
 {
 	struct intel_gt *gt = pxp_to_gt(pxp);
 
+<<<<<<< HEAD
+	spin_lock_irq(gt->irq_lock);
+=======
 	spin_lock_irq(&gt->irq_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!pxp->irq_enabled)
 		WARN_ON_ONCE(gen11_gt_reset_one_iir(gt, 0, GEN11_KCR));
@@ -72,7 +86,11 @@ void intel_pxp_irq_enable(struct intel_pxp *pxp)
 	__pxp_set_interrupts(gt, GEN12_PXP_INTERRUPTS);
 	pxp->irq_enabled = true;
 
+<<<<<<< HEAD
+	spin_unlock_irq(gt->irq_lock);
+=======
 	spin_unlock_irq(&gt->irq_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void intel_pxp_irq_disable(struct intel_pxp *pxp)
@@ -88,12 +106,20 @@ void intel_pxp_irq_disable(struct intel_pxp *pxp)
 	 */
 	GEM_WARN_ON(intel_pxp_is_active(pxp));
 
+<<<<<<< HEAD
+	spin_lock_irq(gt->irq_lock);
+=======
 	spin_lock_irq(&gt->irq_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pxp->irq_enabled = false;
 	__pxp_set_interrupts(gt, 0);
 
+<<<<<<< HEAD
+	spin_unlock_irq(gt->irq_lock);
+=======
 	spin_unlock_irq(&gt->irq_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	intel_synchronize_irq(gt->i915);
 
 	pxp_irq_reset(gt);

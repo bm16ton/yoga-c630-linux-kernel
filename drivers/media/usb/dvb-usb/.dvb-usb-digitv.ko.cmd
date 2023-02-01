@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/dvb-usb/dvb-usb-digitv.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/dvb-usb/dvb-usb-digitv.ko drivers/media/usb/dvb-usb/dvb-usb-digitv.o drivers/media/usb/dvb-usb/dvb-usb-digitv.mod.o;  true

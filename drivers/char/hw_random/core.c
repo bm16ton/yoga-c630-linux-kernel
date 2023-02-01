@@ -52,7 +52,11 @@ MODULE_PARM_DESC(default_quality,
 
 static void drop_current_rng(void);
 static int hwrng_init(struct hwrng *rng);
+<<<<<<< HEAD
+static int hwrng_fillfn(void *unused);
+=======
 static void hwrng_manage_rngd(struct hwrng *rng);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
 			       int wait);
@@ -95,6 +99,15 @@ static int set_current_rng(struct hwrng *rng)
 
 	drop_current_rng();
 	current_rng = rng;
+
+	/* if necessary, start hwrng thread */
+	if (!hwrng_fill) {
+		hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
+		if (IS_ERR(hwrng_fill)) {
+			pr_err("hwrng_fill thread creation failed\n");
+			hwrng_fill = NULL;
+		}
+	}
 
 	return 0;
 }
@@ -166,8 +179,11 @@ skip_init:
 	if (rng->quality > 1024)
 		rng->quality = 1024;
 	current_quality = rng->quality; /* obsolete */
+<<<<<<< HEAD
+=======
 
 	hwrng_manage_rngd(rng);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -307,6 +323,7 @@ static int enable_best_rng(void)
 		drop_current_rng();
 		cur_rng_set_by_user = 0;
 		return 0;
+<<<<<<< HEAD
 	}
 
 	/* use the rng which offers the best quality */
@@ -315,6 +332,16 @@ static int enable_best_rng(void)
 			new_rng = rng;
 	}
 
+=======
+	}
+
+	/* use the rng which offers the best quality */
+	list_for_each_entry(rng, &rng_list, list) {
+		if (!new_rng || rng->quality > new_rng->quality)
+			new_rng = rng;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
 	if (!ret)
 		cur_rng_set_by_user = 0;
@@ -399,6 +426,68 @@ static ssize_t rng_available_show(struct device *dev,
 static ssize_t rng_selected_show(struct device *dev,
 				 struct device_attribute *attr,
 				 char *buf)
+<<<<<<< HEAD
+{
+	return sysfs_emit(buf, "%d\n", cur_rng_set_by_user);
+}
+
+static ssize_t rng_quality_show(struct device *dev,
+				struct device_attribute *attr,
+				char *buf)
+{
+	ssize_t ret;
+	struct hwrng *rng;
+
+	rng = get_current_rng();
+	if (IS_ERR(rng))
+		return PTR_ERR(rng);
+
+	if (!rng) /* no need to put_rng */
+		return -ENODEV;
+
+	ret = sysfs_emit(buf, "%hu\n", rng->quality);
+	put_rng(rng);
+
+	return ret;
+}
+
+static ssize_t rng_quality_store(struct device *dev,
+				 struct device_attribute *attr,
+				 const char *buf, size_t len)
+{
+	u16 quality;
+	int ret = -EINVAL;
+
+	if (len < 2)
+		return -EINVAL;
+
+	ret = mutex_lock_interruptible(&rng_mutex);
+	if (ret)
+		return -ERESTARTSYS;
+
+	ret = kstrtou16(buf, 0, &quality);
+	if (ret || quality > 1024) {
+		ret = -EINVAL;
+		goto out;
+	}
+
+	if (!current_rng) {
+		ret = -ENODEV;
+		goto out;
+	}
+
+	current_rng->quality = quality;
+	current_quality = quality; /* obsolete */
+
+	/* the best available RNG may have changed */
+	ret = enable_best_rng();
+
+out:
+	mutex_unlock(&rng_mutex);
+	return ret ? ret : len;
+}
+
+=======
 {
 	return sysfs_emit(buf, "%d\n", cur_rng_set_by_user);
 }
@@ -463,6 +552,7 @@ out:
 	return ret ? ret : len;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static DEVICE_ATTR_RW(rng_current);
 static DEVICE_ATTR_RO(rng_available);
 static DEVICE_ATTR_RO(rng_selected);
@@ -513,9 +603,12 @@ static int hwrng_fillfn(void *unused)
 
 		put_rng(rng);
 
+<<<<<<< HEAD
+=======
 		if (!quality)
 			break;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (rc <= 0)
 			continue;
 
@@ -534,6 +627,8 @@ static int hwrng_fillfn(void *unused)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
 static void hwrng_manage_rngd(struct hwrng *rng)
 {
 	if (WARN_ON(!mutex_is_locked(&rng_mutex)))
@@ -550,6 +645,7 @@ static void hwrng_manage_rngd(struct hwrng *rng)
 	}
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int hwrng_register(struct hwrng *rng)
 {
 	int err = -EINVAL;

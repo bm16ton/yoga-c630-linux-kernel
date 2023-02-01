@@ -1,0 +1,1 @@
+cmd_drivers/iio/gyro/adxrs450.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/gyro/adxrs450.ko drivers/iio/gyro/adxrs450.o drivers/iio/gyro/adxrs450.mod.o;  true

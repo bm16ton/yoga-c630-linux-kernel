@@ -1687,6 +1687,18 @@ static const struct property_entry w25q32_properties[] = {
 	{}
 };
 
+<<<<<<< HEAD
+#include <dt-bindings/leds/common.h>
+
+static const struct property_entry worldsemi_properties[] = {
+    PROPERTY_ENTRY_U32("reg", 0),
+    PROPERTY_ENTRY_U32("color", LED_COLOR_ID_RGB),
+    PROPERTY_ENTRY_U32_ARRAY("function", LED_FUNCTION_STATUS),
+	{}
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct property_entry sx1276_properties[] = {
     PROPERTY_ENTRY_U32("clock-frequency", 40000000),
     PROPERTY_ENTRY_U32("center-carrier-frq", 915000000),
@@ -1711,11 +1723,22 @@ static const struct software_node sx1276_node = {
 	.properties = sx1276_properties,
 };
 
+<<<<<<< HEAD
+static const struct software_node worldsemi_node = {
+	.properties = worldsemi_properties,
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct spi_board_info ftdi_spi_bus_info[] = {
     {
 //    .modalias	= "yx240qv29",
 //	.modalias	= "ili9341",
+<<<<<<< HEAD
+    .modalias	= "spi-petra",
+=======
     .modalias	= "w25q32",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 //     .modalias	= "sx1278",
 //    .modalias	= "spi-nor",
 //	.modalias	= "mcp2515",
@@ -1725,15 +1748,25 @@ static struct spi_board_info ftdi_spi_bus_info[] = {
     .mode		= SPI_MODE_0,
 //    .mode		= SPI_MODE_0 | SPI_LSB_FIRST | SPI_CS_HIGH,
 //    .max_speed_hz	= 4000000,
+<<<<<<< HEAD
+    .max_speed_hz	= 30000000,
+=======
     .max_speed_hz	= 8000000,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     .bus_num	= 0,
     .chip_select	= 0,
     .platform_data	= ftdi_spi_dev_data,
 // 	.swnode	= &nrf24_node,    //changed from properties to swnode i dunno aroun kernel 5.15ish
 //    .properties	= mcp2515_properties,
+<<<<<<< HEAD
+	.swnode  =  &worldsemi_node,
+//    .swnode = &sx1276_node,
+ //   .swnode = &w25q32_node,
+=======
 //	.swnode  =  &mcp2515_node,
 //    .swnode = &sx1276_node,
     .swnode = &w25q32_node,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 //	.irq     = 0,
     },
 /*
@@ -1797,8 +1830,11 @@ static struct platform_device *mpsse_dev_register(struct ft232h_intf_priv *priv,
 	int i, ret;
     
 	ret = ft232h_intf_add_mpsse_gpio(priv);
-	if (ret < 0)
+	if (ret < 0) {
 		goto err;
+	}
+		
+		if (irqpoll) {
 		
 		if (irqpoll) {
 		

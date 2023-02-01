@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-zynq.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-zynq.ko drivers/gpio/gpio-zynq.o drivers/gpio/gpio-zynq.mod.o;  true

@@ -5,8 +5,6 @@
  *
  **************************************************************************/
 
-#include <linux/backlight.h>
-
 #include <drm/drm.h>
 
 #include "gma_device.h"
@@ -24,8 +22,6 @@ static int psb_output_init(struct drm_device *dev)
 	return 0;
 }
 
-#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
-
 /*
  *	Poulsbo Backlight Interfaces
  */
@@ -40,18 +36,6 @@ static int psb_output_init(struct drm_device *dev)
 
 #define PSB_BACKLIGHT_PWM_POLARITY_BIT_CLEAR (0xFFFE)
 #define PSB_BACKLIGHT_PWM_CTL_SHIFT	(16)
-
-static int psb_brightness;
-static struct backlight_device *psb_backlight_device;
-
-static int psb_get_brightness(struct backlight_device *bd)
-{
-	/* return locally cached var instead of HW read (due to DPST etc.) */
-	/* FIXME: ideally return actual value in case firmware fiddled with
-	   it */
-	return psb_brightness;
-}
-
 
 static int psb_backlight_setup(struct drm_device *dev)
 {
@@ -86,6 +70,8 @@ static int psb_backlight_setup(struct drm_device *dev)
 		REG_WRITE(BLC_PWM_CTL,
 			(value << PSB_BACKLIGHT_PWM_CTL_SHIFT) | (value));
 	}
+<<<<<<< HEAD
+=======
 	return 0;
 }
 
@@ -133,14 +119,13 @@ static int psb_backlight_init(struct drm_device *dev)
 	psb_backlight_device->props.max_brightness = 100;
 	backlight_update_status(psb_backlight_device);
 	dev_priv->backlight_device = psb_backlight_device;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
+	psb_intel_lvds_set_brightness(dev, PSB_MAX_BRIGHTNESS);
 	/* This must occur after the backlight is properly initialised */
 	psb_lid_timer_init(dev_priv);
-
 	return 0;
 }
-
-#endif
 
 /*
  *	Provide the Poulsbo specific chip logic and low level methods
@@ -345,9 +330,9 @@ const struct psb_ops psb_chip_ops = {
 
 	.output_init = psb_output_init,
 
-#ifdef CONFIG_BACKLIGHT_CLASS_DEVICE
-	.backlight_init = psb_backlight_init,
-#endif
+	.backlight_init = psb_backlight_setup,
+	.backlight_set = psb_intel_lvds_set_brightness,
+	.backlight_name = "psb-bl",
 
 	.init_pm = psb_init_pm,
 	.save_regs = psb_save_display_registers,

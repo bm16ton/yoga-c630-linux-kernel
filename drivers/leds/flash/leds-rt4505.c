@@ -393,12 +393,19 @@ static int rt4505_probe(struct i2c_client *client)
 	return 0;
 }
 
+<<<<<<< HEAD
+static void rt4505_remove(struct i2c_client *client)
+=======
 static int rt4505_remove(struct i2c_client *client)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct rt4505_priv *priv = i2c_get_clientdata(client);
 
 	v4l2_flash_release(priv->v4l2_flash);
+<<<<<<< HEAD
+=======
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void rt4505_shutdown(struct i2c_client *client)

@@ -98,7 +98,11 @@ static struct cifs_ses *find_ipc_from_server_path(struct cifs_ses **ses, const c
 
 	get_ipc_unc(path, unc, sizeof(unc));
 	for (; *ses; ses++) {
+<<<<<<< HEAD
+		if (!strcasecmp(unc, (*ses)->tcon_ipc->tree_name))
+=======
 		if (!strcasecmp(unc, (*ses)->tcon_ipc->treeName))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			return *ses;
 	}
 	return ERR_PTR(-ENOENT);

@@ -1,0 +1,1 @@
+cmd_drivers/media/radio/si470x/radio-si470x-usb.mod := printf '%s\n'   radio-si470x-usb.o | awk '!x[$$0]++ { print("drivers/media/radio/si470x/"$$0) }' > drivers/media/radio/si470x/radio-si470x-usb.mod

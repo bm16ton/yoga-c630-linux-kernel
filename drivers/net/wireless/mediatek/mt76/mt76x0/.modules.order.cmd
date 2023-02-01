@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt76x0/modules.order := {   echo drivers/net/wireless/mediatek/mt76/mt76x0/mt76x0u.ko;   echo drivers/net/wireless/mediatek/mt76/mt76x0/mt76x0e.ko;   echo drivers/net/wireless/mediatek/mt76/mt76x0/mt76x0-common.ko; :; } > drivers/net/wireless/mediatek/mt76/mt76x0/modules.order

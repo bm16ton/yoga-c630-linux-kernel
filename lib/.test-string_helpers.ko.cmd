@@ -1,0 +1,1 @@
+cmd_lib/test-string_helpers.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o lib/test-string_helpers.ko lib/test-string_helpers.o lib/test-string_helpers.mod.o;  true

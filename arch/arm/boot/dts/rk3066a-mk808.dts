@@ -32,7 +32,11 @@
 		keyup-threshold-microvolt = <2500000>;
 		poll-interval = <100>;
 
+<<<<<<< HEAD
+		button-recovery {
+=======
 		recovery {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			label = "recovery";
 			linux,code = <KEY_VENDOR>;
 			press-threshold-microvolt = <0>;

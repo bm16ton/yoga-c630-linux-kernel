@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/intel/e1000/e1000.mod := printf '%s\n'   e1000_main.o e1000_hw.o e1000_ethtool.o e1000_param.o | awk '!x[$$0]++ { print("drivers/net/ethernet/intel/e1000/"$$0) }' > drivers/net/ethernet/intel/e1000/e1000.mod

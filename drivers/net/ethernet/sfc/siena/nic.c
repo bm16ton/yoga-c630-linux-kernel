@@ -458,7 +458,11 @@ size_t efx_siena_describe_stats(const struct efx_hw_stat_desc *desc, size_t coun
 	for_each_set_bit(index, mask, count) {
 		if (desc[index].name) {
 			if (names) {
+<<<<<<< HEAD
+				strscpy(names, desc[index].name,
+=======
 				strlcpy(names, desc[index].name,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					ETH_GSTRING_LEN);
 				names += ETH_GSTRING_LEN;
 			}

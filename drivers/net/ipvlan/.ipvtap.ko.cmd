@@ -1,0 +1,1 @@
+cmd_drivers/net/ipvlan/ipvtap.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ipvlan/ipvtap.ko drivers/net/ipvlan/ipvtap.o drivers/net/ipvlan/ipvtap.mod.o;  true

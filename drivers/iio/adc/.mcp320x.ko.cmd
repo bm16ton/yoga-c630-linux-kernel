@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/mcp320x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/mcp320x.ko drivers/iio/adc/mcp320x.o drivers/iio/adc/mcp320x.mod.o;  true

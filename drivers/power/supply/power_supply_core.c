@@ -583,6 +583,7 @@ int power_supply_get_battery_info(struct power_supply *psy,
 		battery_np = of_parse_phandle(psy->of_node, "monitored-battery", 0);
 		if (!battery_np)
 			return -ENODEV;
+<<<<<<< HEAD
 
 		fwnode = fwnode_handle_get(of_fwnode_handle(battery_np));
 	} else {
@@ -622,6 +623,47 @@ int power_supply_get_battery_info(struct power_supply *psy,
 		goto out_put_node;
 	}
 
+=======
+
+		fwnode = fwnode_handle_get(of_fwnode_handle(battery_np));
+	} else {
+		err = fwnode_property_get_reference_args(
+					dev_fwnode(psy->dev.parent),
+					"monitored-battery", NULL, 0, 0, &args);
+		if (err)
+			return err;
+
+		fwnode = args.fwnode;
+	}
+
+	err = fwnode_property_read_string(fwnode, "compatible", &value);
+	if (err)
+		goto out_put_node;
+
+
+	/* Try static batteries first */
+	err = samsung_sdi_battery_get_info(&psy->dev, value, &info);
+	if (!err)
+		goto out_ret_pointer;
+	else if (err == -ENODEV)
+		/*
+		 * Device does not have a static battery.
+		 * Proceed to look for a simple battery.
+		 */
+		err = 0;
+
+	if (strcmp("simple-battery", value)) {
+		err = -ENODEV;
+		goto out_put_node;
+	}
+
+	info = devm_kzalloc(&psy->dev, sizeof(*info), GFP_KERNEL);
+	if (!info) {
+		err = -ENOMEM;
+		goto out_put_node;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	info->technology                     = POWER_SUPPLY_TECHNOLOGY_UNKNOWN;
 	info->energy_full_design_uwh         = -EINVAL;
 	info->charge_full_design_uah         = -EINVAL;
@@ -750,6 +792,11 @@ int power_supply_get_battery_info(struct power_supply *psy,
 		int i, tab_len, size;
 
 		propname = kasprintf(GFP_KERNEL, "ocv-capacity-table-%d", index);
+		if (!propname) {
+			power_supply_put_battery_info(psy, info);
+			err = -ENOMEM;
+			goto out_put_node;
+		}
 		list = of_get_property(battery_np, propname, &size);
 		if (!list || !size) {
 			dev_err(&psy->dev, "failed to get %s\n", propname);
@@ -898,6 +945,7 @@ int power_supply_vbat2ri(struct power_supply_battery_info *info,
 	} else {
 		vbat2ri = info->vbat2ri_discharging;
 		table_len = info->vbat2ri_discharging_size;
+<<<<<<< HEAD
 	}
 
 	/*
@@ -911,6 +959,21 @@ int power_supply_vbat2ri(struct power_supply_battery_info *info,
 			return info->factory_internal_resistance_uohm;
 	}
 
+=======
+	}
+
+	/*
+	 * If no tables are specified, or if we are above the highest voltage in
+	 * the voltage table, just return the factory specified internal resistance.
+	 */
+	if (!vbat2ri || (table_len <= 0) || (vbat_uv > vbat2ri[0].vbat_uv)) {
+		if (charging && (info->factory_internal_resistance_charging_uohm > 0))
+			return info->factory_internal_resistance_charging_uohm;
+		else
+			return info->factory_internal_resistance_uohm;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Break loop at table_len - 1 because that is the highest index */
 	for (i = 0; i < table_len - 1; i++)
 		if (vbat_uv > vbat2ri[i].vbat_uv)
@@ -1387,8 +1450,8 @@ create_triggers_failed:
 register_cooler_failed:
 	psy_unregister_thermal(psy);
 register_thermal_failed:
-	device_del(dev);
 wakeup_init_failed:
+	device_del(dev);
 device_add_failed:
 check_supplies_failed:
 dev_set_name_failed:

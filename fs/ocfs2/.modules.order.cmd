@@ -1,0 +1,1 @@
+cmd_fs/ocfs2/modules.order := {   echo fs/ocfs2/ocfs2.ko;   echo fs/ocfs2/ocfs2_stackglue.ko;   echo fs/ocfs2/ocfs2_stack_o2cb.ko;   echo fs/ocfs2/ocfs2_stack_user.ko;   cat fs/ocfs2/dlmfs/modules.order;   cat fs/ocfs2/cluster/modules.order;   cat fs/ocfs2/dlm/modules.order; :; } > fs/ocfs2/modules.order

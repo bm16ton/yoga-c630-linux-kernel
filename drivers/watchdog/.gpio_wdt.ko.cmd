@@ -1,0 +1,1 @@
+cmd_drivers/watchdog/gpio_wdt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/watchdog/gpio_wdt.ko drivers/watchdog/gpio_wdt.o drivers/watchdog/gpio_wdt.mod.o;  true

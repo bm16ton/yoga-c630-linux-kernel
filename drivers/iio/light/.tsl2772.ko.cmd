@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/tsl2772.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/tsl2772.ko drivers/iio/light/tsl2772.o drivers/iio/light/tsl2772.mod.o;  true

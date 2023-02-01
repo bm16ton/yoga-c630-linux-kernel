@@ -15,8 +15,13 @@
 #include "intel_display_types.h"
 #include "intel_fdi.h"
 #include "intel_modeset_verify.h"
+<<<<<<< HEAD
+#include "intel_snps_phy.h"
+#include "skl_watermark.h"
+=======
 #include "intel_pm.h"
 #include "intel_snps_phy.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Cross check the actual hw state with our own modeset state tracking (and its
@@ -94,10 +99,17 @@ static void intel_pipe_config_sanity_check(struct drm_i915_private *dev_priv,
 
 		/*
 		 * FDI already provided one idea for the dotclock.
+<<<<<<< HEAD
+		 * Yell if the encoder disagrees. Allow for slight
+		 * rounding differences.
+		 */
+		drm_WARN(&dev_priv->drm, abs(fdi_dotclock - dotclock) > 1,
+=======
 		 * Yell if the encoder disagrees.
 		 */
 		drm_WARN(&dev_priv->drm,
 			 !intel_fuzzy_clock_check(fdi_dotclock, dotclock),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			 "FDI dotclock and encoder dotclock mismatch, fdi: %i, encoder: %i\n",
 			 fdi_dotclock, dotclock);
 	}

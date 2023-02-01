@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/pl111/pl111_drm.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/pl111/pl111_drm.ko drivers/gpu/drm/pl111/pl111_drm.o drivers/gpu/drm/pl111/pl111_drm.mod.o;  true

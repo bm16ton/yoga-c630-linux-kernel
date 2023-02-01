@@ -1,0 +1,1 @@
+cmd_drivers/soc/amlogic/built-in.a := rm -f drivers/soc/amlogic/built-in.a;  printf "drivers/soc/amlogic/%s " meson-clk-measure.o meson-gx-socinfo.o meson-gx-pwrc-vpu.o meson-ee-pwrc.o meson-secure-pwrc.o | xargs ar cDPrST drivers/soc/amlogic/built-in.a

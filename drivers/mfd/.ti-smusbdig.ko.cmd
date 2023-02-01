@@ -1,0 +1,1 @@
+cmd_drivers/mfd/ti-smusbdig.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mfd/ti-smusbdig.ko drivers/mfd/ti-smusbdig.o drivers/mfd/ti-smusbdig.mod.o;  true

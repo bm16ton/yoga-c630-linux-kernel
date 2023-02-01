@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/natsemi/ns83820.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/natsemi/ns83820.ko drivers/net/ethernet/natsemi/ns83820.o drivers/net/ethernet/natsemi/ns83820.mod.o;  true

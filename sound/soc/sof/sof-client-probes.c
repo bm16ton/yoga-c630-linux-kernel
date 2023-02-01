@@ -12,6 +12,11 @@
 #include <linux/debugfs.h>
 #include <linux/module.h>
 #include <linux/pm_runtime.h>
+<<<<<<< HEAD
+#include <linux/string_helpers.h>
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <sound/soc.h>
 #include <sound/sof/header.h>
 #include "sof-client.h"
@@ -132,6 +137,10 @@ static int sof_probes_deinit(struct sof_client_dev *cdev)
 static int sof_probes_info(struct sof_client_dev *cdev, unsigned int cmd,
 			   void **params, size_t *num_params)
 {
+<<<<<<< HEAD
+	size_t max_msg_size = sof_client_get_ipc_max_payload_size(cdev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct sof_ipc_probe_info_params msg = {{{0}}};
 	struct sof_ipc_probe_info_params *reply;
 	size_t bytes;
@@ -140,13 +149,21 @@ static int sof_probes_info(struct sof_client_dev *cdev, unsigned int cmd,
 	*params = NULL;
 	*num_params = 0;
 
+<<<<<<< HEAD
+	reply = kzalloc(max_msg_size, GFP_KERNEL);
+=======
 	reply = kzalloc(SOF_IPC_MSG_MAX_SIZE, GFP_KERNEL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!reply)
 		return -ENOMEM;
 	msg.rhdr.hdr.size = sizeof(msg);
 	msg.rhdr.hdr.cmd = SOF_IPC_GLB_PROBE | cmd;
 
+<<<<<<< HEAD
+	ret = sof_client_ipc_tx_message(cdev, &msg, reply, max_msg_size);
+=======
 	ret = sof_client_ipc_tx_message(cdev, &msg, reply, SOF_IPC_MSG_MAX_SIZE);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0 || reply->rhdr.error < 0)
 		goto exit;
 
@@ -269,9 +286,15 @@ static int sof_probes_compr_startup(struct snd_compr_stream *cstream,
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	ret = ops->startup(cdev, cstream, dai, &priv->extractor_stream_tag);
+	if (ret) {
+		dev_err(dai->dev, "Failed to startup probe stream: %d\n", ret);
+=======
 	ret = ops->assign(cdev, cstream, dai, &priv->extractor_stream_tag);
 	if (ret) {
 		dev_err(dai->dev, "Failed to assign probe stream: %d\n", ret);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		priv->extractor_stream_tag = SOF_PROBES_INVALID_NODE_ID;
 		sof_client_core_module_put(cdev);
 	}
@@ -309,7 +332,11 @@ exit:
 	priv->extractor_stream_tag = SOF_PROBES_INVALID_NODE_ID;
 	snd_compr_free_pages(cstream);
 
+<<<<<<< HEAD
+	ret = ops->shutdown(cdev, cstream, dai);
+=======
 	ret = ops->free(cdev, cstream, dai);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	sof_client_core_module_put(cdev);
 
@@ -409,6 +436,8 @@ static const struct snd_compress_ops sof_probes_compressed_ops = {
 	.copy = sof_probes_compr_copy,
 };
 
+<<<<<<< HEAD
+=======
 /**
  * strsplit_u32 - Split string into sequence of u32 tokens
  * @buf:	String to split into tokens.
@@ -482,6 +511,7 @@ exit:
 	return ret;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static ssize_t sof_probes_dfs_points_read(struct file *file, char __user *to,
 					  size_t count, loff_t *ppos)
 {
@@ -503,10 +533,16 @@ static ssize_t sof_probes_dfs_points_read(struct file *file, char __user *to,
 	if (!buf)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	ret = pm_runtime_resume_and_get(dev);
+	if (ret < 0 && ret != -EACCES) {
+		dev_err_ratelimited(dev, "debugfs read failed to resume %d\n", ret);
+=======
 	ret = pm_runtime_get_sync(dev);
 	if (ret < 0 && ret != -EACCES) {
 		dev_err_ratelimited(dev, "debugfs read failed to resume %d\n", ret);
 		pm_runtime_put_noidle(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto exit;
 	}
 
@@ -548,8 +584,13 @@ sof_probes_dfs_points_write(struct file *file, const char __user *from,
 	struct sof_probes_priv *priv = cdev->data;
 	struct device *dev = &cdev->auxdev.dev;
 	struct sof_probe_point_desc *desc;
+<<<<<<< HEAD
+	u32 num_elems, *array;
+	size_t bytes;
+=======
 	size_t num_tkns, bytes;
 	u32 *tkns;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret, err;
 
 	if (priv->extractor_stream_tag == SOF_PROBES_INVALID_NODE_ID) {
@@ -557,21 +598,39 @@ sof_probes_dfs_points_write(struct file *file, const char __user *from,
 		return -ENOENT;
 	}
 
+<<<<<<< HEAD
+	ret = parse_int_array_user(from, count, (int **)&array);
+	if (ret < 0)
+		return ret;
+
+	num_elems = *array;
+	bytes = sizeof(*array) * num_elems;
+	if (bytes % sizeof(*desc)) {
+=======
 	ret = tokenize_input(from, count, ppos, &tkns, &num_tkns);
 	if (ret < 0)
 		return ret;
 	bytes = sizeof(*tkns) * num_tkns;
 	if (!num_tkns || (bytes % sizeof(*desc))) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = -EINVAL;
 		goto exit;
 	}
 
+<<<<<<< HEAD
+	desc = (struct sof_probe_point_desc *)&array[1];
+
+	ret = pm_runtime_resume_and_get(dev);
+	if (ret < 0 && ret != -EACCES) {
+		dev_err_ratelimited(dev, "debugfs write failed to resume %d\n", ret);
+=======
 	desc = (struct sof_probe_point_desc *)tkns;
 
 	ret = pm_runtime_get_sync(dev);
 	if (ret < 0 && ret != -EACCES) {
 		dev_err_ratelimited(dev, "debugfs write failed to resume %d\n", ret);
 		pm_runtime_put_noidle(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto exit;
 	}
 
@@ -584,7 +643,11 @@ sof_probes_dfs_points_write(struct file *file, const char __user *from,
 	if (err < 0)
 		dev_err_ratelimited(dev, "debugfs write failed to idle %d\n", err);
 exit:
+<<<<<<< HEAD
+	kfree(array);
+=======
 	kfree(tkns);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -604,15 +667,33 @@ sof_probes_dfs_points_remove_write(struct file *file, const char __user *from,
 	struct sof_client_dev *cdev = file->private_data;
 	struct sof_probes_priv *priv = cdev->data;
 	struct device *dev = &cdev->auxdev.dev;
+<<<<<<< HEAD
+	int ret, err;
+	u32 *array;
+=======
 	size_t num_tkns;
 	u32 *tkns;
 	int ret, err;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (priv->extractor_stream_tag == SOF_PROBES_INVALID_NODE_ID) {
 		dev_warn(dev, "no extractor stream running\n");
 		return -ENOENT;
 	}
 
+<<<<<<< HEAD
+	ret = parse_int_array_user(from, count, (int **)&array);
+	if (ret < 0)
+		return ret;
+
+	ret = pm_runtime_resume_and_get(dev);
+	if (ret < 0) {
+		dev_err_ratelimited(dev, "debugfs write failed to resume %d\n", ret);
+		goto exit;
+	}
+
+	ret = sof_probes_points_remove(cdev, &array[1], array[0]);
+=======
 	ret = tokenize_input(from, count, ppos, &tkns, &num_tkns);
 	if (ret < 0)
 		return ret;
@@ -629,6 +710,7 @@ sof_probes_dfs_points_remove_write(struct file *file, const char __user *from,
 	}
 
 	ret = sof_probes_points_remove(cdev, tkns, num_tkns);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!ret)
 		ret = count;
 
@@ -637,7 +719,11 @@ sof_probes_dfs_points_remove_write(struct file *file, const char __user *from,
 	if (err < 0)
 		dev_err_ratelimited(dev, "debugfs write failed to idle %d\n", err);
 exit:
+<<<<<<< HEAD
+	kfree(array);
+=======
 	kfree(tkns);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -669,6 +755,10 @@ static const struct snd_soc_component_driver sof_probes_component = {
 	.name = "sof-probes-component",
 	.compress_ops = &sof_probes_compressed_ops,
 	.module_get_upon_open = 1,
+<<<<<<< HEAD
+	.legacy_dai_naming = 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 SND_SOC_DAILINK_DEF(dummy, DAILINK_COMP_ARRAY(COMP_DUMMY()));
@@ -695,6 +785,13 @@ static int sof_probes_client_probe(struct auxiliary_device *auxdev,
 	if (!sof_probes_enabled)
 		return -ENXIO;
 
+<<<<<<< HEAD
+	/* only ipc3 is supported */
+	if (sof_client_get_ipc_type(cdev) != SOF_IPC)
+		return -ENXIO;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!dev->platform_data) {
 		dev_err(dev, "missing platform data\n");
 		return -ENODEV;
@@ -706,7 +803,11 @@ static int sof_probes_client_probe(struct auxiliary_device *auxdev,
 
 	ops = dev->platform_data;
 
+<<<<<<< HEAD
+	if (!ops->startup || !ops->shutdown || !ops->set_params || !ops->trigger ||
+=======
 	if (!ops->assign || !ops->free || !ops->set_params || !ops->trigger ||
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	    !ops->pointer) {
 		dev_err(dev, "missing platform callback(s)\n");
 		return -ENODEV;

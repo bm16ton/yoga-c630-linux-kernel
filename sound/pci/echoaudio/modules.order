@@ -1,0 +1,14 @@
+sound/pci/echoaudio/snd-darla20.ko
+sound/pci/echoaudio/snd-gina20.ko
+sound/pci/echoaudio/snd-layla20.ko
+sound/pci/echoaudio/snd-darla24.ko
+sound/pci/echoaudio/snd-gina24.ko
+sound/pci/echoaudio/snd-layla24.ko
+sound/pci/echoaudio/snd-mona.ko
+sound/pci/echoaudio/snd-mia.ko
+sound/pci/echoaudio/snd-echo3g.ko
+sound/pci/echoaudio/snd-indigo.ko
+sound/pci/echoaudio/snd-indigoio.ko
+sound/pci/echoaudio/snd-indigodj.ko
+sound/pci/echoaudio/snd-indigoiox.ko
+sound/pci/echoaudio/snd-indigodjx.ko

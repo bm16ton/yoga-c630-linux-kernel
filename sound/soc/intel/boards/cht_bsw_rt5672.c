@@ -221,12 +221,21 @@ static int cht_codec_init(struct snd_soc_pcm_runtime *runtime)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	ret = snd_soc_card_jack_new_pins(runtime->card, "Headset",
+					 SND_JACK_HEADSET | SND_JACK_BTN_0 |
+					 SND_JACK_BTN_1 | SND_JACK_BTN_2,
+					 &ctx->headset,
+					 cht_bsw_headset_pins,
+					 ARRAY_SIZE(cht_bsw_headset_pins));
+=======
         ret = snd_soc_card_jack_new(runtime->card, "Headset",
 				    SND_JACK_HEADSET | SND_JACK_BTN_0 |
 				    SND_JACK_BTN_1 | SND_JACK_BTN_2,
 				    &ctx->headset,
 				    cht_bsw_headset_pins,
 				    ARRAY_SIZE(cht_bsw_headset_pins));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         if (ret)
                 return ret;
 
@@ -300,7 +309,11 @@ static int cht_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 	ret = snd_soc_dai_set_fmt(asoc_rtd_to_cpu(rtd, 0),
 				  SND_SOC_DAIFMT_I2S     |
 				  SND_SOC_DAIFMT_NB_NF   |
+<<<<<<< HEAD
+				  SND_SOC_DAIFMT_BP_FP);
+=======
 				  SND_SOC_DAIFMT_CBC_CFC);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		dev_err(rtd->dev, "can't set format to I2S, err %d\n", ret);
 		return ret;

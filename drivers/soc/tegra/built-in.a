@@ -1,0 +1,19 @@
+!<thin>
+//                                              140       `
+fuse/fuse-tegra.o/
+fuse/fuse-tegra30.o/
+fuse/tegra-apbmisc.o/
+fuse/speedo-tegra124.o/
+fuse/speedo-tegra210.o/
+common.o/
+flowctrl.o/
+pmc.o/
+
+/0              0           0     0     644     19408     `
+/19             0           0     0     644     9384      `
+/40             0           0     0     644     10304     `
+/62             0           0     0     644     3400      `
+/86             0           0     0     644     3424      `
+/110            0           0     0     644     7392      `
+/120            0           0     0     644     9992      `
+/132            0           0     0     644     94936     `

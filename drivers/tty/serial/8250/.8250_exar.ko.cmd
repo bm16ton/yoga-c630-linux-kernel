@@ -1,0 +1,1 @@
+cmd_drivers/tty/serial/8250/8250_exar.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/tty/serial/8250/8250_exar.ko drivers/tty/serial/8250/8250_exar.o drivers/tty/serial/8250/8250_exar.mod.o;  true

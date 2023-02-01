@@ -1,0 +1,5 @@
+drivers/net/wwan/wwan.ko
+drivers/net/wwan/mhi_wwan_ctrl.ko
+drivers/net/wwan/mhi_wwan_mbim.ko
+drivers/net/wwan/qcom_bam_dmux.ko
+drivers/net/wwan/rpmsg_wwan_ctrl.ko

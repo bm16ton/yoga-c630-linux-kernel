@@ -1,0 +1,5 @@
+drivers/infiniband/ulp/ipoib/ib_ipoib.ko
+drivers/infiniband/ulp/srp/ib_srp.ko
+drivers/infiniband/ulp/srpt/ib_srpt.ko
+drivers/infiniband/ulp/iser/ib_iser.ko
+drivers/infiniband/ulp/isert/ib_isert.ko

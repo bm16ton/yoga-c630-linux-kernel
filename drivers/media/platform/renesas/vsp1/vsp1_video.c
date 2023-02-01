@@ -305,7 +305,11 @@ static int vsp1_video_pipeline_setup_partitions(struct vsp1_pipeline *pipe)
  * @video: the video node
  *
  * This function completes the current buffer by filling its sequence number,
+<<<<<<< HEAD
+ * time stamp and payload size, and hands it back to the vb2 core.
+=======
  * time stamp and payload size, and hands it back to the videobuf core.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Return the next queued buffer or NULL if the queue is empty.
  */
@@ -927,7 +931,11 @@ static void vsp1_video_stop_streaming(struct vb2_queue *vq)
 	}
 	mutex_unlock(&pipe->lock);
 
+<<<<<<< HEAD
+	video_device_pipeline_stop(&video->video);
+=======
 	media_pipeline_stop(&video->video.entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	vsp1_video_release_buffers(video);
 	vsp1_video_pipeline_put(pipe);
 }
@@ -1046,7 +1054,11 @@ vsp1_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
 		return PTR_ERR(pipe);
 	}
 
+<<<<<<< HEAD
+	ret = __video_device_pipeline_start(&video->video, &pipe->pipe);
+=======
 	ret = __media_pipeline_start(&video->video.entity, &pipe->pipe);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret < 0) {
 		mutex_unlock(&mdev->graph_mutex);
 		goto err_pipe;
@@ -1070,7 +1082,11 @@ vsp1_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
 	return 0;
 
 err_stop:
+<<<<<<< HEAD
+	video_device_pipeline_stop(&video->video);
+=======
 	media_pipeline_stop(&video->video.entity);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_pipe:
 	vsp1_video_pipeline_put(pipe);
 	return ret;

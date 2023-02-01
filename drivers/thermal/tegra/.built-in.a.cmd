@@ -1,0 +1,1 @@
+cmd_drivers/thermal/tegra/built-in.a := rm -f drivers/thermal/tegra/built-in.a;  printf "drivers/thermal/tegra/%s " soctherm.o soctherm-fuse.o tegra132-soctherm.o tegra210-soctherm.o | xargs ar cDPrST drivers/thermal/tegra/built-in.a

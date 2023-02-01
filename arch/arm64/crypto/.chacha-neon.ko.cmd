@@ -1,0 +1,1 @@
+cmd_arch/arm64/crypto/chacha-neon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o arch/arm64/crypto/chacha-neon.ko arch/arm64/crypto/chacha-neon.o arch/arm64/crypto/chacha-neon.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/soundwire/soundwire-bus.mod := printf '%s\n'   bus_type.o bus.o master.o slave.o mipi_disco.o stream.o sysfs_slave.o sysfs_slave_dpn.o debugfs.o | awk '!x[$$0]++ { print("drivers/soundwire/"$$0) }' > drivers/soundwire/soundwire-bus.mod

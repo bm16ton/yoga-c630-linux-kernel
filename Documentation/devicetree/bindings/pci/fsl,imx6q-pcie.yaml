@@ -14,9 +14,12 @@ description: |+
   This PCIe host controller is based on the Synopsys DesignWare PCIe IP
   and thus inherits all the common properties defined in snps,dw-pcie.yaml.
 
+<<<<<<< HEAD
+=======
 allOf:
   - $ref: /schemas/pci/snps,dw-pcie.yaml#
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 properties:
   compatible:
     enum:
@@ -61,7 +64,11 @@ properties:
       - const: pcie
       - const: pcie_bus
       - const: pcie_phy
+<<<<<<< HEAD
+      - enum: [ pcie_inbound_axi, pcie_aux ]
+=======
       - const: pcie_inbound_axi for imx6sx-pcie, pcie_aux for imx8mq-pcie
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   num-lanes:
     const: 1
@@ -175,6 +182,50 @@ required:
   - clocks
   - clock-names
 
+<<<<<<< HEAD
+allOf:
+  - $ref: /schemas/pci/snps,dw-pcie.yaml#
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: fsl,imx6sx-pcie
+    then:
+      properties:
+        clock-names:
+          items:
+            - {}
+            - {}
+            - {}
+            - const: pcie_inbound_axi
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: fsl,imx8mq-pcie
+    then:
+      properties:
+        clock-names:
+          items:
+            - {}
+            - {}
+            - {}
+            - const: pcie_aux
+  - if:
+      properties:
+        compatible:
+          not:
+            contains:
+              enum:
+                - fsl,imx6sx-pcie
+                - fsl,imx8mq-pcie
+    then:
+      properties:
+        clock-names:
+          maxItems: 3
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unevaluatedProperties: false
 
 examples:

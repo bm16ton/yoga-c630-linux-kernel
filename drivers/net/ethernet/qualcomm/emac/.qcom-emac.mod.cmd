@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qualcomm/emac/qcom-emac.mod := printf '%s\n'   emac.o emac-mac.o emac-phy.o emac-sgmii.o emac-ethtool.o emac-sgmii-fsm9900.o emac-sgmii-qdf2432.o emac-sgmii-qdf2400.o | awk '!x[$$0]++ { print("drivers/net/ethernet/qualcomm/emac/"$$0) }' > drivers/net/ethernet/qualcomm/emac/qcom-emac.mod

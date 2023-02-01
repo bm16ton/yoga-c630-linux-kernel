@@ -56,10 +56,17 @@ static const struct link_hwss dpia_link_hwss = {
 	.setup_stream_encoder = setup_dio_stream_encoder,
 	.reset_stream_encoder = reset_dio_stream_encoder,
 	.setup_stream_attribute = setup_dio_stream_attribute,
+<<<<<<< HEAD
+	.disable_link_output = disable_dio_link_output,
+	.ext = {
+		.set_throttled_vcp_size = set_dio_throttled_vcp_size,
+		.enable_dp_link_output = enable_dio_dp_link_output,
+=======
 	.ext = {
 		.set_throttled_vcp_size = set_dio_throttled_vcp_size,
 		.enable_dp_link_output = enable_dio_dp_link_output,
 		.disable_dp_link_output = disable_dio_dp_link_output,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		.set_dp_link_test_pattern = set_dio_dp_link_test_pattern,
 		.set_dp_lane_settings = set_dio_dp_lane_settings,
 		.update_stream_allocation_table = update_dpia_stream_allocation_table,

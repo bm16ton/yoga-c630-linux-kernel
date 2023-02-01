@@ -86,6 +86,8 @@ ifdef CONFIG_KGDB
 KBUILD_CFLAGS := $(subst -fomit-frame-pointer,,$(KBUILD_CFLAGS)) -g
 endif
 
+<<<<<<< HEAD
+=======
 #
 # Select the assembler head startup code. Order is important. The default
 # head code is first, processor specific selections can override it after.
@@ -95,6 +97,7 @@ head-$(CONFIG_SUN3)		:= arch/m68k/kernel/sun3-head.o
 head-$(CONFIG_M68000)		:= arch/m68k/68000/head.o
 head-$(CONFIG_COLDFIRE)		:= arch/m68k/coldfire/head.o
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 libs-y				+= arch/m68k/lib/
 
 

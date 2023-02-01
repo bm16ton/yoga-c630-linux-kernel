@@ -1117,6 +1117,7 @@ tda1997x_detect_std(struct tda1997x_state *state,
 	hper &= MASK_HPER;
 	hsper &= MASK_HSWIDTH;
 	v4l2_dbg(1, debug, sd, "Signal Timings: %u/%u/%u\n", vper, hper, hsper);
+<<<<<<< HEAD
 
 	htot = io_read16(sd, REG_FMT_H_TOT);
 	hact = io_read16(sd, REG_FMT_H_ACT);
@@ -1139,6 +1140,30 @@ tda1997x_detect_std(struct tda1997x_state *state,
 	if (!timings)
 		return 0;
 
+=======
+
+	htot = io_read16(sd, REG_FMT_H_TOT);
+	hact = io_read16(sd, REG_FMT_H_ACT);
+	hfront = io_read16(sd, REG_FMT_H_FRONT);
+	hsync = io_read16(sd, REG_FMT_H_SYNC);
+	hback = io_read16(sd, REG_FMT_H_BACK);
+
+	vtot = io_read16(sd, REG_FMT_V_TOT);
+	vact = io_read16(sd, REG_FMT_V_ACT);
+	vfront1 = io_read(sd, REG_FMT_V_FRONT_F1);
+	vfront2 = io_read(sd, REG_FMT_V_FRONT_F2);
+	vsync = io_read(sd, REG_FMT_V_SYNC);
+	vback1 = io_read(sd, REG_FMT_V_BACK_F1);
+	vback2 = io_read(sd, REG_FMT_V_BACK_F2);
+
+	v4l2_dbg(1, debug, sd, "Geometry: H %u %u %u %u %u Sync%c  V %u %u %u %u %u %u %u Sync%c\n",
+		 htot, hact, hfront, hsync, hback, hsync_pos ? '+' : '-',
+		 vtot, vact, vfront1, vfront2, vsync, vback1, vback2, vsync_pos ? '+' : '-');
+
+	if (!timings)
+		return 0;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	timings->type = V4L2_DV_BT_656_1120;
 	timings->bt.width = hact;
 	timings->bt.hfrontporch = hfront;
@@ -2805,7 +2830,7 @@ err_free_state:
 	return ret;
 }
 
-static int tda1997x_remove(struct i2c_client *client)
+static void tda1997x_remove(struct i2c_client *client)
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct tda1997x_state *state = to_state(sd);
@@ -2827,8 +2852,6 @@ static int tda1997x_remove(struct i2c_client *client)
 	mutex_destroy(&state->lock);
 
 	kfree(state);
-
-	return 0;
 }
 
 static struct i2c_driver tda1997x_i2c_driver = {

@@ -61,6 +61,10 @@ int parse_bw(struct rdt_parse_data *data, struct resctrl_schema *s,
 	     struct rdt_domain *d)
 {
 	struct resctrl_staged_config *cfg;
+<<<<<<< HEAD
+	u32 closid = data->rdtgrp->closid;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rdt_resource *r = s->res;
 	unsigned long bw_val;
 
@@ -72,6 +76,15 @@ int parse_bw(struct rdt_parse_data *data, struct resctrl_schema *s,
 
 	if (!bw_validate(data->buf, &bw_val, r))
 		return -EINVAL;
+<<<<<<< HEAD
+
+	if (is_mba_sc(r)) {
+		d->mbps_val[closid] = bw_val;
+		return 0;
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	cfg->new_ctrl = bw_val;
 	cfg->have_new_ctrl = true;
 
@@ -247,6 +260,59 @@ next:
 }
 
 static u32 get_config_index(u32 closid, enum resctrl_conf_type type)
+<<<<<<< HEAD
+{
+	switch (type) {
+	default:
+	case CDP_NONE:
+		return closid;
+	case CDP_CODE:
+		return closid * 2 + 1;
+	case CDP_DATA:
+		return closid * 2;
+	}
+}
+
+static bool apply_config(struct rdt_hw_domain *hw_dom,
+			 struct resctrl_staged_config *cfg, u32 idx,
+			 cpumask_var_t cpu_mask)
+{
+	struct rdt_domain *dom = &hw_dom->d_resctrl;
+
+	if (cfg->new_ctrl != hw_dom->ctrl_val[idx]) {
+		cpumask_set_cpu(cpumask_any(&dom->cpu_mask), cpu_mask);
+		hw_dom->ctrl_val[idx] = cfg->new_ctrl;
+
+		return true;
+	}
+
+	return false;
+}
+
+int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_domain *d,
+			    u32 closid, enum resctrl_conf_type t, u32 cfg_val)
+{
+	struct rdt_hw_resource *hw_res = resctrl_to_arch_res(r);
+	struct rdt_hw_domain *hw_dom = resctrl_to_arch_dom(d);
+	u32 idx = get_config_index(closid, t);
+	struct msr_param msr_param;
+
+	if (!cpumask_test_cpu(smp_processor_id(), &d->cpu_mask))
+		return -EINVAL;
+
+	hw_dom->ctrl_val[idx] = cfg_val;
+
+	msr_param.res = r;
+	msr_param.low = idx;
+	msr_param.high = idx + 1;
+	hw_res->msr_update(d, &msr_param, r);
+
+	return 0;
+}
+
+int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
+{
+=======
 {
 	switch (type) {
 	default:
@@ -278,20 +344,27 @@ static bool apply_config(struct rdt_hw_domain *hw_dom,
 
 int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct resctrl_staged_config *cfg;
 	struct rdt_hw_domain *hw_dom;
 	struct msr_param msr_param;
 	enum resctrl_conf_type t;
 	cpumask_var_t cpu_mask;
 	struct rdt_domain *d;
+<<<<<<< HEAD
+=======
 	bool mba_sc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int cpu;
 	u32 idx;
 
 	if (!zalloc_cpumask_var(&cpu_mask, GFP_KERNEL))
 		return -ENOMEM;
 
+<<<<<<< HEAD
+=======
 	mba_sc = is_mba_sc(r);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	msr_param.res = NULL;
 	list_for_each_entry(d, &r->domains, list) {
 		hw_dom = resctrl_to_arch_dom(d);
@@ -301,7 +374,11 @@ int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
 				continue;
 
 			idx = get_config_index(closid, t);
+<<<<<<< HEAD
+			if (!apply_config(hw_dom, cfg, idx, cpu_mask))
+=======
 			if (!apply_config(hw_dom, cfg, idx, cpu_mask, mba_sc))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				continue;
 
 			if (!msr_param.res) {
@@ -315,11 +392,7 @@ int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
 		}
 	}
 
-	/*
-	 * Avoid writing the control msr with control values when
-	 * MBA software controller is enabled
-	 */
-	if (cpumask_empty(cpu_mask) || mba_sc)
+	if (cpumask_empty(cpu_mask))
 		goto done;
 	cpu = get_cpu();
 	/* Update resource control msr on this CPU if it's in cpu_mask. */
@@ -406,6 +479,17 @@ ssize_t rdtgroup_schemata_write(struct kernfs_open_file *of,
 
 	list_for_each_entry(s, &resctrl_schema_all, list) {
 		r = s->res;
+<<<<<<< HEAD
+
+		/*
+		 * Writes to mba_sc resources update the software controller,
+		 * not the control MSR.
+		 */
+		if (is_mba_sc(r))
+			continue;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = resctrl_arch_update_domains(r, rdtgrp->closid);
 		if (ret)
 			goto out;
@@ -429,6 +513,17 @@ out:
 
 u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_domain *d,
 			    u32 closid, enum resctrl_conf_type type)
+<<<<<<< HEAD
+{
+	struct rdt_hw_domain *hw_dom = resctrl_to_arch_dom(d);
+	u32 idx = get_config_index(closid, type);
+
+	return hw_dom->ctrl_val[idx];
+}
+
+static void show_doms(struct seq_file *s, struct resctrl_schema *schema, int closid)
+{
+=======
 {
 	struct rdt_hw_domain *hw_dom = resctrl_to_arch_dom(d);
 	u32 idx = get_config_index(closid, type);
@@ -440,6 +535,7 @@ u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_domain *d,
 
 static void show_doms(struct seq_file *s, struct resctrl_schema *schema, int closid)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rdt_resource *r = schema->res;
 	struct rdt_domain *dom;
 	bool sep = false;
@@ -450,8 +546,17 @@ static void show_doms(struct seq_file *s, struct resctrl_schema *schema, int clo
 		if (sep)
 			seq_puts(s, ";");
 
+<<<<<<< HEAD
+		if (is_mba_sc(r))
+			ctrl_val = dom->mbps_val[closid];
+		else
+			ctrl_val = resctrl_arch_get_config(r, dom, closid,
+							   schema->conf_type);
+
+=======
 		ctrl_val = resctrl_arch_get_config(r, dom, closid,
 						   schema->conf_type);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		seq_printf(s, r->format_str, dom->id, max_data_width,
 			   ctrl_val);
 		sep = true;
@@ -538,8 +643,12 @@ int rdtgroup_mondata_show(struct seq_file *m, void *arg)
 	domid = md.u.domid;
 	evtid = md.u.evtid;
 
+<<<<<<< HEAD
+	r = &rdt_resources_all[resid].r_resctrl;
+=======
 	hw_res = &rdt_resources_all[resid];
 	r = &hw_res->r_resctrl;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	d = rdt_find_domain(r, domid, NULL);
 	if (IS_ERR_OR_NULL(d)) {
 		ret = -ENOENT;
@@ -548,12 +657,16 @@ int rdtgroup_mondata_show(struct seq_file *m, void *arg)
 
 	mon_event_read(&rr, r, d, rdtgrp, evtid, false);
 
-	if (rr.val & RMID_VAL_ERROR)
+	if (rr.err == -EIO)
 		seq_puts(m, "Error\n");
-	else if (rr.val & RMID_VAL_UNAVAIL)
+	else if (rr.err == -EINVAL)
 		seq_puts(m, "Unavailable\n");
 	else
+<<<<<<< HEAD
+		seq_printf(m, "%llu\n", rr.val);
+=======
 		seq_printf(m, "%llu\n", rr.val * hw_res->mon_scale);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	rdtgroup_kn_unlock(of->kn);

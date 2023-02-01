@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/adis16400.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/adis16400.ko drivers/iio/imu/adis16400.o drivers/iio/imu/adis16400.mod.o;  true

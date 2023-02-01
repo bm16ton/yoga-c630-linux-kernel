@@ -25,11 +25,24 @@ icc)
 	;;
 llvm)
 	if [ "$SRCARCH" = s390 ]; then
+<<<<<<< HEAD
+		echo 15.0.0
+=======
 		echo 14.0.0
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	else
 		echo 11.0.0
 	fi
 	;;
+<<<<<<< HEAD
+rustc)
+	echo 1.62.0
+	;;
+bindgen)
+	echo 0.56.0
+	;;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 *)
 	echo "$1: unknown tool" >&2
 	exit 1

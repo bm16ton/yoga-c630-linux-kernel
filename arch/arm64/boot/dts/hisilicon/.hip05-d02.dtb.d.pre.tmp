@@ -1,0 +1,5 @@
+hip05-d02.o: arch/arm64/boot/dts/hisilicon/hip05-d02.dts \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ arch/arm64/boot/dts/hisilicon/hip05.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

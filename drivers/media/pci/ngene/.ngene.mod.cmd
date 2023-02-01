@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/ngene/ngene.mod := printf '%s\n'   ngene-core.o ngene-i2c.o ngene-cards.o ngene-dvb.o | awk '!x[$$0]++ { print("drivers/media/pci/ngene/"$$0) }' > drivers/media/pci/ngene/ngene.mod

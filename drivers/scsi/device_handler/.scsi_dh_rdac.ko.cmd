@@ -1,0 +1,1 @@
+cmd_drivers/scsi/device_handler/scsi_dh_rdac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/device_handler/scsi_dh_rdac.ko drivers/scsi/device_handler/scsi_dh_rdac.o drivers/scsi/device_handler/scsi_dh_rdac.mod.o;  true

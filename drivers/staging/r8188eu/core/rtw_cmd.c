@@ -5,8 +5,11 @@
 
 #include "../include/osdep_service.h"
 #include "../include/drv_types.h"
+<<<<<<< HEAD
+=======
 #include "../include/recv_osdep.h"
 #include "../include/mlme_osdep.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../include/rtw_br_ext.h"
 #include "../include/rtw_mlme_ext.h"
 #include "../include/rtl8188e_dm.h"
@@ -58,8 +61,11 @@ exit:
 
 u32	rtw_init_cmd_priv(struct cmd_priv *pcmdpriv)
 {
+<<<<<<< HEAD
+=======
 	u32 res = _SUCCESS;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	init_completion(&pcmdpriv->enqueue_cmd);
 	/* sema_init(&(pcmdpriv->cmd_done_sema), 0); */
 	init_completion(&pcmdpriv->start_cmd_thread);
@@ -74,27 +80,42 @@ u32	rtw_init_cmd_priv(struct cmd_priv *pcmdpriv)
 	pcmdpriv->cmd_allocated_buf = kzalloc(MAX_CMDSZ + CMDBUFF_ALIGN_SZ,
 					      GFP_KERNEL);
 
+<<<<<<< HEAD
+	if (!pcmdpriv->cmd_allocated_buf)
+		return _FAIL;
+=======
 	if (!pcmdpriv->cmd_allocated_buf) {
 		res = _FAIL;
 		goto exit;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pcmdpriv->cmd_buf = pcmdpriv->cmd_allocated_buf  +  CMDBUFF_ALIGN_SZ - ((size_t)(pcmdpriv->cmd_allocated_buf) & (CMDBUFF_ALIGN_SZ - 1));
 
 	pcmdpriv->rsp_allocated_buf = kzalloc(MAX_RSPSZ + 4, GFP_KERNEL);
 
 	if (!pcmdpriv->rsp_allocated_buf) {
+<<<<<<< HEAD
+		kfree(pcmdpriv->cmd_allocated_buf);
+		return _FAIL;
+=======
 		res = _FAIL;
 		goto exit;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	pcmdpriv->rsp_buf = pcmdpriv->rsp_allocated_buf  +  4 - ((size_t)(pcmdpriv->rsp_allocated_buf) & 3);
 
 	pcmdpriv->cmd_done_cnt = 0;
 	pcmdpriv->rsp_cnt = 0;
+<<<<<<< HEAD
+
+	return _SUCCESS;
+=======
 exit:
 
 	return res;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 u32 rtw_init_evt_priv(struct evt_priv *pevtpriv)
@@ -288,8 +309,12 @@ post_process:
  *	### NOTE:#### (!!!!)
  *	MUST TAKE CARE THAT BEFORE CALLING THIS FUNC, YOU SHOULD HAVE LOCKED pmlmepriv->lock
  */
+<<<<<<< HEAD
+u8 rtw_sitesurvey_cmd(struct adapter  *padapter, struct ndis_802_11_ssid *ssid, int ssid_num)
+=======
 u8 rtw_sitesurvey_cmd(struct adapter  *padapter, struct ndis_802_11_ssid *ssid, int ssid_num,
 	struct rtw_ieee80211_channel *ch, int ch_num)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	u8 res = _FAIL;
 	struct cmd_obj		*ph2c;
@@ -331,6 +356,8 @@ u8 rtw_sitesurvey_cmd(struct adapter  *padapter, struct ndis_802_11_ssid *ssid, 
 		}
 	}
 
+<<<<<<< HEAD
+=======
 	/* prepare channel list */
 	if (ch) {
 		int i;
@@ -342,6 +369,7 @@ u8 rtw_sitesurvey_cmd(struct adapter  *padapter, struct ndis_802_11_ssid *ssid, 
 		}
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_fwstate(pmlmepriv, _FW_UNDER_SURVEY);
 
 	res = rtw_enqueue_cmd(pcmdpriv, ph2c);
@@ -1290,6 +1318,69 @@ exit:
 	return res;
 }
 
+<<<<<<< HEAD
+/* C2H event format:
+ * Field    TRIGGER      CONTENT     CMD_SEQ    CMD_LEN    CMD_ID
+ * BITS     [127:120]    [119:16]    [15:8]     [7:4]      [3:0]
+ */
+static s32 c2h_evt_read(struct adapter *adapter, u8 *buf)
+{
+	s32 ret = _FAIL;
+	struct c2h_evt_hdr *c2h_evt;
+	int i;
+	u8 trigger;
+
+	if (!buf)
+		goto exit;
+
+	ret = rtw_read8(adapter, REG_C2HEVT_CLEAR, &trigger);
+	if (ret)
+		return _FAIL;
+
+	if (trigger == C2H_EVT_HOST_CLOSE)
+		goto exit; /* Not ready */
+	else if (trigger != C2H_EVT_FW_CLOSE)
+		goto clear_evt; /* Not a valid value */
+
+	c2h_evt = (struct c2h_evt_hdr *)buf;
+
+	memset(c2h_evt, 0, 16);
+
+	ret = rtw_read8(adapter, REG_C2HEVT_MSG_NORMAL, buf);
+	if (ret) {
+		ret = _FAIL;
+		goto clear_evt;
+	}
+
+	ret = rtw_read8(adapter, REG_C2HEVT_MSG_NORMAL + 1, buf + 1);
+	if (ret) {
+		ret = _FAIL;
+		goto clear_evt;
+	}
+	/* Read the content */
+	for (i = 0; i < c2h_evt->plen; i++) {
+		ret = rtw_read8(adapter, REG_C2HEVT_MSG_NORMAL +
+				sizeof(*c2h_evt) + i, c2h_evt->payload + i);
+		if (ret) {
+			ret = _FAIL;
+			goto clear_evt;
+		}
+	}
+
+	ret = _SUCCESS;
+
+clear_evt:
+	/* Clear event to notify FW we have read the command.
+	 * If this field isn't clear, the FW won't update the next
+	 * command message.
+	 */
+	rtw_write8(adapter, REG_C2HEVT_CLEAR, C2H_EVT_HOST_CLOSE);
+exit:
+	return ret;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static void c2h_evt_hdl(struct adapter *adapter, struct c2h_evt_hdr *c2h_evt, c2h_id_filter filter)
 {
 	u8 buf[16];

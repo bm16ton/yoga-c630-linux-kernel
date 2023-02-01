@@ -29,6 +29,10 @@ properties:
       - description: AST2500 based boards
         items:
           - enum:
+<<<<<<< HEAD
+              - amd,daytonax-bmc
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - amd,ethanolx-bmc
               - ampere,mtjade-bmc
               - aspeed,ast2500-evb
@@ -69,6 +73,10 @@ properties:
       - description: AST2600 based boards
         items:
           - enum:
+<<<<<<< HEAD
+              - ampere,mtmitchell-bmc
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - aspeed,ast2600-evb
               - aspeed,ast2600-evb-a1
               - facebook,bletchley-bmc

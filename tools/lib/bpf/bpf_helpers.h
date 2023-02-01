@@ -160,6 +160,8 @@ bpf_tail_call_static(void *ctx, const void *map, const __u32 slot)
 }
 #endif
 
+<<<<<<< HEAD
+=======
 /*
  * Helper structure used by eBPF C program
  * to describe BPF map attributes to libbpf loader
@@ -172,6 +174,7 @@ struct bpf_map_def {
 	unsigned int map_flags;
 } __attribute__((deprecated("use BTF-defined maps in .maps section")));
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum libbpf_pin_type {
 	LIBBPF_PIN_NONE,
 	/* PIN_BY_NAME: pin maps by name (in /sys/fs/bpf by default) */

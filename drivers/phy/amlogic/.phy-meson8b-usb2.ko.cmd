@@ -1,0 +1,1 @@
+cmd_drivers/phy/amlogic/phy-meson8b-usb2.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/amlogic/phy-meson8b-usb2.ko drivers/phy/amlogic/phy-meson8b-usb2.o drivers/phy/amlogic/phy-meson8b-usb2.mod.o;  true

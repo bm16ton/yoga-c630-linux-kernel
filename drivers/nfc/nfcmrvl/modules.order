@@ -1,0 +1,5 @@
+drivers/nfc/nfcmrvl/nfcmrvl.ko
+drivers/nfc/nfcmrvl/nfcmrvl_usb.ko
+drivers/nfc/nfcmrvl/nfcmrvl_uart.ko
+drivers/nfc/nfcmrvl/nfcmrvl_i2c.ko
+drivers/nfc/nfcmrvl/nfcmrvl_spi.ko

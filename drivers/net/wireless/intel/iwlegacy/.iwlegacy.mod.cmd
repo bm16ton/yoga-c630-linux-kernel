@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/iwlegacy/iwlegacy.mod := printf '%s\n'   common.o | awk '!x[$$0]++ { print("drivers/net/wireless/intel/iwlegacy/"$$0) }' > drivers/net/wireless/intel/iwlegacy/iwlegacy.mod

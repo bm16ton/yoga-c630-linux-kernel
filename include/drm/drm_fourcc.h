@@ -138,8 +138,14 @@ struct drm_format_info {
 
 	/** @is_yuv: Is it a YUV format? */
 	bool is_yuv;
+
+<<<<<<< HEAD
+	/** @is_color_indexed: Is it a color-indexed format? */
+	bool is_color_indexed;
 };
 
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * drm_format_info_is_yuv_packed - check that the format info matches a YUV
  * format with data laid in a single plane
@@ -313,6 +319,7 @@ unsigned int drm_format_info_block_width(const struct drm_format_info *info,
 					 int plane);
 unsigned int drm_format_info_block_height(const struct drm_format_info *info,
 					  int plane);
+unsigned int drm_format_info_bpp(const struct drm_format_info *info, int plane);
 uint64_t drm_format_info_min_pitch(const struct drm_format_info *info,
 				   int plane, unsigned int buffer_width);
 

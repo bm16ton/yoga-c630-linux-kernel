@@ -1,0 +1,1 @@
+cmd_drivers/firmware/qemu_fw_cfg.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/firmware/qemu_fw_cfg.ko drivers/firmware/qemu_fw_cfg.o drivers/firmware/qemu_fw_cfg.mod.o;  true

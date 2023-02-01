@@ -165,10 +165,19 @@ static void lan966x_port_link_up(struct lan966x_port *port)
 		break;
 	}
 
+<<<<<<< HEAD
+	lan966x_taprio_speed_set(port, config->speed);
+
+	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
+	 * port speed for QSGMII ports.
+	 */
+	if (phy_interface_num_ports(config->portmode) == 4)
+=======
 	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
 	 * port speed for QSGMII ports.
 	 */
 	if (config->portmode == PHY_INTERFACE_MODE_QSGMII)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
 
 	lan_wr(config->duplex | mode,
@@ -331,10 +340,21 @@ int lan966x_port_pcs_set(struct lan966x_port *port,
 	struct lan966x *lan966x = port->lan966x;
 	bool inband_aneg = false;
 	bool outband;
+<<<<<<< HEAD
+	bool full_preamble = false;
+
+	if (config->portmode == PHY_INTERFACE_MODE_QUSGMII)
+		full_preamble = true;
+
+	if (config->inband) {
+		if (config->portmode == PHY_INTERFACE_MODE_SGMII ||
+		    phy_interface_num_ports(config->portmode) == 4)
+=======
 
 	if (config->inband) {
 		if (config->portmode == PHY_INTERFACE_MODE_SGMII ||
 		    config->portmode == PHY_INTERFACE_MODE_QSGMII)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			inband_aneg = true; /* Cisco-SGMII in-band-aneg */
 		else if (config->portmode == PHY_INTERFACE_MODE_1000BASEX &&
 			 config->autoneg)
@@ -345,9 +365,21 @@ int lan966x_port_pcs_set(struct lan966x_port *port,
 		outband = true;
 	}
 
+<<<<<<< HEAD
+	/* Disable or enable inband.
+	 * For QUSGMII, we rely on the preamble to transmit data such as
+	 * timestamps, therefore force full preamble transmission, and prevent
+	 * premable shortening
+	 */
+	lan_rmw(DEV_PCS1G_MODE_CFG_SGMII_MODE_ENA_SET(outband) |
+		DEV_PCS1G_MODE_CFG_SAVE_PREAMBLE_ENA_SET(full_preamble),
+		DEV_PCS1G_MODE_CFG_SGMII_MODE_ENA |
+		DEV_PCS1G_MODE_CFG_SAVE_PREAMBLE_ENA,
+=======
 	/* Disable or enable inband */
 	lan_rmw(DEV_PCS1G_MODE_CFG_SGMII_MODE_ENA_SET(outband),
 		DEV_PCS1G_MODE_CFG_SGMII_MODE_ENA,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		lan966x, DEV_PCS1G_MODE_CFG(port->chip_port));
 
 	/* Enable PCS */
@@ -369,7 +401,11 @@ int lan966x_port_pcs_set(struct lan966x_port *port,
 	}
 
 	/* Take PCS out of reset */
+<<<<<<< HEAD
+	lan_rmw(DEV_CLOCK_CFG_LINK_SPEED_SET(LAN966X_SPEED_1000) |
+=======
 	lan_rmw(DEV_CLOCK_CFG_LINK_SPEED_SET(2) |
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		DEV_CLOCK_CFG_PCS_RX_RST_SET(0) |
 		DEV_CLOCK_CFG_PCS_TX_RST_SET(0),
 		DEV_CLOCK_CFG_LINK_SPEED |
@@ -396,7 +432,11 @@ void lan966x_port_init(struct lan966x_port *port)
 	if (lan966x->fdma)
 		lan966x_fdma_netdev_init(lan966x, port->dev);
 
+<<<<<<< HEAD
+	if (phy_interface_num_ports(config->portmode) != 4)
+=======
 	if (config->portmode != PHY_INTERFACE_MODE_QSGMII)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 
 	lan_rmw(DEV_CLOCK_CFG_PCS_RX_RST_SET(0) |

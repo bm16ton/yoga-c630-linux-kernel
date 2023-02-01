@@ -62,6 +62,10 @@ extern int __modsi3(int, int);
 extern int __mulsi3(int, int);
 extern unsigned int __udivsi3(unsigned int, unsigned int);
 extern unsigned int __umodsi3(unsigned int, unsigned int);
+<<<<<<< HEAD
+extern unsigned long long __umulsidi3(unsigned int, unsigned int);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 EXPORT_SYMBOL(__ashldi3);
 EXPORT_SYMBOL(__ashrdi3);
@@ -71,6 +75,10 @@ EXPORT_SYMBOL(__modsi3);
 EXPORT_SYMBOL(__mulsi3);
 EXPORT_SYMBOL(__udivsi3);
 EXPORT_SYMBOL(__umodsi3);
+<<<<<<< HEAD
+EXPORT_SYMBOL(__umulsidi3);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 unsigned int __sync_fetch_and_and_4(volatile void *p, unsigned int v)
 {

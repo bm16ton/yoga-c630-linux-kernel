@@ -57,6 +57,11 @@ properties:
       - description: interrupt ID for I2C event
       - description: interrupt ID for I2C error
 
+  interrupt-names:
+    items:
+      - const: event
+      - const: error
+
   resets:
     maxItems: 1
 
@@ -92,6 +97,11 @@ properties:
           - description: register offset within syscfg
           - description: register bitmask for FMP bit
 
+<<<<<<< HEAD
+  wakeup-source: true
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg

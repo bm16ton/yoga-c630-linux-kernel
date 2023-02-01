@@ -28,5 +28,9 @@
 
 extern const struct nbio_hdp_flush_reg nbio_v4_3_hdp_flush_reg;
 extern const struct amdgpu_nbio_funcs nbio_v4_3_funcs;
+<<<<<<< HEAD
+extern const struct amdgpu_nbio_funcs nbio_v4_3_sriov_funcs;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif

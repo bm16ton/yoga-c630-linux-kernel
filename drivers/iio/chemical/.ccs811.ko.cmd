@@ -1,0 +1,1 @@
+cmd_drivers/iio/chemical/ccs811.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/chemical/ccs811.ko drivers/iio/chemical/ccs811.o drivers/iio/chemical/ccs811.mod.o;  true

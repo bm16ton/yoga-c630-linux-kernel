@@ -1,0 +1,1 @@
+cmd_net/6lowpan/nhc_ghc_ext_frag.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/6lowpan/nhc_ghc_ext_frag.ko net/6lowpan/nhc_ghc_ext_frag.o net/6lowpan/nhc_ghc_ext_frag.mod.o;  true

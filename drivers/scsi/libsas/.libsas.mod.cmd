@@ -1,0 +1,1 @@
+cmd_drivers/scsi/libsas/libsas.mod := printf '%s\n'   sas_init.o sas_phy.o sas_port.o sas_event.o sas_discover.o sas_expander.o sas_scsi_host.o sas_task.o sas_ata.o sas_host_smp.o | awk '!x[$$0]++ { print("drivers/scsi/libsas/"$$0) }' > drivers/scsi/libsas/libsas.mod

@@ -27,7 +27,18 @@ properties:
   interrupt-controller: true
   '#interrupt-cells': true
   gpio-controller: true
+<<<<<<< HEAD
+
+  gpio-reserved-ranges:
+    minItems: 1
+    maxItems: 105
+
+  gpio-line-names:
+    maxItems: 209
+
+=======
   gpio-reserved-ranges: true
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   '#gpio-cells': true
   gpio-ranges: true
   wakeup-parent: true
@@ -43,8 +54,14 @@ patternProperties:
     oneOf:
       - $ref: "#/$defs/qcom-sm8450-tlmm-state"
       - patternProperties:
+<<<<<<< HEAD
+          "-pins$":
+            $ref: "#/$defs/qcom-sm8450-tlmm-state"
+        additionalProperties: false
+=======
           ".*":
             $ref: "#/$defs/qcom-sm8450-tlmm-state"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 $defs:
   qcom-sm8450-tlmm-state:
@@ -52,7 +69,10 @@ $defs:
     description:
       Pinctrl node's client devices use subnodes for desired pin configuration.
       Client device subnodes use below standard properties.
+<<<<<<< HEAD
+=======
     $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     properties:
       pins:
@@ -104,12 +124,57 @@ $defs:
 
     required:
       - pins
+<<<<<<< HEAD
+
+    allOf:
+      - $ref: "qcom,tlmm-common.yaml#/$defs/qcom-tlmm-state"
+      - if:
+          properties:
+            pins:
+              pattern: "^gpio([0-9]|[1-9][0-9]|1[0-9][0-9]|20[0-9])$"
+        then:
+          required:
+            - function
+=======
       - function
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
     additionalProperties: false
 
 examples:
   - |
+<<<<<<< HEAD
+    #include <dt-bindings/interrupt-controller/arm-gic.h>
+    pinctrl@f100000 {
+        compatible = "qcom,sm8450-tlmm";
+        reg = <0x0f100000 0x300000>;
+        gpio-controller;
+        #gpio-cells = <2>;
+        gpio-ranges = <&tlmm 0 0 211>;
+        interrupt-controller;
+        #interrupt-cells = <2>;
+        interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+
+        gpio-wo-state {
+            pins = "gpio1";
+            function = "gpio";
+        };
+
+        uart-w-state {
+            rx-pins {
+                pins = "gpio26";
+                function = "qup7";
+                bias-pull-up;
+            };
+
+            tx-pins {
+                pins = "gpio27";
+                function = "qup7";
+                bias-disable;
+            };
+        };
+    };
+=======
         #include <dt-bindings/interrupt-controller/arm-gic.h>
         pinctrl@f100000 {
                 compatible = "qcom,sm8450-tlmm";
@@ -140,4 +205,5 @@ examples:
                     };
                };
         };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ...

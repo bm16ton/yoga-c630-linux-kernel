@@ -1,0 +1,1 @@
+cmd_drivers/misc/eeprom/eeprom_93xx46.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/eeprom/eeprom_93xx46.ko drivers/misc/eeprom/eeprom_93xx46.o drivers/misc/eeprom/eeprom_93xx46.mod.o;  true

@@ -186,6 +186,10 @@
 enum rockchip_pinctrl_type {
 	PX30,
 	RV1108,
+<<<<<<< HEAD
+	RV1126,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	RK2928,
 	RK3066B,
 	RK3128,

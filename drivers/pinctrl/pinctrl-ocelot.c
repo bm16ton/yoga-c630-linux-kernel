@@ -10,6 +10,7 @@
 #include <linux/gpio/driver.h>
 #include <linux/interrupt.h>
 #include <linux/io.h>
+#include <linux/mfd/ocelot.h>
 #include <linux/of_device.h>
 #include <linux/of_irq.h>
 #include <linux/of_platform.h>
@@ -2045,6 +2046,14 @@ static struct regmap *ocelot_pinctrl_create_pincfg(struct platform_device *pdev,
 
 	return devm_regmap_init_mmio(&pdev->dev, base, &regmap_config);
 }
+<<<<<<< HEAD
+
+static void ocelot_destroy_workqueue(void *data)
+{
+	destroy_workqueue(data);
+}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static int ocelot_pinctrl_probe(struct platform_device *pdev)
 {
@@ -2053,7 +2062,10 @@ static int ocelot_pinctrl_probe(struct platform_device *pdev)
 	struct ocelot_pinctrl *info;
 	struct reset_control *reset;
 	struct regmap *pincfg;
+<<<<<<< HEAD
+=======
 	void __iomem *base;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 	struct regmap_config regmap_config = {
 		.reg_bits = 32,
@@ -2068,6 +2080,30 @@ static int ocelot_pinctrl_probe(struct platform_device *pdev)
 	data = device_get_match_data(dev);
 	if (!data)
 		return -EINVAL;
+<<<<<<< HEAD
+
+	info->desc = devm_kmemdup(dev, &data->desc, sizeof(*info->desc),
+				  GFP_KERNEL);
+	if (!info->desc)
+		return -ENOMEM;
+
+	info->wq = alloc_ordered_workqueue("ocelot_ordered", 0);
+	if (!info->wq)
+		return -ENOMEM;
+
+	ret = devm_add_action_or_reset(dev, ocelot_destroy_workqueue,
+				       info->wq);
+	if (ret)
+		return ret;
+
+	info->pincfg_data = &data->pincfg_data;
+
+	reset = devm_reset_control_get_optional_shared(dev, "switch");
+	if (IS_ERR(reset))
+		return dev_err_probe(dev, PTR_ERR(reset),
+				     "Failed to get reset\n");
+	reset_control_reset(reset);
+=======
 
 	info->desc = devm_kmemdup(dev, &data->desc, sizeof(*info->desc),
 				  GFP_KERNEL);
@@ -2090,16 +2126,24 @@ static int ocelot_pinctrl_probe(struct platform_device *pdev)
 			platform_get_resource(pdev, IORESOURCE_MEM, 0));
 	if (IS_ERR(base))
 		return PTR_ERR(base);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	info->stride = 1 + (info->desc->npins - 1) / 32;
 
 	regmap_config.max_register = OCELOT_GPIO_SD_MAP * info->stride + 15 * 4;
 
+<<<<<<< HEAD
+	info->map = ocelot_regmap_from_resource(pdev, 0, &regmap_config);
+	if (IS_ERR(info->map))
+		return dev_err_probe(dev, PTR_ERR(info->map),
+				     "Failed to create regmap\n");
+=======
 	info->map = devm_regmap_init_mmio(dev, base, &regmap_config);
 	if (IS_ERR(info->map)) {
 		dev_err(dev, "Failed to create regmap\n");
 		return PTR_ERR(info->map);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dev_set_drvdata(dev, info);
 	info->dev = dev;
 
@@ -2144,4 +2188,9 @@ static struct platform_driver ocelot_pinctrl_driver = {
 	.remove = ocelot_pinctrl_remove,
 };
 module_platform_driver(ocelot_pinctrl_driver);
+<<<<<<< HEAD
+
+MODULE_DESCRIPTION("Ocelot Chip Pinctrl Driver");
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_LICENSE("Dual MIT/GPL");

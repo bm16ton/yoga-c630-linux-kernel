@@ -65,6 +65,25 @@ struct test_def {
 void test_test_global_funcs(void)
 {
 	struct test_def tests[] = {
+<<<<<<< HEAD
+		{ "test_global_func1.bpf.o", "combined stack size of 4 calls is 544" },
+		{ "test_global_func2.bpf.o" },
+		{ "test_global_func3.bpf.o", "the call stack of 8 frames" },
+		{ "test_global_func4.bpf.o" },
+		{ "test_global_func5.bpf.o", "expected pointer to ctx, but got PTR" },
+		{ "test_global_func6.bpf.o", "modified ctx ptr R2" },
+		{ "test_global_func7.bpf.o", "foo() doesn't return scalar" },
+		{ "test_global_func8.bpf.o" },
+		{ "test_global_func9.bpf.o" },
+		{ "test_global_func10.bpf.o", "invalid indirect read from stack" },
+		{ "test_global_func11.bpf.o", "Caller passes invalid args into func#1" },
+		{ "test_global_func12.bpf.o", "invalid mem access 'mem_or_null'" },
+		{ "test_global_func13.bpf.o", "Caller passes invalid args into func#1" },
+		{ "test_global_func14.bpf.o", "reference type('FWD S') size cannot be determined" },
+		{ "test_global_func15.bpf.o", "At program exit the register R0 has value" },
+		{ "test_global_func16.bpf.o", "invalid indirect read from stack" },
+		{ "test_global_func17.bpf.o", "Caller passes invalid args into func#1" },
+=======
 		{ "test_global_func1.o", "combined stack size of 4 calls is 544" },
 		{ "test_global_func2.o" },
 		{ "test_global_func3.o" , "the call stack of 8 frames" },
@@ -82,6 +101,7 @@ void test_test_global_funcs(void)
 		{ "test_global_func15.o", "At program exit the register R0 has value" },
 		{ "test_global_func16.o", "invalid indirect read from stack" },
 		{ "test_global_func17.o", "Caller passes invalid args into func#1" },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 	libbpf_print_fn_t old_print_fn = NULL;
 	int err, i, duration = 0;

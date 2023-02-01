@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/ti-adc161s626.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/ti-adc161s626.ko drivers/iio/adc/ti-adc161s626.o drivers/iio/adc/ti-adc161s626.mod.o;  true

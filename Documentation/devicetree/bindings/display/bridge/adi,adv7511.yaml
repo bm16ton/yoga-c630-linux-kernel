@@ -117,6 +117,23 @@ properties:
 
   ports:
     description:
+<<<<<<< HEAD
+      The ADV7511(W)/13 has two video ports and one audio port.
+    $ref: /schemas/graph.yaml#/properties/ports
+
+    properties:
+      port@0:
+        description: Video port for the RGB or YUV input.
+        $ref: /schemas/graph.yaml#/properties/port
+
+      port@1:
+        description: Video port for the HDMI output.
+        $ref: /schemas/graph.yaml#/properties/port
+
+      port@2:
+        description: Audio port for the HDMI output.
+        $ref: /schemas/graph.yaml#/properties/port
+=======
       The ADV7511(W)/13 has two video ports and one audio port. This node
       models their connections as documented in
       Documentation/devicetree/bindings/media/video-interfaces.txt
@@ -134,6 +151,7 @@ properties:
       port@2:
         description: Audio port for the HDMI output.
         type: object
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 # adi,input-colorspace and adi,input-clock are required except in
 # "rgb 1x" and "yuv444 1x" modes, in which case they must not be

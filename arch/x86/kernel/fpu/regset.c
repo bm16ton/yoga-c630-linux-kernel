@@ -167,7 +167,11 @@ int xstateregs_set(struct task_struct *target, const struct user_regset *regset,
 	}
 
 	fpu_force_restore(fpu);
+<<<<<<< HEAD
+	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf, &target->thread.pkru);
+=======
 	ret = copy_uabi_from_kernel_to_xstate(fpu->fpstate, kbuf ?: tmpbuf);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 out:
 	vfree(tmpbuf);

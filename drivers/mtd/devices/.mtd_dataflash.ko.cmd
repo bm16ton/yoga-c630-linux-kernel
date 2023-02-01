@@ -1,0 +1,1 @@
+cmd_drivers/mtd/devices/mtd_dataflash.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/devices/mtd_dataflash.ko drivers/mtd/devices/mtd_dataflash.o drivers/mtd/devices/mtd_dataflash.mod.o;  true

@@ -28,4 +28,8 @@ table of content:
    display-manager.rst
    dc-debug.rst
    dcn-overview.rst
+<<<<<<< HEAD
+   mpo-overview.rst
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
    dc-glossary.rst

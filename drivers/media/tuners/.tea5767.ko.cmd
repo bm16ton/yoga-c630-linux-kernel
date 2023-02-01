@@ -1,0 +1,1 @@
+cmd_drivers/media/tuners/tea5767.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/tuners/tea5767.ko drivers/media/tuners/tea5767.o drivers/media/tuners/tea5767.mod.o;  true

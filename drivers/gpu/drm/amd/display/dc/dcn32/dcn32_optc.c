@@ -151,12 +151,20 @@ static bool optc32_disable_crtc(struct timing_generator *optc)
 	/* CRTC disabled, so disable  clock. */
 	REG_WAIT(OTG_CLOCK_CONTROL,
 			OTG_BUSY, 0,
+<<<<<<< HEAD
+			1, 150000);
+=======
 			1, 100000);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return true;
 }
 
+<<<<<<< HEAD
+static void optc32_phantom_crtc_post_enable(struct timing_generator *optc)
+=======
 void optc32_phantom_crtc_post_enable(struct timing_generator *optc)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct optc *optc1 = DCN10TG_FROM_TG(optc);
 
@@ -190,7 +198,11 @@ static void optc32_set_odm_bypass(struct timing_generator *optc,
 	optc1->opp_count = 1;
 }
 
+<<<<<<< HEAD
+static void optc32_setup_manual_trigger(struct timing_generator *optc)
+=======
 void optc32_setup_manual_trigger(struct timing_generator *optc)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct optc *optc1 = DCN10TG_FROM_TG(optc);
 	struct dc *dc = optc->ctx->dc;
@@ -215,7 +227,11 @@ void optc32_setup_manual_trigger(struct timing_generator *optc)
 	}
 }
 
+<<<<<<< HEAD
+static void optc32_set_drr(
+=======
 void optc32_set_drr(
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct timing_generator *optc,
 	const struct drr_params *params)
 {

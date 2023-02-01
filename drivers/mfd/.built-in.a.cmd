@@ -1,0 +1,1 @@
+cmd_drivers/mfd/built-in.a := rm -f drivers/mfd/built-in.a;  printf "drivers/mfd/%s " stmpe.o stmpe-i2c.o stmpe-spi.o twl6040.o mfd-core.o max77620.o qcom-spmi-pmic.o syscon.o vexpress-sysreg.o | xargs ar cDPrST drivers/mfd/built-in.a

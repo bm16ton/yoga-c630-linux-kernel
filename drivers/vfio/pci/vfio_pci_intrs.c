@@ -20,7 +20,37 @@
 #include <linux/wait.h>
 #include <linux/slab.h>
 
+<<<<<<< HEAD
+#include "vfio_pci_priv.h"
+
+struct vfio_pci_irq_ctx {
+	struct eventfd_ctx	*trigger;
+	struct virqfd		*unmask;
+	struct virqfd		*mask;
+	char			*name;
+	bool			masked;
+	struct irq_bypass_producer	producer;
+};
+
+static bool irq_is(struct vfio_pci_core_device *vdev, int type)
+{
+	return vdev->irq_type == type;
+}
+
+static bool is_intx(struct vfio_pci_core_device *vdev)
+{
+	return vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX;
+}
+
+static bool is_irq_none(struct vfio_pci_core_device *vdev)
+{
+	return !(vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX ||
+		 vdev->irq_type == VFIO_PCI_MSI_IRQ_INDEX ||
+		 vdev->irq_type == VFIO_PCI_MSIX_IRQ_INDEX);
+}
+=======
 #include <linux/vfio_pci_core.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * INTx
@@ -33,10 +63,16 @@ static void vfio_send_intx_eventfd(void *opaque, void *unused)
 		eventfd_signal(vdev->ctx[0].trigger, 1);
 }
 
+<<<<<<< HEAD
+/* Returns true if the INTx vfio_pci_irq_ctx.masked value is changed. */
+bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
+=======
 void vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct pci_dev *pdev = vdev->pdev;
 	unsigned long flags;
+	bool masked_changed = false;
 
 	spin_lock_irqsave(&vdev->irqlock, flags);
 
@@ -60,9 +96,11 @@ void vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
 			disable_irq_nosync(pdev->irq);
 
 		vdev->ctx[0].masked = true;
+		masked_changed = true;
 	}
 
 	spin_unlock_irqrestore(&vdev->irqlock, flags);
+	return masked_changed;
 }
 
 /*

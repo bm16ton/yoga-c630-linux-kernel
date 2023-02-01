@@ -1,0 +1,1 @@
+cmd_drivers/iio/gyro/adis16260.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/gyro/adis16260.ko drivers/iio/gyro/adis16260.o drivers/iio/gyro/adis16260.mod.o;  true

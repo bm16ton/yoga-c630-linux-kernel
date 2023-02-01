@@ -51,6 +51,55 @@ static inline bool __must_check __must_check_overflow(bool overflow)
 	return unlikely(overflow);
 }
 
+<<<<<<< HEAD
+/**
+ * check_add_overflow() - Calculate addition with overflow checking
+ * @a: first addend
+ * @b: second addend
+ * @d: pointer to store sum
+ *
+ * Returns 0 on success.
+ *
+ * *@d holds the results of the attempted addition, but is not considered
+ * "safe for use" on a non-zero return value, which indicates that the
+ * sum has overflowed or been truncated.
+ */
+#define check_add_overflow(a, b, d)	\
+	__must_check_overflow(__builtin_add_overflow(a, b, d))
+
+/**
+ * check_sub_overflow() - Calculate subtraction with overflow checking
+ * @a: minuend; value to subtract from
+ * @b: subtrahend; value to subtract from @a
+ * @d: pointer to store difference
+ *
+ * Returns 0 on success.
+ *
+ * *@d holds the results of the attempted subtraction, but is not considered
+ * "safe for use" on a non-zero return value, which indicates that the
+ * difference has underflowed or been truncated.
+ */
+#define check_sub_overflow(a, b, d)	\
+	__must_check_overflow(__builtin_sub_overflow(a, b, d))
+
+/**
+ * check_mul_overflow() - Calculate multiplication with overflow checking
+ * @a: first factor
+ * @b: second factor
+ * @d: pointer to store product
+ *
+ * Returns 0 on success.
+ *
+ * *@d holds the results of the attempted multiplication, but is not
+ * considered "safe for use" on a non-zero return value, which indicates
+ * that the product has overflowed or been truncated.
+ */
+#define check_mul_overflow(a, b, d)	\
+	__must_check_overflow(__builtin_mul_overflow(a, b, d))
+
+/**
+ * check_shl_overflow() - Calculate a left-shifted value and check overflow
+=======
 /*
  * For simplicity and code hygiene, the fallback code below insists on
  * a, b and *d having the same type (similar to the min() and max()
@@ -88,21 +137,27 @@ static inline bool __must_check __must_check_overflow(bool overflow)
 
 /** check_shl_overflow() - Calculate a left-shifted value and check overflow
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @a: Value to be shifted
  * @s: How many bits left to shift
  * @d: Pointer to where to store the result
  *
  * Computes *@d = (@a << @s)
  *
- * Returns true if '*d' cannot hold the result or when 'a << s' doesn't
+ * Returns true if '*@d' cannot hold the result or when '@a << @s' doesn't
  * make sense. Example conditions:
- * - 'a << s' causes bits to be lost when stored in *d.
- * - 's' is garbage (e.g. negative) or so large that the result of
- *   'a << s' is guaranteed to be 0.
- * - 'a' is negative.
- * - 'a << s' sets the sign bit, if any, in '*d'.
  *
+<<<<<<< HEAD
+ * - '@a << @s' causes bits to be lost when stored in *@d.
+ * - '@s' is garbage (e.g. negative) or so large that the result of
+ *   '@a << @s' is guaranteed to be 0.
+ * - '@a' is negative.
+ * - '@a << @s' sets the sign bit, if any, in '*@d'.
+ *
+ * '*@d' will hold the results of the attempted shift, but is not
+=======
  * '*d' will hold the results of the attempted shift, but is not
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * considered "safe for use" if true is returned.
  */
 #define check_shl_overflow(a, s, d) __must_check_overflow(({		\
@@ -119,7 +174,10 @@ static inline bool __must_check __must_check_overflow(bool overflow)
 
 /**
  * size_mul() - Calculate size_t multiplication with saturation at SIZE_MAX
+<<<<<<< HEAD
+=======
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @factor1: first factor
  * @factor2: second factor
  *
@@ -139,10 +197,16 @@ static inline size_t __must_check size_mul(size_t factor1, size_t factor2)
 
 /**
  * size_add() - Calculate size_t addition with saturation at SIZE_MAX
+<<<<<<< HEAD
+ * @addend1: first addend
+ * @addend2: second addend
+ *
+=======
  *
  * @addend1: first addend
  * @addend2: second addend
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Returns: calculate @addend1 + @addend2, both promoted to size_t,
  * with any overflow causing the return value to be SIZE_MAX. The
  * lvalue must be size_t to avoid implicit type conversion.
@@ -159,7 +223,10 @@ static inline size_t __must_check size_add(size_t addend1, size_t addend2)
 
 /**
  * size_sub() - Calculate size_t subtraction with saturation at SIZE_MAX
+<<<<<<< HEAD
+=======
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @minuend: value to subtract from
  * @subtrahend: value to subtract from @minuend
  *
@@ -182,12 +249,20 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 
 /**
  * array_size() - Calculate size of 2-dimensional array.
+<<<<<<< HEAD
+ * @a: dimension one
+ * @b: dimension two
+ *
+ * Calculates size of 2-dimensional array: @a * @b.
+ *
+=======
  *
  * @a: dimension one
  * @b: dimension two
  *
  * Calculates size of 2-dimensional array: @a * @b.
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Returns: number of bytes needed to represent the array or SIZE_MAX on
  * overflow.
  */
@@ -195,7 +270,10 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 
 /**
  * array3_size() - Calculate size of 3-dimensional array.
+<<<<<<< HEAD
+=======
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @a: dimension one
  * @b: dimension two
  * @c: dimension three
@@ -210,7 +288,6 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 /**
  * flex_array_size() - Calculate size of a flexible array member
  *                     within an enclosing structure.
- *
  * @p: Pointer to the structure.
  * @member: Name of the flexible array member.
  * @count: Number of elements in the array.
@@ -227,7 +304,10 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 
 /**
  * struct_size() - Calculate size of structure with trailing flexible array.
+<<<<<<< HEAD
+=======
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @p: Pointer to the structure.
  * @member: Name of the array member.
  * @count: Number of elements in the array.

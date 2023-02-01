@@ -836,7 +836,11 @@ static int __init save_async_options(char *buf)
 	if (strlen(buf) >= ASYNC_DRV_NAMES_MAX_LEN)
 		pr_warn("Too long list of driver names for 'driver_async_probe'!\n");
 
+<<<<<<< HEAD
+	strscpy(async_probe_drv_names, buf, ASYNC_DRV_NAMES_MAX_LEN);
+=======
 	strlcpy(async_probe_drv_names, buf, ASYNC_DRV_NAMES_MAX_LEN);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	async_probe_default = parse_option_str(async_probe_drv_names, "*");
 
 	return 1;
@@ -1162,7 +1166,11 @@ static int __driver_attach(struct device *dev, void *data)
 		return 0;
 	} else if (ret < 0) {
 		dev_dbg(dev, "Bus failed to match device: %d\n", ret);
-		return ret;
+		/*
+		 * Driver could not match with device, but may match with
+		 * another device on the bus.
+		 */
+		return 0;
 	} /* ret > 0 means positive match */
 
 	if (driver_allows_async_probing(drv)) {

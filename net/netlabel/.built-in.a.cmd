@@ -1,0 +1,1 @@
+cmd_net/netlabel/built-in.a := rm -f net/netlabel/built-in.a;  printf "net/netlabel/%s " netlabel_user.o netlabel_kapi.o netlabel_domainhash.o netlabel_addrlist.o netlabel_mgmt.o netlabel_unlabeled.o netlabel_cipso_v4.o netlabel_calipso.o | xargs ar cDPrST net/netlabel/built-in.a

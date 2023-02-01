@@ -1038,7 +1038,11 @@ static int sja1105_init_l2_policing(struct sja1105_private *priv)
 
 		policing[bcast].sharindx = port;
 		/* Only SJA1110 has multicast policers */
+<<<<<<< HEAD
+		if (mcast < table->ops->max_entry_count)
+=======
 		if (mcast <= table->ops->max_entry_count)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			policing[mcast].sharindx = port;
 	}
 
@@ -2597,11 +2601,19 @@ static int sja1105_prechangeupper(struct dsa_switch *ds, int port,
 		NL_SET_ERR_MSG_MOD(extack, "8021q uppers are not supported");
 		return -EBUSY;
 	}
+<<<<<<< HEAD
 
 	if (netif_is_bridge_master(upper)) {
 		list_for_each_entry(dp, &dst->ports, list) {
 			struct net_device *br = dsa_port_bridge_dev_get(dp);
 
+=======
+
+	if (netif_is_bridge_master(upper)) {
+		list_for_each_entry(dp, &dst->ports, list) {
+			struct net_device *br = dsa_port_bridge_dev_get(dp);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (br && br != upper && br_vlan_enabled(br)) {
 				NL_SET_ERR_MSG_MOD(extack,
 						   "Only one VLAN-aware bridge is supported");
@@ -2685,6 +2697,7 @@ static void sja1105_port_deferred_xmit(struct kthread_work *work)
 	struct dsa_switch *ds = xmit_work->dp->ds;
 	struct sja1105_private *priv = ds->priv;
 	int port = xmit_work->dp->index;
+<<<<<<< HEAD
 
 	clone = SJA1105_SKB_CB(skb)->clone;
 
@@ -2698,6 +2711,21 @@ static void sja1105_port_deferred_xmit(struct kthread_work *work)
 
 	mutex_unlock(&priv->mgmt_lock);
 
+=======
+
+	clone = SJA1105_SKB_CB(skb)->clone;
+
+	mutex_lock(&priv->mgmt_lock);
+
+	sja1105_mgmt_xmit(ds, port, 0, skb, !!clone);
+
+	/* The clone, if there, was made by dsa_skb_tx_timestamp */
+	if (clone)
+		sja1105_ptp_txtstamp_skb(ds, port, clone);
+
+	mutex_unlock(&priv->mgmt_lock);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	kfree(xmit_work);
 }
 
@@ -3342,6 +3370,17 @@ static int sja1105_probe(struct spi_device *spi)
 
 	return dsa_register_switch(priv->ds);
 }
+<<<<<<< HEAD
+
+static void sja1105_remove(struct spi_device *spi)
+{
+	struct sja1105_private *priv = spi_get_drvdata(spi);
+
+	if (!priv)
+		return;
+
+	dsa_unregister_switch(priv->ds);
+=======
 
 static void sja1105_remove(struct spi_device *spi)
 {
@@ -3353,6 +3392,7 @@ static void sja1105_remove(struct spi_device *spi)
 	dsa_unregister_switch(priv->ds);
 
 	spi_set_drvdata(spi, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void sja1105_shutdown(struct spi_device *spi)

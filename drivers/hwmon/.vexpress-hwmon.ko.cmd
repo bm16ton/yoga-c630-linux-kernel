@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/vexpress-hwmon.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/vexpress-hwmon.ko drivers/hwmon/vexpress-hwmon.o drivers/hwmon/vexpress-hwmon.mod.o;  true

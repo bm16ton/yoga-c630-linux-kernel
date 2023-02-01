@@ -1,0 +1,1 @@
+cmd_drivers/char/modules.order := {   cat drivers/char/agp/modules.order;   echo drivers/char/virtio_console.ko;   cat drivers/char/hw_random/modules.order;   echo drivers/char/ppdev.ko;   cat drivers/char/tpm/modules.order; :; } > drivers/char/modules.order

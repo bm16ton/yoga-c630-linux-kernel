@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/microchip/wilc1000/wilc1000-spi.mod := printf '%s\n'   spi.o | awk '!x[$$0]++ { print("drivers/net/wireless/microchip/wilc1000/"$$0) }' > drivers/net/wireless/microchip/wilc1000/wilc1000-spi.mod

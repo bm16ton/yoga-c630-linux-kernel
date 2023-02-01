@@ -419,6 +419,7 @@ scmi_clock_config_set(const struct scmi_protocol_handle *ph, u32 clk_id,
 }
 
 static int scmi_clock_enable(const struct scmi_protocol_handle *ph, u32 clk_id)
+<<<<<<< HEAD
 {
 	return scmi_clock_config_set(ph, clk_id, CLOCK_ENABLE, false);
 }
@@ -442,6 +443,31 @@ static int scmi_clock_disable_atomic(const struct scmi_protocol_handle *ph,
 
 static int scmi_clock_count_get(const struct scmi_protocol_handle *ph)
 {
+=======
+{
+	return scmi_clock_config_set(ph, clk_id, CLOCK_ENABLE, false);
+}
+
+static int scmi_clock_disable(const struct scmi_protocol_handle *ph, u32 clk_id)
+{
+	return scmi_clock_config_set(ph, clk_id, 0, false);
+}
+
+static int scmi_clock_enable_atomic(const struct scmi_protocol_handle *ph,
+				    u32 clk_id)
+{
+	return scmi_clock_config_set(ph, clk_id, CLOCK_ENABLE, true);
+}
+
+static int scmi_clock_disable_atomic(const struct scmi_protocol_handle *ph,
+				     u32 clk_id)
+{
+	return scmi_clock_config_set(ph, clk_id, 0, true);
+}
+
+static int scmi_clock_count_get(const struct scmi_protocol_handle *ph)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct clock_info *ci = ph->get_priv(ph);
 
 	return ci->num_clocks;
@@ -450,9 +476,18 @@ static int scmi_clock_count_get(const struct scmi_protocol_handle *ph)
 static const struct scmi_clock_info *
 scmi_clock_info_get(const struct scmi_protocol_handle *ph, u32 clk_id)
 {
+<<<<<<< HEAD
+	struct scmi_clock_info *clk;
+	struct clock_info *ci = ph->get_priv(ph);
+=======
 	struct clock_info *ci = ph->get_priv(ph);
 	struct scmi_clock_info *clk = ci->clk + clk_id;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
+	if (clk_id >= ci->num_clocks)
+		return NULL;
+
+	clk = ci->clk + clk_id;
 	if (!clk->name[0])
 		return NULL;
 
@@ -468,6 +503,7 @@ static const struct scmi_clk_proto_ops clk_proto_ops = {
 	.disable = scmi_clock_disable,
 	.enable_atomic = scmi_clock_enable_atomic,
 	.disable_atomic = scmi_clock_disable_atomic,
+<<<<<<< HEAD
 };
 
 static int scmi_clk_rate_notify(const struct scmi_protocol_handle *ph,
@@ -559,6 +595,99 @@ static const struct scmi_event_ops clk_event_ops = {
 	.fill_custom_report = scmi_clk_fill_custom_report,
 };
 
+=======
+};
+
+static int scmi_clk_rate_notify(const struct scmi_protocol_handle *ph,
+				u32 clk_id, int message_id, bool enable)
+{
+	int ret;
+	struct scmi_xfer *t;
+	struct scmi_msg_clock_rate_notify *notify;
+
+	ret = ph->xops->xfer_get_init(ph, message_id, sizeof(*notify), 0, &t);
+	if (ret)
+		return ret;
+
+	notify = t->tx.buf;
+	notify->clk_id = cpu_to_le32(clk_id);
+	notify->notify_enable = enable ? cpu_to_le32(BIT(0)) : 0;
+
+	ret = ph->xops->do_xfer(ph, t);
+
+	ph->xops->xfer_put(ph, t);
+	return ret;
+}
+
+static int scmi_clk_set_notify_enabled(const struct scmi_protocol_handle *ph,
+				       u8 evt_id, u32 src_id, bool enable)
+{
+	int ret, cmd_id;
+
+	if (evt_id >= ARRAY_SIZE(evt_2_cmd))
+		return -EINVAL;
+
+	cmd_id = evt_2_cmd[evt_id];
+	ret = scmi_clk_rate_notify(ph, src_id, cmd_id, enable);
+	if (ret)
+		pr_debug("FAIL_ENABLED - evt[%X] dom[%d] - ret:%d\n",
+			 evt_id, src_id, ret);
+
+	return ret;
+}
+
+static void *scmi_clk_fill_custom_report(const struct scmi_protocol_handle *ph,
+					 u8 evt_id, ktime_t timestamp,
+					 const void *payld, size_t payld_sz,
+					 void *report, u32 *src_id)
+{
+	const struct scmi_clock_rate_notify_payld *p = payld;
+	struct scmi_clock_rate_notif_report *r = report;
+
+	if (sizeof(*p) != payld_sz ||
+	    (evt_id != SCMI_EVENT_CLOCK_RATE_CHANGED &&
+	     evt_id != SCMI_EVENT_CLOCK_RATE_CHANGE_REQUESTED))
+		return NULL;
+
+	r->timestamp = timestamp;
+	r->agent_id = le32_to_cpu(p->agent_id);
+	r->clock_id = le32_to_cpu(p->clock_id);
+	r->rate = get_unaligned_le64(&p->rate_low);
+	*src_id = r->clock_id;
+
+	return r;
+}
+
+static int scmi_clk_get_num_sources(const struct scmi_protocol_handle *ph)
+{
+	struct clock_info *ci = ph->get_priv(ph);
+
+	if (!ci)
+		return -EINVAL;
+
+	return ci->num_clocks;
+}
+
+static const struct scmi_event clk_events[] = {
+	{
+		.id = SCMI_EVENT_CLOCK_RATE_CHANGED,
+		.max_payld_sz = sizeof(struct scmi_clock_rate_notify_payld),
+		.max_report_sz = sizeof(struct scmi_clock_rate_notif_report),
+	},
+	{
+		.id = SCMI_EVENT_CLOCK_RATE_CHANGE_REQUESTED,
+		.max_payld_sz = sizeof(struct scmi_clock_rate_notify_payld),
+		.max_report_sz = sizeof(struct scmi_clock_rate_notif_report),
+	},
+};
+
+static const struct scmi_event_ops clk_event_ops = {
+	.get_num_sources = scmi_clk_get_num_sources,
+	.set_notify_enabled = scmi_clk_set_notify_enabled,
+	.fill_custom_report = scmi_clk_fill_custom_report,
+};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct scmi_protocol_events clk_protocol_events = {
 	.queue_sz = SCMI_PROTO_QUEUE_SZ,
 	.ops = &clk_event_ops,

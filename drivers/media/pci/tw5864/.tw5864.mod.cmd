@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/tw5864/tw5864.mod := printf '%s\n'   tw5864-core.o tw5864-video.o tw5864-h264.o tw5864-util.o | awk '!x[$$0]++ { print("drivers/media/pci/tw5864/"$$0) }' > drivers/media/pci/tw5864/tw5864.mod

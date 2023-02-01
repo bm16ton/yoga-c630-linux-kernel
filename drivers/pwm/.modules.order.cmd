@@ -1,0 +1,1 @@
+cmd_drivers/pwm/modules.order := {   echo drivers/pwm/pwm-cros-ec.ko;   echo drivers/pwm/pwm-meson.ko;   echo drivers/pwm/pwm-pca9685.ko;   echo drivers/pwm/pwm-rockchip.ko;   echo drivers/pwm/pwm-sun4i.ko;   echo drivers/pwm/pwm-tegra.ko; :; } > drivers/pwm/modules.order

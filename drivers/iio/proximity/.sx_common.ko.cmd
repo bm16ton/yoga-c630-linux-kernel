@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/sx_common.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/sx_common.ko drivers/iio/proximity/sx_common.o drivers/iio/proximity/sx_common.mod.o;  true

@@ -1,0 +1,2 @@
+drivers/target/iscsi/iscsi_target_mod.ko
+drivers/target/iscsi/cxgbit/cxgbit.ko

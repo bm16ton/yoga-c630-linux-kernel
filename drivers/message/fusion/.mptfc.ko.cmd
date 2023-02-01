@@ -1,0 +1,1 @@
+cmd_drivers/message/fusion/mptfc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/message/fusion/mptfc.ko drivers/message/fusion/mptfc.o drivers/message/fusion/mptfc.mod.o;  true

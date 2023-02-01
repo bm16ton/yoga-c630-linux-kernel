@@ -1,0 +1,16 @@
+tegra132-norrin.o: arch/arm64/boot/dts/nvidia/tegra132-norrin.dts \
+ scripts/dtc/include-prefixes/dt-bindings/input/input.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/linux-event-codes.h \
+ arch/arm64/boot/dts/nvidia/tegra132.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/tegra124-car.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/tegra124-car-common.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/tegra-gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/memory/tegra124-mc.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/pinctrl-tegra.h \
+ scripts/dtc/include-prefixes/dt-bindings/pinctrl/pinctrl-tegra-xusb.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/tegra124-soctherm.h \
+ scripts/dtc/include-prefixes/dt-bindings/soc/tegra-pmc.h \
+ arch/arm64/boot/dts/nvidia/tegra132-peripherals-opp.dtsi

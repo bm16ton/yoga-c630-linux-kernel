@@ -1,0 +1,4 @@
+drivers/net/wireless/mediatek/mt76/mt7615/mt7615-common.ko
+drivers/net/wireless/mediatek/mt76/mt7615/mt7663-usb-sdio-common.ko
+drivers/net/wireless/mediatek/mt76/mt7615/mt7663u.ko
+drivers/net/wireless/mediatek/mt76/mt7615/mt7663s.ko

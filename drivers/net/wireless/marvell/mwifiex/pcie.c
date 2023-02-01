@@ -644,7 +644,11 @@ static int mwifiex_pm_wakeup_card(struct mwifiex_adapter *adapter)
 {
 	struct pcie_service_card *card = adapter->card;
 	const struct mwifiex_pcie_card_reg *reg = card->pcie.reg;
+<<<<<<< HEAD
+	int retval __maybe_unused;
+=======
 	int retval;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mwifiex_dbg(adapter, EVENT,
 		    "event: Wakeup device...\n");

@@ -1,0 +1,1 @@
+cmd_drivers/slimbus/slimbus.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/slimbus/slimbus.ko drivers/slimbus/slimbus.o drivers/slimbus/slimbus.mod.o;  true

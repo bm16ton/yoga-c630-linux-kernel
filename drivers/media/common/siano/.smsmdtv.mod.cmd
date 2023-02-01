@@ -1,0 +1,1 @@
+cmd_drivers/media/common/siano/smsmdtv.mod := printf '%s\n'   smscoreapi.o sms-cards.o smsendian.o smsir.o | awk '!x[$$0]++ { print("drivers/media/common/siano/"$$0) }' > drivers/media/common/siano/smsmdtv.mod

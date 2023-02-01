@@ -1,0 +1,1 @@
+cmd_drivers/remoteproc/built-in.a := rm -f drivers/remoteproc/built-in.a;  printf "drivers/remoteproc/%s " remoteproc_core.o remoteproc_coredump.o remoteproc_debugfs.o remoteproc_sysfs.o remoteproc_virtio.o remoteproc_elf_loader.o | xargs ar cDPrST drivers/remoteproc/built-in.a

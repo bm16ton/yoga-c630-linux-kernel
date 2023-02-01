@@ -876,7 +876,11 @@ static bool hubbub31_get_dcc_compression_cap(struct hubbub *hubbub,
 	return true;
 }
 
+<<<<<<< HEAD
+int hubbub31_init_dchub_sys_ctx(struct hubbub *hubbub,
+=======
 static int hubbub31_init_dchub_sys_ctx(struct hubbub *hubbub,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct dcn_hubbub_phys_addr_config *pa_config)
 {
 	struct dcn20_hubbub *hubbub2 = TO_DCN20_HUBBUB(hubbub);

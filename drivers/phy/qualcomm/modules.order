@@ -1,0 +1,5 @@
+drivers/phy/qualcomm/phy-qcom-apq8064-sata.ko
+drivers/phy/qualcomm/phy-qcom-ipq806x-sata.ko
+drivers/phy/qualcomm/phy-qcom-pcie2.ko
+drivers/phy/qualcomm/phy-qcom-usb-hs.ko
+drivers/phy/qualcomm/phy-qcom-usb-hsic.ko

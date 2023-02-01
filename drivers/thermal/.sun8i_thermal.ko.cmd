@@ -1,0 +1,1 @@
+cmd_drivers/thermal/sun8i_thermal.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/thermal/sun8i_thermal.ko drivers/thermal/sun8i_thermal.o drivers/thermal/sun8i_thermal.mod.o;  true

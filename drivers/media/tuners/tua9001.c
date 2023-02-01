@@ -227,7 +227,7 @@ err:
 	return ret;
 }
 
-static int tua9001_remove(struct i2c_client *client)
+static void tua9001_remove(struct i2c_client *client)
 {
 	struct tua9001_dev *dev = i2c_get_clientdata(client);
 	struct dvb_frontend *fe = dev->fe;
@@ -243,7 +243,10 @@ static int tua9001_remove(struct i2c_client *client)
 			dev_err(&client->dev, "Tuner disable failed (%pe)\n", ERR_PTR(ret));
 	}
 	kfree(dev);
+<<<<<<< HEAD
+=======
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id tua9001_id_table[] = {

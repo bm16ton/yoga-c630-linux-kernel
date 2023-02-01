@@ -392,7 +392,11 @@ static int __init hsmp_plt_init(void)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	amd_hsmp_platdev = platform_device_alloc(DRIVER_NAME, PLATFORM_DEVID_NONE);
+=======
 	amd_hsmp_platdev = platform_device_alloc(DRIVER_NAME, -1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!amd_hsmp_platdev) {
 		ret = -ENOMEM;
 		goto drv_unregister;

@@ -1,0 +1,1 @@
+cmd_drivers/staging/media/deprecated/saa7146/saa7146/built-in.a := rm -f drivers/staging/media/deprecated/saa7146/saa7146/built-in.a;  ar cDPrST drivers/staging/media/deprecated/saa7146/saa7146/built-in.a

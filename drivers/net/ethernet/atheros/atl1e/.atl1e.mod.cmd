@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/atheros/atl1e/atl1e.mod := printf '%s\n'   atl1e_main.o atl1e_hw.o atl1e_ethtool.o atl1e_param.o | awk '!x[$$0]++ { print("drivers/net/ethernet/atheros/atl1e/"$$0) }' > drivers/net/ethernet/atheros/atl1e/atl1e.mod

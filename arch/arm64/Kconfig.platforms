@@ -33,6 +33,14 @@ config ARCH_APPLE
 	  This enables support for Apple's in-house ARM SoC family, starting
 	  with the Apple M1.
 
+<<<<<<< HEAD
+menuconfig ARCH_BCM
+	bool "Broadcom SoC Support"
+
+if ARCH_BCM
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ARCH_BCM2835
 	bool "Broadcom BCM2835 family"
 	select TIMER_OF
@@ -47,6 +55,8 @@ config ARCH_BCM2835
 	  This enables support for the Broadcom BCM2837 and BCM2711 SoC.
 	  These SoCs are used in the Raspberry Pi 3 and 4 devices.
 
+<<<<<<< HEAD
+=======
 config ARCH_BCM4908
 	bool "Broadcom BCM4908 family"
 	select ARCH_BCMBCA
@@ -56,6 +66,7 @@ config ARCH_BCM4908
 	  BCM49408 SoCs. These SoCs use Brahma-B53 cores and can be
 	  found in home routers.
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ARCH_BCM_IPROC
 	bool "Broadcom iProc SoC Family"
 	select COMMON_CLK_IPROC
@@ -66,6 +77,10 @@ config ARCH_BCM_IPROC
 
 config ARCH_BCMBCA
 	bool "Broadcom Broadband Carrier Access (BCA) origin SoC"
+<<<<<<< HEAD
+	select GPIOLIB
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	help
 	  Say Y if you intend to run the kernel on a Broadcom Broadband ARM-based
 	  BCA chipset.
@@ -73,6 +88,19 @@ config ARCH_BCMBCA
 	  This enables support for Broadcom BCA ARM-based broadband chipsets,
 	  including the DSL, PON and Wireless family of chips.
 
+<<<<<<< HEAD
+config ARCH_BRCMSTB
+	bool "Broadcom Set-Top-Box SoCs"
+	select ARCH_HAS_RESET_CONTROLLER
+	select GENERIC_IRQ_CHIP
+	select PINCTRL
+	help
+	  This enables support for Broadcom's ARMv8 Set Top Box SoCs
+
+endif
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ARCH_BERLIN
 	bool "Marvell Berlin SoC Family"
 	select DW_APB_ICTL
@@ -87,6 +115,8 @@ config ARCH_BITMAIN
 	help
 	  This enables support for the Bitmain SoC Family.
 
+<<<<<<< HEAD
+=======
 config ARCH_BRCMSTB
 	bool "Broadcom Set-Top-Box SoCs"
 	select ARCH_HAS_RESET_CONTROLLER
@@ -95,6 +125,7 @@ config ARCH_BRCMSTB
 	help
 	  This enables support for Broadcom's ARMv8 Set Top Box SoCs
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ARCH_EXYNOS
 	bool "ARMv8 based Samsung Exynos SoC family"
 	select COMMON_CLK_SAMSUNG
@@ -135,12 +166,6 @@ config ARCH_K3
 	help
 	  This enables support for Texas Instruments' K3 multicore SoC
 	  architecture.
-
-config ARCH_LAYERSCAPE
-	bool "ARMv8 based Freescale Layerscape SoC family"
-	select EDAC_SUPPORT
-	help
-	  This enables support for the Freescale Layerscape SoC family.
 
 config ARCH_LG1K
 	bool "LG Electronics LG1K SoC Family"
@@ -199,6 +224,20 @@ config ARCH_MVEBU
 	   - Armada 7K SoC Family
 	   - Armada 8K SoC Family
 	   - 98DX2530 SoC Family
+<<<<<<< HEAD
+
+menuconfig ARCH_NXP
+	bool "NXP SoC support"
+
+if ARCH_NXP
+
+config ARCH_LAYERSCAPE
+	bool "ARMv8 based Freescale Layerscape SoC family"
+	select EDAC_SUPPORT
+	help
+	  This enables support for the Freescale Layerscape SoC family.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 config ARCH_MXC
 	bool "ARMv8 based NXP i.MX SoC family"
@@ -214,6 +253,16 @@ config ARCH_MXC
 	  This enables support for the ARMv8 based SoCs in the
 	  NXP i.MX family.
 
+<<<<<<< HEAD
+config ARCH_S32
+	bool "NXP S32 SoC Family"
+	help
+	  This enables support for the NXP S32 family of processors.
+
+endif
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 config ARCH_NPCM
 	bool "Nuvoton NPCM Architecture"
 	select PINCTRL
@@ -243,7 +292,6 @@ config ARCH_RENESAS
 	bool "Renesas SoC Platforms"
 	select GPIOLIB
 	select PINCTRL
-	select SOC_BUS
 	help
 	  This enables support for the ARMv8 based Renesas SoCs.
 
@@ -256,11 +304,6 @@ config ARCH_ROCKCHIP
 	help
 	  This enables support for the ARMv8 based Rockchip chipsets,
 	  like the RK3368.
-
-config ARCH_S32
-	bool "NXP S32 SoC Family"
-	help
-	  This enables support for the NXP S32 family of processors.
 
 config ARCH_SEATTLE
 	bool "AMD Seattle SoC Family"

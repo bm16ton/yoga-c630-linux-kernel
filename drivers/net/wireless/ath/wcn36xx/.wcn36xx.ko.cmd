@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/wcn36xx/wcn36xx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/ath/wcn36xx/wcn36xx.ko drivers/net/wireless/ath/wcn36xx/wcn36xx.o drivers/net/wireless/ath/wcn36xx/wcn36xx.mod.o;  true

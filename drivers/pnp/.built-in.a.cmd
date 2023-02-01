@@ -1,0 +1,1 @@
+cmd_drivers/pnp/built-in.a := rm -f drivers/pnp/built-in.a;  printf "drivers/pnp/%s " core.o card.o driver.o resource.o manager.o support.o interface.o quirks.o system.o pnpacpi/built-in.a | xargs ar cDPrST drivers/pnp/built-in.a

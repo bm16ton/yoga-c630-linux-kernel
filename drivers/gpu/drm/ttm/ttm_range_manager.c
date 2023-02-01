@@ -111,12 +111,47 @@ static void ttm_range_man_free(struct ttm_resource_manager *man,
 
 	ttm_resource_fini(man, res);
 	kfree(node);
+<<<<<<< HEAD
+}
+
+static bool ttm_range_man_intersects(struct ttm_resource_manager *man,
+				     struct ttm_resource *res,
+				     const struct ttm_place *place,
+				     size_t size)
+{
+	struct drm_mm_node *node = &to_ttm_range_mgr_node(res)->mm_nodes[0];
+	u32 num_pages = PFN_UP(size);
+
+	/* Don't evict BOs outside of the requested placement range */
+	if (place->fpfn >= (node->start + num_pages) ||
+	    (place->lpfn && place->lpfn <= node->start))
+		return false;
+
+	return true;
+}
+
+static bool ttm_range_man_compatible(struct ttm_resource_manager *man,
+				     struct ttm_resource *res,
+				     const struct ttm_place *place,
+				     size_t size)
+{
+	struct drm_mm_node *node = &to_ttm_range_mgr_node(res)->mm_nodes[0];
+	u32 num_pages = PFN_UP(size);
+
+	if (node->start < place->fpfn ||
+	    (place->lpfn && (node->start + num_pages) > place->lpfn))
+		return false;
+
+	return true;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void ttm_range_man_debug(struct ttm_resource_manager *man,
 				struct drm_printer *printer)
 {
 	struct ttm_range_manager *rman = to_range_manager(man);
+<<<<<<< HEAD
 
 	spin_lock(&rman->lock);
 	drm_mm_print(&rman->mm, printer);
@@ -126,6 +161,19 @@ static void ttm_range_man_debug(struct ttm_resource_manager *man,
 static const struct ttm_resource_manager_func ttm_range_manager_func = {
 	.alloc = ttm_range_man_alloc,
 	.free = ttm_range_man_free,
+	.intersects = ttm_range_man_intersects,
+	.compatible = ttm_range_man_compatible,
+=======
+
+	spin_lock(&rman->lock);
+	drm_mm_print(&rman->mm, printer);
+	spin_unlock(&rman->lock);
+}
+
+static const struct ttm_resource_manager_func ttm_range_manager_func = {
+	.alloc = ttm_range_man_alloc,
+	.free = ttm_range_man_free,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.debug = ttm_range_man_debug
 };
 

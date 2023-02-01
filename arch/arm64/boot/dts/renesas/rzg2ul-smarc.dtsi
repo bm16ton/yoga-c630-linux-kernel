@@ -5,6 +5,8 @@
  * Copyright (C) 2022 Renesas Electronics Corp.
  */
 
+<<<<<<< HEAD
+=======
 /*
  * DIP-Switch SW1 setting
  * 1 : High; 0: Low
@@ -16,6 +18,7 @@
 #define SW_ET0_EN_N	1
 
 #include "rzg2ul-smarc-som.dtsi"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "rzg2ul-smarc-pinfunction.dtsi"
 #include "rz-smarc-common.dtsi"
 

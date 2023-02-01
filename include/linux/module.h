@@ -132,7 +132,11 @@ extern void cleanup_module(void);
 	{ return initfn; }					\
 	int init_module(void) __copy(initfn)			\
 		__attribute__((alias(#initfn)));		\
+<<<<<<< HEAD
+	___ADDRESSABLE(init_module, __initdata);
+=======
 	__CFI_ADDRESSABLE(init_module, __initdata);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* This is only required if you want to be unloadable. */
 #define module_exit(exitfn)					\
@@ -140,7 +144,11 @@ extern void cleanup_module(void);
 	{ return exitfn; }					\
 	void cleanup_module(void) __copy(exitfn)		\
 		__attribute__((alias(#exitfn)));		\
+<<<<<<< HEAD
+	___ADDRESSABLE(cleanup_module, __exitdata);
+=======
 	__CFI_ADDRESSABLE(cleanup_module, __exitdata);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif
 
@@ -387,8 +395,14 @@ struct module {
 	const s32 *crcs;
 	unsigned int num_syms;
 
+<<<<<<< HEAD
+#ifdef CONFIG_ARCH_USES_CFI_TRAPS
+	s32 *kcfi_traps;
+	s32 *kcfi_traps_end;
+=======
 #ifdef CONFIG_CFI_CLANG
 	cfi_check_fn cfi_check;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 	/* Kernel parameters. */

@@ -997,6 +997,8 @@ void crypto_inc(u8 *a, unsigned int size)
 }
 EXPORT_SYMBOL_GPL(crypto_inc);
 
+<<<<<<< HEAD
+=======
 void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int len)
 {
 	int relalign = 0;
@@ -1068,6 +1070,7 @@ void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int len)
 }
 EXPORT_SYMBOL_GPL(__crypto_xor);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 unsigned int crypto_alg_extsize(struct crypto_alg *alg)
 {
 	return alg->cra_ctxsize +

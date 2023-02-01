@@ -603,19 +603,27 @@ static const struct iio_info hmc5843_info = {
 
 static const unsigned long hmc5843_scan_masks[] = {0x7, 0};
 
-int hmc5843_common_suspend(struct device *dev)
+static int hmc5843_common_suspend(struct device *dev)
 {
 	return hmc5843_set_mode(iio_priv(dev_get_drvdata(dev)),
 				HMC5843_MODE_SLEEP);
 }
+<<<<<<< HEAD
+=======
 EXPORT_SYMBOL_NS(hmc5843_common_suspend, IIO_HMC5843);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-int hmc5843_common_resume(struct device *dev)
+static int hmc5843_common_resume(struct device *dev)
 {
 	return hmc5843_set_mode(iio_priv(dev_get_drvdata(dev)),
 		HMC5843_MODE_CONVERSION_CONTINUOUS);
 }
+<<<<<<< HEAD
+EXPORT_NS_SIMPLE_DEV_PM_OPS(hmc5843_pm_ops, hmc5843_common_suspend,
+			    hmc5843_common_resume, IIO_HMC5843);
+=======
 EXPORT_SYMBOL_NS(hmc5843_common_resume, IIO_HMC5843);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 int hmc5843_common_probe(struct device *dev, struct regmap *regmap,
 			 enum hmc5843_ids id, const char *name)

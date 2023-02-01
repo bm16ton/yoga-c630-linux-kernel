@@ -1,0 +1,1 @@
+cmd_drivers/staging/rtl8192e/rtllib.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/rtl8192e/rtllib.ko drivers/staging/rtl8192e/rtllib.o drivers/staging/rtl8192e/rtllib.mod.o;  true

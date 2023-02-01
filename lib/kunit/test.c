@@ -55,6 +55,20 @@ EXPORT_SYMBOL_GPL(__kunit_fail_current_test);
 #endif
 
 /*
+<<<<<<< HEAD
+ * Enable KUnit tests to run.
+ */
+#ifdef CONFIG_KUNIT_DEFAULT_ENABLED
+static bool enable_param = true;
+#else
+static bool enable_param;
+#endif
+module_param_named(enable, enable_param, bool, 0);
+MODULE_PARM_DESC(enable, "Enable KUnit tests");
+
+/*
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * KUnit statistic mode:
  * 0 - disabled
  * 1 - only when there is more than one subtest
@@ -247,14 +261,18 @@ static void kunit_print_string_stream(struct kunit *test,
 
 static void kunit_fail(struct kunit *test, const struct kunit_loc *loc,
 		       enum kunit_assert_type type, const struct kunit_assert *assert,
+<<<<<<< HEAD
+		       assert_format_t assert_format, const struct va_format *message)
+=======
 		       const struct va_format *message)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct string_stream *stream;
 
 	kunit_set_failure(test);
 
 	stream = alloc_string_stream(test, GFP_KERNEL);
-	if (!stream) {
+	if (IS_ERR(stream)) {
 		WARN(true,
 		     "Could not allocate stream to print failed assertion in %s:%d\n",
 		     loc->file,
@@ -263,11 +281,15 @@ static void kunit_fail(struct kunit *test, const struct kunit_loc *loc,
 	}
 
 	kunit_assert_prologue(loc, type, stream);
+<<<<<<< HEAD
+	assert_format(assert, message, stream);
+=======
 	assert->format(assert, message, stream);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	kunit_print_string_stream(test, stream);
 
-	WARN_ON(string_stream_destroy(stream));
+	string_stream_destroy(stream);
 }
 
 static void __noreturn kunit_abort(struct kunit *test)
@@ -287,6 +309,10 @@ void kunit_do_failed_assertion(struct kunit *test,
 			       const struct kunit_loc *loc,
 			       enum kunit_assert_type type,
 			       const struct kunit_assert *assert,
+<<<<<<< HEAD
+			       assert_format_t assert_format,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			       const char *fmt, ...)
 {
 	va_list args;
@@ -296,7 +322,11 @@ void kunit_do_failed_assertion(struct kunit *test,
 	message.fmt = fmt;
 	message.va = &args;
 
+<<<<<<< HEAD
+	kunit_fail(test, loc, type, assert, assert_format, &message);
+=======
 	kunit_fail(test, loc, type, assert, &message);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	va_end(args);
 
@@ -555,10 +585,17 @@ int kunit_run_tests(struct kunit_suite *suite)
 				kunit_update_stats(&param_stats, test.status);
 			}
 		}
+<<<<<<< HEAD
 
 
 		kunit_print_test_stats(&test, param_stats);
 
+=======
+
+
+		kunit_print_test_stats(&test, param_stats);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		kunit_print_ok_not_ok(&test, true, test_case->status,
 				      kunit_test_case_num(suite, test_case),
 				      test_case->name,
@@ -584,12 +621,28 @@ static void kunit_init_suite(struct kunit_suite *suite)
 	kunit_debugfs_create_suite(suite);
 	suite->status_comment[0] = '\0';
 	suite->suite_init_err = 0;
+<<<<<<< HEAD
+}
+
+bool kunit_enabled(void)
+{
+	return enable_param;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int __kunit_test_suites_init(struct kunit_suite * const * const suites, int num_suites)
 {
 	unsigned int i;
 
+<<<<<<< HEAD
+	if (!kunit_enabled() && num_suites > 0) {
+		pr_info("kunit: disabled\n");
+		return 0;
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < num_suites; i++) {
 		kunit_init_suite(suites[i]);
 		kunit_run_tests(suites[i]);
@@ -607,6 +660,12 @@ void __kunit_test_suites_exit(struct kunit_suite **suites, int num_suites)
 {
 	unsigned int i;
 
+<<<<<<< HEAD
+	if (!kunit_enabled())
+		return;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < num_suites; i++)
 		kunit_exit_suite(suites[i]);
 
@@ -689,21 +748,20 @@ void *kunit_kmalloc_array(struct kunit *test, size_t n, size_t size, gfp_t gfp)
 }
 EXPORT_SYMBOL_GPL(kunit_kmalloc_array);
 
+static inline bool kunit_kfree_match(struct kunit *test,
+				     struct kunit_resource *res, void *match_data)
+{
+	/* Only match resources allocated with kunit_kmalloc() and friends. */
+	return res->free == kunit_kmalloc_array_free && res->data == match_data;
+}
+
 void kunit_kfree(struct kunit *test, const void *ptr)
 {
-	struct kunit_resource *res;
+	if (!ptr)
+		return;
 
-	res = kunit_find_resource(test, kunit_resource_instance_match,
-				  (void *)ptr);
-
-	/*
-	 * Removing the resource from the list of resources drops the
-	 * reference count to 1; the final put will trigger the free.
-	 */
-	kunit_remove_resource(test, res);
-
-	kunit_put_resource(res);
-
+	if (kunit_destroy_resource(test, kunit_kfree_match, (void *)ptr))
+		KUNIT_FAIL(test, "kunit_kfree: %px already freed or not allocated by kunit", ptr);
 }
 EXPORT_SYMBOL_GPL(kunit_kfree);
 

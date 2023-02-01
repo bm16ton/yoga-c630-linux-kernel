@@ -83,7 +83,11 @@ static void RxPktPendingTimeout(struct timer_list *t)
 	if (bPktInBuf && (pRxTs->rx_timeout_indicate_seq == 0xffff)) {
 		pRxTs->rx_timeout_indicate_seq = pRxTs->rx_indicate_seq;
 		mod_timer(&pRxTs->rx_pkt_pending_timer,  jiffies +
+<<<<<<< HEAD
+			  msecs_to_jiffies(ieee->pHTInfo->rx_reorder_pending_time)
+=======
 			  msecs_to_jiffies(ieee->pHTInfo->RxReorderPendingTime)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			  );
 	}
 	spin_unlock_irqrestore(&(ieee->reorder_spinlock), flags);

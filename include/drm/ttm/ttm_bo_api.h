@@ -317,6 +317,18 @@ void ttm_bo_unlock_delayed_workqueue(struct ttm_device *bdev, int resched);
 bool ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 			      const struct ttm_place *place);
 
+<<<<<<< HEAD
+int ttm_bo_init_reserved(struct ttm_device *bdev, struct ttm_buffer_object *bo,
+			 enum ttm_bo_type type, struct ttm_placement *placement,
+			 uint32_t alignment, struct ttm_operation_ctx *ctx,
+			 struct sg_table *sg, struct dma_resv *resv,
+			 void (*destroy) (struct ttm_buffer_object *));
+int ttm_bo_init_validate(struct ttm_device *bdev, struct ttm_buffer_object *bo,
+			 enum ttm_bo_type type, struct ttm_placement *placement,
+			 uint32_t alignment, bool interruptible,
+			 struct sg_table *sg, struct dma_resv *resv,
+			 void (*destroy) (struct ttm_buffer_object *));
+=======
 /**
  * ttm_bo_init_reserved
  *
@@ -404,6 +416,7 @@ int ttm_bo_init(struct ttm_device *bdev, struct ttm_buffer_object *bo,
 		uint32_t page_alignment, bool interrubtible,
 		struct sg_table *sg, struct dma_resv *resv,
 		void (*destroy) (struct ttm_buffer_object *));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * ttm_kmap_obj_virtual

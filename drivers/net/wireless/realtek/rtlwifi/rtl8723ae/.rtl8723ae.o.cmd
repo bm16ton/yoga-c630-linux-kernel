@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8723ae/rtl8723ae.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/wireless/realtek/rtlwifi/rtl8723ae/rtl8723ae.o @drivers/net/wireless/realtek/rtlwifi/rtl8723ae/rtl8723ae.mod 

@@ -269,11 +269,19 @@ void optee_free_msg_arg(struct tee_context *ctx,
 	bit = offs / sz;
 
 	mutex_lock(&optee->shm_arg_cache.mutex);
+<<<<<<< HEAD
 
 	if (!test_bit(bit, entry->map))
 		pr_err("Bit pos %lu is already free\n", bit);
 	clear_bit(bit, entry->map);
 
+=======
+
+	if (!test_bit(bit, entry->map))
+		pr_err("Bit pos %lu is already free\n", bit);
+	clear_bit(bit, entry->map);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mutex_unlock(&optee->shm_arg_cache.mutex);
 }
 
@@ -492,15 +500,18 @@ static bool is_normal_memory(pgprot_t p)
 #endif
 }
 
-static int __check_mem_type(struct vm_area_struct *vma, unsigned long end)
+static int __check_mem_type(struct mm_struct *mm, unsigned long start,
+				unsigned long end)
 {
-	while (vma && is_normal_memory(vma->vm_page_prot)) {
-		if (vma->vm_end >= end)
-			return 0;
-		vma = vma->vm_next;
+	struct vm_area_struct *vma;
+	VMA_ITERATOR(vmi, mm, start);
+
+	for_each_vma_range(vmi, vma, end) {
+		if (!is_normal_memory(vma->vm_page_prot))
+			return -EINVAL;
 	}
 
-	return -EINVAL;
+	return 0;
 }
 
 int optee_check_mem_type(unsigned long start, size_t num_pages)
@@ -516,8 +527,7 @@ int optee_check_mem_type(unsigned long start, size_t num_pages)
 		return 0;
 
 	mmap_read_lock(mm);
-	rc = __check_mem_type(find_vma(mm, start),
-			      start + num_pages * PAGE_SIZE);
+	rc = __check_mem_type(mm, start, start + num_pages * PAGE_SIZE);
 	mmap_read_unlock(mm);
 
 	return rc;

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/microchip/wilc1000/modules.order := {   echo drivers/net/wireless/microchip/wilc1000/wilc1000.ko;   echo drivers/net/wireless/microchip/wilc1000/wilc1000-sdio.ko;   echo drivers/net/wireless/microchip/wilc1000/wilc1000-spi.ko; :; } > drivers/net/wireless/microchip/wilc1000/modules.order

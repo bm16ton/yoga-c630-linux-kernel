@@ -145,6 +145,8 @@ bool v4l2_valid_dv_timings(const struct v4l2_dv_timings *t,
 	const struct v4l2_bt_timings *bt = &t->bt;
 	const struct v4l2_bt_timings_cap *cap = &dvcap->bt;
 	u32 caps = cap->capabilities;
+	const u32 max_vert = 10240;
+	u32 max_hor = 3 * bt->width;
 
 	if (t->type != V4L2_DV_BT_656_1120)
 		return false;
@@ -166,6 +168,22 @@ bool v4l2_valid_dv_timings(const struct v4l2_dv_timings *t,
 	if (!bt->interlaced &&
 	    (bt->il_vbackporch || bt->il_vsync || bt->il_vfrontporch))
 		return false;
+<<<<<<< HEAD
+	/*
+	 * Some video receivers cannot properly separate the frontporch,
+	 * backporch and sync values, and instead they only have the total
+	 * blanking. That can be assigned to any of these three fields.
+	 * So just check that none of these are way out of range.
+	 */
+	if (bt->hfrontporch > max_hor ||
+	    bt->hsync > max_hor || bt->hbackporch > max_hor)
+		return false;
+	if (bt->vfrontporch > max_vert ||
+	    bt->vsync > max_vert || bt->vbackporch > max_vert)
+		return false;
+	if (bt->interlaced && (bt->il_vfrontporch > max_vert ||
+	    bt->il_vsync > max_vert || bt->il_vbackporch > max_vert))
+=======
 	if (bt->hfrontporch > 2 * bt->width ||
 	    bt->hsync > 1024 || bt->hbackporch > 1024)
 		return false;
@@ -174,6 +192,7 @@ bool v4l2_valid_dv_timings(const struct v4l2_dv_timings *t,
 		return false;
 	if (bt->interlaced && (bt->il_vfrontporch > 4096 ||
 	    bt->il_vsync > 128 || bt->il_vbackporch > 4096))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return false;
 	return fnc == NULL || fnc(t, fnc_handle);
 }

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/broadcom/b43legacy/b43legacy.mod := printf '%s\n'   main.o ilt.o phy.o radio.o sysfs.o xmit.o rfkill.o leds.o debugfs.o dma.o pio.o | awk '!x[$$0]++ { print("drivers/net/wireless/broadcom/b43legacy/"$$0) }' > drivers/net/wireless/broadcom/b43legacy/b43legacy.mod

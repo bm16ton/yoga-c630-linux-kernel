@@ -16,10 +16,15 @@
 
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_crtc.h>
+<<<<<<< HEAD
+#include <drm/drm_framebuffer.h>
+#include <drm/drm_gem_dma_helper.h>
+=======
 #include <drm/drm_fb_cma_helper.h>
 #include <drm/drm_framebuffer.h>
 #include <drm/drm_gem_cma_helper.h>
 #include <drm/drm_plane_helper.h>
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <drm/drm_probe_helper.h>
 
 #include "sun4i_drv.h"

@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-adnp.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-adnp.ko drivers/gpio/gpio-adnp.o drivers/gpio/gpio-adnp.mod.o;  true

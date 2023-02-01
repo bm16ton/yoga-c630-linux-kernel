@@ -854,7 +854,11 @@ fail:
 	return -ENOMEM;
 }
 
+<<<<<<< HEAD
+static void pxa_video_buf_set_actdma(struct pxa_camera_dev *pcdev,
+=======
 static void pxa_videobuf_set_actdma(struct pxa_camera_dev *pcdev,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				    struct pxa_buffer *buf)
 {
 	buf->active_dma = DMA_Y;
@@ -973,7 +977,11 @@ static void pxa_camera_wakeup(struct pxa_camera_dev *pcdev,
  * stopped. This means the tailed buffer would never be transferred by DMA.
  * This function restarts the capture for this corner case, where :
  *  - DADR() == DADDR_STOP
+<<<<<<< HEAD
+ *  - a video buffer is queued on the pcdev->capture list
+=======
  *  - a videobuffer is queued on the pcdev->capture list
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  *
  * Please check the "DMA hot chaining timeslice issue" in
  *   Documentation/driver-api/media/drivers/pxa_camera.rst
@@ -1163,7 +1171,11 @@ static void pxa_camera_eof(struct tasklet_struct *t)
 	pcdev->active = list_first_entry(&pcdev->capture,
 					 struct pxa_buffer, queue);
 	buf = pcdev->active;
+<<<<<<< HEAD
+	pxa_video_buf_set_actdma(pcdev, buf);
+=======
 	pxa_videobuf_set_actdma(pcdev, buf);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	pxa_dma_start_channels(pcdev);
 }
@@ -1416,7 +1428,11 @@ static int pxac_vb2_prepare(struct vb2_buffer *vb)
 	 * the actual buffer is yours
 	 */
 	buf->inwork = 0;
+<<<<<<< HEAD
+	pxa_video_buf_set_actdma(pcdev, buf);
+=======
 	pxa_videobuf_set_actdma(pcdev, buf);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }

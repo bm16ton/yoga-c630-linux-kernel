@@ -343,13 +343,20 @@ unsigned int dcn314_calculate_dccg_k1_k2_values(struct pipe_ctx *pipe_ctx, unsig
 {
 	struct dc_stream_state *stream = pipe_ctx->stream;
 	unsigned int odm_combine_factor = 0;
+<<<<<<< HEAD
+=======
 	struct dc *dc = pipe_ctx->stream->ctx->dc;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bool two_pix_per_container = false;
 
 	two_pix_per_container = optc2_is_two_pixels_per_containter(&stream->timing);
 	odm_combine_factor = get_odm_config(pipe_ctx, NULL);
 
 	if (is_dp_128b_132b_signal(pipe_ctx)) {
+<<<<<<< HEAD
+		*k1_div = PIXEL_RATE_DIV_BY_1;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*k2_div = PIXEL_RATE_DIV_BY_1;
 	} else if (dc_is_hdmi_tmds_signal(pipe_ctx->stream->signal) || dc_is_dvi_signal(pipe_ctx->stream->signal)) {
 		*k1_div = PIXEL_RATE_DIV_BY_1;
@@ -357,14 +364,22 @@ unsigned int dcn314_calculate_dccg_k1_k2_values(struct pipe_ctx *pipe_ctx, unsig
 			*k2_div = PIXEL_RATE_DIV_BY_2;
 		else
 			*k2_div = PIXEL_RATE_DIV_BY_4;
+<<<<<<< HEAD
+	} else if (dc_is_dp_signal(pipe_ctx->stream->signal) || dc_is_virtual_signal(pipe_ctx->stream->signal)) {
+=======
 	} else if (dc_is_dp_signal(pipe_ctx->stream->signal)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (two_pix_per_container) {
 			*k1_div = PIXEL_RATE_DIV_BY_1;
 			*k2_div = PIXEL_RATE_DIV_BY_2;
 		} else {
 			*k1_div = PIXEL_RATE_DIV_BY_1;
 			*k2_div = PIXEL_RATE_DIV_BY_4;
+<<<<<<< HEAD
+			if (odm_combine_factor == 2)
+=======
 			if ((odm_combine_factor == 2) || dc->debug.enable_dp_dig_pixel_rate_div_policy)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				*k2_div = PIXEL_RATE_DIV_BY_2;
 		}
 	}
@@ -384,14 +399,20 @@ void dcn314_set_pixels_per_cycle(struct pipe_ctx *pipe_ctx)
 		return;
 
 	odm_combine_factor = get_odm_config(pipe_ctx, NULL);
+<<<<<<< HEAD
+	if (optc2_is_two_pixels_per_containter(&pipe_ctx->stream->timing) || odm_combine_factor > 1)
+=======
 	if (optc2_is_two_pixels_per_containter(&pipe_ctx->stream->timing) || odm_combine_factor > 1
 		|| dcn314_is_dp_dig_pixel_rate_div_policy(pipe_ctx))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pix_per_cycle = 2;
 
 	if (pipe_ctx->stream_res.stream_enc->funcs->set_input_mode)
 		pipe_ctx->stream_res.stream_enc->funcs->set_input_mode(pipe_ctx->stream_res.stream_enc,
 				pix_per_cycle);
 }
+<<<<<<< HEAD
+=======
 
 bool dcn314_is_dp_dig_pixel_rate_div_policy(struct pipe_ctx *pipe_ctx)
 {
@@ -402,3 +423,4 @@ bool dcn314_is_dp_dig_pixel_rate_div_policy(struct pipe_ctx *pipe_ctx)
 		return true;
 	return false;
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

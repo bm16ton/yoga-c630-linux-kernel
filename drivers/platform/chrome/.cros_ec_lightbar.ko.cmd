@@ -1,0 +1,1 @@
+cmd_drivers/platform/chrome/cros_ec_lightbar.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/platform/chrome/cros_ec_lightbar.ko drivers/platform/chrome/cros_ec_lightbar.o drivers/platform/chrome/cros_ec_lightbar.mod.o;  true

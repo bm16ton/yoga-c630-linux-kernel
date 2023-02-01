@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/ad7877.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/ad7877.ko drivers/input/touchscreen/ad7877.o drivers/input/touchscreen/ad7877.mod.o;  true

@@ -45,6 +45,10 @@
 #define __ARCH_WANT_SYS_UTIME
 #define __ARCH_WANT_SYS_NEWFSTATAT
 #define __ARCH_WANT_COMPAT_STAT
+<<<<<<< HEAD
+#define __ARCH_WANT_COMPAT_FALLOCATE
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define __ARCH_WANT_COMPAT_SYS_SENDFILE
 #endif
 #define __ARCH_WANT_SYS_FORK

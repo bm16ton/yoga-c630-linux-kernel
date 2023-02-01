@@ -1,0 +1,1 @@
+cmd_drivers/pps/clients/pps-gpio.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/pps/clients/pps-gpio.ko drivers/pps/clients/pps-gpio.o drivers/pps/clients/pps-gpio.mod.o;  true

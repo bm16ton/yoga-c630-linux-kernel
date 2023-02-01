@@ -475,6 +475,10 @@ static const struct mtk_eint_hw mt6795_eint_hw = {
 	.ports     = 7,
 	.ap_num    = 224,
 	.db_cnt    = 32,
+<<<<<<< HEAD
+	.db_time   = debounce_time_mt6795,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const unsigned int mt6795_pull_type[] = {

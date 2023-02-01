@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/w83l785ts.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/w83l785ts.ko drivers/hwmon/w83l785ts.o drivers/hwmon/w83l785ts.mod.o;  true

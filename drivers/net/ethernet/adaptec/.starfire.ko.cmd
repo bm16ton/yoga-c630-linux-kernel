@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/adaptec/starfire.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/adaptec/starfire.ko drivers/net/ethernet/adaptec/starfire.o drivers/net/ethernet/adaptec/starfire.mod.o;  true

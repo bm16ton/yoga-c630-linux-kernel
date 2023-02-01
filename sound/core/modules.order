@@ -1,0 +1,17 @@
+sound/core/oss/snd-mixer-oss.ko
+sound/core/oss/snd-pcm-oss.ko
+sound/core/snd.ko
+sound/core/snd-ctl-led.ko
+sound/core/snd-hwdep.ko
+sound/core/snd-timer.ko
+sound/core/snd-hrtimer.ko
+sound/core/snd-pcm.ko
+sound/core/snd-pcm-dmaengine.ko
+sound/core/snd-seq-device.ko
+sound/core/snd-rawmidi.ko
+sound/core/seq/snd-seq.ko
+sound/core/seq/snd-seq-dummy.ko
+sound/core/seq/snd-seq-midi.ko
+sound/core/seq/snd-seq-midi-emul.ko
+sound/core/seq/snd-seq-midi-event.ko
+sound/core/snd-compress.ko

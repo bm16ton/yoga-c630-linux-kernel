@@ -61,6 +61,7 @@ struct at91_pm_sfrbu_regs {
 		u32 softsw;
 	} pswbu;
 };
+<<<<<<< HEAD
 
 /**
  * enum at91_pm_eth_clk - Ethernet clock indexes
@@ -87,6 +88,34 @@ enum at91_pm_eth {
 };
 
 /**
+=======
+
+/**
+ * enum at91_pm_eth_clk - Ethernet clock indexes
+ * @AT91_PM_ETH_PCLK: pclk index
+ * @AT91_PM_ETH_HCLK: hclk index
+ * @AT91_PM_ETH_MAX_CLK: max index
+ */
+enum at91_pm_eth_clk {
+	AT91_PM_ETH_PCLK,
+	AT91_PM_ETH_HCLK,
+	AT91_PM_ETH_MAX_CLK,
+};
+
+/**
+ * enum at91_pm_eth - Ethernet controller indexes
+ * @AT91_PM_G_ETH: gigabit Ethernet controller index
+ * @AT91_PM_E_ETH: megabit Ethernet controller index
+ * @AT91_PM_MAX_ETH: max index
+ */
+enum at91_pm_eth {
+	AT91_PM_G_ETH,
+	AT91_PM_E_ETH,
+	AT91_PM_MAX_ETH,
+};
+
+/**
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * struct at91_pm_quirk_eth - AT91 PM Ethernet quirks
  * @dev: Ethernet device
  * @np: Ethernet device node
@@ -132,6 +161,7 @@ struct at91_soc_pm {
 	struct at91_pm_data data;
 	struct at91_pm_sfrbu_regs sfrbu_regs;
 	void *memcs;
+<<<<<<< HEAD
 };
 
 /**
@@ -146,6 +176,22 @@ enum at91_pm_iomaps {
 	AT91_PM_IOMAP_ETHC,
 };
 
+=======
+};
+
+/**
+ * enum at91_pm_iomaps - IOs that needs to be mapped for different PM modes
+ * @AT91_PM_IOMAP_SHDWC:	SHDWC controller
+ * @AT91_PM_IOMAP_SFRBU:	SFRBU controller
+ * @AT91_PM_IOMAP_ETHC:		Ethernet controller
+ */
+enum at91_pm_iomaps {
+	AT91_PM_IOMAP_SHDWC,
+	AT91_PM_IOMAP_SFRBU,
+	AT91_PM_IOMAP_ETHC,
+};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define AT91_PM_IOMAP(name)	BIT(AT91_PM_IOMAP_##name)
 
 static struct at91_soc_pm soc_pm = {
@@ -655,6 +701,8 @@ static int at91_pm_enter(suspend_state_t state)
 	ret = at91_pm_config_quirks(true);
 	if (ret)
 		return ret;
+<<<<<<< HEAD
+=======
 
 #ifdef CONFIG_PINCTRL_AT91
 	/*
@@ -665,6 +713,7 @@ static int at91_pm_enter(suspend_state_t state)
 	 */
 	at91_pinctrl_gpio_suspend();
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	switch (state) {
 	case PM_SUSPEND_MEM:
@@ -690,9 +739,12 @@ static int at91_pm_enter(suspend_state_t state)
 	}
 
 error:
+<<<<<<< HEAD
+=======
 #ifdef CONFIG_PINCTRL_AT91
 	at91_pinctrl_gpio_resume();
 #endif
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	at91_pm_config_quirks(false);
 	return 0;
 }
@@ -1130,10 +1182,17 @@ static void __init at91_pm_secure_init(void)
 		pr_warn("AT91: Secure PM: failed to get default mode\n");
 		return;
 	}
+<<<<<<< HEAD
 
 	pr_info("AT91: Secure PM: using default suspend mode %s\n",
 		pm_modes[suspend_mode].pattern);
 
+=======
+
+	pr_info("AT91: Secure PM: using default suspend mode %s\n",
+		pm_modes[suspend_mode].pattern);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	soc_pm.data.suspend_mode = res.a1;
 }
 static const struct of_device_id atmel_shdwc_ids[] = {
@@ -1225,6 +1284,7 @@ static int __init at91_pm_get_eth_clks(struct device_node *np,
 }
 
 static int __init at91_pm_eth_clks_empty(struct clk_bulk_data *clks)
+<<<<<<< HEAD
 {
 	return IS_ERR(clks[AT91_PM_ETH_PCLK].clk) ||
 	       IS_ERR(clks[AT91_PM_ETH_HCLK].clk);
@@ -1232,6 +1292,15 @@ static int __init at91_pm_eth_clks_empty(struct clk_bulk_data *clks)
 
 static void __init at91_pm_modes_init(const u32 *maps, int len)
 {
+=======
+{
+	return IS_ERR(clks[AT91_PM_ETH_PCLK].clk) ||
+	       IS_ERR(clks[AT91_PM_ETH_HCLK].clk);
+}
+
+static void __init at91_pm_modes_init(const u32 *maps, int len)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct at91_pm_quirk_eth *gmac = &soc_pm.quirks.eth[AT91_PM_G_ETH];
 	struct at91_pm_quirk_eth *emac = &soc_pm.quirks.eth[AT91_PM_E_ETH];
 	struct device_node *np;

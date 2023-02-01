@@ -12,12 +12,57 @@
 #include "mock.h"
 
 #define NR_CXL_HOST_BRIDGES 2
+<<<<<<< HEAD
+#define NR_CXL_SINGLE_HOST 1
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define NR_CXL_ROOT_PORTS 2
 #define NR_CXL_SWITCH_PORTS 2
 #define NR_CXL_PORT_DECODERS 8
 
 static struct platform_device *cxl_acpi;
 static struct platform_device *cxl_host_bridge[NR_CXL_HOST_BRIDGES];
+<<<<<<< HEAD
+#define NR_MULTI_ROOT (NR_CXL_HOST_BRIDGES * NR_CXL_ROOT_PORTS)
+static struct platform_device *cxl_root_port[NR_MULTI_ROOT];
+static struct platform_device *cxl_switch_uport[NR_MULTI_ROOT];
+#define NR_MEM_MULTI \
+	(NR_CXL_HOST_BRIDGES * NR_CXL_ROOT_PORTS * NR_CXL_SWITCH_PORTS)
+static struct platform_device *cxl_switch_dport[NR_MEM_MULTI];
+
+static struct platform_device *cxl_hb_single[NR_CXL_SINGLE_HOST];
+static struct platform_device *cxl_root_single[NR_CXL_SINGLE_HOST];
+static struct platform_device *cxl_swu_single[NR_CXL_SINGLE_HOST];
+#define NR_MEM_SINGLE (NR_CXL_SINGLE_HOST * NR_CXL_SWITCH_PORTS)
+static struct platform_device *cxl_swd_single[NR_MEM_SINGLE];
+
+struct platform_device *cxl_mem[NR_MEM_MULTI];
+struct platform_device *cxl_mem_single[NR_MEM_SINGLE];
+
+
+static inline bool is_multi_bridge(struct device *dev)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(cxl_host_bridge); i++)
+		if (&cxl_host_bridge[i]->dev == dev)
+			return true;
+	return false;
+}
+
+static inline bool is_single_bridge(struct device *dev)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(cxl_hb_single); i++)
+		if (&cxl_hb_single[i]->dev == dev)
+			return true;
+	return false;
+}
+
+static struct acpi_device acpi0017_mock;
+static struct acpi_device host_bridge[NR_CXL_HOST_BRIDGES + NR_CXL_SINGLE_HOST] = {
+=======
 static struct platform_device
 	*cxl_root_port[NR_CXL_HOST_BRIDGES * NR_CXL_ROOT_PORTS];
 static struct platform_device
@@ -30,12 +75,20 @@ struct platform_device
 
 static struct acpi_device acpi0017_mock;
 static struct acpi_device host_bridge[NR_CXL_HOST_BRIDGES] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	[0] = {
 		.handle = &host_bridge[0],
 	},
 	[1] = {
 		.handle = &host_bridge[1],
 	},
+<<<<<<< HEAD
+	[2] = {
+		.handle = &host_bridge[2],
+	},
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static bool is_mock_dev(struct device *dev)
@@ -45,6 +98,12 @@ static bool is_mock_dev(struct device *dev)
 	for (i = 0; i < ARRAY_SIZE(cxl_mem); i++)
 		if (dev == &cxl_mem[i]->dev)
 			return true;
+<<<<<<< HEAD
+	for (i = 0; i < ARRAY_SIZE(cxl_mem_single); i++)
+		if (dev == &cxl_mem_single[i]->dev)
+			return true;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (dev == &cxl_acpi->dev)
 		return true;
 	return false;
@@ -66,7 +125,11 @@ static bool is_mock_adev(struct acpi_device *adev)
 
 static struct {
 	struct acpi_table_cedt cedt;
+<<<<<<< HEAD
+	struct acpi_cedt_chbs chbs[NR_CXL_HOST_BRIDGES + NR_CXL_SINGLE_HOST];
+=======
 	struct acpi_cedt_chbs chbs[NR_CXL_HOST_BRIDGES];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct {
 		struct acpi_cedt_cfmws cfmws;
 		u32 target[1];
@@ -83,6 +146,13 @@ static struct {
 		struct acpi_cedt_cfmws cfmws;
 		u32 target[2];
 	} cfmws3;
+<<<<<<< HEAD
+	struct {
+		struct acpi_cedt_cfmws cfmws;
+		u32 target[1];
+	} cfmws4;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 } __packed mock_cedt = {
 	.cedt = {
 		.header = {
@@ -107,6 +177,17 @@ static struct {
 		.uid = 1,
 		.cxl_version = ACPI_CEDT_CHBS_VERSION_CXL20,
 	},
+<<<<<<< HEAD
+	.chbs[2] = {
+		.header = {
+			.type = ACPI_CEDT_TYPE_CHBS,
+			.length = sizeof(mock_cedt.chbs[0]),
+		},
+		.uid = 2,
+		.cxl_version = ACPI_CEDT_CHBS_VERSION_CXL20,
+	},
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.cfmws0 = {
 		.cfmws = {
 			.header = {
@@ -167,13 +248,38 @@ static struct {
 		},
 		.target = { 0, 1, },
 	},
+<<<<<<< HEAD
+	.cfmws4 = {
+		.cfmws = {
+			.header = {
+				.type = ACPI_CEDT_TYPE_CFMWS,
+				.length = sizeof(mock_cedt.cfmws4),
+			},
+			.interleave_ways = 0,
+			.granularity = 4,
+			.restrictions = ACPI_CEDT_CFMWS_RESTRICT_TYPE3 |
+					ACPI_CEDT_CFMWS_RESTRICT_PMEM,
+			.qtg_id = 4,
+			.window_size = SZ_256M * 4UL,
+		},
+		.target = { 2 },
+	},
+};
+
+struct acpi_cedt_cfmws *mock_cfmws[] = {
+=======
 };
 
 struct acpi_cedt_cfmws *mock_cfmws[4] = {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	[0] = &mock_cedt.cfmws0.cfmws,
 	[1] = &mock_cedt.cfmws1.cfmws,
 	[2] = &mock_cedt.cfmws2.cfmws,
 	[3] = &mock_cedt.cfmws3.cfmws,
+<<<<<<< HEAD
+	[4] = &mock_cedt.cfmws4.cfmws,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct cxl_mock_res {
@@ -304,6 +410,12 @@ static bool is_mock_bridge(struct device *dev)
 	for (i = 0; i < ARRAY_SIZE(cxl_host_bridge); i++)
 		if (dev == &cxl_host_bridge[i]->dev)
 			return true;
+<<<<<<< HEAD
+	for (i = 0; i < ARRAY_SIZE(cxl_hb_single); i++)
+		if (dev == &cxl_hb_single[i]->dev)
+			return true;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return false;
 }
 
@@ -326,6 +438,21 @@ static bool is_mock_port(struct device *dev)
 		if (dev == &cxl_switch_dport[i]->dev)
 			return true;
 
+<<<<<<< HEAD
+	for (i = 0; i < ARRAY_SIZE(cxl_root_single); i++)
+		if (dev == &cxl_root_single[i]->dev)
+			return true;
+
+	for (i = 0; i < ARRAY_SIZE(cxl_swu_single); i++)
+		if (dev == &cxl_swu_single[i]->dev)
+			return true;
+
+	for (i = 0; i < ARRAY_SIZE(cxl_swd_single); i++)
+		if (dev == &cxl_swd_single[i]->dev)
+			return true;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (is_cxl_memdev(dev))
 		return is_mock_dev(dev->parent);
 
@@ -561,11 +688,39 @@ static int mock_cxl_port_enumerate_dports(struct cxl_port *port)
 	int i, array_size;
 
 	if (port->depth == 1) {
+<<<<<<< HEAD
+		if (is_multi_bridge(port->uport)) {
+			array_size = ARRAY_SIZE(cxl_root_port);
+			array = cxl_root_port;
+		} else if (is_single_bridge(port->uport)) {
+			array_size = ARRAY_SIZE(cxl_root_single);
+			array = cxl_root_single;
+		} else {
+			dev_dbg(&port->dev, "%s: unknown bridge type\n",
+				dev_name(port->uport));
+			return -ENXIO;
+		}
+	} else if (port->depth == 2) {
+		struct cxl_port *parent = to_cxl_port(port->dev.parent);
+
+		if (is_multi_bridge(parent->uport)) {
+			array_size = ARRAY_SIZE(cxl_switch_dport);
+			array = cxl_switch_dport;
+		} else if (is_single_bridge(parent->uport)) {
+			array_size = ARRAY_SIZE(cxl_swd_single);
+			array = cxl_swd_single;
+		} else {
+			dev_dbg(&port->dev, "%s: unknown bridge type\n",
+				dev_name(port->uport));
+			return -ENXIO;
+		}
+=======
 		array_size = ARRAY_SIZE(cxl_root_port);
 		array = cxl_root_port;
 	} else if (port->depth == 2) {
 		array_size = ARRAY_SIZE(cxl_switch_dport);
 		array = cxl_switch_dport;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		dev_WARN_ONCE(&port->dev, 1, "unexpected depth %d\n",
 			      port->depth);
@@ -576,8 +731,17 @@ static int mock_cxl_port_enumerate_dports(struct cxl_port *port)
 		struct platform_device *pdev = array[i];
 		struct cxl_dport *dport;
 
+<<<<<<< HEAD
+		if (pdev->dev.parent != port->uport) {
+			dev_dbg(&port->dev, "%s: mismatch parent %s\n",
+				dev_name(port->uport),
+				dev_name(pdev->dev.parent));
+			continue;
+		}
+=======
 		if (pdev->dev.parent != port->uport)
 			continue;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		dport = devm_cxl_add_dport(port, &pdev->dev, pdev->id,
 					   CXL_RESOURCE_NONE);
@@ -627,6 +791,160 @@ static void mock_companion(struct acpi_device *adev, struct device *dev)
 #define SZ_512G (SZ_64G * 8)
 #endif
 
+<<<<<<< HEAD
+static __init int cxl_single_init(void)
+{
+	int i, rc;
+
+	for (i = 0; i < ARRAY_SIZE(cxl_hb_single); i++) {
+		struct acpi_device *adev =
+			&host_bridge[NR_CXL_HOST_BRIDGES + i];
+		struct platform_device *pdev;
+
+		pdev = platform_device_alloc("cxl_host_bridge",
+					     NR_CXL_HOST_BRIDGES + i);
+		if (!pdev)
+			goto err_bridge;
+
+		mock_companion(adev, &pdev->dev);
+		rc = platform_device_add(pdev);
+		if (rc) {
+			platform_device_put(pdev);
+			goto err_bridge;
+		}
+
+		cxl_hb_single[i] = pdev;
+		rc = sysfs_create_link(&pdev->dev.kobj, &pdev->dev.kobj,
+				       "physical_node");
+		if (rc)
+			goto err_bridge;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(cxl_root_single); i++) {
+		struct platform_device *bridge =
+			cxl_hb_single[i % ARRAY_SIZE(cxl_hb_single)];
+		struct platform_device *pdev;
+
+		pdev = platform_device_alloc("cxl_root_port",
+					     NR_MULTI_ROOT + i);
+		if (!pdev)
+			goto err_port;
+		pdev->dev.parent = &bridge->dev;
+
+		rc = platform_device_add(pdev);
+		if (rc) {
+			platform_device_put(pdev);
+			goto err_port;
+		}
+		cxl_root_single[i] = pdev;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(cxl_swu_single); i++) {
+		struct platform_device *root_port = cxl_root_single[i];
+		struct platform_device *pdev;
+
+		pdev = platform_device_alloc("cxl_switch_uport",
+					     NR_MULTI_ROOT + i);
+		if (!pdev)
+			goto err_uport;
+		pdev->dev.parent = &root_port->dev;
+
+		rc = platform_device_add(pdev);
+		if (rc) {
+			platform_device_put(pdev);
+			goto err_uport;
+		}
+		cxl_swu_single[i] = pdev;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(cxl_swd_single); i++) {
+		struct platform_device *uport =
+			cxl_swu_single[i % ARRAY_SIZE(cxl_swu_single)];
+		struct platform_device *pdev;
+
+		pdev = platform_device_alloc("cxl_switch_dport",
+					     i + NR_MEM_MULTI);
+		if (!pdev)
+			goto err_dport;
+		pdev->dev.parent = &uport->dev;
+
+		rc = platform_device_add(pdev);
+		if (rc) {
+			platform_device_put(pdev);
+			goto err_dport;
+		}
+		cxl_swd_single[i] = pdev;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(cxl_mem_single); i++) {
+		struct platform_device *dport = cxl_swd_single[i];
+		struct platform_device *pdev;
+
+		pdev = platform_device_alloc("cxl_mem", NR_MEM_MULTI + i);
+		if (!pdev)
+			goto err_mem;
+		pdev->dev.parent = &dport->dev;
+		set_dev_node(&pdev->dev, i % 2);
+
+		rc = platform_device_add(pdev);
+		if (rc) {
+			platform_device_put(pdev);
+			goto err_mem;
+		}
+		cxl_mem_single[i] = pdev;
+	}
+
+	return 0;
+
+err_mem:
+	for (i = ARRAY_SIZE(cxl_mem_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_mem_single[i]);
+err_dport:
+	for (i = ARRAY_SIZE(cxl_swd_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_swd_single[i]);
+err_uport:
+	for (i = ARRAY_SIZE(cxl_swu_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_swu_single[i]);
+err_port:
+	for (i = ARRAY_SIZE(cxl_root_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_root_single[i]);
+err_bridge:
+	for (i = ARRAY_SIZE(cxl_hb_single) - 1; i >= 0; i--) {
+		struct platform_device *pdev = cxl_hb_single[i];
+
+		if (!pdev)
+			continue;
+		sysfs_remove_link(&pdev->dev.kobj, "physical_node");
+		platform_device_unregister(cxl_hb_single[i]);
+	}
+
+	return rc;
+}
+
+static void cxl_single_exit(void)
+{
+	int i;
+
+	for (i = ARRAY_SIZE(cxl_mem_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_mem_single[i]);
+	for (i = ARRAY_SIZE(cxl_swd_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_swd_single[i]);
+	for (i = ARRAY_SIZE(cxl_swu_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_swu_single[i]);
+	for (i = ARRAY_SIZE(cxl_root_single) - 1; i >= 0; i--)
+		platform_device_unregister(cxl_root_single[i]);
+	for (i = ARRAY_SIZE(cxl_hb_single) - 1; i >= 0; i--) {
+		struct platform_device *pdev = cxl_hb_single[i];
+
+		if (!pdev)
+			continue;
+		sysfs_remove_link(&pdev->dev.kobj, "physical_node");
+		platform_device_unregister(cxl_hb_single[i]);
+	}
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static __init int cxl_test_init(void)
 {
 	int rc, i;
@@ -724,7 +1042,10 @@ static __init int cxl_test_init(void)
 		cxl_switch_dport[i] = pdev;
 	}
 
+<<<<<<< HEAD
+=======
 	BUILD_BUG_ON(ARRAY_SIZE(cxl_mem) != ARRAY_SIZE(cxl_switch_dport));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = 0; i < ARRAY_SIZE(cxl_mem); i++) {
 		struct platform_device *dport = cxl_switch_dport[i];
 		struct platform_device *pdev;
@@ -743,9 +1064,19 @@ static __init int cxl_test_init(void)
 		cxl_mem[i] = pdev;
 	}
 
+<<<<<<< HEAD
+	rc = cxl_single_init();
+	if (rc)
+		goto err_mem;
+
+	cxl_acpi = platform_device_alloc("cxl_acpi", 0);
+	if (!cxl_acpi)
+		goto err_single;
+=======
 	cxl_acpi = platform_device_alloc("cxl_acpi", 0);
 	if (!cxl_acpi)
 		goto err_mem;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	mock_companion(&acpi0017_mock, &cxl_acpi->dev);
 	acpi0017_mock.dev.bus = &platform_bus_type;
@@ -758,6 +1089,11 @@ static __init int cxl_test_init(void)
 
 err_add:
 	platform_device_put(cxl_acpi);
+<<<<<<< HEAD
+err_single:
+	cxl_single_exit();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 err_mem:
 	for (i = ARRAY_SIZE(cxl_mem) - 1; i >= 0; i--)
 		platform_device_unregister(cxl_mem[i]);
@@ -793,6 +1129,10 @@ static __exit void cxl_test_exit(void)
 	int i;
 
 	platform_device_unregister(cxl_acpi);
+<<<<<<< HEAD
+	cxl_single_exit();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	for (i = ARRAY_SIZE(cxl_mem) - 1; i >= 0; i--)
 		platform_device_unregister(cxl_mem[i]);
 	for (i = ARRAY_SIZE(cxl_switch_dport) - 1; i >= 0; i--)

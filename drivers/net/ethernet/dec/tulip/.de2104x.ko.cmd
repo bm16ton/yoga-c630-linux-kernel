@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/dec/tulip/de2104x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/dec/tulip/de2104x.ko drivers/net/ethernet/dec/tulip/de2104x.o drivers/net/ethernet/dec/tulip/de2104x.mod.o;  true

@@ -1,0 +1,54 @@
+Description: Allow build without embedding pubkey data into crda/regdbdump
+ binaries.
+From: Kel Modderman <kel@otaku42.de>
+--- a/Makefile
++++ b/Makefile
+@@ -42,7 +42,12 @@ ifeq ($(USE_OPENSSL),1)
+ CFLAGS += -DUSE_OPENSSL -DPUBKEY_DIR=\"$(RUNTIME_PUBKEY_DIR)\" `pkg-config --cflags openssl`
+ LDLIBS += `pkg-config --libs openssl`
+ 
++ifeq ($(RUNTIME_PUBKEY_ONLY),1)
++CFLAGS += -DRUNTIME_PUBKEY_ONLY
++else
++CFLAGS += -DHAVE_KEYS_SSL
+ $(LIBREG): keys-ssl.c
++endif
+ 
+ else
+ CFLAGS += -DUSE_GCRYPT
+--- a/reglib.c
++++ b/reglib.c
+@@ -30,7 +30,7 @@
+ 
+ #include "reglib.h"
+ 
+-#ifdef USE_OPENSSL
++#if defined(USE_OPENSSL) && defined(HAVE_KEYS_SSL)
+ #include "keys-ssl.c"
+ #endif
+ 
+@@ -83,7 +83,6 @@ int reglib_verify_db_signature(uint8_t *
+ {
+ 	RSA *rsa;
+ 	uint8_t hash[SHA_DIGEST_LENGTH];
+-	unsigned int i;
+ 	int ok = 0;
+ 	DIR *pubkey_dir;
+ 	struct dirent *nextfile;
+@@ -95,6 +94,8 @@ int reglib_verify_db_signature(uint8_t *
+ 		goto out;
+ 	}
+ 
++#ifdef HAVE_KEYS_SSL
++	unsigned int i;
+ 	for (i = 0; (i < sizeof(keys)/sizeof(keys[0])) && (!ok); i++) {
+ 		rsa = RSA_new();
+ 		if (!rsa) {
+@@ -112,6 +113,7 @@ int reglib_verify_db_signature(uint8_t *
+ 		rsa->n = NULL;
+ 		RSA_free(rsa);
+ 	}
++#endif
+ 	if (!ok && (pubkey_dir = opendir(PUBKEY_DIR))) {
+ 		while (!ok && (nextfile = readdir(pubkey_dir))) {
+ 			snprintf(filename, PATH_MAX, "%s/%s", PUBKEY_DIR,

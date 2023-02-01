@@ -600,6 +600,19 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
 }
 
 static void vfio_ap_mdev_update_guest_apcb(struct ap_matrix_mdev *matrix_mdev)
+<<<<<<< HEAD
+{
+	if (matrix_mdev->kvm)
+		kvm_arch_crypto_set_masks(matrix_mdev->kvm,
+					  matrix_mdev->shadow_apcb.apm,
+					  matrix_mdev->shadow_apcb.aqm,
+					  matrix_mdev->shadow_apcb.adm);
+}
+
+static bool vfio_ap_mdev_filter_cdoms(struct ap_matrix_mdev *matrix_mdev)
+{
+	DECLARE_BITMAP(prev_shadow_adm, AP_DOMAINS);
+=======
 {
 	if (matrix_mdev->kvm)
 		kvm_arch_crypto_set_masks(matrix_mdev->kvm,
@@ -688,19 +701,95 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
 {
 	struct ap_matrix_mdev *matrix_mdev;
 	int ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	if ((atomic_dec_if_positive(&matrix_dev->available_instances) < 0))
-		return -EPERM;
+	bitmap_copy(prev_shadow_adm, matrix_mdev->shadow_apcb.adm, AP_DOMAINS);
+	bitmap_and(matrix_mdev->shadow_apcb.adm, matrix_mdev->matrix.adm,
+		   (unsigned long *)matrix_dev->info.adm, AP_DOMAINS);
 
+<<<<<<< HEAD
+	return !bitmap_equal(prev_shadow_adm, matrix_mdev->shadow_apcb.adm,
+			     AP_DOMAINS);
+}
+
+/*
+ * vfio_ap_mdev_filter_matrix - filter the APQNs assigned to the matrix mdev
+ *				to ensure no queue devices are passed through to
+ *				the guest that are not bound to the vfio_ap
+ *				device driver.
+ *
+ * @matrix_mdev: the matrix mdev whose matrix is to be filtered.
+ *
+ * Note: If an APQN referencing a queue device that is not bound to the vfio_ap
+ *	 driver, its APID will be filtered from the guest's APCB. The matrix
+ *	 structure precludes filtering an individual APQN, so its APID will be
+ *	 filtered.
+ *
+ * Return: a boolean value indicating whether the KVM guest's APCB was changed
+ *	   by the filtering or not.
+ */
+static bool vfio_ap_mdev_filter_matrix(unsigned long *apm, unsigned long *aqm,
+				       struct ap_matrix_mdev *matrix_mdev)
+{
+	unsigned long apid, apqi, apqn;
+	DECLARE_BITMAP(prev_shadow_apm, AP_DEVICES);
+	DECLARE_BITMAP(prev_shadow_aqm, AP_DOMAINS);
+	struct vfio_ap_queue *q;
+
+	bitmap_copy(prev_shadow_apm, matrix_mdev->shadow_apcb.apm, AP_DEVICES);
+	bitmap_copy(prev_shadow_aqm, matrix_mdev->shadow_apcb.aqm, AP_DOMAINS);
+	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_apcb);
+
+	/*
+	 * Copy the adapters, domains and control domains to the shadow_apcb
+	 * from the matrix mdev, but only those that are assigned to the host's
+	 * AP configuration.
+	 */
+	bitmap_and(matrix_mdev->shadow_apcb.apm, matrix_mdev->matrix.apm,
+		   (unsigned long *)matrix_dev->info.apm, AP_DEVICES);
+	bitmap_and(matrix_mdev->shadow_apcb.aqm, matrix_mdev->matrix.aqm,
+		   (unsigned long *)matrix_dev->info.aqm, AP_DOMAINS);
+
+	for_each_set_bit_inv(apid, apm, AP_DEVICES) {
+		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS) {
+			/*
+			 * If the APQN is not bound to the vfio_ap device
+			 * driver, then we can't assign it to the guest's
+			 * AP configuration. The AP architecture won't
+			 * allow filtering of a single APQN, so let's filter
+			 * the APID since an adapter represents a physical
+			 * hardware device.
+			 */
+			apqn = AP_MKQID(apid, apqi);
+			q = vfio_ap_mdev_get_queue(matrix_mdev, apqn);
+			if (!q || q->reset_rc) {
+				clear_bit_inv(apid,
+					      matrix_mdev->shadow_apcb.apm);
+				break;
+			}
+		}
+=======
 	matrix_mdev = kzalloc(sizeof(*matrix_mdev), GFP_KERNEL);
 	if (!matrix_mdev) {
 		ret = -ENOMEM;
 		goto err_dec_available;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	vfio_init_group_dev(&matrix_mdev->vdev, &mdev->dev,
 			    &vfio_ap_matrix_dev_ops);
 
-	matrix_mdev->mdev = mdev;
+	return !bitmap_equal(prev_shadow_apm, matrix_mdev->shadow_apcb.apm,
+			     AP_DEVICES) ||
+	       !bitmap_equal(prev_shadow_aqm, matrix_mdev->shadow_apcb.aqm,
+			     AP_DOMAINS);
+}
+
+static int vfio_ap_mdev_init_dev(struct vfio_device *vdev)
+{
+	struct ap_matrix_mdev *matrix_mdev =
+		container_of(vdev, struct ap_matrix_mdev, vdev);
+
+	matrix_mdev->mdev = to_mdev_device(vdev->dev);
 	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
 	matrix_mdev->pqap_hook = handle_pqap;
 	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_apcb);
@@ -766,6 +855,34 @@ static void vfio_ap_mdev_unlink_fr_queues(struct ap_matrix_mdev *matrix_mdev)
 	}
 }
 
+<<<<<<< HEAD
+static int vfio_ap_mdev_probe(struct mdev_device *mdev)
+{
+	struct ap_matrix_mdev *matrix_mdev;
+	int ret;
+
+	matrix_mdev = vfio_alloc_device(ap_matrix_mdev, vdev, &mdev->dev,
+					&vfio_ap_matrix_dev_ops);
+	if (IS_ERR(matrix_mdev))
+		return PTR_ERR(matrix_mdev);
+
+	ret = vfio_register_emulated_iommu_dev(&matrix_mdev->vdev);
+	if (ret)
+		goto err_put_vdev;
+	dev_set_drvdata(&mdev->dev, matrix_mdev);
+	mutex_lock(&matrix_dev->mdevs_lock);
+	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
+	mutex_unlock(&matrix_dev->mdevs_lock);
+	return 0;
+
+err_put_vdev:
+	vfio_put_device(&matrix_mdev->vdev);
+	return ret;
+}
+
+static void vfio_ap_mdev_link_queue(struct ap_matrix_mdev *matrix_mdev,
+				    struct vfio_ap_queue *q)
+=======
 static void vfio_ap_mdev_remove(struct mdev_device *mdev)
 {
 	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(&mdev->dev);
@@ -786,28 +903,110 @@ static void vfio_ap_mdev_remove(struct mdev_device *mdev)
 
 static ssize_t name_show(struct mdev_type *mtype,
 			 struct mdev_type_attribute *attr, char *buf)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
-	return sprintf(buf, "%s\n", VFIO_AP_MDEV_NAME_HWVIRT);
+	if (q) {
+		q->matrix_mdev = matrix_mdev;
+		hash_add(matrix_mdev->qtable.queues, &q->mdev_qnode, q->apqn);
+	}
 }
 
+<<<<<<< HEAD
+static void vfio_ap_mdev_link_apqn(struct ap_matrix_mdev *matrix_mdev, int apqn)
+=======
 static MDEV_TYPE_ATTR_RO(name);
 
 static ssize_t available_instances_show(struct mdev_type *mtype,
 					struct mdev_type_attribute *attr,
 					char *buf)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
-	return sprintf(buf, "%d\n",
-		       atomic_read(&matrix_dev->available_instances));
+	struct vfio_ap_queue *q;
+
+	q = vfio_ap_find_queue(apqn);
+	vfio_ap_mdev_link_queue(matrix_mdev, q);
 }
 
-static MDEV_TYPE_ATTR_RO(available_instances);
-
+<<<<<<< HEAD
+static void vfio_ap_unlink_queue_fr_mdev(struct vfio_ap_queue *q)
+=======
 static ssize_t device_api_show(struct mdev_type *mtype,
 			       struct mdev_type_attribute *attr, char *buf)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
-	return sprintf(buf, "%s\n", VFIO_DEVICE_API_AP_STRING);
+	hash_del(&q->mdev_qnode);
 }
 
+<<<<<<< HEAD
+static void vfio_ap_unlink_mdev_fr_queue(struct vfio_ap_queue *q)
+{
+	q->matrix_mdev = NULL;
+}
+
+static void vfio_ap_mdev_unlink_fr_queues(struct ap_matrix_mdev *matrix_mdev)
+{
+	struct vfio_ap_queue *q;
+	unsigned long apid, apqi;
+
+	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, AP_DEVICES) {
+		for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
+				     AP_DOMAINS) {
+			q = vfio_ap_mdev_get_queue(matrix_mdev,
+						   AP_MKQID(apid, apqi));
+			if (q)
+				q->matrix_mdev = NULL;
+		}
+	}
+}
+
+static void vfio_ap_mdev_release_dev(struct vfio_device *vdev)
+{
+	vfio_free_device(vdev);
+}
+
+static void vfio_ap_mdev_remove(struct mdev_device *mdev)
+{
+	struct ap_matrix_mdev *matrix_mdev = dev_get_drvdata(&mdev->dev);
+
+	vfio_unregister_group_dev(&matrix_mdev->vdev);
+
+	mutex_lock(&matrix_dev->guests_lock);
+	mutex_lock(&matrix_dev->mdevs_lock);
+	vfio_ap_mdev_reset_queues(&matrix_mdev->qtable);
+	vfio_ap_mdev_unlink_fr_queues(matrix_mdev);
+	list_del(&matrix_mdev->node);
+	mutex_unlock(&matrix_dev->mdevs_lock);
+	mutex_unlock(&matrix_dev->guests_lock);
+	vfio_put_device(&matrix_mdev->vdev);
+}
+
+#define MDEV_SHARING_ERR "Userspace may not re-assign queue %02lx.%04lx " \
+			 "already assigned to %s"
+
+static void vfio_ap_mdev_log_sharing_err(struct ap_matrix_mdev *matrix_mdev,
+					 unsigned long *apm,
+					 unsigned long *aqm)
+{
+	unsigned long apid, apqi;
+	const struct device *dev = mdev_dev(matrix_mdev->mdev);
+	const char *mdev_name = dev_name(dev);
+
+	for_each_set_bit_inv(apid, apm, AP_DEVICES)
+		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS)
+			dev_warn(dev, MDEV_SHARING_ERR, apid, apqi, mdev_name);
+}
+
+/**
+ * vfio_ap_mdev_verify_no_sharing - verify APQNs are not shared by matrix mdevs
+ *
+ * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
+ * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
+ *
+ * Verifies that each APQN derived from the Cartesian product of a bitmap of
+ * AP adapter IDs and AP queue indexes is not configured for any matrix
+ * mediated device. AP queue sharing is not allowed.
+ *
+=======
 static MDEV_TYPE_ATTR_RO(device_api);
 
 static struct attribute *vfio_ap_mdev_type_attrs[] = {
@@ -853,6 +1052,7 @@ static void vfio_ap_mdev_log_sharing_err(struct ap_matrix_mdev *matrix_mdev,
  * AP adapter IDs and AP queue indexes is not configured for any matrix
  * mediated device. AP queue sharing is not allowed.
  *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Return: 0 if the APQNs are not shared; otherwise return -EADDRINUSE.
  */
 static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
@@ -984,6 +1184,14 @@ static ssize_t assign_adapter_store(struct device *dev,
 		goto done;
 	}
 
+<<<<<<< HEAD
+	if (test_bit_inv(apid, matrix_mdev->matrix.apm)) {
+		ret = count;
+		goto done;
+	}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	set_bit_inv(apid, matrix_mdev->matrix.apm);
 
 	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
@@ -995,11 +1203,19 @@ static ssize_t assign_adapter_store(struct device *dev,
 	vfio_ap_mdev_link_adapter(matrix_mdev, apid);
 	memset(apm_delta, 0, sizeof(apm_delta));
 	set_bit_inv(apid, apm_delta);
+<<<<<<< HEAD
 
 	if (vfio_ap_mdev_filter_matrix(apm_delta,
 				       matrix_mdev->matrix.aqm, matrix_mdev))
 		vfio_ap_mdev_update_guest_apcb(matrix_mdev);
 
+=======
+
+	if (vfio_ap_mdev_filter_matrix(apm_delta,
+				       matrix_mdev->matrix.aqm, matrix_mdev))
+		vfio_ap_mdev_update_guest_apcb(matrix_mdev);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = count;
 done:
 	release_update_locks_for_mdev(matrix_mdev);
@@ -1023,6 +1239,7 @@ static struct vfio_ap_queue
 	return q;
 }
 
+<<<<<<< HEAD
 /**
  * vfio_ap_mdev_unlink_adapter - unlink all queues associated with unassigned
  *				 adapter from the matrix mdev to which the
@@ -1076,6 +1293,61 @@ static void vfio_ap_mdev_hot_unplug_adapter(struct ap_matrix_mdev *matrix_mdev,
 }
 
 /**
+=======
+/**
+ * vfio_ap_mdev_unlink_adapter - unlink all queues associated with unassigned
+ *				 adapter from the matrix mdev to which the
+ *				 adapter was assigned.
+ * @matrix_mdev: the matrix mediated device to which the adapter was assigned.
+ * @apid: the APID of the unassigned adapter.
+ * @qtable: table for storing queues associated with unassigned adapter.
+ */
+static void vfio_ap_mdev_unlink_adapter(struct ap_matrix_mdev *matrix_mdev,
+					unsigned long apid,
+					struct ap_queue_table *qtable)
+{
+	unsigned long apqi;
+	struct vfio_ap_queue *q;
+
+	for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, AP_DOMAINS) {
+		q = vfio_ap_unlink_apqn_fr_mdev(matrix_mdev, apid, apqi);
+
+		if (q && qtable) {
+			if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
+			    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm))
+				hash_add(qtable->queues, &q->mdev_qnode,
+					 q->apqn);
+		}
+	}
+}
+
+static void vfio_ap_mdev_hot_unplug_adapter(struct ap_matrix_mdev *matrix_mdev,
+					    unsigned long apid)
+{
+	int loop_cursor;
+	struct vfio_ap_queue *q;
+	struct ap_queue_table *qtable = kzalloc(sizeof(*qtable), GFP_KERNEL);
+
+	hash_init(qtable->queues);
+	vfio_ap_mdev_unlink_adapter(matrix_mdev, apid, qtable);
+
+	if (test_bit_inv(apid, matrix_mdev->shadow_apcb.apm)) {
+		clear_bit_inv(apid, matrix_mdev->shadow_apcb.apm);
+		vfio_ap_mdev_update_guest_apcb(matrix_mdev);
+	}
+
+	vfio_ap_mdev_reset_queues(qtable);
+
+	hash_for_each(qtable->queues, loop_cursor, q, mdev_qnode) {
+		vfio_ap_unlink_mdev_fr_queue(q);
+		hash_del(&q->mdev_qnode);
+	}
+
+	kfree(qtable);
+}
+
+/**
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * unassign_adapter_store - parses the APID from @buf and clears the
  * corresponding bit in the mediated matrix device's APM
  *
@@ -1106,6 +1378,11 @@ static ssize_t unassign_adapter_store(struct device *dev,
 
 	if (apid > matrix_mdev->matrix.apm_max) {
 		ret = -ENODEV;
+		goto done;
+	}
+
+	if (!test_bit_inv(apid, matrix_mdev->matrix.apm)) {
+		ret = count;
 		goto done;
 	}
 
@@ -1183,8 +1460,24 @@ static ssize_t assign_domain_store(struct device *dev,
 		goto done;
 	}
 
+<<<<<<< HEAD
+	if (test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
+		ret = count;
+=======
 	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
 
+	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
+	if (ret) {
+		clear_bit_inv(apqi, matrix_mdev->matrix.aqm);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+		goto done;
+	}
+
+	vfio_ap_mdev_link_domain(matrix_mdev, apqi);
+	memset(aqm_delta, 0, sizeof(aqm_delta));
+	set_bit_inv(apqi, aqm_delta);
+
+<<<<<<< HEAD
 	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
 	if (ret) {
 		clear_bit_inv(apqi, matrix_mdev->matrix.aqm);
@@ -1199,6 +1492,12 @@ static ssize_t assign_domain_store(struct device *dev,
 				       matrix_mdev))
 		vfio_ap_mdev_update_guest_apcb(matrix_mdev);
 
+=======
+	if (vfio_ap_mdev_filter_matrix(matrix_mdev->matrix.apm, aqm_delta,
+				       matrix_mdev))
+		vfio_ap_mdev_update_guest_apcb(matrix_mdev);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	ret = count;
 done:
 	release_update_locks_for_mdev(matrix_mdev);
@@ -1286,6 +1585,11 @@ static ssize_t unassign_domain_store(struct device *dev,
 		goto done;
 	}
 
+	if (!test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
+		ret = count;
+		goto done;
+	}
+
 	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
 	vfio_ap_mdev_hot_unplug_domain(matrix_mdev, apqi);
 	ret = count;
@@ -1326,6 +1630,11 @@ static ssize_t assign_control_domain_store(struct device *dev,
 
 	if (id > matrix_mdev->matrix.adm_max) {
 		ret = -ENODEV;
+		goto done;
+	}
+
+	if (test_bit_inv(id, matrix_mdev->matrix.adm)) {
+		ret = count;
 		goto done;
 	}
 
@@ -1375,6 +1684,11 @@ static ssize_t unassign_control_domain_store(struct device *dev,
 
 	if (domid > matrix_mdev->matrix.adm_max) {
 		ret = -ENODEV;
+		goto done;
+	}
+
+	if (!test_bit_inv(domid, matrix_mdev->matrix.adm)) {
+		ret = count;
 		goto done;
 	}
 
@@ -1794,6 +2108,11 @@ static const struct attribute_group vfio_queue_attr_group = {
 };
 
 static const struct vfio_device_ops vfio_ap_matrix_dev_ops = {
+<<<<<<< HEAD
+	.init = vfio_ap_mdev_init_dev,
+	.release = vfio_ap_mdev_release_dev,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.open_device = vfio_ap_mdev_open_device,
 	.close_device = vfio_ap_mdev_close_device,
 	.ioctl = vfio_ap_mdev_ioctl,
@@ -1801,6 +2120,11 @@ static const struct vfio_device_ops vfio_ap_matrix_dev_ops = {
 };
 
 static struct mdev_driver vfio_ap_matrix_driver = {
+<<<<<<< HEAD
+	.device_api = VFIO_DEVICE_API_AP_STRING,
+	.max_instances = MAX_ZDEV_ENTRIES_EXT,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.driver = {
 		.name = "vfio_ap_mdev",
 		.owner = THIS_MODULE,
@@ -1809,20 +2133,35 @@ static struct mdev_driver vfio_ap_matrix_driver = {
 	},
 	.probe = vfio_ap_mdev_probe,
 	.remove = vfio_ap_mdev_remove,
+<<<<<<< HEAD
+=======
 	.supported_type_groups = vfio_ap_mdev_type_groups,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 int vfio_ap_mdev_register(void)
 {
 	int ret;
+<<<<<<< HEAD
+=======
 
 	atomic_set(&matrix_dev->available_instances, MAX_ZDEV_ENTRIES_EXT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = mdev_register_driver(&vfio_ap_matrix_driver);
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	matrix_dev->mdev_type.sysfs_name = VFIO_AP_MDEV_TYPE_HWVIRT;
+	matrix_dev->mdev_type.pretty_name = VFIO_AP_MDEV_NAME_HWVIRT;
+	matrix_dev->mdev_types[0] = &matrix_dev->mdev_type;
+	ret = mdev_register_parent(&matrix_dev->parent, &matrix_dev->device,
+				   &vfio_ap_matrix_driver,
+				   matrix_dev->mdev_types, 1);
+=======
 	ret = mdev_register_device(&matrix_dev->device, &vfio_ap_matrix_driver);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		goto err_driver;
 	return 0;
@@ -1834,7 +2173,11 @@ err_driver:
 
 void vfio_ap_mdev_unregister(void)
 {
+<<<<<<< HEAD
+	mdev_unregister_parent(&matrix_dev->parent);
+=======
 	mdev_unregister_device(&matrix_dev->device);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mdev_unregister_driver(&vfio_ap_matrix_driver);
 }
 

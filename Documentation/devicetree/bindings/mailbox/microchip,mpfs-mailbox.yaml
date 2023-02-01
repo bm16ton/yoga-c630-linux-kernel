@@ -14,9 +14,21 @@ properties:
     const: microchip,mpfs-mailbox
 
   reg:
+<<<<<<< HEAD
+    oneOf:
+      - items:
+          - description: mailbox control & data registers
+          - description: mailbox interrupt registers
+        deprecated: true
+      - items:
+          - description: mailbox control registers
+          - description: mailbox interrupt registers
+          - description: mailbox data registers
+=======
     items:
       - description: mailbox data registers
       - description: mailbox interrupt registers
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   interrupts:
     maxItems: 1
@@ -39,7 +51,12 @@ examples:
       #size-cells = <2>;
       mbox: mailbox@37020000 {
         compatible = "microchip,mpfs-mailbox";
+<<<<<<< HEAD
+        reg = <0x0 0x37020000 0x0 0x58>, <0x0 0x2000318C 0x0 0x40>,
+              <0x0 0x37020800 0x0 0x100>;
+=======
         reg = <0x0 0x37020000 0x0 0x1000>, <0x0 0x2000318c 0x0 0x40>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         interrupt-parent = <&L1>;
         interrupts = <96>;
         #mbox-cells = <1>;

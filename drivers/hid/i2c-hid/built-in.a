@@ -1,0 +1,10 @@
+!<thin>
+//                                              68        `
+i2c-hid-core.o/
+i2c-hid-dmi-quirks.o/
+i2c-hid-acpi.o/
+i2c-hid-of.o/
+/0              0           0     0     644     26808     `
+/16             0           0     0     644     9392      `
+/38             0           0     0     644     6656      `
+/54             0           0     0     644     7512      `

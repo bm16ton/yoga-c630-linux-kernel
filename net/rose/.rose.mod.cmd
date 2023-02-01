@@ -1,0 +1,1 @@
+cmd_net/rose/rose.mod := printf '%s\n'   af_rose.o rose_dev.o rose_in.o rose_link.o rose_loopback.o rose_out.o rose_route.o rose_subr.o rose_timer.o sysctl_net_rose.o | awk '!x[$$0]++ { print("net/rose/"$$0) }' > net/rose/rose.mod

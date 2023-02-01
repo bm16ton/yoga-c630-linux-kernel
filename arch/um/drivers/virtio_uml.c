@@ -374,7 +374,29 @@ static irqreturn_t vu_req_read_message(struct virtio_uml_device *vu_dev,
 		u8 extra_payload[512];
 	} msg;
 	int rc;
+	irqreturn_t irq_rc = IRQ_NONE;
 
+<<<<<<< HEAD
+	while (1) {
+		rc = vhost_user_recv_req(vu_dev, &msg.msg,
+					 sizeof(msg.msg.payload) +
+					 sizeof(msg.extra_payload));
+		if (rc)
+			break;
+
+		switch (msg.msg.header.request) {
+		case VHOST_USER_SLAVE_CONFIG_CHANGE_MSG:
+			vu_dev->config_changed_irq = true;
+			response = 0;
+			break;
+		case VHOST_USER_SLAVE_VRING_CALL:
+			virtio_device_for_each_vq((&vu_dev->vdev), vq) {
+				if (vq->index == msg.msg.payload.vring_state.index) {
+					response = 0;
+					vu_dev->vq_irq_vq_map |= BIT_ULL(vq->index);
+					break;
+				}
+=======
 	rc = vhost_user_recv_req(vu_dev, &msg.msg,
 				 sizeof(msg.msg.payload) +
 				 sizeof(msg.extra_payload));
@@ -394,25 +416,28 @@ static irqreturn_t vu_req_read_message(struct virtio_uml_device *vu_dev,
 				response = 0;
 				vu_dev->vq_irq_vq_map |= BIT_ULL(vq->index);
 				break;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
+			break;
+		case VHOST_USER_SLAVE_IOTLB_MSG:
+			/* not supported - VIRTIO_F_ACCESS_PLATFORM */
+		case VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG:
+			/* not supported - VHOST_USER_PROTOCOL_F_HOST_NOTIFIER */
+		default:
+			vu_err(vu_dev, "unexpected slave request %d\n",
+			       msg.msg.header.request);
 		}
-		break;
-	case VHOST_USER_SLAVE_IOTLB_MSG:
-		/* not supported - VIRTIO_F_ACCESS_PLATFORM */
-	case VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG:
-		/* not supported - VHOST_USER_PROTOCOL_F_HOST_NOTIFIER */
-	default:
-		vu_err(vu_dev, "unexpected slave request %d\n",
-		       msg.msg.header.request);
-	}
 
-	if (ev && !vu_dev->suspended)
-		time_travel_add_irq_event(ev);
+		if (ev && !vu_dev->suspended)
+			time_travel_add_irq_event(ev);
 
-	if (msg.msg.header.flags & VHOST_USER_FLAG_NEED_REPLY)
-		vhost_user_reply(vu_dev, &msg.msg, response);
-
-	return IRQ_HANDLED;
+		if (msg.msg.header.flags & VHOST_USER_FLAG_NEED_REPLY)
+			vhost_user_reply(vu_dev, &msg.msg, response);
+		irq_rc = IRQ_HANDLED;
+	};
+	/* mask EAGAIN as we try non-blocking read until socket is empty */
+	vu_dev->recv_rc = (rc == -EAGAIN) ? 0 : rc;
+	return irq_rc;
 }
 
 static irqreturn_t vu_req_interrupt(int irq, void *data)
@@ -1407,10 +1432,17 @@ static int virtio_uml_resume(struct platform_device *pdev)
 
 	if (!vu_dev->no_vq_suspend) {
 		struct virtqueue *vq;
+<<<<<<< HEAD
 
 		virtio_device_for_each_vq((&vu_dev->vdev), vq) {
 			struct virtio_uml_vq_info *info = vq->priv;
 
+=======
+
+		virtio_device_for_each_vq((&vu_dev->vdev), vq) {
+			struct virtio_uml_vq_info *info = vq->priv;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			info->suspended = false;
 			vhost_user_set_vring_enable(vu_dev, vq->index, true);
 		}

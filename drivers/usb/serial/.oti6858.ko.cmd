@@ -1,0 +1,1 @@
+cmd_drivers/usb/serial/oti6858.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/serial/oti6858.ko drivers/usb/serial/oti6858.o drivers/usb/serial/oti6858.mod.o;  true

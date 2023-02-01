@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath11k/ath11k.mod := printf '%s\n'   core.o hal.o hal_tx.o hal_rx.o wmi.o mac.o reg.o htc.o qmi.o dp.o dp_tx.o dp_rx.o debug.o ce.o peer.o dbring.o hw.o pcic.o debugfs.o debugfs_htt_stats.o debugfs_sta.o testmode.o thermal.o spectral.o wow.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath11k/"$$0) }' > drivers/net/wireless/ath/ath11k/ath11k.mod

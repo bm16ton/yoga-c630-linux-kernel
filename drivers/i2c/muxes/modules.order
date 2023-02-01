@@ -1,0 +1,10 @@
+drivers/i2c/muxes/i2c-arb-gpio-challenge.ko
+drivers/i2c/muxes/i2c-demux-pinctrl.ko
+drivers/i2c/muxes/i2c-mux-gpio.ko
+drivers/i2c/muxes/i2c-mux-gpmux.ko
+drivers/i2c/muxes/i2c-mux-ltc4306.ko
+drivers/i2c/muxes/i2c-mux-mlxcpld.ko
+drivers/i2c/muxes/i2c-mux-pca9541.ko
+drivers/i2c/muxes/i2c-mux-pca954x.ko
+drivers/i2c/muxes/i2c-mux-pinctrl.ko
+drivers/i2c/muxes/i2c-mux-reg.ko

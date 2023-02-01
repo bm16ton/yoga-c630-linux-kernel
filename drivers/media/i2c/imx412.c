@@ -1257,7 +1257,11 @@ error_mutex_destroy:
  *
  * Return: 0 if successful, error code otherwise.
  */
+<<<<<<< HEAD
+static void imx412_remove(struct i2c_client *client)
+=======
 static int imx412_remove(struct i2c_client *client)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct v4l2_subdev *sd = i2c_get_clientdata(client);
 	struct imx412 *imx412 = to_imx412(sd);
@@ -1272,8 +1276,11 @@ static int imx412_remove(struct i2c_client *client)
 	pm_runtime_set_suspended(&client->dev);
 
 	mutex_destroy(&imx412->mutex);
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct dev_pm_ops imx412_pm_ops = {

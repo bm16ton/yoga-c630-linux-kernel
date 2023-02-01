@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/iwlegacy/iwl4965.mod := printf '%s\n'   4965.o 4965-mac.o 4965-rs.o 4965-calib.o | awk '!x[$$0]++ { print("drivers/net/wireless/intel/iwlegacy/"$$0) }' > drivers/net/wireless/intel/iwlegacy/iwl4965.mod

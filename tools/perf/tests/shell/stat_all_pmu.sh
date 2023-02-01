@@ -4,6 +4,10 @@
 
 set -e
 
+<<<<<<< HEAD
+# Test all PMU events; however exclude parametrized ones (name contains '?')
+for p in $(perf list --raw-dump pmu | sed 's/[[:graph:]]\+?[[:graph:]]\+[[:space:]]//g'); do
+=======
 for p in $(perf list --raw-dump pmu); do
   # In powerpc, skip the events for hv_24x7 and hv_gpci.
   # These events needs input values to be filled in for
@@ -15,6 +19,7 @@ for p in $(perf list --raw-dump pmu); do
     echo "Skipping: Event '$p' in powerpc"
     continue
   fi
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
   echo "Testing $p"
   result=$(perf stat -e "$p" true 2>&1)
   if ! echo "$result" | grep -q "$p" && ! echo "$result" | grep -q "<not supported>" ; then

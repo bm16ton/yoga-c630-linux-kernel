@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/broadcom/brcm80211/brcmsmac/brcmsmac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/broadcom/brcm80211/brcmsmac/brcmsmac.ko drivers/net/wireless/broadcom/brcm80211/brcmsmac/brcmsmac.o drivers/net/wireless/broadcom/brcm80211/brcmsmac/brcmsmac.mod.o;  true

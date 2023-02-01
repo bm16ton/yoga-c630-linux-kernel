@@ -17,8 +17,14 @@
 #include <linux/clocksource.h>
 #include <linux/net_tstamp.h>
 #include <linux/pm_qos.h>
+<<<<<<< HEAD
+#include <linux/bpf.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/ptp_clock_kernel.h>
 #include <linux/timecounter.h>
+#include <dt-bindings/firmware/imx/rsrc.h>
+#include <linux/firmware/imx/sci.h>
 
 #if defined(CONFIG_M523x) || defined(CONFIG_M527x) || defined(CONFIG_M528x) || \
     defined(CONFIG_M520x) || defined(CONFIG_M532x) || defined(CONFIG_ARM) || \
@@ -344,8 +350,11 @@ struct bufdesc_ex {
  * the skbuffer directly.
  */
 
+#define FEC_ENET_XDP_HEADROOM	(XDP_PACKET_HEADROOM)
+
 #define FEC_ENET_RX_PAGES	256
-#define FEC_ENET_RX_FRSIZE	2048
+#define FEC_ENET_RX_FRSIZE	(PAGE_SIZE - FEC_ENET_XDP_HEADROOM \
+		- SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
 #define FEC_ENET_RX_FRPPG	(PAGE_SIZE / FEC_ENET_RX_FRSIZE)
 #define RX_RING_SIZE		(FEC_ENET_RX_FRPPG * FEC_ENET_RX_PAGES)
 #define FEC_ENET_TX_FRSIZE	2048
@@ -515,6 +524,12 @@ struct bufdesc_prop {
 	unsigned char dsize_log2;
 };
 
+struct fec_enet_priv_txrx_info {
+	int	offset;
+	struct	page *page;
+	struct  sk_buff *skb;
+};
+
 struct fec_enet_priv_tx_q {
 	struct bufdesc_prop bd;
 	unsigned char *tx_bounce[TX_RING_SIZE];
@@ -530,7 +545,14 @@ struct fec_enet_priv_tx_q {
 
 struct fec_enet_priv_rx_q {
 	struct bufdesc_prop bd;
-	struct  sk_buff *rx_skbuff[RX_RING_SIZE];
+	struct  fec_enet_priv_txrx_info rx_skb_info[RX_RING_SIZE];
+
+	/* page_pool */
+	struct page_pool *page_pool;
+	struct xdp_rxq_info xdp_rxq;
+
+	/* rx queue number, in the range 0-7 */
+	u8 id;
 };
 
 struct fec_stop_mode_gpr {
@@ -582,6 +604,10 @@ struct fec_enet_private {
 	struct device_node *phy_node;
 	bool	rgmii_txc_dly;
 	bool	rgmii_rxc_dly;
+<<<<<<< HEAD
+	bool	rpm_active;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int	link;
 	int	full_duplex;
 	int	speed;
@@ -638,12 +664,16 @@ struct fec_enet_private {
 	int pps_enable;
 	unsigned int next_counter;
 
+<<<<<<< HEAD
+	struct imx_sc_ipc *ipc_handle;
+=======
 	struct {
 		struct timespec64 ts_phc;
 		u64 ns_sys;
 		u32 at_corr;
 		u8 at_inc_corr;
 	} ptp_saved_state;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	u64 ethtool_stats[];
 };

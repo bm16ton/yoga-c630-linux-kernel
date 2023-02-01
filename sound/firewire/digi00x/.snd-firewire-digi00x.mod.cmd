@@ -1,0 +1,1 @@
+cmd_sound/firewire/digi00x/snd-firewire-digi00x.mod := printf '%s\n'   amdtp-dot.o digi00x-stream.o digi00x-proc.o digi00x-pcm.o digi00x-hwdep.o digi00x-transaction.o digi00x-midi.o digi00x.o | awk '!x[$$0]++ { print("sound/firewire/digi00x/"$$0) }' > sound/firewire/digi00x/snd-firewire-digi00x.mod

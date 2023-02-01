@@ -42,6 +42,8 @@
 #define UVC_EXT_GPIO_UNIT_ID		0x100
 
 /* ------------------------------------------------------------------------
+<<<<<<< HEAD
+=======
  * GUIDs
  */
 #define UVC_GUID_UVC_CAMERA \
@@ -180,6 +182,7 @@
 
 
 /* ------------------------------------------------------------------------
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * Driver specific constants.
  */
 
@@ -283,12 +286,15 @@ struct uvc_control {
 	struct uvc_fh *handle;	/* File handle that last changed the control. */
 };
 
+<<<<<<< HEAD
+=======
 struct uvc_format_desc {
 	char *name;
 	u8 guid[16];
 	u32 fcc;
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /*
  * The term 'entity' refers to both UVC units and UVC terminals.
  *
@@ -911,9 +917,6 @@ int uvc_xu_ctrl_query(struct uvc_video_chain *chain,
 		      struct uvc_xu_control_query *xqry);
 
 /* Utility functions */
-void uvc_simplify_fraction(u32 *numerator, u32 *denominator,
-			   unsigned int n_terms, unsigned int threshold);
-u32 uvc_fraction_to_interval(u32 numerator, u32 denominator);
 struct usb_host_endpoint *uvc_find_endpoint(struct usb_host_interface *alts,
 					    u8 epaddr);
 u16 uvc_endpoint_max_bpi(struct usb_device *dev, struct usb_host_endpoint *ep);

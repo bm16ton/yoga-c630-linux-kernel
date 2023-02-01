@@ -926,7 +926,7 @@ static int iwl_mvm_tx_tso(struct iwl_mvm *mvm, struct sk_buff *skb,
 	 * Take the min of ieee80211 station and mvm station
 	 */
 	max_amsdu_len =
-		min_t(unsigned int, sta->max_amsdu_len,
+		min_t(unsigned int, sta->cur->max_amsdu_len,
 		      iwl_mvm_max_amsdu_size(mvm, sta, tid));
 
 	/*
@@ -1171,9 +1171,21 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 	/* From now on, we cannot access info->control */
 	iwl_mvm_skb_prepare_status(skb, dev_cmd);
 
+<<<<<<< HEAD
+	/*
+	 * The IV is introduced by the HW for new tx api, and it is not present
+	 * in the skb, hence, don't tell iwl_mvm_mei_tx_copy_to_csme about the
+	 * IV for those devices.
+	 */
+	if (ieee80211_is_data(fc))
+		iwl_mvm_mei_tx_copy_to_csme(mvm, skb,
+					    info->control.hw_key &&
+					    !iwl_mvm_has_new_tx_api(mvm) ?
+=======
 	if (ieee80211_is_data(fc))
 		iwl_mvm_mei_tx_copy_to_csme(mvm, skb,
 					    info->control.hw_key ?
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					    info->control.hw_key->iv_len : 0);
 
 	if (iwl_trans_tx(mvm->trans, skb, dev_cmd, txq_id))
@@ -1206,6 +1218,7 @@ int iwl_mvm_tx_skb_sta(struct iwl_mvm *mvm, struct sk_buff *skb,
 	struct sk_buff_head mpdus_skbs;
 	unsigned int payload_len;
 	int ret;
+	struct sk_buff *orig_skb = skb;
 
 	if (WARN_ON_ONCE(!mvmsta))
 		return -1;
@@ -1238,8 +1251,17 @@ int iwl_mvm_tx_skb_sta(struct iwl_mvm *mvm, struct sk_buff *skb,
 
 		ret = iwl_mvm_tx_mpdu(mvm, skb, &info, sta);
 		if (ret) {
+			/* Free skbs created as part of TSO logic that have not yet been dequeued */
 			__skb_queue_purge(&mpdus_skbs);
-			return ret;
+			/* skb here is not necessarily same as skb that entered this method,
+			 * so free it explicitly.
+			 */
+			if (skb == orig_skb)
+				ieee80211_free_txskb(mvm->hw, skb);
+			else
+				kfree_skb(skb);
+			/* there was error, but we consumed skb one way or another, so return 0 */
+			return 0;
 		}
 	}
 
@@ -1372,6 +1394,7 @@ void iwl_mvm_hwrate_to_tx_rate(u32 rate_n_flags,
 	if (rate_n_flags & RATE_MCS_SGI_MSK)
 		r->flags |= IEEE80211_TX_RC_SHORT_GI;
 	if (format ==  RATE_MCS_HT_MSK) {
+<<<<<<< HEAD
 		r->flags |= IEEE80211_TX_RC_MCS;
 		r->idx = rate;
 	} else if (format ==  RATE_MCS_VHT_MSK) {
@@ -1404,6 +1427,40 @@ void iwl_mvm_hwrate_to_tx_rate_v1(u32 rate_n_flags,
 		r->flags |= IEEE80211_TX_RC_SHORT_GI;
 	if (rate_n_flags & RATE_MCS_HT_MSK_V1) {
 		r->flags |= IEEE80211_TX_RC_MCS;
+=======
+		r->flags |= IEEE80211_TX_RC_MCS;
+		r->idx = rate;
+	} else if (format ==  RATE_MCS_VHT_MSK) {
+		ieee80211_rate_set_vht(r, rate,
+				       ((rate_n_flags & RATE_MCS_NSS_MSK) >>
+					RATE_MCS_NSS_POS) + 1);
+		r->flags |= IEEE80211_TX_RC_VHT_MCS;
+	} else if (format == RATE_MCS_HE_MSK) {
+		/* mac80211 cannot do this without ieee80211_tx_status_ext()
+		 * but it only matters for radiotap */
+		r->idx = 0;
+	} else {
+		r->idx = iwl_mvm_legacy_hw_idx_to_mac80211_idx(rate_n_flags,
+							       band);
+	}
+}
+
+void iwl_mvm_hwrate_to_tx_rate_v1(u32 rate_n_flags,
+				  enum nl80211_band band,
+				  struct ieee80211_tx_rate *r)
+{
+	if (rate_n_flags & RATE_HT_MCS_GF_MSK)
+		r->flags |= IEEE80211_TX_RC_GREEN_FIELD;
+
+	r->flags |=
+		iwl_mvm_get_hwrate_chan_width(rate_n_flags &
+					      RATE_MCS_CHAN_WIDTH_MSK_V1);
+
+	if (rate_n_flags & RATE_MCS_SGI_MSK_V1)
+		r->flags |= IEEE80211_TX_RC_SHORT_GI;
+	if (rate_n_flags & RATE_MCS_HT_MSK_V1) {
+		r->flags |= IEEE80211_TX_RC_MCS;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		r->idx = rate_n_flags & RATE_HT_MCS_INDEX_MSK_V1;
 	} else if (rate_n_flags & RATE_MCS_VHT_MSK_V1) {
 		ieee80211_rate_set_vht(

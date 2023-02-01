@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/go7007/go7007-loader.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/go7007/go7007-loader.ko drivers/media/usb/go7007/go7007-loader.o drivers/media/usb/go7007/go7007-loader.mod.o;  true

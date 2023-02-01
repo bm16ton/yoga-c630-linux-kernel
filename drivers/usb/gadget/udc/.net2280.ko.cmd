@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/udc/net2280.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/udc/net2280.ko drivers/usb/gadget/udc/net2280.o drivers/usb/gadget/udc/net2280.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/mtd/nand/raw/nand.mod := printf '%s\n'   nand_base.o nand_legacy.o nand_bbt.o nand_timings.o nand_ids.o nand_onfi.o nand_jedec.o nand_amd.o nand_esmt.o nand_hynix.o nand_macronix.o nand_micron.o nand_samsung.o nand_toshiba.o | awk '!x[$$0]++ { print("drivers/mtd/nand/raw/"$$0) }' > drivers/mtd/nand/raw/nand.mod

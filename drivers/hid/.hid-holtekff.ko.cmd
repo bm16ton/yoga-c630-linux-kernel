@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-holtekff.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-holtekff.ko drivers/hid/hid-holtekff.o drivers/hid/hid-holtekff.mod.o;  true

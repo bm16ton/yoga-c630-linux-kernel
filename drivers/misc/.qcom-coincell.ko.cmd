@@ -1,0 +1,1 @@
+cmd_drivers/misc/qcom-coincell.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/qcom-coincell.ko drivers/misc/qcom-coincell.o drivers/misc/qcom-coincell.mod.o;  true

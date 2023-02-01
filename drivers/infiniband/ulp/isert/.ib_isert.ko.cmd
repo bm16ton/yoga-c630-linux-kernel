@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/ulp/isert/ib_isert.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/infiniband/ulp/isert/ib_isert.ko drivers/infiniband/ulp/isert/ib_isert.o drivers/infiniband/ulp/isert/ib_isert.mod.o;  true

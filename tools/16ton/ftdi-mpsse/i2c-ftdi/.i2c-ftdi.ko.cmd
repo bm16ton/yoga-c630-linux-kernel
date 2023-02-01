@@ -1,0 +1,1 @@
+cmd_/Part/ft2232-mpsse-i2c-spi-kern-drivers/i2c-ftdi/i2c-ftdi.ko := ld -r  -EL  -maarch64elf  --build-id=sha1  -T scripts/module.lds -o /Part/ft2232-mpsse-i2c-spi-kern-drivers/i2c-ftdi/i2c-ftdi.ko /Part/ft2232-mpsse-i2c-spi-kern-drivers/i2c-ftdi/i2c-ftdi.o /Part/ft2232-mpsse-i2c-spi-kern-drivers/i2c-ftdi/i2c-ftdi.mod.o;  true

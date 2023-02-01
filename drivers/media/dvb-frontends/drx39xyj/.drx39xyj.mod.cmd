@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/drx39xyj/drx39xyj.mod := printf '%s\n'   drxj.o | awk '!x[$$0]++ { print("drivers/media/dvb-frontends/drx39xyj/"$$0) }' > drivers/media/dvb-frontends/drx39xyj/drx39xyj.mod

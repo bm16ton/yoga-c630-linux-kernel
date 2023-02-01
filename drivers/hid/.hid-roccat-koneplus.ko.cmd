@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-roccat-koneplus.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-roccat-koneplus.ko drivers/hid/hid-roccat-koneplus.o drivers/hid/hid-roccat-koneplus.mod.o;  true

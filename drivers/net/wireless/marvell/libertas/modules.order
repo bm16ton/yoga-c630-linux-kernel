@@ -1,0 +1,3 @@
+drivers/net/wireless/marvell/libertas/libertas.ko
+drivers/net/wireless/marvell/libertas/usb8xxx.ko
+drivers/net/wireless/marvell/libertas/libertas_sdio.ko

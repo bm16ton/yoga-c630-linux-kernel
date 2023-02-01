@@ -35,8 +35,6 @@ properties:
       - const: rx1
       - const: rx2
 
-  dma-coherent: true
-
   "#address-cells":
     const: 2
 
@@ -71,6 +69,8 @@ required:
   - power-domains
   - dmas
   - dma-names
+<<<<<<< HEAD
+=======
 
 if:
   properties:
@@ -81,6 +81,7 @@ if:
 then:
   required:
     - dma-coherent
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 additionalProperties: false
 
@@ -95,5 +96,4 @@ examples:
         dmas = <&main_udmap 0xc000>, <&main_udmap 0x4000>,
                <&main_udmap 0x4001>;
         dma-names = "tx", "rx1", "rx2";
-        dma-coherent;
     };

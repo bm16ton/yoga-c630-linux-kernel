@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/sx9500.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/sx9500.ko drivers/iio/proximity/sx9500.o drivers/iio/proximity/sx9500.mod.o;  true

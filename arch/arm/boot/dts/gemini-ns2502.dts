@@ -39,10 +39,13 @@
 		phy0: ethernet-phy@1 {
 			reg = <1>;
 			device_type = "ethernet-phy";
+<<<<<<< HEAD
+=======
 			/* We lack the knowledge of necessary GPIO to achieve
 			 * Gigabit
 			 */
 			max-speed = <100>;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		};
 	};
 };
@@ -50,7 +53,11 @@
 &ethernet {
 	status = "okay";
 	ethernet-port@0 {
+<<<<<<< HEAD
+		phy-mode = "rgmii-id";
+=======
 		phy-mode = "rgmii";
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		phy-handle = <&phy0>;
 	};
 };
@@ -65,6 +72,11 @@
 	pinctrl-1 = <&pflash_disabled_pins>;
 
 	partitions {
+<<<<<<< HEAD
+		compatible = "redboot-fis";
+		/* Eraseblock at 0x7e0000 */
+		fis-index-block = <0x3f>;
+=======
 		compatible = "fixed-partitions";
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -89,6 +101,7 @@
 			label = "FIS";
 			reg = <0x007e0000 0x00010000>;
 		};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 

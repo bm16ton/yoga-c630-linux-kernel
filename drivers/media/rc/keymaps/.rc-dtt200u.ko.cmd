@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-dtt200u.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/keymaps/rc-dtt200u.ko drivers/media/rc/keymaps/rc-dtt200u.o drivers/media/rc/keymaps/rc-dtt200u.mod.o;  true

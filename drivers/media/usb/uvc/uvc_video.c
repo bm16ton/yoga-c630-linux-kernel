@@ -1095,7 +1095,11 @@ static int uvc_video_decode_start(struct uvc_streaming *stream,
 
 	/*
 	 * Synchronize to the input stream by waiting for the FID bit to be
+<<<<<<< HEAD
+	 * toggled when the buffer state is not UVC_BUF_STATE_ACTIVE.
+=======
 	 * toggled when the the buffer state is not UVC_BUF_STATE_ACTIVE.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * stream->last_fid is initialized to -1, so the first isochronous
 	 * frame will always be in sync.
 	 *

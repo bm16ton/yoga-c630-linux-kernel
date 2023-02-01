@@ -1,0 +1,40 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Wed, 29 Jan 2020 13:31:51 +0000
+Subject: Run scripts with Python 3
+Bug-Debian: https://bugs.debian.org/938829
+
+All the Python scripts here are meant to be Python 3 compatible, but
+they still use "/usr/bin/env python" as their interpreter.  Since
+Debian is deprecating Python 2 but not (yet) changing "python" to
+Python 3, change the shebang lines.
+
+---
+ db2bin.py  | 2 +-
+ db2fw.py   | 2 +-
+ dbparse.py | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+--- a/db2bin.py
++++ b/db2bin.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ from io import BytesIO, open
+ import struct
+--- a/db2fw.py
++++ b/db2fw.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ from io import BytesIO, open
+ import struct
+--- a/dbparse.py
++++ b/dbparse.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/python3
+ 
+ from functools import total_ordering
+ import sys, math

@@ -18,6 +18,7 @@ properties:
       - enum:
           - qcom,apq8064-qfprom
           - qcom,apq8084-qfprom
+          - qcom,ipq8064-qfprom
           - qcom,msm8974-qfprom
           - qcom,msm8916-qfprom
           - qcom,msm8996-qfprom
@@ -25,7 +26,12 @@ properties:
           - qcom,qcs404-qfprom
           - qcom,sc7180-qfprom
           - qcom,sc7280-qfprom
+<<<<<<< HEAD
+          - qcom,sdm630-qfprom
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - qcom,sdm845-qfprom
+          - qcom,sm6115-qfprom
       - const: qcom,qfprom
 
   reg:

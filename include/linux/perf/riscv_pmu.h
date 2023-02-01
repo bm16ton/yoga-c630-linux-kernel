@@ -45,7 +45,11 @@ struct riscv_pmu {
 
 	irqreturn_t	(*handle_irq)(int irq_num, void *dev);
 
+<<<<<<< HEAD
+	unsigned long	cmask;
+=======
 	int		num_counters;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64		(*ctr_read)(struct perf_event *event);
 	int		(*ctr_get_idx)(struct perf_event *event);
 	int		(*ctr_get_width)(int idx);

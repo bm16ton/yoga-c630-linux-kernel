@@ -233,7 +233,11 @@ err:
 	return 0;
 }
 
+<<<<<<< HEAD
+static int ulpi_regs_show(struct seq_file *seq, void *data)
+=======
 static int ulpi_regs_read(struct seq_file *seq, void *data)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ulpi *ulpi = seq->private;
 
@@ -269,6 +273,9 @@ static int ulpi_regs_read(struct seq_file *seq, void *data)
 
 	return 0;
 }
+<<<<<<< HEAD
+DEFINE_SHOW_ATTRIBUTE(ulpi_regs);
+=======
 
 static int ulpi_regs_open(struct inode *inode, struct file *f)
 {
@@ -284,6 +291,7 @@ static const struct file_operations ulpi_regs_ops = {
 	.read = seq_read,
 	.llseek = seq_lseek
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define ULPI_ROOT debugfs_lookup(KBUILD_MODNAME, NULL)
 
@@ -316,7 +324,11 @@ static int ulpi_register(struct device *dev, struct ulpi *ulpi)
 	}
 
 	root = debugfs_create_dir(dev_name(dev), ULPI_ROOT);
+<<<<<<< HEAD
+	debugfs_create_file("regs", 0444, root, ulpi, &ulpi_regs_fops);
+=======
 	debugfs_create_file("regs", 0444, root, ulpi, &ulpi_regs_ops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dev_dbg(&ulpi->dev, "registered ULPI PHY: vendor %04x, product %04x\n",
 		ulpi->id.vendor, ulpi->id.product);

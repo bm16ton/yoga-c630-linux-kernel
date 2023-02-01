@@ -1,0 +1,1 @@
+cmd_drivers/hid/hid-keytouch.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hid/hid-keytouch.ko drivers/hid/hid-keytouch.o drivers/hid/hid-keytouch.mod.o;  true

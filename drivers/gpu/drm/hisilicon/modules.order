@@ -1,0 +1,3 @@
+drivers/gpu/drm/hisilicon/hibmc/hibmc-drm.ko
+drivers/gpu/drm/hisilicon/kirin/kirin-drm.ko
+drivers/gpu/drm/hisilicon/kirin/dw_drm_dsi.ko

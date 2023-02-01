@@ -1,0 +1,1 @@
+cmd_drivers/cpufreq/armada-37xx-cpufreq.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/cpufreq/armada-37xx-cpufreq.ko drivers/cpufreq/armada-37xx-cpufreq.o drivers/cpufreq/armada-37xx-cpufreq.mod.o;  true

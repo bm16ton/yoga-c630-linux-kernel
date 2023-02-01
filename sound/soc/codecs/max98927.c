@@ -934,15 +934,22 @@ static int max98927_i2c_probe(struct i2c_client *i2c)
 	return ret;
 }
 
+<<<<<<< HEAD
+static void max98927_i2c_remove(struct i2c_client *i2c)
+=======
 static int max98927_i2c_remove(struct i2c_client *i2c)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct max98927_priv *max98927 = i2c_get_clientdata(i2c);
 
 	if (max98927->reset_gpio) {
 		gpiod_set_value_cansleep(max98927->reset_gpio, 1);
 	}
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id max98927_i2c_id[] = {

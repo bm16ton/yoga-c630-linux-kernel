@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/omap2/omapfb/built-in.a := rm -f drivers/video/fbdev/omap2/omapfb/built-in.a;  printf "drivers/video/fbdev/omap2/omapfb/%s " dss/built-in.a displays/built-in.a | xargs ar cDPrST drivers/video/fbdev/omap2/omapfb/built-in.a

@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/panfrost/panfrost.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/panfrost/panfrost.ko drivers/gpu/drm/panfrost/panfrost.o drivers/gpu/drm/panfrost/panfrost.mod.o;  true

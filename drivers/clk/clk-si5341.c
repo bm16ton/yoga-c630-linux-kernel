@@ -1796,7 +1796,11 @@ cleanup:
 	return err;
 }
 
+<<<<<<< HEAD
+static void si5341_remove(struct i2c_client *client)
+=======
 static int si5341_remove(struct i2c_client *client)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct clk_si5341 *data = i2c_get_clientdata(client);
 	int i;
@@ -1807,8 +1811,11 @@ static int si5341_remove(struct i2c_client *client)
 		if (data->clk[i].vddo_reg)
 			regulator_disable(data->clk[i].vddo_reg);
 	}
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id si5341_id[] = {

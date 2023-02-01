@@ -5,7 +5,11 @@
 $id: http://devicetree.org/schemas/rtc/atmel,at91sam9260-rtt.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
+<<<<<<< HEAD
+title: Atmel AT91 RTT
+=======
 title: Atmel AT91 RTT Device Tree Bindings
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 allOf:
   - $ref: "rtc.yaml#"

@@ -1,0 +1,1 @@
+cmd_net/ipv4/netfilter/arp_tables.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/ipv4/netfilter/arp_tables.ko net/ipv4/netfilter/arp_tables.o net/ipv4/netfilter/arp_tables.mod.o;  true

@@ -589,6 +589,8 @@ u8 rtw_sitesurvey_cmd(struct adapter  *padapter, struct ndis_802_11_ssid *ssid, 
 	return res;
 }
 
+<<<<<<< HEAD
+=======
 u8 rtw_setdatarate_cmd(struct adapter *padapter, u8 *rateset)
 {
 	struct cmd_obj *ph2c;
@@ -618,6 +620,7 @@ exit:
 	return res;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtw_getbbrfreg_cmdrsp_callback(struct adapter *padapter,  struct cmd_obj *pcmd)
 {
 	/* rtw_free_cmd_obj(pcmd); */
@@ -1132,6 +1135,8 @@ u8 rtw_dynamic_chk_wk_cmd(struct adapter *padapter)
 
 	/* rtw_enqueue_cmd(pcmdpriv, ph2c); */
 	res = rtw_enqueue_cmd(pcmdpriv, ph2c);
+<<<<<<< HEAD
+=======
 exit:
 	return res;
 }
@@ -1187,6 +1192,7 @@ u8 rtw_set_chplan_cmd(struct adapter *padapter, u8 chplan, u8 enqueue, u8 swconf
 	if (res == _SUCCESS)
 		padapter->mlmepriv.ChannelPlan = chplan;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exit:
 	return res;
 }

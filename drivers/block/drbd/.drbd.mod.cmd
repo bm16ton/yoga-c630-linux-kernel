@@ -1,0 +1,1 @@
+cmd_drivers/block/drbd/drbd.mod := printf '%s\n'   drbd_bitmap.o drbd_proc.o drbd_worker.o drbd_receiver.o drbd_req.o drbd_actlog.o drbd_main.o drbd_strings.o drbd_nl.o drbd_interval.o drbd_state.o drbd_nla.o drbd_debugfs.o | awk '!x[$$0]++ { print("drivers/block/drbd/"$$0) }' > drivers/block/drbd/drbd.mod

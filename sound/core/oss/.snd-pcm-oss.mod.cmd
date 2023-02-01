@@ -1,0 +1,1 @@
+cmd_sound/core/oss/snd-pcm-oss.mod := printf '%s\n'   pcm_oss.o pcm_plugin.o io.o copy.o linear.o mulaw.o route.o rate.o | awk '!x[$$0]++ { print("sound/core/oss/"$$0) }' > sound/core/oss/snd-pcm-oss.mod

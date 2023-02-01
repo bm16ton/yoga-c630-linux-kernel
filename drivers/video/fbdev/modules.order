@@ -1,0 +1,12 @@
+drivers/video/fbdev/core/svgalib.ko
+drivers/video/fbdev/core/fb_ddc.ko
+drivers/video/fbdev/pm3fb.ko
+drivers/video/fbdev/tdfxfb.ko
+drivers/video/fbdev/vt8623fb.ko
+drivers/video/fbdev/s3fb.ko
+drivers/video/fbdev/arkfb.ko
+drivers/video/fbdev/udlfb.ko
+drivers/video/fbdev/smscufx.ko
+drivers/video/fbdev/mb862xx/mb862xxfb.ko
+drivers/video/fbdev/ssd1307fb.ko
+drivers/video/fbdev/simplefb.ko

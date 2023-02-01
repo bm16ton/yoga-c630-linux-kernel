@@ -1,0 +1,1 @@
+cmd_drivers/ata/ahci_qoriq.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/ata/ahci_qoriq.ko drivers/ata/ahci_qoriq.o drivers/ata/ahci_qoriq.mod.o;  true

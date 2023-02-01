@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/sis/sis190.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/sis/sis190.ko drivers/net/ethernet/sis/sis190.o drivers/net/ethernet/sis/sis190.mod.o;  true

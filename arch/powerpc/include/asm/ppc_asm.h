@@ -32,6 +32,23 @@
 	.Lreg=.Lreg+1
 	.endr
 .endm
+<<<<<<< HEAD
+
+/*
+ * This expands to a sequence of register clears for regs start to end
+ * inclusive, of the form:
+ *
+ *   li rN, 0
+ */
+.macro ZEROIZE_REGS start, end
+	.Lreg=\start
+	.rept (\end - \start + 1)
+	li	.Lreg, 0
+	.Lreg=.Lreg+1
+	.endr
+.endm
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Macros for storing registers into and loading registers from
@@ -42,12 +59,28 @@
 #define REST_GPRS(start, end, base)	OP_REGS ld, 8, start, end, base, GPR0
 #define SAVE_NVGPRS(base)		SAVE_GPRS(14, 31, base)
 #define REST_NVGPRS(base)		REST_GPRS(14, 31, base)
+<<<<<<< HEAD
 #else
 #define SAVE_GPRS(start, end, base)	OP_REGS stw, 4, start, end, base, GPR0
 #define REST_GPRS(start, end, base)	OP_REGS lwz, 4, start, end, base, GPR0
 #define SAVE_NVGPRS(base)		SAVE_GPRS(13, 31, base)
 #define REST_NVGPRS(base)		REST_GPRS(13, 31, base)
 #endif
+
+#define	ZEROIZE_GPRS(start, end)	ZEROIZE_REGS start, end
+#ifdef __powerpc64__
+#define	ZEROIZE_NVGPRS()		ZEROIZE_GPRS(14, 31)
+#else
+#define	ZEROIZE_NVGPRS()		ZEROIZE_GPRS(13, 31)
+=======
+#else
+#define SAVE_GPRS(start, end, base)	OP_REGS stw, 4, start, end, base, GPR0
+#define REST_GPRS(start, end, base)	OP_REGS lwz, 4, start, end, base, GPR0
+#define SAVE_NVGPRS(base)		SAVE_GPRS(13, 31, base)
+#define REST_NVGPRS(base)		REST_GPRS(13, 31, base)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+#endif
+#define	ZEROIZE_GPR(n)			ZEROIZE_GPRS(n, n)
 
 #define SAVE_GPR(n, base)		SAVE_GPRS(n, n, base)
 #define REST_GPR(n, base)		REST_GPRS(n, n, base)
@@ -305,6 +338,12 @@ n:
 
 #ifdef __powerpc64__
 
+#define __LOAD_PACA_TOC(reg)			\
+	ld	reg,PACATOC(r13)
+
+#define LOAD_PACA_TOC()				\
+	__LOAD_PACA_TOC(r2)
+
 #define LOAD_REG_IMMEDIATE(reg, expr) __LOAD_REG_IMMEDIATE reg, expr
 
 #define LOAD_REG_IMMEDIATE_SYM(reg, tmp, expr)	\
@@ -315,7 +354,19 @@ n:
 	rldimi	reg, tmp, 32, 0
 
 #define LOAD_REG_ADDR(reg,name)			\
-	ld	reg,name@got(r2)
+	addis	reg,r2,name@toc@ha;		\
+	addi	reg,reg,name@toc@l
+
+#ifdef CONFIG_PPC_BOOK3E_64
+/*
+ * This is used in register-constrained interrupt handlers. Not to be used
+ * by BOOK3S. ld complains with "got/toc optimization is not supported" if r2
+ * is not used for the TOC offset, so use @got(tocreg). If the interrupt
+ * handlers saved r2 instead, LOAD_REG_ADDR could be used.
+ */
+#define LOAD_REG_ADDR_ALTTOC(reg,tocreg,name)	\
+	ld	reg,name@got(tocreg)
+#endif
 
 #define LOAD_REG_ADDRBASE(reg,name)	LOAD_REG_ADDR(reg,name)
 #define ADDROFF(name)			0
@@ -342,7 +393,7 @@ n:
 #endif
 
 /* various errata or part fixups */
-#if defined(CONFIG_PPC_CELL) || defined(CONFIG_PPC_FSL_BOOK3E)
+#if defined(CONFIG_PPC_CELL) || defined(CONFIG_PPC_E500)
 #define MFTB(dest)			\
 90:	mfspr dest, SPRN_TBRL;		\
 BEGIN_FTR_SECTION_NESTED(96);		\
@@ -709,7 +760,7 @@ END_FTR_SECTION_NESTED(CPU_FTR_CELL_TB_BUG, CPU_FTR_CELL_TB_BUG, 96)
  * kernel is built for.
  */
 
-#ifdef CONFIG_PPC_BOOK3E
+#ifdef CONFIG_PPC_BOOK3E_64
 #define FIXUP_ENDIAN
 #else
 /*
@@ -749,7 +800,7 @@ END_FTR_SECTION_NESTED(CPU_FTR_CELL_TB_BUG, CPU_FTR_CELL_TB_BUG, 96)
 	.long 0x2402004c; /* hrfid				*/ \
 191:
 
-#endif /* !CONFIG_PPC_BOOK3E */
+#endif /* !CONFIG_PPC_BOOK3E_64 */
 
 #endif /*  __ASSEMBLY__ */
 
@@ -768,7 +819,7 @@ END_FTR_SECTION_NESTED(CPU_FTR_CELL_TB_BUG, CPU_FTR_CELL_TB_BUG, 96)
 	stringify_in_c(.llong (_target);)	\
 	stringify_in_c(.previous)
 
-#ifdef CONFIG_PPC_FSL_BOOK3E
+#ifdef CONFIG_PPC_E500
 #define BTB_FLUSH(reg)			\
 	lis reg,BUCSR_INIT@h;		\
 	ori reg,reg,BUCSR_INIT@l;	\
@@ -776,6 +827,6 @@ END_FTR_SECTION_NESTED(CPU_FTR_CELL_TB_BUG, CPU_FTR_CELL_TB_BUG, 96)
 	isync;
 #else
 #define BTB_FLUSH(reg)
-#endif /* CONFIG_PPC_FSL_BOOK3E */
+#endif /* CONFIG_PPC_E500 */
 
 #endif /* _ASM_POWERPC_PPC_ASM_H */

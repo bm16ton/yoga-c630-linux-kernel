@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_conntrack_sane.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/nf_conntrack_sane.ko net/netfilter/nf_conntrack_sane.o net/netfilter/nf_conntrack_sane.mod.o;  true

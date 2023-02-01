@@ -1,0 +1,1 @@
+cmd_drivers/scsi/qla4xxx/qla4xxx.mod := printf '%s\n'   ql4_os.o ql4_init.o ql4_mbx.o ql4_iocb.o ql4_isr.o ql4_nx.o ql4_nvram.o ql4_dbg.o ql4_attr.o ql4_bsg.o ql4_83xx.o | awk '!x[$$0]++ { print("drivers/scsi/qla4xxx/"$$0) }' > drivers/scsi/qla4xxx/qla4xxx.mod

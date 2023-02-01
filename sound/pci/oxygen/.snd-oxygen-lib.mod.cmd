@@ -1,0 +1,1 @@
+cmd_sound/pci/oxygen/snd-oxygen-lib.mod := printf '%s\n'   oxygen_io.o oxygen_lib.o oxygen_mixer.o oxygen_pcm.o | awk '!x[$$0]++ { print("sound/pci/oxygen/"$$0) }' > sound/pci/oxygen/snd-oxygen-lib.mod

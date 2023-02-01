@@ -1043,6 +1043,7 @@ static int max9286_gpio_set(struct max9286_priv *priv, unsigned int offset,
 
 	return max9286_write(priv, 0x0f,
 			     MAX9286_0X0F_RESERVED | priv->gpio_state);
+<<<<<<< HEAD
 }
 
 static void max9286_gpiochip_set(struct gpio_chip *chip,
@@ -1053,6 +1054,18 @@ static void max9286_gpiochip_set(struct gpio_chip *chip,
 	max9286_gpio_set(priv, offset, value);
 }
 
+=======
+}
+
+static void max9286_gpiochip_set(struct gpio_chip *chip,
+				 unsigned int offset, int value)
+{
+	struct max9286_priv *priv = gpiochip_get_data(chip);
+
+	max9286_gpio_set(priv, offset, value);
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int max9286_gpiochip_get(struct gpio_chip *chip, unsigned int offset)
 {
 	struct max9286_priv *priv = gpiochip_get_data(chip);
@@ -1378,7 +1391,7 @@ err_powerdown:
 	return ret;
 }
 
-static int max9286_remove(struct i2c_client *client)
+static void max9286_remove(struct i2c_client *client)
 {
 	struct max9286_priv *priv = sd_to_max9286(i2c_get_clientdata(client));
 
@@ -1391,8 +1404,6 @@ static int max9286_remove(struct i2c_client *client)
 	gpiod_set_value_cansleep(priv->gpiod_pwdn, 0);
 
 	max9286_cleanup_dt(priv);
-
-	return 0;
 }
 
 static const struct of_device_id max9286_dt_ids[] = {

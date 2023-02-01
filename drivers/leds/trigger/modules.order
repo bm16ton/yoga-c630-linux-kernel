@@ -1,0 +1,12 @@
+drivers/leds/trigger/ledtrig-timer.ko
+drivers/leds/trigger/ledtrig-oneshot.ko
+drivers/leds/trigger/ledtrig-backlight.ko
+drivers/leds/trigger/ledtrig-gpio.ko
+drivers/leds/trigger/ledtrig-activity.ko
+drivers/leds/trigger/ledtrig-default-on.ko
+drivers/leds/trigger/ledtrig-transient.ko
+drivers/leds/trigger/ledtrig-camera.ko
+drivers/leds/trigger/ledtrig-netdev.ko
+drivers/leds/trigger/ledtrig-pattern.ko
+drivers/leds/trigger/ledtrig-audio.ko
+drivers/leds/trigger/ledtrig-tty.ko

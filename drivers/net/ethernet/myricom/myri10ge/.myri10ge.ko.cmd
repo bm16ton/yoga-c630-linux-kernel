@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/myricom/myri10ge/myri10ge.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/myricom/myri10ge/myri10ge.ko drivers/net/ethernet/myricom/myri10ge/myri10ge.o drivers/net/ethernet/myricom/myri10ge/myri10ge.mod.o;  true

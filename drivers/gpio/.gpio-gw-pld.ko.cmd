@@ -1,0 +1,1 @@
+cmd_drivers/gpio/gpio-gw-pld.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpio/gpio-gw-pld.ko drivers/gpio/gpio-gw-pld.o drivers/gpio/gpio-gw-pld.mod.o;  true

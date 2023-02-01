@@ -23,6 +23,8 @@
 #define I2S_SP_INSTANCE		1
 #define PDM_DMIC_INSTANCE	2
 
+<<<<<<< HEAD
+=======
 #define I2S_MODE		0x04
 
 static int renoir_dai_probe(struct snd_soc_dai *dai)
@@ -39,6 +41,7 @@ static int renoir_dai_probe(struct snd_soc_dai *dai)
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct snd_soc_dai_driver renoir_sof_dai[] = {
 	[I2S_BT_INSTANCE] = {
 		.id = I2S_BT_INSTANCE,
@@ -62,7 +65,11 @@ static struct snd_soc_dai_driver renoir_sof_dai[] = {
 			.rate_min = 8000,
 			.rate_max = 48000,
 		},
+<<<<<<< HEAD
+		.probe = &acp_dai_probe,
+=======
 		.probe = &renoir_dai_probe,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 
 	[I2S_SP_INSTANCE] = {
@@ -87,7 +94,11 @@ static struct snd_soc_dai_driver renoir_sof_dai[] = {
 			.rate_min = 8000,
 			.rate_max = 48000,
 		},
+<<<<<<< HEAD
+		.probe = &acp_dai_probe,
+=======
 		.probe = &renoir_dai_probe,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	},
 
 	[PDM_DMIC_INSTANCE] = {
@@ -104,6 +115,23 @@ static struct snd_soc_dai_driver renoir_sof_dai[] = {
 	},
 };
 
+<<<<<<< HEAD
+/* Renoir ops */
+struct snd_sof_dsp_ops sof_renoir_ops;
+EXPORT_SYMBOL_NS(sof_renoir_ops, SND_SOC_SOF_AMD_COMMON);
+
+int sof_renoir_ops_init(struct snd_sof_dev *sdev)
+{
+	/* common defaults */
+	memcpy(&sof_renoir_ops, &sof_acp_common_ops, sizeof(struct snd_sof_dsp_ops));
+
+	sof_renoir_ops.drv = renoir_sof_dai;
+	sof_renoir_ops.num_drv = ARRAY_SIZE(renoir_sof_dai);
+
+	return 0;
+}
+
+=======
 static struct snd_soc_acpi_mach *amd_sof_machine_select(struct snd_sof_dev *sdev)
 {
 	struct snd_sof_pdata *sof_pdata = sdev->pdata;
@@ -180,6 +208,7 @@ const struct snd_sof_dsp_ops sof_renoir_ops = {
 };
 EXPORT_SYMBOL(sof_renoir_ops);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 MODULE_IMPORT_NS(SND_SOC_SOF_AMD_COMMON);
 MODULE_DESCRIPTION("RENOIR SOF Driver");
 MODULE_LICENSE("Dual BSD/GPL");

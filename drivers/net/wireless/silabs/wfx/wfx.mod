@@ -1,0 +1,16 @@
+drivers/net/wireless/silabs/wfx/bh.o
+drivers/net/wireless/silabs/wfx/hwio.o
+drivers/net/wireless/silabs/wfx/fwio.o
+drivers/net/wireless/silabs/wfx/hif_tx_mib.o
+drivers/net/wireless/silabs/wfx/hif_tx.o
+drivers/net/wireless/silabs/wfx/hif_rx.o
+drivers/net/wireless/silabs/wfx/queue.o
+drivers/net/wireless/silabs/wfx/data_tx.o
+drivers/net/wireless/silabs/wfx/data_rx.o
+drivers/net/wireless/silabs/wfx/scan.o
+drivers/net/wireless/silabs/wfx/sta.o
+drivers/net/wireless/silabs/wfx/key.o
+drivers/net/wireless/silabs/wfx/main.o
+drivers/net/wireless/silabs/wfx/debug.o
+drivers/net/wireless/silabs/wfx/bus_spi.o
+drivers/net/wireless/silabs/wfx/bus_sdio.o

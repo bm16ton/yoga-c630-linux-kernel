@@ -1,0 +1,1 @@
+cmd_drivers/watchdog/tegra_wdt.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/watchdog/tegra_wdt.ko drivers/watchdog/tegra_wdt.o drivers/watchdog/tegra_wdt.mod.o;  true

@@ -13,6 +13,11 @@
 #include <linux/sched.h>
 #include <linux/workqueue.h>
 
+<<<<<<< HEAD
+#include "modules-common.h"
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #ifdef MODULE_PARAM_PREFIX
 #undef MODULE_PARAM_PREFIX
 #endif
@@ -50,6 +55,37 @@ module_param(commit_inputs, bool, 0600);
 static unsigned long min_age __read_mostly = 120000000;
 module_param(min_age, ulong, 0600);
 
+<<<<<<< HEAD
+static struct damos_quota damon_reclaim_quota = {
+	/* use up to 10 ms time, reclaim up to 128 MiB per 1 sec by default */
+	.ms = 10,
+	.sz = 128 * 1024 * 1024,
+	.reset_interval = 1000,
+	/* Within the quota, page out older regions first. */
+	.weight_sz = 0,
+	.weight_nr_accesses = 0,
+	.weight_age = 1
+};
+DEFINE_DAMON_MODULES_DAMOS_QUOTAS(damon_reclaim_quota);
+
+static struct damos_watermarks damon_reclaim_wmarks = {
+	.metric = DAMOS_WMARK_FREE_MEM_RATE,
+	.interval = 5000000,	/* 5 seconds */
+	.high = 500,		/* 50 percent */
+	.mid = 400,		/* 40 percent */
+	.low = 200,		/* 20 percent */
+};
+DEFINE_DAMON_MODULES_WMARKS_PARAMS(damon_reclaim_wmarks);
+
+static struct damon_attrs damon_reclaim_mon_attrs = {
+	.sample_interval = 5000,	/* 5 ms */
+	.aggr_interval = 100000,	/* 100 ms */
+	.ops_update_interval = 0,
+	.min_nr_regions = 10,
+	.max_nr_regions = 1000,
+};
+DEFINE_DAMON_MODULES_MON_ATTRS_PARAMS(damon_reclaim_mon_attrs);
+=======
 /*
  * Limit of time for trying the reclamation in milliseconds.
  *
@@ -168,6 +204,7 @@ module_param(min_nr_regions, ulong, 0600);
  */
 static unsigned long max_nr_regions __read_mostly = 1000;
 module_param(max_nr_regions, ulong, 0600);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Start of the target memory region in physical address.
@@ -196,6 +233,11 @@ module_param(monitor_region_end, ulong, 0600);
 static int kdamond_pid __read_mostly = -1;
 module_param(kdamond_pid, int, 0400);
 
+<<<<<<< HEAD
+static struct damos_stat damon_reclaim_stat;
+DEFINE_DAMON_MODULES_DAMOS_STATS_PARAMS(damon_reclaim_stat,
+		reclaim_tried_regions, reclaimed_regions, quota_exceeds);
+=======
 /*
  * Number of memory regions that tried to be reclaimed.
  */
@@ -225,10 +267,13 @@ module_param(bytes_reclaimed_regions, ulong, 0400);
  */
 static unsigned long nr_quota_exceeds __read_mostly;
 module_param(nr_quota_exceeds, ulong, 0400);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static struct damon_ctx *ctx;
 static struct damon_target *target;
 
+<<<<<<< HEAD
+=======
 struct damon_reclaim_ram_walk_arg {
 	unsigned long start;
 	unsigned long end;
@@ -262,6 +307,7 @@ static bool get_monitoring_region(unsigned long *start, unsigned long *end)
 	return true;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct damos *damon_reclaim_new_scheme(void)
 {
 	struct damos_access_pattern pattern = {
@@ -272,6 +318,12 @@ static struct damos *damon_reclaim_new_scheme(void)
 		.min_nr_accesses = 0,
 		.max_nr_accesses = 0,
 		/* for min_age or more micro-seconds */
+<<<<<<< HEAD
+		.min_age_region = min_age /
+			damon_reclaim_mon_attrs.aggr_interval,
+		.max_age_region = UINT_MAX,
+	};
+=======
 		.min_age_region = min_age / aggr_interval,
 		.max_age_region = UINT_MAX,
 	};
@@ -295,25 +347,38 @@ static struct damos *damon_reclaim_new_scheme(void)
 		.weight_nr_accesses = 0,
 		.weight_age = 1
 	};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return damon_new_scheme(
 			&pattern,
 			/* page out those, as soon as found */
 			DAMOS_PAGEOUT,
 			/* under the quota. */
+<<<<<<< HEAD
+			&damon_reclaim_quota,
+			/* (De)activate this according to the watermarks. */
+			&damon_reclaim_wmarks);
+=======
 			&quota,
 			/* (De)activate this according to the watermarks. */
 			&wmarks);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int damon_reclaim_apply_parameters(void)
 {
 	struct damos *scheme;
+<<<<<<< HEAD
+	int err = 0;
+
+	err = damon_set_attrs(ctx, &damon_reclaim_mon_attrs);
+=======
 	struct damon_addr_range addr_range;
 	int err = 0;
 
 	err = damon_set_attrs(ctx, sample_interval, aggr_interval, 0,
 			min_nr_regions, max_nr_regions);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (err)
 		return err;
 
@@ -321,6 +386,13 @@ static int damon_reclaim_apply_parameters(void)
 	scheme = damon_reclaim_new_scheme();
 	if (!scheme)
 		return -ENOMEM;
+<<<<<<< HEAD
+	damon_set_schemes(ctx, &scheme, 1);
+
+	return damon_set_region_biggest_system_ram_default(target,
+					&monitor_region_start,
+					&monitor_region_end);
+=======
 	err = damon_set_schemes(ctx, &scheme, 1);
 	if (err)
 		return err;
@@ -334,6 +406,7 @@ static int damon_reclaim_apply_parameters(void)
 	addr_range.start = monitor_region_start;
 	addr_range.end = monitor_region_end;
 	return damon_set_regions(target, &addr_range, 1);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int damon_reclaim_turn(bool on)
@@ -418,6 +491,10 @@ static int damon_reclaim_after_aggregation(struct damon_ctx *c)
 	struct damos *s;
 
 	/* update the stats parameter */
+<<<<<<< HEAD
+	damon_for_each_scheme(s, c)
+		damon_reclaim_stat = s->stat;
+=======
 	damon_for_each_scheme(s, c) {
 		nr_reclaim_tried_regions = s->stat.nr_tried;
 		bytes_reclaim_tried_regions = s->stat.sz_tried;
@@ -425,6 +502,7 @@ static int damon_reclaim_after_aggregation(struct damon_ctx *c)
 		bytes_reclaimed_regions = s->stat.sz_applied;
 		nr_quota_exceeds = s->stat.qt_exceeds;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return damon_reclaim_handle_commit_inputs();
 }

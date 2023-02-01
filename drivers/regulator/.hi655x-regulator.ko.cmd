@@ -1,0 +1,1 @@
+cmd_drivers/regulator/hi655x-regulator.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/regulator/hi655x-regulator.ko drivers/regulator/hi655x-regulator.o drivers/regulator/hi655x-regulator.mod.o;  true

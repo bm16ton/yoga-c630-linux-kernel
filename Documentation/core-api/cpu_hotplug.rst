@@ -560,7 +560,11 @@ available:
   * cpuhp_state_remove_instance(state, node)
   * cpuhp_state_remove_instance_nocalls(state, node)
 
+<<<<<<< HEAD
+The arguments are the same as for the cpuhp_state_add_instance*()
+=======
 The arguments are the same as for the the cpuhp_state_add_instance*()
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 variants above.
 
 The functions differ in the way how the installed callbacks are treated:

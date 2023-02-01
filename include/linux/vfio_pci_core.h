@@ -20,11 +20,16 @@
 #define VFIO_PCI_CORE_H
 
 #define VFIO_PCI_OFFSET_SHIFT   40
+<<<<<<< HEAD
+=======
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define VFIO_PCI_OFFSET_TO_INDEX(off)	(off >> VFIO_PCI_OFFSET_SHIFT)
 #define VFIO_PCI_INDEX_TO_OFFSET(index)	((u64)(index) << VFIO_PCI_OFFSET_SHIFT)
 #define VFIO_PCI_OFFSET_MASK	(((u64)(1) << VFIO_PCI_OFFSET_SHIFT) - 1)
 
+<<<<<<< HEAD
+=======
 /* Special capability IDs predefined access */
 #define PCI_CAP_ID_INVALID		0xFF	/* default raw access */
 #define PCI_CAP_ID_INVALID_VIRT		0xFE	/* default virt access */
@@ -53,6 +58,7 @@ struct vfio_pci_irq_ctx {
 	struct irq_bypass_producer	producer;
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct vfio_pci_core_device;
 struct vfio_pci_region;
 
@@ -78,6 +84,8 @@ struct vfio_pci_region {
 	u32				flags;
 };
 
+<<<<<<< HEAD
+=======
 struct vfio_pci_dummy_resource {
 	struct resource		resource;
 	int			index;
@@ -95,6 +103,7 @@ struct vfio_pci_mmap_vma {
 	struct list_head	vma_next;
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct vfio_pci_core_device {
 	struct vfio_device	vdev;
 	struct pci_dev		*pdev;
@@ -124,11 +133,20 @@ struct vfio_pci_core_device {
 	bool			needs_reset;
 	bool			nointx;
 	bool			needs_pm_restore;
+<<<<<<< HEAD
+	bool			pm_intx_masked;
+	bool			pm_runtime_engaged;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct pci_saved_state	*pci_saved_state;
 	struct pci_saved_state	*pm_save;
 	int			ioeventfds_nr;
 	struct eventfd_ctx	*err_trigger;
 	struct eventfd_ctx	*req_trigger;
+<<<<<<< HEAD
+	struct eventfd_ctx	*pm_wake_eventfd_ctx;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct list_head	dummy_resources_list;
 	struct mutex		ioeventfds_lock;
 	struct list_head	ioeventfds_list;
@@ -141,6 +159,19 @@ struct vfio_pci_core_device {
 	struct rw_semaphore	memory_lock;
 };
 
+<<<<<<< HEAD
+/* Will be exported for vfio pci drivers usage */
+int vfio_pci_core_register_dev_region(struct vfio_pci_core_device *vdev,
+				      unsigned int type, unsigned int subtype,
+				      const struct vfio_pci_regops *ops,
+				      size_t size, u32 flags, void *data);
+void vfio_pci_core_set_params(bool nointxmask, bool is_disable_vga,
+			      bool is_disable_idle_d3);
+void vfio_pci_core_close_device(struct vfio_device *core_vdev);
+int vfio_pci_core_init_dev(struct vfio_device *core_vdev);
+void vfio_pci_core_release_dev(struct vfio_device *core_vdev);
+int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev);
+=======
 #define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
 #define is_msi(vdev) (vdev->irq_type == VFIO_PCI_MSI_IRQ_INDEX)
 #define is_msix(vdev) (vdev->irq_type == VFIO_PCI_MSIX_IRQ_INDEX)
@@ -235,6 +266,7 @@ void vfio_pci_core_init_device(struct vfio_pci_core_device *vdev,
 			       const struct vfio_device_ops *vfio_pci_ops);
 int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev);
 void vfio_pci_core_uninit_device(struct vfio_pci_core_device *vdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev);
 extern const struct pci_error_handlers vfio_pci_core_err_handlers;
 int vfio_pci_core_sriov_configure(struct vfio_pci_core_device *vdev,
@@ -256,9 +288,12 @@ void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev);
 pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
 						pci_channel_state_t state);
 
+<<<<<<< HEAD
+=======
 static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
 {
 	return (pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* VFIO_PCI_CORE_H */

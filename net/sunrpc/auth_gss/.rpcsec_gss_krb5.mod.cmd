@@ -1,0 +1,1 @@
+cmd_net/sunrpc/auth_gss/rpcsec_gss_krb5.mod := printf '%s\n'   gss_krb5_mech.o gss_krb5_seal.o gss_krb5_unseal.o gss_krb5_seqnum.o gss_krb5_wrap.o gss_krb5_crypto.o gss_krb5_keys.o | awk '!x[$$0]++ { print("net/sunrpc/auth_gss/"$$0) }' > net/sunrpc/auth_gss/rpcsec_gss_krb5.mod

@@ -1,0 +1,1 @@
+cmd_drivers/iio/buffer/industrialio-triggered-buffer.mod := printf '%s\n'   industrialio-triggered-buffer.o | awk '!x[$$0]++ { print("drivers/iio/buffer/"$$0) }' > drivers/iio/buffer/industrialio-triggered-buffer.mod

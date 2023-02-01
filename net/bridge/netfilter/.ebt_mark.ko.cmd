@@ -1,0 +1,1 @@
+cmd_net/bridge/netfilter/ebt_mark.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/bridge/netfilter/ebt_mark.ko net/bridge/netfilter/ebt_mark.o net/bridge/netfilter/ebt_mark.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/packetengines/yellowfin.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/packetengines/yellowfin.ko drivers/net/ethernet/packetengines/yellowfin.o drivers/net/ethernet/packetengines/yellowfin.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/meson-ir-tx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/meson-ir-tx.ko drivers/media/rc/meson-ir-tx.o drivers/media/rc/meson-ir-tx.mod.o;  true

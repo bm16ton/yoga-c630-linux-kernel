@@ -1,0 +1,1 @@
+cmd_drivers/iio/common/cros_ec_sensors/modules.order := {   echo drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.ko;   echo drivers/iio/common/cros_ec_sensors/cros_ec_sensors.ko; :; } > drivers/iio/common/cros_ec_sensors/modules.order

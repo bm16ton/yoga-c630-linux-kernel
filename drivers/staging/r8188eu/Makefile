@@ -10,7 +10,10 @@ r8188eu-y = \
 		hal/hal_com.o \
 		hal/odm.o \
 		hal/odm_HWConfig.o \
+<<<<<<< HEAD
+=======
 		hal/odm_RegConfig8188E.o \
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hal/odm_RTL8188E.o \
 		hal/rtl8188e_cmd.o \
 		hal/rtl8188e_dm.o \
@@ -18,12 +21,21 @@ r8188eu-y = \
 		hal/rtl8188e_phycfg.o \
 		hal/rtl8188e_rf6052.o \
 		hal/rtl8188e_rxdesc.o \
+<<<<<<< HEAD
+=======
 		hal/rtl8188e_xmit.o \
 		hal/rtl8188eu_recv.o \
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hal/rtl8188eu_xmit.o \
 		hal/usb_halinit.o \
 		hal/usb_ops_linux.o \
 		os_dep/ioctl_linux.o \
+<<<<<<< HEAD
+		os_dep/os_intfs.o \
+		os_dep/osdep_service.o \
+		os_dep/usb_intf.o \
+		os_dep/usb_ops_linux.o \
+=======
 		os_dep/mlme_linux.o \
 		os_dep/os_intfs.o \
 		os_dep/osdep_service.o \
@@ -31,6 +43,7 @@ r8188eu-y = \
 		os_dep/usb_intf.o \
 		os_dep/usb_ops_linux.o \
 		os_dep/xmit_linux.o \
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		core/rtw_ap.o \
 		core/rtw_br_ext.o \
 		core/rtw_cmd.o \

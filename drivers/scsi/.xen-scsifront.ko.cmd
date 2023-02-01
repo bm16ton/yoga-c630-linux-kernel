@@ -1,0 +1,1 @@
+cmd_drivers/scsi/xen-scsifront.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/xen-scsifront.ko drivers/scsi/xen-scsifront.o drivers/scsi/xen-scsifront.mod.o;  true

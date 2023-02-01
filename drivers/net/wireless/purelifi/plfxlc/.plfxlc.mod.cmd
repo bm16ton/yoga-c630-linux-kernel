@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/purelifi/plfxlc/plfxlc.mod := printf '%s\n'   chip.o firmware.o usb.o mac.o | awk '!x[$$0]++ { print("drivers/net/wireless/purelifi/plfxlc/"$$0) }' > drivers/net/wireless/purelifi/plfxlc/plfxlc.mod

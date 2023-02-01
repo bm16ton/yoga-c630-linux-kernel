@@ -1,0 +1,1 @@
+cmd_drivers/usb/host/ehci-orion.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/host/ehci-orion.ko drivers/usb/host/ehci-orion.o drivers/usb/host/ehci-orion.mod.o;  true

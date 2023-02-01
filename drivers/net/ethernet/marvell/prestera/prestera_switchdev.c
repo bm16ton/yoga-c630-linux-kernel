@@ -143,6 +143,10 @@ prestera_br_port_flags_reset(struct prestera_bridge_port *br_port,
 	prestera_port_uc_flood_set(port, false);
 	prestera_port_mc_flood_set(port, false);
 	prestera_port_learning_set(port, false);
+<<<<<<< HEAD
+	prestera_port_br_locked_set(port, false);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int prestera_br_port_flags_set(struct prestera_bridge_port *br_port,
@@ -162,6 +166,14 @@ static int prestera_br_port_flags_set(struct prestera_bridge_port *br_port,
 	if (err)
 		goto err_out;
 
+<<<<<<< HEAD
+	err = prestera_port_br_locked_set(port,
+					  br_port->flags & BR_PORT_LOCKED);
+	if (err)
+		goto err_out;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 err_out:
@@ -1163,7 +1175,7 @@ static int prestera_port_obj_attr_set(struct net_device *dev, const void *ctx,
 		break;
 	case SWITCHDEV_ATTR_ID_PORT_PRE_BRIDGE_FLAGS:
 		if (attr->u.brport_flags.mask &
-		    ~(BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD))
+		    ~(BR_LEARNING | BR_FLOOD | BR_MCAST_FLOOD | BR_PORT_LOCKED))
 			err = -EINVAL;
 		break;
 	case SWITCHDEV_ATTR_ID_PORT_BRIDGE_FLAGS:

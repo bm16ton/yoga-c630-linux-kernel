@@ -120,7 +120,11 @@ static int timer_cb1(void *map, int *key, struct bpf_timer *timer)
 }
 
 SEC("fentry/bpf_fentry_test1")
+<<<<<<< HEAD
+int BPF_PROG2(test1, int, a)
+=======
 int BPF_PROG(test1, int a)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct bpf_timer *arr_timer, *lru_timer;
 	struct elem init = {};
@@ -208,6 +212,8 @@ static int timer_cb2(void *map, int *key, struct hmap_elem *val)
 		 */
 		bpf_map_delete_elem(map, key);
 
+<<<<<<< HEAD
+=======
 		/* in non-preallocated hashmap both 'key' and 'val' are RCU
 		 * protected and still valid though this element was deleted
 		 * from the map. Arm this timer for ~35 seconds. When callback
@@ -219,6 +225,7 @@ static int timer_cb2(void *map, int *key, struct hmap_elem *val)
 		 */
 		if (bpf_timer_start(&val->timer, 1ull << 35, 0) != 0)
 			err |= 256;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ok |= 4;
 	}
 	return 0;
@@ -247,7 +254,11 @@ int bpf_timer_test(void)
 }
 
 SEC("fentry/bpf_fentry_test2")
+<<<<<<< HEAD
+int BPF_PROG2(test2, int, a, int, b)
+=======
 int BPF_PROG(test2, int a, int b)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct hmap_elem init = {}, *val;
 	int key = HTAB, key_malloc = HTAB_MALLOC;

@@ -1,0 +1,1 @@
+cmd_drivers/gnss/gnss-sirf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gnss/gnss-sirf.ko drivers/gnss/gnss-sirf.o drivers/gnss/gnss-sirf.mod.o;  true

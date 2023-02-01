@@ -1,0 +1,12 @@
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mdio.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_tm.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.o
+drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.o
+drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.o
+drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.o
+drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_dcb.o

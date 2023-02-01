@@ -1,0 +1,1 @@
+cmd_drivers/media/i2c/tvaudio.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/i2c/tvaudio.ko drivers/media/i2c/tvaudio.o drivers/media/i2c/tvaudio.mod.o;  true

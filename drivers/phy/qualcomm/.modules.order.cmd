@@ -1,0 +1,1 @@
+cmd_drivers/phy/qualcomm/modules.order := {   echo drivers/phy/qualcomm/phy-qcom-apq8064-sata.ko;   echo drivers/phy/qualcomm/phy-qcom-ipq806x-sata.ko;   echo drivers/phy/qualcomm/phy-qcom-pcie2.ko;   echo drivers/phy/qualcomm/phy-qcom-usb-hs.ko;   echo drivers/phy/qualcomm/phy-qcom-usb-hsic.ko; :; } > drivers/phy/qualcomm/modules.order

@@ -40,8 +40,12 @@ after usage with pwm_free().
 
 New users should use the pwm_get() function and pass to it the consumer
 device or a consumer name. pwm_put() is used to free the PWM device. Managed
+<<<<<<< HEAD
+variants of the getter, devm_pwm_get() and devm_fwnode_pwm_get(), also exist.
+=======
 variants of the getter, devm_pwm_get(), devm_of_pwm_get(),
 devm_fwnode_pwm_get(), also exist.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 After being requested, a PWM has to be configured using::
 

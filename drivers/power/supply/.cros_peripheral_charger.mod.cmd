@@ -1,0 +1,1 @@
+cmd_drivers/power/supply/cros_peripheral_charger.mod := printf '%s\n'   cros_peripheral_charger.o | awk '!x[$$0]++ { print("drivers/power/supply/"$$0) }' > drivers/power/supply/cros_peripheral_charger.mod

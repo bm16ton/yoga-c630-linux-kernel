@@ -6,6 +6,11 @@
 
 set -e
 
+<<<<<<< HEAD
+skip_test=0
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 pythonchecker=$(dirname $0)/lib/perf_json_output_lint.py
 if [ "x$PYTHON" == "x" ]
 then
@@ -134,6 +139,51 @@ check_per_socket()
 	echo "[Success]"
 }
 
+<<<<<<< HEAD
+# The perf stat options for per-socket, per-core, per-die
+# and -A ( no_aggr mode ) uses the info fetched from this
+# directory: "/sys/devices/system/cpu/cpu*/topology". For
+# example, socket value is fetched from "physical_package_id"
+# file in topology directory.
+# Reference: cpu__get_topology_int in util/cpumap.c
+# If the platform doesn't expose topology information, values
+# will be set to -1. For example, incase of pSeries platform
+# of powerpc, value for  "physical_package_id" is restricted
+# and set to -1. Check here validates the socket-id read from
+# topology file before proceeding further
+
+FILE_LOC="/sys/devices/system/cpu/cpu*/topology/"
+FILE_NAME="physical_package_id"
+
+check_for_topology()
+{
+	if ! ParanoidAndNotRoot 0
+	then
+		socket_file=`ls $FILE_LOC/$FILE_NAME | head -n 1`
+		[ -z $socket_file ] && return 0
+		socket_id=`cat $socket_file`
+		[ $socket_id == -1 ] && skip_test=1
+		return 0
+	fi
+}
+
+check_for_topology
+check_no_args
+check_system_wide
+check_interval
+check_event
+check_per_thread
+check_per_node
+if [ $skip_test -ne 1 ]
+then
+	check_system_wide_no_aggr
+	check_per_core
+	check_per_die
+	check_per_socket
+else
+	echo "[Skip] Skipping tests for system_wide_no_aggr, per_core, per_die and per_socket since socket id exposed via topology is invalid"
+fi
+=======
 check_no_args
 check_system_wide
 check_system_wide_no_aggr
@@ -144,4 +194,5 @@ check_per_thread
 check_per_die
 check_per_node
 check_per_socket
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 exit 0

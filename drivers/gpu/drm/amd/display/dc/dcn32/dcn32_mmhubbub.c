@@ -100,7 +100,11 @@ static void mmhubbub32_warmup_mcif(struct mcif_wb *mcif_wb,
 	REG_UPDATE(MMHUBBUB_WARMUP_CONTROL_STATUS, MMHUBBUB_WARMUP_EN, false);
 }
 
+<<<<<<< HEAD
+static void mmhubbub32_config_mcif_buf(struct mcif_wb *mcif_wb,
+=======
 void mmhubbub32_config_mcif_buf(struct mcif_wb *mcif_wb,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		struct mcif_buf_params *params,
 		unsigned int dest_height)
 {

@@ -102,7 +102,11 @@ static void check_sched_switch_args(void)
 	const struct btf_type *t1, *t2, *t3;
 	u32 type_id;
 
+<<<<<<< HEAD
+	type_id = btf__find_by_name_kind(btf, "btf_trace_sched_switch",
+=======
 	type_id = btf__find_by_name_kind(btf, "bpf_trace_sched_switch",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					 BTF_KIND_TYPEDEF);
 	if ((s32)type_id < 0)
 		return;

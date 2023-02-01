@@ -1,0 +1,1 @@
+cmd_drivers/iio/industrialio.mod := printf '%s\n'   industrialio-core.o industrialio-event.o inkern.o industrialio-buffer.o industrialio-trigger.o | awk '!x[$$0]++ { print("drivers/iio/"$$0) }' > drivers/iio/industrialio.mod

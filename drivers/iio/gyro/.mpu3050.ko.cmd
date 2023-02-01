@@ -1,0 +1,1 @@
+cmd_drivers/iio/gyro/mpu3050.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/gyro/mpu3050.ko drivers/iio/gyro/mpu3050.o drivers/iio/gyro/mpu3050.mod.o;  true

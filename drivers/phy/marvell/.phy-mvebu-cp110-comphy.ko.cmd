@@ -1,0 +1,1 @@
+cmd_drivers/phy/marvell/phy-mvebu-cp110-comphy.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/marvell/phy-mvebu-cp110-comphy.ko drivers/phy/marvell/phy-mvebu-cp110-comphy.o drivers/phy/marvell/phy-mvebu-cp110-comphy.mod.o;  true

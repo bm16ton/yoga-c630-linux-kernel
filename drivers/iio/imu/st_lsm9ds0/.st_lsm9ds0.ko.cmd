@@ -1,0 +1,1 @@
+cmd_drivers/iio/imu/st_lsm9ds0/st_lsm9ds0.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/imu/st_lsm9ds0/st_lsm9ds0.ko drivers/iio/imu/st_lsm9ds0/st_lsm9ds0.o drivers/iio/imu/st_lsm9ds0/st_lsm9ds0.mod.o;  true

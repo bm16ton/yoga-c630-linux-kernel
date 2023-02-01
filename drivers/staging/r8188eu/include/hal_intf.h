@@ -10,8 +10,13 @@
 
 typedef s32 (*c2h_id_filter)(u8 id);
 
+<<<<<<< HEAD
+int rtl8188eu_interface_configure(struct adapter *adapt);
+int ReadAdapterInfo8188EU(struct adapter *Adapter);
+=======
 void rtl8188eu_interface_configure(struct adapter *adapt);
 void ReadAdapterInfo8188EU(struct adapter *Adapter);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void rtl8188eu_init_default_value(struct adapter *adapt);
 void rtl8188e_SetHalODMVar(struct adapter *Adapter, void *pValue1, bool bSet);
 u32 rtl8188eu_InitPowerOn(struct adapter *adapt);
@@ -39,7 +44,10 @@ void rtw_hal_update_ra_mask(struct adapter *padapter, u32 mac_id, u8 level);
 void	rtw_hal_clone_data(struct adapter *dst_adapt,
 			   struct adapter *src_adapt);
 
+<<<<<<< HEAD
+=======
 void indicate_wx_scan_complete_event(struct adapter *padapter);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 u8 rtw_do_join(struct adapter *padapter);
 
 #endif /* __HAL_INTF_H__ */

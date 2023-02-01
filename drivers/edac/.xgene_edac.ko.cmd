@@ -1,0 +1,1 @@
+cmd_drivers/edac/xgene_edac.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/edac/xgene_edac.ko drivers/edac/xgene_edac.o drivers/edac/xgene_edac.mod.o;  true

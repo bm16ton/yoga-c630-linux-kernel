@@ -26,6 +26,10 @@
 #include <linux/iio/iio.h>
 #include <linux/iio/buffer.h>
 #include <linux/iio/events.h>
+<<<<<<< HEAD
+#include <linux/iio/sysfs.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/iio/trigger.h>
 #include <linux/iio/trigger_consumer.h>
 #include <linux/iio/triggered_buffer.h>
@@ -46,6 +50,27 @@ static int bma400_scales[8];
 static int bma400_sample_freqs[14];
 
 static const int bma400_osr_range[] = { 0, 1, 3 };
+
+static int tap_reset_timeout[BMA400_TAP_TIM_LIST_LEN] = {
+	300000,
+	400000,
+	500000,
+	600000
+};
+
+static int tap_max2min_time[BMA400_TAP_TIM_LIST_LEN] = {
+	30000,
+	45000,
+	60000,
+	90000
+};
+
+static int double_tap2_min_delay[BMA400_TAP_TIM_LIST_LEN] = {
+	20000,
+	40000,
+	60000,
+	80000
+};
 
 /* See the ACC_CONFIG0 section of the datasheet */
 enum bma400_power_mode {
@@ -88,6 +113,10 @@ struct bma400_data {
 	bool step_event_en;
 	bool activity_event_en;
 	unsigned int generic_event_en;
+<<<<<<< HEAD
+	unsigned int tap_event_en_bitmask;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Correct time stamp alignment */
 	struct {
 		__le16 buff[3];
@@ -216,6 +245,118 @@ static const struct iio_event_spec bma400_accel_event[] = {
 				       BIT(IIO_EV_INFO_HYSTERESIS) |
 				       BIT(IIO_EV_INFO_ENABLE),
 	},
+<<<<<<< HEAD
+	{
+		.type = IIO_EV_TYPE_GESTURE,
+		.dir = IIO_EV_DIR_SINGLETAP,
+		.mask_shared_by_type = BIT(IIO_EV_INFO_VALUE) |
+				       BIT(IIO_EV_INFO_ENABLE) |
+				       BIT(IIO_EV_INFO_RESET_TIMEOUT),
+	},
+	{
+		.type = IIO_EV_TYPE_GESTURE,
+		.dir = IIO_EV_DIR_DOUBLETAP,
+		.mask_shared_by_type = BIT(IIO_EV_INFO_VALUE) |
+				       BIT(IIO_EV_INFO_ENABLE) |
+				       BIT(IIO_EV_INFO_RESET_TIMEOUT) |
+				       BIT(IIO_EV_INFO_TAP2_MIN_DELAY),
+	},
+};
+
+static int usec_to_tapreg_raw(int usec, const int *time_list)
+{
+	int index;
+
+	for (index = 0; index < BMA400_TAP_TIM_LIST_LEN; index++) {
+		if (usec == time_list[index])
+			return index;
+	}
+	return -EINVAL;
+}
+
+static ssize_t in_accel_gesture_tap_maxtomin_time_show(struct device *dev,
+						       struct device_attribute *attr,
+						       char *buf)
+{
+	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
+	struct bma400_data *data = iio_priv(indio_dev);
+	int ret, reg_val, raw, vals[2];
+
+	ret = regmap_read(data->regmap, BMA400_TAP_CONFIG1, &reg_val);
+	if (ret)
+		return ret;
+
+	raw = FIELD_GET(BMA400_TAP_TICSTH_MSK, reg_val);
+	vals[0] = 0;
+	vals[1] = tap_max2min_time[raw];
+
+	return iio_format_value(buf, IIO_VAL_INT_PLUS_MICRO, 2, vals);
+}
+
+static ssize_t in_accel_gesture_tap_maxtomin_time_store(struct device *dev,
+							struct device_attribute *attr,
+							const char *buf, size_t len)
+{
+	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
+	struct bma400_data *data = iio_priv(indio_dev);
+	int ret, val_int, val_fract, raw;
+
+	ret = iio_str_to_fixpoint(buf, 100000, &val_int, &val_fract);
+	if (ret)
+		return ret;
+
+	raw = usec_to_tapreg_raw(val_fract, tap_max2min_time);
+	if (raw < 0)
+		return -EINVAL;
+
+	ret = regmap_update_bits(data->regmap, BMA400_TAP_CONFIG1,
+				 BMA400_TAP_TICSTH_MSK,
+				 FIELD_PREP(BMA400_TAP_TICSTH_MSK, raw));
+	if (ret)
+		return ret;
+
+	return len;
+}
+
+static IIO_DEVICE_ATTR_RW(in_accel_gesture_tap_maxtomin_time, 0);
+
+/*
+ * Tap interrupts works with 200 Hz input data rate and the time based tap
+ * controls are in the terms of data samples so the below calculation is
+ * used to convert the configuration values into seconds.
+ * e.g.:
+ * 60 data samples * 0.005 ms = 0.3 seconds.
+ * 80 data samples * 0.005 ms = 0.4 seconds.
+ */
+
+/* quiet configuration values in seconds */
+static IIO_CONST_ATTR(in_accel_gesture_tap_reset_timeout_available,
+		      "0.3 0.4 0.5 0.6");
+
+/* tics_th configuration values in seconds */
+static IIO_CONST_ATTR(in_accel_gesture_tap_maxtomin_time_available,
+		      "0.03 0.045 0.06 0.09");
+
+/* quiet_dt configuration values in seconds */
+static IIO_CONST_ATTR(in_accel_gesture_doubletap_tap2_min_delay_available,
+		      "0.02 0.04 0.06 0.08");
+
+/* List of sensitivity values available to configure tap interrupts */
+static IIO_CONST_ATTR(in_accel_gesture_tap_value_available, "0 1 2 3 4 5 6 7");
+
+static struct attribute *bma400_event_attributes[] = {
+	&iio_const_attr_in_accel_gesture_tap_value_available.dev_attr.attr,
+	&iio_const_attr_in_accel_gesture_tap_reset_timeout_available.dev_attr.attr,
+	&iio_const_attr_in_accel_gesture_tap_maxtomin_time_available.dev_attr.attr,
+	&iio_const_attr_in_accel_gesture_doubletap_tap2_min_delay_available.dev_attr.attr,
+	&iio_dev_attr_in_accel_gesture_tap_maxtomin_time.dev_attr.attr,
+	NULL
+};
+
+static const struct attribute_group bma400_event_attribute_group = {
+	.attrs = bma400_event_attributes,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 #define BMA400_ACC_CHANNEL(_index, _axis) { \
@@ -1014,6 +1155,15 @@ static int bma400_read_event_config(struct iio_dev *indio_dev,
 		case IIO_EV_DIR_FALLING:
 			return FIELD_GET(BMA400_INT_GEN2_MSK,
 					 data->generic_event_en);
+<<<<<<< HEAD
+		case IIO_EV_DIR_SINGLETAP:
+			return FIELD_GET(BMA400_S_TAP_MSK,
+					 data->tap_event_en_bitmask);
+		case IIO_EV_DIR_DOUBLETAP:
+			return FIELD_GET(BMA400_D_TAP_MSK,
+					 data->tap_event_en_bitmask);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		default:
 			return -EINVAL;
 		}
@@ -1021,11 +1171,314 @@ static int bma400_read_event_config(struct iio_dev *indio_dev,
 		return data->step_event_en;
 	case IIO_ACTIVITY:
 		return data->activity_event_en;
+<<<<<<< HEAD
 	default:
 		return -EINVAL;
 	}
 }
 
+static int bma400_steps_event_enable(struct bma400_data *data, int state)
+{
+	int ret;
+
+	ret = bma400_enable_steps(data, 1);
+	if (ret)
+		return ret;
+
+	ret = regmap_update_bits(data->regmap, BMA400_INT12_MAP_REG,
+				 BMA400_STEP_INT_MSK,
+				 FIELD_PREP(BMA400_STEP_INT_MSK,
+					    state));
+	if (ret)
+		return ret;
+	data->step_event_en = state;
+	return 0;
+}
+
+static int bma400_activity_event_en(struct bma400_data *data,
+				    enum iio_event_direction dir,
+				    int state)
+{
+	int ret, reg, msk, value;
+	int field_value = 0;
+
+	switch (dir) {
+	case IIO_EV_DIR_RISING:
+		reg = BMA400_GEN1INT_CONFIG0;
+		msk = BMA400_INT_GEN1_MSK;
+		value = 2;
+		set_mask_bits(&field_value, BMA400_INT_GEN1_MSK,
+			      FIELD_PREP(BMA400_INT_GEN1_MSK, state));
+		break;
+	case IIO_EV_DIR_FALLING:
+		reg = BMA400_GEN2INT_CONFIG0;
+		msk = BMA400_INT_GEN2_MSK;
+		value = 0;
+		set_mask_bits(&field_value, BMA400_INT_GEN2_MSK,
+			      FIELD_PREP(BMA400_INT_GEN2_MSK, state));
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	/* Enabling all axis for interrupt evaluation */
+	ret = regmap_write(data->regmap, reg, 0xF8);
+	if (ret)
+		return ret;
+
+	/* OR combination of all axis for interrupt evaluation */
+	ret = regmap_write(data->regmap, reg + BMA400_GEN_CONFIG1_OFF, value);
+	if (ret)
+		return ret;
+
+	/* Initial value to avoid interrupts while enabling*/
+	ret = regmap_write(data->regmap, reg + BMA400_GEN_CONFIG2_OFF, 0x0A);
+	if (ret)
+		return ret;
+
+	/* Initial duration value to avoid interrupts while enabling*/
+	ret = regmap_write(data->regmap, reg + BMA400_GEN_CONFIG31_OFF, 0x0F);
+	if (ret)
+		return ret;
+
+	ret = regmap_update_bits(data->regmap, BMA400_INT1_MAP_REG, msk,
+				 field_value);
+	if (ret)
+		return ret;
+
+	ret = regmap_update_bits(data->regmap, BMA400_INT_CONFIG0_REG, msk,
+				 field_value);
+	if (ret)
+		return ret;
+
+	set_mask_bits(&data->generic_event_en, msk, field_value);
+	return 0;
+}
+
+static int bma400_tap_event_en(struct bma400_data *data,
+			       enum iio_event_direction dir, int state)
+{
+	unsigned int mask, field_value;
+	int ret;
+
+	/*
+	 * Tap interrupts can be configured only in normal mode.
+	 * See table in section 4.3 "Power modes - performance modes" of
+	 * datasheet v1.2.
+	 */
+	if (data->power_mode != POWER_MODE_NORMAL)
+		return -EINVAL;
+
+	/*
+	 * Tap interrupts are operating with a data rate of 200Hz.
+	 * See section 4.7 "Tap sensing interrupt" in datasheet v1.2.
+	 */
+	if (data->sample_freq.hz != 200 && state) {
+		dev_err(data->dev, "Invalid data rate for tap interrupts.\n");
+		return -EINVAL;
+	}
+
+	ret = regmap_update_bits(data->regmap, BMA400_INT12_MAP_REG,
+				 BMA400_S_TAP_MSK,
+				 FIELD_PREP(BMA400_S_TAP_MSK, state));
+	if (ret)
+		return ret;
+
+	switch (dir) {
+	case IIO_EV_DIR_SINGLETAP:
+		mask = BMA400_S_TAP_MSK;
+		set_mask_bits(&field_value, BMA400_S_TAP_MSK,
+			      FIELD_PREP(BMA400_S_TAP_MSK, state));
+		break;
+	case IIO_EV_DIR_DOUBLETAP:
+		mask = BMA400_D_TAP_MSK;
+		set_mask_bits(&field_value, BMA400_D_TAP_MSK,
+			      FIELD_PREP(BMA400_D_TAP_MSK, state));
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	ret = regmap_update_bits(data->regmap, BMA400_INT_CONFIG1_REG, mask,
+				 field_value);
+	if (ret)
+		return ret;
+
+	set_mask_bits(&data->tap_event_en_bitmask, mask, field_value);
+
+	return 0;
+}
+
+static int bma400_disable_adv_interrupt(struct bma400_data *data)
+{
+	int ret;
+
+	ret = regmap_write(data->regmap, BMA400_INT_CONFIG0_REG, 0);
+	if (ret)
+		return ret;
+
+	ret = regmap_write(data->regmap, BMA400_INT_CONFIG1_REG, 0);
+	if (ret)
+		return ret;
+
+	data->tap_event_en_bitmask = 0;
+	data->generic_event_en = 0;
+	data->step_event_en = false;
+	data->activity_event_en = false;
+
+	return 0;
+}
+
+static int bma400_write_event_config(struct iio_dev *indio_dev,
+				     const struct iio_chan_spec *chan,
+				     enum iio_event_type type,
+				     enum iio_event_direction dir, int state)
+{
+	struct bma400_data *data = iio_priv(indio_dev);
+	int ret;
+
+	switch (chan->type) {
+	case IIO_ACCEL:
+		switch (type) {
+		case IIO_EV_TYPE_MAG:
+			mutex_lock(&data->mutex);
+			ret = bma400_activity_event_en(data, dir, state);
+			mutex_unlock(&data->mutex);
+			return ret;
+		case IIO_EV_TYPE_GESTURE:
+			mutex_lock(&data->mutex);
+			ret = bma400_tap_event_en(data, dir, state);
+			mutex_unlock(&data->mutex);
+			return ret;
+		default:
+			return -EINVAL;
+		}
+	case IIO_STEPS:
+		mutex_lock(&data->mutex);
+		ret = bma400_steps_event_enable(data, state);
+		mutex_unlock(&data->mutex);
+		return ret;
+	case IIO_ACTIVITY:
+		mutex_lock(&data->mutex);
+		if (!data->step_event_en) {
+			ret = bma400_steps_event_enable(data, true);
+			if (ret) {
+				mutex_unlock(&data->mutex);
+				return ret;
+			}
+		}
+		data->activity_event_en = state;
+		mutex_unlock(&data->mutex);
+		return 0;
+	default:
+		return -EINVAL;
+	}
+}
+
+static int get_gen_config_reg(enum iio_event_direction dir)
+{
+	switch (dir) {
+	case IIO_EV_DIR_FALLING:
+		return BMA400_GEN2INT_CONFIG0;
+	case IIO_EV_DIR_RISING:
+		return BMA400_GEN1INT_CONFIG0;
+	default:
+		return -EINVAL;
+	}
+}
+
+static int bma400_read_event_value(struct iio_dev *indio_dev,
+				   const struct iio_chan_spec *chan,
+				   enum iio_event_type type,
+				   enum iio_event_direction dir,
+				   enum iio_event_info info,
+				   int *val, int *val2)
+{
+	struct bma400_data *data = iio_priv(indio_dev);
+	int ret, reg, reg_val, raw;
+
+	if (chan->type != IIO_ACCEL)
+		return -EINVAL;
+
+	switch (type) {
+	case IIO_EV_TYPE_MAG:
+		reg = get_gen_config_reg(dir);
+		if (reg < 0)
+			return -EINVAL;
+
+		*val2 = 0;
+		switch (info) {
+		case IIO_EV_INFO_VALUE:
+			ret = regmap_read(data->regmap,
+					  reg + BMA400_GEN_CONFIG2_OFF,
+					  val);
+			if (ret)
+				return ret;
+			return IIO_VAL_INT;
+		case IIO_EV_INFO_PERIOD:
+			mutex_lock(&data->mutex);
+			ret = regmap_bulk_read(data->regmap,
+					       reg + BMA400_GEN_CONFIG3_OFF,
+					       &data->duration,
+					       sizeof(data->duration));
+			if (ret) {
+				mutex_unlock(&data->mutex);
+				return ret;
+			}
+			*val = be16_to_cpu(data->duration);
+			mutex_unlock(&data->mutex);
+			return IIO_VAL_INT;
+		case IIO_EV_INFO_HYSTERESIS:
+			ret = regmap_read(data->regmap, reg, val);
+			if (ret)
+				return ret;
+			*val = FIELD_GET(BMA400_GEN_HYST_MSK, *val);
+			return IIO_VAL_INT;
+		default:
+			return -EINVAL;
+		}
+	case IIO_EV_TYPE_GESTURE:
+		switch (info) {
+		case IIO_EV_INFO_VALUE:
+			ret = regmap_read(data->regmap, BMA400_TAP_CONFIG,
+					  &reg_val);
+			if (ret)
+				return ret;
+
+			*val = FIELD_GET(BMA400_TAP_SEN_MSK, reg_val);
+			return IIO_VAL_INT;
+		case IIO_EV_INFO_RESET_TIMEOUT:
+			ret = regmap_read(data->regmap, BMA400_TAP_CONFIG1,
+					  &reg_val);
+			if (ret)
+				return ret;
+
+			raw = FIELD_GET(BMA400_TAP_QUIET_MSK, reg_val);
+			*val = 0;
+			*val2 = tap_reset_timeout[raw];
+			return IIO_VAL_INT_PLUS_MICRO;
+		case IIO_EV_INFO_TAP2_MIN_DELAY:
+			ret = regmap_read(data->regmap, BMA400_TAP_CONFIG1,
+					  &reg_val);
+			if (ret)
+				return ret;
+
+			raw = FIELD_GET(BMA400_TAP_QUIETDT_MSK, reg_val);
+			*val = 0;
+			*val2 = double_tap2_min_delay[raw];
+			return IIO_VAL_INT_PLUS_MICRO;
+		default:
+			return -EINVAL;
+		}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+	default:
+		return -EINVAL;
+	}
+}
+
+<<<<<<< HEAD
+=======
 static int bma400_steps_event_enable(struct bma400_data *data, int state)
 {
 	int ret;
@@ -1203,6 +1656,7 @@ static int bma400_read_event_value(struct iio_dev *indio_dev,
 	}
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int bma400_write_event_value(struct iio_dev *indio_dev,
 				    const struct iio_chan_spec *chan,
 				    enum iio_event_type type,
@@ -1211,10 +1665,20 @@ static int bma400_write_event_value(struct iio_dev *indio_dev,
 				    int val, int val2)
 {
 	struct bma400_data *data = iio_priv(indio_dev);
+<<<<<<< HEAD
+	int reg, ret, raw;
+
+	if (chan->type != IIO_ACCEL)
+		return -EINVAL;
+
+	switch (type) {
+	case IIO_EV_TYPE_MAG:
+=======
 	int reg, ret;
 
 	switch (chan->type) {
 	case IIO_ACCEL:
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		reg = get_gen_config_reg(dir);
 		if (reg < 0)
 			return -EINVAL;
@@ -1250,6 +1714,43 @@ static int bma400_write_event_value(struct iio_dev *indio_dev,
 		default:
 			return -EINVAL;
 		}
+<<<<<<< HEAD
+	case IIO_EV_TYPE_GESTURE:
+		switch (info) {
+		case IIO_EV_INFO_VALUE:
+			if (val < 0 || val > 7)
+				return -EINVAL;
+
+			return regmap_update_bits(data->regmap,
+						  BMA400_TAP_CONFIG,
+						  BMA400_TAP_SEN_MSK,
+						  FIELD_PREP(BMA400_TAP_SEN_MSK,
+							     val));
+		case IIO_EV_INFO_RESET_TIMEOUT:
+			raw = usec_to_tapreg_raw(val2, tap_reset_timeout);
+			if (raw < 0)
+				return -EINVAL;
+
+			return regmap_update_bits(data->regmap,
+						  BMA400_TAP_CONFIG1,
+						  BMA400_TAP_QUIET_MSK,
+						  FIELD_PREP(BMA400_TAP_QUIET_MSK,
+							     raw));
+		case IIO_EV_INFO_TAP2_MIN_DELAY:
+			raw = usec_to_tapreg_raw(val2, double_tap2_min_delay);
+			if (raw < 0)
+				return -EINVAL;
+
+			return regmap_update_bits(data->regmap,
+						  BMA400_TAP_CONFIG1,
+						  BMA400_TAP_QUIETDT_MSK,
+						  FIELD_PREP(BMA400_TAP_QUIETDT_MSK,
+							     raw));
+		default:
+			return -EINVAL;
+		}
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	default:
 		return -EINVAL;
 	}
@@ -1289,6 +1790,10 @@ static const struct iio_info bma400_info = {
 	.write_event_config = bma400_write_event_config,
 	.write_event_value = bma400_write_event_value,
 	.read_event_value = bma400_read_event_value,
+<<<<<<< HEAD
+	.event_attrs = &bma400_event_attribute_group,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static const struct iio_trigger_ops bma400_trigger_ops = {
@@ -1352,6 +1857,35 @@ static irqreturn_t bma400_interrupt(int irq, void *private)
 	if (ret || !data->status)
 		goto unlock_err;
 
+<<<<<<< HEAD
+	/*
+	 * Disable all advance interrupts if interrupt engine overrun occurs.
+	 * See section 4.7 "Interrupt engine overrun" in datasheet v1.2.
+	 */
+	if (FIELD_GET(BMA400_INT_ENG_OVRUN_MSK, le16_to_cpu(data->status))) {
+		bma400_disable_adv_interrupt(data);
+		dev_err(data->dev, "Interrupt engine overrun\n");
+		goto unlock_err;
+	}
+
+	if (FIELD_GET(BMA400_INT_S_TAP_MSK, le16_to_cpu(data->status)))
+		iio_push_event(indio_dev,
+			       IIO_MOD_EVENT_CODE(IIO_ACCEL, 0,
+						  IIO_MOD_X_OR_Y_OR_Z,
+						  IIO_EV_TYPE_GESTURE,
+						  IIO_EV_DIR_SINGLETAP),
+			       timestamp);
+
+	if (FIELD_GET(BMA400_INT_D_TAP_MSK, le16_to_cpu(data->status)))
+		iio_push_event(indio_dev,
+			       IIO_MOD_EVENT_CODE(IIO_ACCEL, 0,
+						  IIO_MOD_X_OR_Y_OR_Z,
+						  IIO_EV_TYPE_GESTURE,
+						  IIO_EV_DIR_DOUBLETAP),
+			       timestamp);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (FIELD_GET(BMA400_INT_GEN1_MSK, le16_to_cpu(data->status)))
 		ev_dir = IIO_EV_DIR_RISING;
 
@@ -1469,5 +2003,6 @@ int bma400_probe(struct device *dev, struct regmap *regmap, int irq,
 EXPORT_SYMBOL_NS(bma400_probe, IIO_BMA400);
 
 MODULE_AUTHOR("Dan Robertson <dan@dlrobertson.com>");
+MODULE_AUTHOR("Jagath Jog J <jagathjog1996@gmail.com>");
 MODULE_DESCRIPTION("Bosch BMA400 triaxial acceleration sensor core");
 MODULE_LICENSE("GPL");

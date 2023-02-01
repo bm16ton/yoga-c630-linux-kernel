@@ -1,0 +1,1 @@
+cmd_drivers/bluetooth/btmtkuart.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/bluetooth/btmtkuart.ko drivers/bluetooth/btmtkuart.o drivers/bluetooth/btmtkuart.mod.o;  true

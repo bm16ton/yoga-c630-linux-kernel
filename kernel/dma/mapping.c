@@ -10,6 +10,7 @@
 #include <linux/dma-map-ops.h>
 #include <linux/export.h>
 #include <linux/gfp.h>
+#include <linux/kmsan.h>
 #include <linux/of_device.h>
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
@@ -156,6 +157,10 @@ dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
 		addr = dma_direct_map_page(dev, page, offset, size, dir, attrs);
 	else
 		addr = ops->map_page(dev, page, offset, size, dir, attrs);
+<<<<<<< HEAD
+	kmsan_handle_dma(page, offset, size, dir);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	debug_dma_map_page(dev, page, offset, size, dir, addr, attrs);
 
 	return addr;
@@ -194,11 +199,21 @@ static int __dma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
 	else
 		ents = ops->map_sg(dev, sg, nents, dir, attrs);
 
+<<<<<<< HEAD
+	if (ents > 0) {
+		kmsan_handle_dma_sg(sg, nents, dir);
+		debug_dma_map_sg(dev, sg, nents, ents, dir, attrs);
+	} else if (WARN_ON_ONCE(ents != -EINVAL && ents != -ENOMEM &&
+				ents != -EIO && ents != -EREMOTEIO)) {
+		return -EIO;
+	}
+=======
 	if (ents > 0)
 		debug_dma_map_sg(dev, sg, nents, ents, dir, attrs);
 	else if (WARN_ON_ONCE(ents != -EINVAL && ents != -ENOMEM &&
 			      ents != -EIO && ents != -EREMOTEIO))
 		return -EIO;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ents;
 }

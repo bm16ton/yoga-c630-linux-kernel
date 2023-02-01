@@ -1,0 +1,11 @@
+--- a/Makefile
++++ b/Makefile
+@@ -30,7 +30,7 @@
+ 			echo custom-user; \
+ 		fi)
+ 
+-REGDB_PRIVKEY ?= ~/.wireless-regdb-$(REGDB_AUTHOR).key.priv.pem
++REGDB_PRIVKEY ?= .wireless-regdb-$(REGDB_AUTHOR).key.priv.pem
+ REGDB_PUBKEY ?= $(REGDB_AUTHOR).key.pub.pem
+ REGDB_PUBCERT ?= $(REGDB_AUTHOR).x509.pem
+ 

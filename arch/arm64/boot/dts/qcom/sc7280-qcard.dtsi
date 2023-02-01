@@ -28,6 +28,41 @@
 		bluetooth0 = &bluetooth;
 		serial0 = &uart5;
 		serial1 = &uart7;
+<<<<<<< HEAD
+		wifi0 = &wifi;
+	};
+
+	wcd9385: audio-codec-1 {
+		compatible = "qcom,wcd9385-codec";
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&wcd_reset_n>, <&us_euro_hs_sel>;
+		pinctrl-1 = <&wcd_reset_n_sleep>, <&us_euro_hs_sel>;
+
+		reset-gpios = <&tlmm 83 GPIO_ACTIVE_LOW>;
+		us-euro-gpios = <&tlmm 81 GPIO_ACTIVE_HIGH>;
+
+		qcom,rx-device = <&wcd_rx>;
+		qcom,tx-device = <&wcd_tx>;
+
+		vdd-rxtx-supply = <&vreg_l18b_1p8>;
+		vdd-io-supply = <&vreg_l18b_1p8>;
+		vdd-buck-supply = <&vreg_l17b_1p8>;
+		vdd-mic-bias-supply = <&vreg_bob>;
+
+		qcom,micbias1-microvolt = <1800000>;
+		qcom,micbias2-microvolt = <1800000>;
+		qcom,micbias3-microvolt = <1800000>;
+		qcom,micbias4-microvolt = <1800000>;
+
+		qcom,mbhc-buttons-vthreshold-microvolt = <75000 150000 237000 500000 500000
+							  500000 500000 500000>;
+		qcom,mbhc-headset-vthreshold-microvolt = <1700000>;
+		qcom,mbhc-headphone-vthreshold-microvolt = <50000>;
+		#sound-dai-cells = <1>;
+
+		status = "disabled";
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 
 	pm8350c_pwm_backlight: backlight {
@@ -309,6 +344,13 @@
 	modem-init;
 };
 
+<<<<<<< HEAD
+&lpass_va_macro {
+	vdd-micb-supply = <&vreg_bob>;
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* NOTE: Not all Qcards have eDP connector stuffed */
 &mdss_edp {
 	aux-bus {
@@ -378,6 +420,27 @@
 	no-sdio;
 };
 
+<<<<<<< HEAD
+&swr0 {
+	wcd_rx: codec@0,4 {
+		compatible = "sdw20217010d00";
+		reg = <0 4>;
+		#sound-dai-cells = <1>;
+		qcom,rx-port-mapping = <1 2 3 4 5>;
+	};
+};
+
+&swr1 {
+	wcd_tx: codec@0,3 {
+		compatible = "sdw20217010d00";
+		reg = <0 3>;
+		#sound-dai-cells = <1>;
+		qcom,tx-port-mapping = <1 2 3 4>;
+	};
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 uart_dbg: &uart5 {
 	compatible = "qcom,geni-debug-uart";
 	status = "okay";
@@ -541,7 +604,11 @@ mos_bt_uart: &uart7 {
 };
 
 &tlmm {
+<<<<<<< HEAD
+	mos_bt_en: mos-bt-en-pins {
+=======
 	mos_bt_en: mos-bt-en {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio85";
 		function = "gpio";
 		drive-strength = <2>;
@@ -549,7 +616,11 @@ mos_bt_uart: &uart7 {
 	};
 
 	/* For mos_bt_uart */
+<<<<<<< HEAD
+	qup_uart7_sleep_cts: qup-uart7-sleep-cts-pins {
+=======
 	qup_uart7_sleep_cts: qup-uart7-sleep-cts {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio28";
 		function = "gpio";
 		/*
@@ -563,7 +634,11 @@ mos_bt_uart: &uart7 {
 	};
 
 	/* For mos_bt_uart */
+<<<<<<< HEAD
+	qup_uart7_sleep_rts: qup-uart7-sleep-rts-pins {
+=======
 	qup_uart7_sleep_rts: qup-uart7-sleep-rts {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio29";
 		function = "gpio";
 		/*
@@ -576,7 +651,11 @@ mos_bt_uart: &uart7 {
 	};
 
 	/* For mos_bt_uart */
+<<<<<<< HEAD
+	qup_uart7_sleep_rx: qup-uart7-sleep-rx-pins {
+=======
 	qup_uart7_sleep_rx: qup-uart7-sleep-rx {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio31";
 		function = "gpio";
 		/*
@@ -588,7 +667,11 @@ mos_bt_uart: &uart7 {
 	};
 
 	/* For mos_bt_uart */
+<<<<<<< HEAD
+	qup_uart7_sleep_tx: qup-uart7-sleep-tx-pins {
+=======
 	qup_uart7_sleep_tx: qup-uart7-sleep-tx {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio30";
 		function = "gpio";
 		/*
@@ -598,15 +681,46 @@ mos_bt_uart: &uart7 {
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	ts_int_conn: ts-int-conn-pins {
+=======
 	ts_int_conn: ts-int-conn {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio55";
 		function = "gpio";
 		bias-pull-up;
 	};
 
+<<<<<<< HEAD
+	ts_rst_conn: ts-rst-conn-pins {
+=======
 	ts_rst_conn: ts-rst-conn {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		pins = "gpio54";
 		function = "gpio";
 		drive-strength = <2>;
 	};
+<<<<<<< HEAD
+
+	us_euro_hs_sel: us-euro-hs-sel {
+		pins = "gpio81";
+		function = "gpio";
+		bias-pull-down;
+		drive-strength = <2>;
+	};
+
+	wcd_reset_n: wcd-reset-n {
+		pins = "gpio83";
+		function = "gpio";
+		drive-strength = <8>;
+	};
+
+	wcd_reset_n_sleep: wcd-reset-n-sleep {
+		pins = "gpio83";
+		function = "gpio";
+		drive-strength = <8>;
+		bias-disable;
+	};
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };

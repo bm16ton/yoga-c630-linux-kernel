@@ -19,6 +19,12 @@ static int alloc_from_simple_generic_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+	phys_addr_t size = SZ_16;
+	phys_addr_t min_addr;
+
+	PREFIX_PUSH();
+=======
 	char *b;
 
 	PREFIX_PUSH();
@@ -26,15 +32,22 @@ static int alloc_from_simple_generic_check(void)
 	phys_addr_t size = SZ_16;
 	phys_addr_t min_addr;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	min_addr = memblock_end_of_DRAM() - SMP_CACHE_BYTES;
 
 	allocated_ptr = memblock_alloc_from(size, SMP_CACHE_BYTES, min_addr);
+<<<<<<< HEAD
+
+	ASSERT_NE(allocated_ptr, NULL);
+	ASSERT_MEM_EQ(allocated_ptr, 0, size);
+=======
 	b = (char *)allocated_ptr;
 
 	ASSERT_NE(allocated_ptr, NULL);
 	ASSERT_EQ(*b, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ASSERT_EQ(rgn->size, size);
 	ASSERT_EQ(rgn->base, min_addr);
@@ -66,6 +79,12 @@ static int alloc_from_misaligned_generic_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+	phys_addr_t size = SZ_32;
+	phys_addr_t min_addr;
+
+	PREFIX_PUSH();
+=======
 	char *b;
 
 	PREFIX_PUSH();
@@ -73,16 +92,23 @@ static int alloc_from_misaligned_generic_check(void)
 	phys_addr_t size = SZ_32;
 	phys_addr_t min_addr;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	/* A misaligned address */
 	min_addr = memblock_end_of_DRAM() - (SMP_CACHE_BYTES * 2 - 1);
 
 	allocated_ptr = memblock_alloc_from(size, SMP_CACHE_BYTES, min_addr);
+<<<<<<< HEAD
+
+	ASSERT_NE(allocated_ptr, NULL);
+	ASSERT_MEM_EQ(allocated_ptr, 0, size);
+=======
 	b = (char *)allocated_ptr;
 
 	ASSERT_NE(allocated_ptr, NULL);
 	ASSERT_EQ(*b, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ASSERT_EQ(rgn->size, size);
 	ASSERT_EQ(rgn->base, memblock_end_of_DRAM() - SMP_CACHE_BYTES);
@@ -117,12 +143,19 @@ static int alloc_from_top_down_high_addr_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+	phys_addr_t size = SZ_32;
+	phys_addr_t min_addr;
+
+	PREFIX_PUSH();
+=======
 
 	PREFIX_PUSH();
 
 	phys_addr_t size = SZ_32;
 	phys_addr_t min_addr;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	/* The address is too close to the end of the memory */
@@ -162,14 +195,21 @@ static int alloc_from_top_down_no_space_above_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+=======
 
 	PREFIX_PUSH();
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t r1_size = SZ_64;
 	phys_addr_t r2_size = SZ_2;
 	phys_addr_t total_size = r1_size + r2_size;
 	phys_addr_t min_addr;
 
+<<<<<<< HEAD
+	PREFIX_PUSH();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	min_addr = memblock_end_of_DRAM() - SMP_CACHE_BYTES * 2;
@@ -201,13 +241,20 @@ static int alloc_from_top_down_min_addr_cap_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+=======
 
 	PREFIX_PUSH();
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t r1_size = SZ_64;
 	phys_addr_t min_addr;
 	phys_addr_t start_addr;
 
+<<<<<<< HEAD
+	PREFIX_PUSH();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	start_addr = (phys_addr_t)memblock_start_of_DRAM();
@@ -249,12 +296,19 @@ static int alloc_from_bottom_up_high_addr_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+	phys_addr_t size = SZ_32;
+	phys_addr_t min_addr;
+
+	PREFIX_PUSH();
+=======
 
 	PREFIX_PUSH();
 
 	phys_addr_t size = SZ_32;
 	phys_addr_t min_addr;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	/* The address is too close to the end of the memory */
@@ -293,13 +347,20 @@ static int alloc_from_bottom_up_no_space_above_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+=======
 
 	PREFIX_PUSH();
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t r1_size = SZ_64;
 	phys_addr_t min_addr;
 	phys_addr_t r2_size;
 
+<<<<<<< HEAD
+	PREFIX_PUSH();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	min_addr = memblock_start_of_DRAM() + SZ_128;
@@ -331,13 +392,20 @@ static int alloc_from_bottom_up_min_addr_cap_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
+<<<<<<< HEAD
+=======
 
 	PREFIX_PUSH();
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	phys_addr_t r1_size = SZ_64;
 	phys_addr_t min_addr;
 	phys_addr_t start_addr;
 
+<<<<<<< HEAD
+	PREFIX_PUSH();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	setup_memblock();
 
 	start_addr = (phys_addr_t)memblock_start_of_DRAM();
@@ -361,10 +429,15 @@ static int alloc_from_bottom_up_min_addr_cap_check(void)
 static int alloc_from_simple_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
+<<<<<<< HEAD
+	run_top_down(alloc_from_simple_generic_check);
+	run_bottom_up(alloc_from_simple_generic_check);
+=======
 	memblock_set_bottom_up(false);
 	alloc_from_simple_generic_check();
 	memblock_set_bottom_up(true);
 	alloc_from_simple_generic_check();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -372,10 +445,15 @@ static int alloc_from_simple_check(void)
 static int alloc_from_misaligned_check(void)
 {
 	test_print("\tRunning %s...\n", __func__);
+<<<<<<< HEAD
+	run_top_down(alloc_from_misaligned_generic_check);
+	run_bottom_up(alloc_from_misaligned_generic_check);
+=======
 	memblock_set_bottom_up(false);
 	alloc_from_misaligned_generic_check();
 	memblock_set_bottom_up(true);
 	alloc_from_misaligned_generic_check();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

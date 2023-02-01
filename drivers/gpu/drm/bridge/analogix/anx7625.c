@@ -1369,6 +1369,7 @@ static void anx7625_power_on_init(struct anx7625_data *ctx)
 static void anx7625_init_gpio(struct anx7625_data *platform)
 {
 	struct device *dev = &platform->client->dev;
+<<<<<<< HEAD
 
 	DRM_DEV_DEBUG_DRIVER(dev, "init gpio\n");
 
@@ -1380,6 +1381,19 @@ static void anx7625_init_gpio(struct anx7625_data *platform)
 		platform->pdata.gpio_p_on = NULL;
 	}
 
+=======
+
+	DRM_DEV_DEBUG_DRIVER(dev, "init gpio\n");
+
+	/* Gpio for chip power enable */
+	platform->pdata.gpio_p_on =
+		devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
+	if (IS_ERR_OR_NULL(platform->pdata.gpio_p_on)) {
+		DRM_DEV_DEBUG_DRIVER(dev, "no enable gpio found\n");
+		platform->pdata.gpio_p_on = NULL;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Gpio for chip reset */
 	platform->pdata.gpio_reset =
 		devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
@@ -1440,6 +1454,20 @@ static void anx7625_start_dp_work(struct anx7625_data *ctx)
 
 static int anx7625_read_hpd_status_p0(struct anx7625_data *ctx)
 {
+	int ret;
+
+	/* Set irq detect window to 2ms */
+	ret = anx7625_reg_write(ctx, ctx->i2c.tx_p2_client,
+				HPD_DET_TIMER_BIT0_7, HPD_TIME & 0xFF);
+	ret |= anx7625_reg_write(ctx, ctx->i2c.tx_p2_client,
+				 HPD_DET_TIMER_BIT8_15,
+				 (HPD_TIME >> 8) & 0xFF);
+	ret |= anx7625_reg_write(ctx, ctx->i2c.tx_p2_client,
+				 HPD_DET_TIMER_BIT16_23,
+				 (HPD_TIME >> 16) & 0xFF);
+	if (ret < 0)
+		return ret;
+
 	return anx7625_reg_read(ctx, ctx->i2c.rx_p0_client, SYSTEM_STSTUS);
 }
 
@@ -1638,9 +1666,15 @@ static int anx7625_parse_dt(struct device *dev,
 {
 	struct device_node *np = dev->of_node, *ep0;
 	int bus_type, mipi_lanes;
+<<<<<<< HEAD
 
 	anx7625_get_swing_setting(dev, pdata);
 
+=======
+
+	anx7625_get_swing_setting(dev, pdata);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pdata->is_dpi = 0; /* default dsi mode */
 	of_node_put(pdata->mipi_host_node);
 	pdata->mipi_host_node = of_graph_get_remote_node(np, 0, 0);
@@ -1781,10 +1815,17 @@ static enum drm_connector_status anx7625_sink_detect(struct anx7625_data *ctx)
 	struct device *dev = &ctx->client->dev;
 
 	DRM_DEV_DEBUG_DRIVER(dev, "sink detect\n");
+<<<<<<< HEAD
 
 	if (ctx->pdata.panel_bridge)
 		return connector_status_connected;
 
+=======
+
+	if (ctx->pdata.panel_bridge)
+		return connector_status_connected;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ctx->hpd_status ? connector_status_connected :
 				     connector_status_disconnected;
 }
@@ -1797,8 +1838,18 @@ static int anx7625_audio_hw_params(struct device *dev, void *data,
 	int wl, ch, rate;
 	int ret = 0;
 
+<<<<<<< HEAD
+	if (anx7625_sink_detect(ctx) == connector_status_disconnected) {
+		DRM_DEV_DEBUG_DRIVER(dev, "DP not connected\n");
+		return 0;
+	}
+
+	if (fmt->fmt != HDMI_DSP_A && fmt->fmt != HDMI_I2S) {
+		DRM_DEV_ERROR(dev, "only supports DSP_A & I2S\n");
+=======
 	if (fmt->fmt != HDMI_DSP_A) {
 		DRM_DEV_ERROR(dev, "only supports DSP_A\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 	}
 
@@ -1806,10 +1857,23 @@ static int anx7625_audio_hw_params(struct device *dev, void *data,
 			     params->sample_rate, params->sample_width,
 			     params->cea.channels);
 
+<<<<<<< HEAD
+	if (fmt->fmt == HDMI_DSP_A)
+		ret = anx7625_write_and_or(ctx, ctx->i2c.tx_p2_client,
+					   AUDIO_CHANNEL_STATUS_6,
+					   ~I2S_SLAVE_MODE,
+					   TDM_SLAVE_MODE);
+	else
+		ret = anx7625_write_and_or(ctx, ctx->i2c.tx_p2_client,
+					   AUDIO_CHANNEL_STATUS_6,
+					   ~TDM_SLAVE_MODE,
+					   I2S_SLAVE_MODE);
+=======
 	ret |= anx7625_write_and_or(ctx, ctx->i2c.tx_p2_client,
 				    AUDIO_CHANNEL_STATUS_6,
 				    ~I2S_SLAVE_MODE,
 				    TDM_SLAVE_MODE);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Word length */
 	switch (params->sample_width) {
@@ -2071,6 +2135,7 @@ static void hdcp_check_work_func(struct work_struct *work)
 		dev_err(dev, "HDCP connector is null!");
 		return;
 	}
+<<<<<<< HEAD
 
 	drm_dev = ctx->connector->dev;
 	drm_modeset_lock(&drm_dev->mode_config.connection_mutex, NULL);
@@ -2129,6 +2194,66 @@ static int anx7625_connector_atomic_check(struct anx7625_data *ctx,
 		return -EINVAL;
 	}
 
+=======
+
+	drm_dev = ctx->connector->dev;
+	drm_modeset_lock(&drm_dev->mode_config.connection_mutex, NULL);
+	mutex_lock(&ctx->hdcp_wq_lock);
+
+	status = anx7625_reg_read(ctx, ctx->i2c.tx_p0_client, 0);
+	dev_dbg(dev, "sink HDCP status check: %.02x\n", status);
+	if (status & BIT(1)) {
+		ctx->hdcp_cp = DRM_MODE_CONTENT_PROTECTION_ENABLED;
+		drm_hdcp_update_content_protection(ctx->connector,
+						   ctx->hdcp_cp);
+		dev_dbg(dev, "update CP to ENABLE\n");
+	}
+
+	mutex_unlock(&ctx->hdcp_wq_lock);
+	drm_modeset_unlock(&drm_dev->mode_config.connection_mutex);
+}
+
+static int anx7625_connector_atomic_check(struct anx7625_data *ctx,
+					  struct drm_connector_state *state)
+{
+	struct device *dev = &ctx->client->dev;
+	int cp;
+
+	dev_dbg(dev, "hdcp state check\n");
+	cp = state->content_protection;
+
+	if (cp == ctx->hdcp_cp)
+		return 0;
+
+	if (cp == DRM_MODE_CONTENT_PROTECTION_DESIRED) {
+		if (ctx->dp_en) {
+			dev_dbg(dev, "enable HDCP\n");
+			anx7625_hdcp_enable(ctx);
+
+			queue_delayed_work(ctx->hdcp_workqueue,
+					   &ctx->hdcp_work,
+					   msecs_to_jiffies(2000));
+		}
+	}
+
+	if (cp == DRM_MODE_CONTENT_PROTECTION_UNDESIRED) {
+		if (ctx->hdcp_cp != DRM_MODE_CONTENT_PROTECTION_ENABLED) {
+			dev_err(dev, "current CP is not ENABLED\n");
+			return -EINVAL;
+		}
+		anx7625_hdcp_disable(ctx);
+		ctx->hdcp_cp = DRM_MODE_CONTENT_PROTECTION_UNDESIRED;
+		drm_hdcp_update_content_protection(ctx->connector,
+						   ctx->hdcp_cp);
+		dev_dbg(dev, "update CP to UNDESIRE\n");
+	}
+
+	if (cp == DRM_MODE_CONTENT_PROTECTION_ENABLED) {
+		dev_err(dev, "Userspace illegal set to PROTECTION ENABLE\n");
+		return -EINVAL;
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -2364,10 +2489,29 @@ static int anx7625_bridge_atomic_check(struct drm_bridge *bridge,
 				       struct drm_bridge_state *bridge_state,
 				       struct drm_crtc_state *crtc_state,
 				       struct drm_connector_state *conn_state)
+<<<<<<< HEAD
+=======
 {
 	struct anx7625_data *ctx = bridge_to_anx7625(bridge);
 	struct device *dev = &ctx->client->dev;
 
+	dev_dbg(dev, "drm bridge atomic check\n");
+
+	anx7625_bridge_mode_fixup(bridge, &crtc_state->mode,
+				  &crtc_state->adjusted_mode);
+
+	return anx7625_connector_atomic_check(ctx, conn_state);
+}
+
+static void anx7625_bridge_atomic_enable(struct drm_bridge *bridge,
+					 struct drm_bridge_state *state)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
+{
+	struct anx7625_data *ctx = bridge_to_anx7625(bridge);
+	struct device *dev = &ctx->client->dev;
+	struct drm_connector *connector;
+
+<<<<<<< HEAD
 	dev_dbg(dev, "drm bridge atomic check\n");
 
 	anx7625_bridge_mode_fixup(bridge, &crtc_state->mode,
@@ -2387,6 +2531,18 @@ static void anx7625_bridge_atomic_enable(struct drm_bridge *bridge,
 
 	if (!bridge->encoder) {
 		dev_err(dev, "Parent encoder object not found");
+=======
+	dev_dbg(dev, "drm atomic enable\n");
+
+	if (!bridge->encoder) {
+		dev_err(dev, "Parent encoder object not found");
+		return;
+	}
+
+	connector = drm_atomic_get_new_connector_for_encoder(state->base.state,
+							     bridge->encoder);
+	if (!connector)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return;
 	}
 
@@ -2394,6 +2550,11 @@ static void anx7625_bridge_atomic_enable(struct drm_bridge *bridge,
 							     bridge->encoder);
 	if (!connector)
 		return;
+
+	ctx->connector = connector;
+
+	pm_runtime_get_sync(dev);
+	_anx7625_hpd_polling(ctx, 5000 * 100);
 
 	ctx->connector = connector;
 
@@ -2510,6 +2671,7 @@ static int __maybe_unused anx7625_runtime_pm_suspend(struct device *dev)
 
 	return 0;
 }
+<<<<<<< HEAD
 
 static int __maybe_unused anx7625_runtime_pm_resume(struct device *dev)
 {
@@ -2521,6 +2683,19 @@ static int __maybe_unused anx7625_runtime_pm_resume(struct device *dev)
 
 	mutex_unlock(&ctx->lock);
 
+=======
+
+static int __maybe_unused anx7625_runtime_pm_resume(struct device *dev)
+{
+	struct anx7625_data *ctx = dev_get_drvdata(dev);
+
+	mutex_lock(&ctx->lock);
+
+	anx7625_power_on_init(ctx);
+
+	mutex_unlock(&ctx->lock);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -2690,7 +2865,7 @@ free_hdcp_wq:
 	return ret;
 }
 
-static int anx7625_i2c_remove(struct i2c_client *client)
+static void anx7625_i2c_remove(struct i2c_client *client)
 {
 	struct anx7625_data *platform = i2c_get_clientdata(client);
 
@@ -2707,11 +2882,17 @@ static int anx7625_i2c_remove(struct i2c_client *client)
 
 	if (!platform->pdata.low_power_mode)
 		pm_runtime_put_sync_suspend(&client->dev);
+<<<<<<< HEAD
+
+	if (platform->pdata.audio_en)
+		anx7625_unregister_audio(platform);
+=======
 
 	if (platform->pdata.audio_en)
 		anx7625_unregister_audio(platform);
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id anx7625_id[] = {

@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/sdhci_f_sdh30.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/sdhci_f_sdh30.ko drivers/mmc/host/sdhci_f_sdh30.o drivers/mmc/host/sdhci_f_sdh30.mod.o;  true

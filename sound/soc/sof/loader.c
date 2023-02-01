@@ -11,6 +11,11 @@
 //
 
 #include <linux/firmware.h>
+<<<<<<< HEAD
+#include "sof-priv.h"
+#include "ops.h"
+
+=======
 #include <sound/sof.h>
 #include <sound/sof/ext_manifest.h>
 #include "sof-priv.h"
@@ -695,6 +700,7 @@ static int load_modules(struct snd_sof_dev *sdev, const struct firmware *fw,
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int snd_sof_load_firmware_raw(struct snd_sof_dev *sdev)
 {
 	struct snd_sof_pdata *plat_data = sdev->pdata;
@@ -726,7 +732,7 @@ int snd_sof_load_firmware_raw(struct snd_sof_dev *sdev)
 	}
 
 	/* check for extended manifest */
-	ext_man_size = snd_sof_fw_ext_man_parse(sdev, plat_data->fw);
+	ext_man_size = sdev->ipc->ops->fw_loader->parse_ext_manifest(sdev);
 	if (ext_man_size > 0) {
 		/* when no error occurred, drop extended manifest */
 		plat_data->fw_offset = ext_man_size;
@@ -756,7 +762,7 @@ int snd_sof_load_firmware_memcpy(struct snd_sof_dev *sdev)
 		return ret;
 
 	/* make sure the FW header and file is valid */
-	ret = check_header(sdev, plat_data->fw, plat_data->fw_offset);
+	ret = sdev->ipc->ops->fw_loader->validate(sdev);
 	if (ret < 0) {
 		dev_err(sdev->dev, "error: invalid FW header\n");
 		goto error;
@@ -770,10 +776,12 @@ int snd_sof_load_firmware_memcpy(struct snd_sof_dev *sdev)
 	}
 
 	/* parse and load firmware modules to DSP */
-	ret = load_modules(sdev, plat_data->fw, plat_data->fw_offset);
-	if (ret < 0) {
-		dev_err(sdev->dev, "error: invalid FW modules\n");
-		goto error;
+	if (sdev->ipc->ops->fw_loader->load_fw_to_dsp) {
+		ret = sdev->ipc->ops->fw_loader->load_fw_to_dsp(sdev);
+		if (ret < 0) {
+			dev_err(sdev->dev, "Firmware loading failed\n");
+			goto error;
+		}
 	}
 
 	return 0;
@@ -853,6 +861,12 @@ int snd_sof_run_firmware(struct snd_sof_dev *sdev)
 
 	dev_dbg(sdev->dev, "firmware boot complete\n");
 	sof_set_fw_state(sdev, SOF_FW_BOOT_COMPLETE);
+<<<<<<< HEAD
+
+	if (sdev->first_boot && sdev->ipc->ops->fw_loader->query_fw_configuration)
+		return sdev->ipc->ops->fw_loader->query_fw_configuration(sdev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }

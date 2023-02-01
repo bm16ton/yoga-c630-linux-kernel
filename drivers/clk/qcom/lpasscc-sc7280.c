@@ -17,6 +17,8 @@
 #include "clk-branch.h"
 #include "common.h"
 
+<<<<<<< HEAD
+=======
 static struct clk_branch lpass_q6ss_ahbm_clk = {
 	.halt_reg = 0x1c,
 	.halt_check = BRANCH_HALT,
@@ -43,6 +45,7 @@ static struct clk_branch lpass_q6ss_ahbs_clk = {
 	},
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct clk_branch lpass_top_cc_lpi_q6_axim_hs_clk = {
 	.halt_reg = 0x0,
 	.halt_check = BRANCH_HALT,
@@ -105,6 +108,8 @@ static struct regmap_config lpass_regmap_config = {
 	.fast_io	= true,
 };
 
+<<<<<<< HEAD
+=======
 static struct clk_regmap *lpass_cc_sc7280_clocks[] = {
 	[LPASS_Q6SS_AHBM_CLK] = &lpass_q6ss_ahbm_clk.clkr,
 	[LPASS_Q6SS_AHBS_CLK] = &lpass_q6ss_ahbs_clk.clkr,
@@ -116,6 +121,7 @@ static const struct qcom_cc_desc lpass_cc_sc7280_desc = {
 	.num_clks = ARRAY_SIZE(lpass_cc_sc7280_clocks),
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static struct clk_regmap *lpass_cc_top_sc7280_clocks[] = {
 	[LPASS_TOP_CC_LPI_Q6_AXIM_HS_CLK] =
 				&lpass_top_cc_lpi_q6_axim_hs_clk.clkr,
@@ -169,6 +175,8 @@ static int lpass_cc_sc7280_probe(struct platform_device *pdev)
 	if (ret)
 		goto destroy_pm_clk;
 
+<<<<<<< HEAD
+=======
 	lpass_regmap_config.name = "cc";
 	desc = &lpass_cc_sc7280_desc;
 
@@ -176,6 +184,7 @@ static int lpass_cc_sc7280_probe(struct platform_device *pdev)
 	if (ret)
 		goto destroy_pm_clk;
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 
 destroy_pm_clk:

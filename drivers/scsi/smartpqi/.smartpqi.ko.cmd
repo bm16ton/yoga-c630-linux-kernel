@@ -1,0 +1,1 @@
+cmd_drivers/scsi/smartpqi/smartpqi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/smartpqi/smartpqi.ko drivers/scsi/smartpqi/smartpqi.o drivers/scsi/smartpqi/smartpqi.mod.o;  true

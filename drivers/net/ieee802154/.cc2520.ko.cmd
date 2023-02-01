@@ -1,0 +1,1 @@
+cmd_drivers/net/ieee802154/cc2520.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ieee802154/cc2520.ko drivers/net/ieee802154/cc2520.o drivers/net/ieee802154/cc2520.mod.o;  true

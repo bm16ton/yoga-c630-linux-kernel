@@ -238,7 +238,7 @@ static void dm_done(struct request *clone, blk_status_t error, bool mapped)
 		dm_requeue_original_request(tio, true);
 		break;
 	default:
-		DMWARN("unimplemented target endio return value: %d", r);
+		DMCRIT("unimplemented target endio return value: %d", r);
 		BUG();
 	}
 }
@@ -292,11 +292,16 @@ static void dm_kill_unmapped_request(struct request *rq, blk_status_t error)
 	dm_complete_request(rq, error);
 }
 
-static void end_clone_request(struct request *clone, blk_status_t error)
+static enum rq_end_io_ret end_clone_request(struct request *clone,
+					    blk_status_t error)
 {
 	struct dm_rq_target_io *tio = clone->end_io_data;
 
 	dm_complete_request(tio->orig, error);
+<<<<<<< HEAD
+	return RQ_END_IO_NONE;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int dm_rq_bio_constructor(struct bio *bio, struct bio *bio_orig,
@@ -407,7 +412,7 @@ static int map_request(struct dm_rq_target_io *tio)
 		dm_kill_unmapped_request(rq, BLK_STS_IOERR);
 		break;
 	default:
-		DMWARN("unimplemented target map return value: %d", r);
+		DMCRIT("unimplemented target map return value: %d", r);
 		BUG();
 	}
 

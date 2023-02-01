@@ -99,7 +99,11 @@ SYM_CODE_START(primary_entry)
 	 */
 #if VA_BITS > 48
 	mrs_s	x0, SYS_ID_AA64MMFR2_EL1
+<<<<<<< HEAD
+	tst	x0, #0xf << ID_AA64MMFR2_EL1_VARange_SHIFT
+=======
 	tst	x0, #0xf << ID_AA64MMFR2_LVA_SHIFT
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	mov	x0, #VA_BITS
 	mov	x25, #VA_BITS_MIN
 	csel	x25, x25, x0, eq
@@ -658,10 +662,17 @@ SYM_FUNC_END(__secondary_too_slow)
  */
 SYM_FUNC_START(__enable_mmu)
 	mrs	x3, ID_AA64MMFR0_EL1
+<<<<<<< HEAD
+	ubfx	x3, x3, #ID_AA64MMFR0_EL1_TGRAN_SHIFT, 4
+	cmp     x3, #ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MIN
+	b.lt    __no_granule_support
+	cmp     x3, #ID_AA64MMFR0_EL1_TGRAN_SUPPORTED_MAX
+=======
 	ubfx	x3, x3, #ID_AA64MMFR0_TGRAN_SHIFT, 4
 	cmp     x3, #ID_AA64MMFR0_TGRAN_SUPPORTED_MIN
 	b.lt    __no_granule_support
 	cmp     x3, #ID_AA64MMFR0_TGRAN_SUPPORTED_MAX
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	b.gt    __no_granule_support
 	phys_to_ttbr x2, x2
 	msr	ttbr0_el1, x2			// load TTBR0
@@ -679,7 +690,7 @@ SYM_FUNC_START(__cpu_secondary_check52bitva)
 	b.ne	2f
 
 	mrs_s	x0, SYS_ID_AA64MMFR2_EL1
-	and	x0, x0, #(0xf << ID_AA64MMFR2_LVA_SHIFT)
+	and	x0, x0, #(0xf << ID_AA64MMFR2_EL1_VARange_SHIFT)
 	cbnz	x0, 2f
 
 	update_early_cpu_boot_status \

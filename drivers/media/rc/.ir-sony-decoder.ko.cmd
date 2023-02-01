@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/ir-sony-decoder.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/ir-sony-decoder.ko drivers/media/rc/ir-sony-decoder.o drivers/media/rc/ir-sony-decoder.mod.o;  true

@@ -264,6 +264,10 @@ static struct snd_soc_dai_driver tegra20_spdif_dai = {
 
 static const struct snd_soc_component_driver tegra20_spdif_component = {
 	.name = "tegra20-spdif",
+<<<<<<< HEAD
+	.legacy_dai_naming = 1,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static bool tegra20_spdif_wr_rd_reg(struct device *dev, unsigned int reg)

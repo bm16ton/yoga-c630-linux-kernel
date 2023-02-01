@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/cavium/liquidio/liquidio.o := ld  -EL  -maarch64elf -z noexecstack     -r -o drivers/net/ethernet/cavium/liquidio/liquidio.o @drivers/net/ethernet/cavium/liquidio/liquidio.mod 

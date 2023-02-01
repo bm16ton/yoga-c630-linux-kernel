@@ -15,6 +15,8 @@
  * Hardware interface for audio DSP on Apollolake and GeminiLake
  */
 
+#include <sound/sof/ext_manifest4.h>
+#include "../ipc4-priv.h"
 #include "../sof-priv.h"
 #include "hda.h"
 #include "../sof-audio.h"
@@ -26,6 +28,58 @@ static const struct snd_sof_debugfs_map apl_dsp_debugfs[] = {
 };
 
 /* apollolake ops */
+<<<<<<< HEAD
+struct snd_sof_dsp_ops sof_apl_ops;
+EXPORT_SYMBOL_NS(sof_apl_ops, SND_SOC_SOF_INTEL_HDA_COMMON);
+
+int sof_apl_ops_init(struct snd_sof_dev *sdev)
+{
+	/* common defaults */
+	memcpy(&sof_apl_ops, &sof_hda_common_ops, sizeof(struct snd_sof_dsp_ops));
+
+	/* probe/remove/shutdown */
+	sof_apl_ops.shutdown	= hda_dsp_shutdown;
+
+	if (sdev->pdata->ipc_type == SOF_IPC) {
+		/* doorbell */
+		sof_apl_ops.irq_thread	= hda_dsp_ipc_irq_thread;
+
+		/* ipc */
+		sof_apl_ops.send_msg	= hda_dsp_ipc_send_msg;
+
+		/* debug */
+		sof_apl_ops.ipc_dump	= hda_ipc_dump;
+	}
+
+	if (sdev->pdata->ipc_type == SOF_INTEL_IPC4) {
+		struct sof_ipc4_fw_data *ipc4_data;
+
+		sdev->private = devm_kzalloc(sdev->dev, sizeof(*ipc4_data), GFP_KERNEL);
+		if (!sdev->private)
+			return -ENOMEM;
+
+		ipc4_data = sdev->private;
+		ipc4_data->manifest_fw_hdr_offset = SOF_MAN4_FW_HDR_OFFSET;
+
+		ipc4_data->mtrace_type = SOF_IPC4_MTRACE_INTEL_CAVS_1_5;
+
+		/* doorbell */
+		sof_apl_ops.irq_thread	= hda_dsp_ipc4_irq_thread;
+
+		/* ipc */
+		sof_apl_ops.send_msg	= hda_dsp_ipc4_send_msg;
+
+		/* debug */
+		sof_apl_ops.ipc_dump	= hda_ipc4_dump;
+	}
+
+	/* set DAI driver ops */
+	hda_set_dai_drv_ops(sdev, &sof_apl_ops);
+
+	/* debug */
+	sof_apl_ops.debug_map	= apl_dsp_debugfs;
+	sof_apl_ops.debug_map_count	= ARRAY_SIZE(apl_dsp_debugfs);
+=======
 const struct snd_sof_dsp_ops sof_apl_ops = {
 	/* probe/remove/shutdown */
 	.probe		= hda_dsp_probe,
@@ -82,11 +136,20 @@ const struct snd_sof_dsp_ops sof_apl_ops = {
 
 	/* firmware loading */
 	.load_firmware = snd_sof_load_firmware_raw,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* firmware run */
-	.run = hda_dsp_cl_boot_firmware,
+	sof_apl_ops.run = hda_dsp_cl_boot_firmware;
 
 	/* pre/post fw run */
+<<<<<<< HEAD
+	sof_apl_ops.post_fw_run = hda_dsp_post_fw_run;
+
+	/* dsp core get/put */
+	sof_apl_ops.core_get = hda_dsp_core_get;
+
+	return 0;
+=======
 	.pre_fw_run = hda_dsp_pre_fw_run,
 	.post_fw_run = hda_dsp_post_fw_run,
 
@@ -126,8 +189,9 @@ const struct snd_sof_dsp_ops sof_apl_ops = {
 			SNDRV_PCM_INFO_NO_PERIOD_WAKEUP,
 
 	.dsp_arch_ops = &sof_xtensa_arch_ops,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
-EXPORT_SYMBOL_NS(sof_apl_ops, SND_SOC_SOF_INTEL_HDA_COMMON);
+EXPORT_SYMBOL_NS(sof_apl_ops_init, SND_SOC_SOF_INTEL_HDA_COMMON);
 
 const struct sof_intel_dsp_desc apl_chip_info = {
 	/* Apollolake */
@@ -139,9 +203,18 @@ const struct sof_intel_dsp_desc apl_chip_info = {
 	.ipc_ack = HDA_DSP_REG_HIPCIE,
 	.ipc_ack_mask = HDA_DSP_REG_HIPCIE_DONE,
 	.ipc_ctl = HDA_DSP_REG_HIPCCTL,
+	.rom_status_reg = HDA_DSP_SRAM_REG_ROM_STATUS,
 	.rom_init_timeout	= 150,
 	.ssp_count = APL_SSP_COUNT,
 	.ssp_base_offset = APL_SSP_BASE_OFFSET,
 	.quirks = SOF_INTEL_PROCEN_FMT_QUIRK,
+<<<<<<< HEAD
+	.check_ipc_irq	= hda_dsp_check_ipc_irq,
+	.cl_init = cl_dsp_init,
+	.power_down_dsp = hda_power_down_dsp,
+	.disable_interrupts = hda_dsp_disable_interrupts,
+	.hw_ip_version = SOF_INTEL_CAVS_1_5_PLUS,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 EXPORT_SYMBOL_NS(apl_chip_info, SND_SOC_SOF_INTEL_HDA_COMMON);

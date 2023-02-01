@@ -1,0 +1,17 @@
+meson-axg-jethome-jethub-j110-rev-2.o: \
+ arch/arm64/boot/dts/amlogic/meson-axg-jethome-jethub-j110-rev-2.dts \
+ arch/arm64/boot/dts/amlogic/meson-axg-jethome-jethub-j1xx.dtsi \
+ arch/arm64/boot/dts/amlogic/meson-axg.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/clock/axg-aoclkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/axg-audio-clkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/clock/axg-clkc.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/gpio/meson-axg-gpio.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/amlogic,meson-axg-audio-arb.h \
+ scripts/dtc/include-prefixes/dt-bindings/reset/amlogic,meson-axg-reset.h \
+ scripts/dtc/include-prefixes/dt-bindings/power/meson-axg-power.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/input.h \
+ scripts/dtc/include-prefixes/dt-bindings/input/linux-event-codes.h \
+ scripts/dtc/include-prefixes/dt-bindings/thermal/thermal.h

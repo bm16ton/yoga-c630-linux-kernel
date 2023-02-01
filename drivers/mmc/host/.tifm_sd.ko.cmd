@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/tifm_sd.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/tifm_sd.ko drivers/mmc/host/tifm_sd.o drivers/mmc/host/tifm_sd.mod.o;  true

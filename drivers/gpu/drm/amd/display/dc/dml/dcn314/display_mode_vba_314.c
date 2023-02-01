@@ -265,6 +265,15 @@ static void CalculateRowBandwidth(
 
 static void CalculateFlipSchedule(
 		struct display_mode_lib *mode_lib,
+<<<<<<< HEAD
+		unsigned int k,
+		double HostVMInefficiencyFactor,
+		double UrgentExtraLatency,
+		double UrgentLatency,
+		double PDEAndMetaPTEBytesPerFrame,
+		double MetaRowBytes,
+		double DPTEBytesPerRow);
+=======
 		double HostVMInefficiencyFactor,
 		double UrgentExtraLatency,
 		double UrgentLatency,
@@ -292,6 +301,7 @@ static void CalculateFlipSchedule(
 		double *DestinationLinesToRequestRowInImmediateFlip,
 		double *final_flip_bw,
 		bool *ImmediateFlipSupportedForPipe);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static double CalculateWriteBackDelay(
 		enum source_format_class WritebackPixelFormat,
 		double WritebackHRatio,
@@ -325,6 +335,13 @@ static void CalculateVupdateAndDynamicMetadataParameters(
 static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		struct display_mode_lib *mode_lib,
 		unsigned int PrefetchMode,
+<<<<<<< HEAD
+		double DCFCLK,
+		double ReturnBW,
+		double UrgentLatency,
+		double ExtraLatency,
+		double SOCCLK,
+=======
 		unsigned int NumberOfActivePlanes,
 		unsigned int MaxLineBufferLines,
 		unsigned int LineBufferSize,
@@ -344,11 +361,26 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		double SREnterPlusExitTime,
 		double SRExitZ8Time,
 		double SREnterPlusExitZ8Time,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		double DCFCLKDeepSleep,
 		unsigned int DETBufferSizeY[],
 		unsigned int DETBufferSizeC[],
 		unsigned int SwathHeightY[],
 		unsigned int SwathHeightC[],
+<<<<<<< HEAD
+		double SwathWidthY[],
+		double SwathWidthC[],
+		unsigned int DPPPerPlane[],
+		double BytePerPixelDETY[],
+		double BytePerPixelDETC[],
+		bool UnboundedRequestEnabled,
+		unsigned int CompressedBufferSizeInkByte,
+		enum clock_change_support *DRAMClockChangeSupport,
+		double *StutterExitWatermark,
+		double *StutterEnterPlusExitWatermark,
+		double *Z8StutterExitWatermark,
+		double *Z8StutterEnterPlusExitWatermark);
+=======
 		unsigned int LBBitPerPixel[],
 		double SwathWidthY[],
 		double SwathWidthC[],
@@ -383,6 +415,7 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		double *Z8StutterExitWatermark,
 		double *Z8StutterEnterPlusExitWatermark,
 		double *MinActiveDRAMClockChangeLatencySupported);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static void CalculateDCFCLKDeepSleep(
 		struct display_mode_lib *mode_lib,
@@ -1362,7 +1395,11 @@ static bool CalculatePrefetchSchedule(
 		//                      - ((NumberOfCursors > 0 || GPUVMEnable || DCCEnable) ?
 				- ((GPUVMEnable || myPipe->DCCEnable) ? (*DestinationLinesToRequestVMInVBlank + 2 * *DestinationLinesToRequestRowInVBlank) : 0.0); // TODO: Did someone else add this??
 #else
+<<<<<<< HEAD
+		LinesToRequestPrefetchPixelData = *DestinationLinesForPrefetch - *DestinationLinesToRequestVMInVBlank - 2 * *DestinationLinesToRequestRowInVBlank;
+=======
 				LinesToRequestPrefetchPixelData = *DestinationLinesForPrefetch - *DestinationLinesToRequestVMInVBlank - 2 * *DestinationLinesToRequestRowInVBlank;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 #ifdef __DML_VBA_DEBUG__
@@ -2928,6 +2965,15 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 			for (k = 0; k < v->NumberOfActivePlanes; ++k) {
 				CalculateFlipSchedule(
 						mode_lib,
+<<<<<<< HEAD
+						k,
+						HostVMInefficiencyFactor,
+						v->UrgentExtraLatency,
+						v->UrgentLatency,
+						v->PDEAndMetaPTEBytesFrame[k],
+						v->MetaRowByte[k],
+						v->PixelPTEBytesPerRow[k]);
+=======
 						HostVMInefficiencyFactor,
 						v->UrgentExtraLatency,
 						v->UrgentLatency,
@@ -2955,6 +3001,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 						&v->DestinationLinesToRequestRowInImmediateFlip[k],
 						&v->final_flip_bw[k],
 						&v->ImmediateFlipSupportedForPipe[k]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 
 			v->total_dcn_read_bw_with_flip = 0.0;
@@ -3041,6 +3088,13 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 		CalculateWatermarksAndDRAMSpeedChangeSupport(
 				mode_lib,
 				PrefetchMode,
+<<<<<<< HEAD
+				v->DCFCLK,
+				v->ReturnBW,
+				v->UrgentLatency,
+				v->UrgentExtraLatency,
+				v->SOCCLK,
+=======
 				v->NumberOfActivePlanes,
 				v->MaxLineBufferLines,
 				v->LineBufferSize,
@@ -3060,11 +3114,26 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 				v->SREnterPlusExitTime,
 				v->SRExitZ8Time,
 				v->SREnterPlusExitZ8Time,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				v->DCFCLKDeepSleep,
 				v->DETBufferSizeY,
 				v->DETBufferSizeC,
 				v->SwathHeightY,
 				v->SwathHeightC,
+<<<<<<< HEAD
+				v->SwathWidthY,
+				v->SwathWidthC,
+				v->DPPPerPlane,
+				v->BytePerPixelDETY,
+				v->BytePerPixelDETC,
+				v->UnboundedRequestEnabled,
+				v->CompressedBufferSizeInkByte,
+				&DRAMClockChangeSupport,
+				&v->StutterExitWatermark,
+				&v->StutterEnterPlusExitWatermark,
+				&v->Z8StutterExitWatermark,
+				&v->Z8StutterEnterPlusExitWatermark);
+=======
 				v->LBBitPerPixel,
 				v->SwathWidthY,
 				v->SwathWidthC,
@@ -3099,6 +3168,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 				&v->Z8StutterExitWatermark,
 				&v->Z8StutterEnterPlusExitWatermark,
 				&v->MinActiveDRAMClockChangeLatencySupported);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		for (k = 0; k < v->NumberOfActivePlanes; ++k) {
 			if (v->WritebackEnable[k] == true) {
@@ -3710,6 +3780,17 @@ static void CalculateRowBandwidth(
 
 static void CalculateFlipSchedule(
 		struct display_mode_lib *mode_lib,
+<<<<<<< HEAD
+		unsigned int k,
+		double HostVMInefficiencyFactor,
+		double UrgentExtraLatency,
+		double UrgentLatency,
+		double PDEAndMetaPTEBytesPerFrame,
+		double MetaRowBytes,
+		double DPTEBytesPerRow)
+{
+	struct vba_vars_st *v = &mode_lib->vba;
+=======
 		double HostVMInefficiencyFactor,
 		double UrgentExtraLatency,
 		double UrgentLatency,
@@ -3738,18 +3819,36 @@ static void CalculateFlipSchedule(
 		double *final_flip_bw,
 		bool *ImmediateFlipSupportedForPipe)
 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	double min_row_time = 0.0;
 	unsigned int HostVMDynamicLevelsTrips;
 	double TimeForFetchingMetaPTEImmediateFlip;
 	double TimeForFetchingRowInVBlankImmediateFlip;
 	double ImmediateFlipBW;
+<<<<<<< HEAD
+	double LineTime = v->HTotal[k] / v->PixelClock[k];
+
+	if (v->GPUVMEnable == true && v->HostVMEnable == true) {
+		HostVMDynamicLevelsTrips = v->HostVMMaxNonCachedPageTableLevels;
+=======
 
 	if (GPUVMEnable == true && HostVMEnable == true) {
 		HostVMDynamicLevelsTrips = HostVMMaxNonCachedPageTableLevels;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		HostVMDynamicLevelsTrips = 0;
 	}
 
+<<<<<<< HEAD
+	if (v->GPUVMEnable == true || v->DCCEnable[k] == true) {
+		ImmediateFlipBW = (PDEAndMetaPTEBytesPerFrame + MetaRowBytes + DPTEBytesPerRow) * v->BandwidthAvailableForImmediateFlip / v->TotImmediateFlipBytes;
+	}
+
+	if (v->GPUVMEnable == true) {
+		TimeForFetchingMetaPTEImmediateFlip = dml_max3(
+				v->Tno_bw[k] + PDEAndMetaPTEBytesPerFrame * HostVMInefficiencyFactor / ImmediateFlipBW,
+				UrgentExtraLatency + UrgentLatency * (v->GPUVMMaxPageTableLevels * (HostVMDynamicLevelsTrips + 1) - 1),
+=======
 	if (GPUVMEnable == true || DCCEnable == true) {
 		ImmediateFlipBW = (PDEAndMetaPTEBytesPerFrame + MetaRowBytes + DPTEBytesPerRow) * BandwidthAvailableForImmediateFlip / TotImmediateFlipBytes;
 	}
@@ -3758,13 +3857,19 @@ static void CalculateFlipSchedule(
 		TimeForFetchingMetaPTEImmediateFlip = dml_max3(
 				Tno_bw + PDEAndMetaPTEBytesPerFrame * HostVMInefficiencyFactor / ImmediateFlipBW,
 				UrgentExtraLatency + UrgentLatency * (GPUVMMaxPageTableLevels * (HostVMDynamicLevelsTrips + 1) - 1),
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				LineTime / 4.0);
 	} else {
 		TimeForFetchingMetaPTEImmediateFlip = 0;
 	}
 
+<<<<<<< HEAD
+	v->DestinationLinesToRequestVMInImmediateFlip[k] = dml_ceil(4.0 * (TimeForFetchingMetaPTEImmediateFlip / LineTime), 1) / 4.0;
+	if ((v->GPUVMEnable == true || v->DCCEnable[k] == true)) {
+=======
 	*DestinationLinesToRequestVMInImmediateFlip = dml_ceil(4.0 * (TimeForFetchingMetaPTEImmediateFlip / LineTime), 1) / 4.0;
 	if ((GPUVMEnable == true || DCCEnable == true)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		TimeForFetchingRowInVBlankImmediateFlip = dml_max3(
 				(MetaRowBytes + DPTEBytesPerRow * HostVMInefficiencyFactor) / ImmediateFlipBW,
 				UrgentLatency * (HostVMDynamicLevelsTrips + 1),
@@ -3773,6 +3878,56 @@ static void CalculateFlipSchedule(
 		TimeForFetchingRowInVBlankImmediateFlip = 0;
 	}
 
+<<<<<<< HEAD
+	v->DestinationLinesToRequestRowInImmediateFlip[k] = dml_ceil(4.0 * (TimeForFetchingRowInVBlankImmediateFlip / LineTime), 1) / 4.0;
+
+	if (v->GPUVMEnable == true) {
+		v->final_flip_bw[k] = dml_max(
+				PDEAndMetaPTEBytesPerFrame * HostVMInefficiencyFactor / (v->DestinationLinesToRequestVMInImmediateFlip[k] * LineTime),
+				(MetaRowBytes + DPTEBytesPerRow * HostVMInefficiencyFactor) / (v->DestinationLinesToRequestRowInImmediateFlip[k] * LineTime));
+	} else if ((v->GPUVMEnable == true || v->DCCEnable[k] == true)) {
+		v->final_flip_bw[k] = (MetaRowBytes + DPTEBytesPerRow * HostVMInefficiencyFactor) / (v->DestinationLinesToRequestRowInImmediateFlip[k] * LineTime);
+	} else {
+		v->final_flip_bw[k] = 0;
+	}
+
+	if (v->SourcePixelFormat[k] == dm_420_8 || v->SourcePixelFormat[k] == dm_420_10 || v->SourcePixelFormat[k] == dm_rgbe_alpha) {
+		if (v->GPUVMEnable == true && v->DCCEnable[k] != true) {
+			min_row_time = dml_min(v->dpte_row_height[k] * LineTime / v->VRatio[k], v->dpte_row_height_chroma[k] * LineTime / v->VRatioChroma[k]);
+		} else if (v->GPUVMEnable != true && v->DCCEnable[k] == true) {
+			min_row_time = dml_min(v->meta_row_height[k] * LineTime / v->VRatio[k], v->meta_row_height_chroma[k] * LineTime / v->VRatioChroma[k]);
+		} else {
+			min_row_time = dml_min4(
+					v->dpte_row_height[k] * LineTime / v->VRatio[k],
+					v->meta_row_height[k] * LineTime / v->VRatio[k],
+					v->dpte_row_height_chroma[k] * LineTime / v->VRatioChroma[k],
+					v->meta_row_height_chroma[k] * LineTime / v->VRatioChroma[k]);
+		}
+	} else {
+		if (v->GPUVMEnable == true && v->DCCEnable[k] != true) {
+			min_row_time = v->dpte_row_height[k] * LineTime / v->VRatio[k];
+		} else if (v->GPUVMEnable != true && v->DCCEnable[k] == true) {
+			min_row_time = v->meta_row_height[k] * LineTime / v->VRatio[k];
+		} else {
+			min_row_time = dml_min(v->dpte_row_height[k] * LineTime / v->VRatio[k], v->meta_row_height[k] * LineTime / v->VRatio[k]);
+		}
+	}
+
+	if (v->DestinationLinesToRequestVMInImmediateFlip[k] >= 32 || v->DestinationLinesToRequestRowInImmediateFlip[k] >= 16
+			|| TimeForFetchingMetaPTEImmediateFlip + 2 * TimeForFetchingRowInVBlankImmediateFlip > min_row_time) {
+		v->ImmediateFlipSupportedForPipe[k] = false;
+	} else {
+		v->ImmediateFlipSupportedForPipe[k] = true;
+	}
+
+#ifdef __DML_VBA_DEBUG__
+	dml_print("DML::%s: DestinationLinesToRequestVMInImmediateFlip = %f\n", __func__, v->DestinationLinesToRequestVMInImmediateFlip[k]);
+	dml_print("DML::%s: DestinationLinesToRequestRowInImmediateFlip = %f\n", __func__, v->DestinationLinesToRequestRowInImmediateFlip[k]);
+	dml_print("DML::%s: TimeForFetchingMetaPTEImmediateFlip = %f\n", __func__, TimeForFetchingMetaPTEImmediateFlip);
+	dml_print("DML::%s: TimeForFetchingRowInVBlankImmediateFlip = %f\n", __func__, TimeForFetchingRowInVBlankImmediateFlip);
+	dml_print("DML::%s: min_row_time = %f\n", __func__, min_row_time);
+	dml_print("DML::%s: ImmediateFlipSupportedForPipe = %d\n", __func__, v->ImmediateFlipSupportedForPipe[k]);
+=======
 	*DestinationLinesToRequestRowInImmediateFlip = dml_ceil(4.0 * (TimeForFetchingRowInVBlankImmediateFlip / LineTime), 1) / 4.0;
 
 	if (GPUVMEnable == true) {
@@ -3821,6 +3976,7 @@ static void CalculateFlipSchedule(
 	dml_print("DML::%s: TimeForFetchingRowInVBlankImmediateFlip = %f\n", __func__, TimeForFetchingRowInVBlankImmediateFlip);
 	dml_print("DML::%s: min_row_time = %f\n", __func__, min_row_time);
 	dml_print("DML::%s: ImmediateFlipSupportedForPipe = %d\n", __func__, *ImmediateFlipSupportedForPipe);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif
 
 }
@@ -5412,6 +5568,15 @@ void dml314_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_
 					for (k = 0; k < v->NumberOfActivePlanes; k++) {
 						CalculateFlipSchedule(
 								mode_lib,
+<<<<<<< HEAD
+								k,
+								HostVMInefficiencyFactor,
+								v->ExtraLatency,
+								v->UrgLatency[i],
+								v->PDEAndMetaPTEBytesPerFrame[i][j][k],
+								v->MetaRowBytes[i][j][k],
+								v->DPTEBytesPerRow[i][j][k]);
+=======
 								HostVMInefficiencyFactor,
 								v->ExtraLatency,
 								v->UrgLatency[i],
@@ -5439,6 +5604,7 @@ void dml314_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_
 								&v->DestinationLinesToRequestRowInImmediateFlip[k],
 								&v->final_flip_bw[k],
 								&v->ImmediateFlipSupportedForPipe[k]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					}
 					v->total_dcn_read_bw_with_flip = 0.0;
 					for (k = 0; k < v->NumberOfActivePlanes; k++) {
@@ -5496,6 +5662,13 @@ void dml314_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_
 			CalculateWatermarksAndDRAMSpeedChangeSupport(
 					mode_lib,
 					v->PrefetchModePerState[i][j],
+<<<<<<< HEAD
+					v->DCFCLKState[i][j],
+					v->ReturnBWPerState[i][j],
+					v->UrgLatency[i],
+					v->ExtraLatency,
+					v->SOCCLKPerState[i],
+=======
 					v->NumberOfActivePlanes,
 					v->MaxLineBufferLines,
 					v->LineBufferSize,
@@ -5515,11 +5688,26 @@ void dml314_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_
 					v->SREnterPlusExitTime,
 					v->SRExitZ8Time,
 					v->SREnterPlusExitZ8Time,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 					v->ProjectedDCFCLKDeepSleep[i][j],
 					v->DETBufferSizeYThisState,
 					v->DETBufferSizeCThisState,
 					v->SwathHeightYThisState,
 					v->SwathHeightCThisState,
+<<<<<<< HEAD
+					v->SwathWidthYThisState,
+					v->SwathWidthCThisState,
+					v->NoOfDPPThisState,
+					v->BytePerPixelInDETY,
+					v->BytePerPixelInDETC,
+					UnboundedRequestEnabledThisState,
+					CompressedBufferSizeInkByteThisState,
+					&v->DRAMClockChangeSupport[i][j],
+					&dummy,
+					&dummy,
+					&dummy,
+					&dummy);
+=======
 					v->LBBitPerPixel,
 					v->SwathWidthYThisState,
 					v->SwathWidthCThisState,
@@ -5554,6 +5742,7 @@ void dml314_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_
 					&dummy,
 					&dummy,
 					&v->MinActiveDRAMClockChangeLatencySupported);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 
@@ -5679,6 +5868,13 @@ void dml314_ModeSupportAndSystemConfigurationFull(struct display_mode_lib *mode_
 static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		struct display_mode_lib *mode_lib,
 		unsigned int PrefetchMode,
+<<<<<<< HEAD
+		double DCFCLK,
+		double ReturnBW,
+		double UrgentLatency,
+		double ExtraLatency,
+		double SOCCLK,
+=======
 		unsigned int NumberOfActivePlanes,
 		unsigned int MaxLineBufferLines,
 		unsigned int LineBufferSize,
@@ -5698,11 +5894,26 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		double SREnterPlusExitTime,
 		double SRExitZ8Time,
 		double SREnterPlusExitZ8Time,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		double DCFCLKDeepSleep,
 		unsigned int DETBufferSizeY[],
 		unsigned int DETBufferSizeC[],
 		unsigned int SwathHeightY[],
 		unsigned int SwathHeightC[],
+<<<<<<< HEAD
+		double SwathWidthY[],
+		double SwathWidthC[],
+		unsigned int DPPPerPlane[],
+		double BytePerPixelDETY[],
+		double BytePerPixelDETC[],
+		bool UnboundedRequestEnabled,
+		unsigned int CompressedBufferSizeInkByte,
+		enum clock_change_support *DRAMClockChangeSupport,
+		double *StutterExitWatermark,
+		double *StutterEnterPlusExitWatermark,
+		double *Z8StutterExitWatermark,
+		double *Z8StutterEnterPlusExitWatermark)
+=======
 		unsigned int LBBitPerPixel[],
 		double SwathWidthY[],
 		double SwathWidthC[],
@@ -5737,6 +5948,7 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		double *Z8StutterExitWatermark,
 		double *Z8StutterEnterPlusExitWatermark,
 		double *MinActiveDRAMClockChangeLatencySupported)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct vba_vars_st *v = &mode_lib->vba;
 	double EffectiveLBLatencyHidingY;
@@ -5756,11 +5968,30 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 	double TotalPixelBW = 0.0;
 	int k, j;
 
+<<<<<<< HEAD
+	v->UrgentWatermark = UrgentLatency + ExtraLatency;
+=======
 	*UrgentWatermark = UrgentLatency + ExtraLatency;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef __DML_VBA_DEBUG__
 	dml_print("DML::%s: UrgentLatency = %f\n", __func__, UrgentLatency);
 	dml_print("DML::%s: ExtraLatency = %f\n", __func__, ExtraLatency);
+<<<<<<< HEAD
+	dml_print("DML::%s: UrgentWatermark = %f\n", __func__, v->UrgentWatermark);
+#endif
+
+	v->DRAMClockChangeWatermark = v->DRAMClockChangeLatency + v->UrgentWatermark;
+
+#ifdef __DML_VBA_DEBUG__
+	dml_print("DML::%s: v->DRAMClockChangeLatency = %f\n", __func__, v->DRAMClockChangeLatency);
+	dml_print("DML::%s: DRAMClockChangeWatermark = %f\n", __func__, v->DRAMClockChangeWatermark);
+#endif
+
+	v->TotalActiveWriteback = 0;
+	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
+		if (v->WritebackEnable[k] == true) {
+=======
 	dml_print("DML::%s: UrgentWatermark = %f\n", __func__, *UrgentWatermark);
 #endif
 
@@ -5774,11 +6005,49 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 	v->TotalActiveWriteback = 0;
 	for (k = 0; k < NumberOfActivePlanes; ++k) {
 		if (WritebackEnable[k] == true) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			v->TotalActiveWriteback = v->TotalActiveWriteback + 1;
 		}
 	}
 
 	if (v->TotalActiveWriteback <= 1) {
+<<<<<<< HEAD
+		v->WritebackUrgentWatermark = v->WritebackLatency;
+	} else {
+		v->WritebackUrgentWatermark = v->WritebackLatency + v->WritebackChunkSize * 1024.0 / 32.0 / SOCCLK;
+	}
+
+	if (v->TotalActiveWriteback <= 1) {
+		v->WritebackDRAMClockChangeWatermark = v->DRAMClockChangeLatency + v->WritebackLatency;
+	} else {
+		v->WritebackDRAMClockChangeWatermark = v->DRAMClockChangeLatency + v->WritebackLatency + v->WritebackChunkSize * 1024.0 / 32.0 / SOCCLK;
+	}
+
+	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
+		TotalPixelBW = TotalPixelBW
+				+ DPPPerPlane[k] * (SwathWidthY[k] * BytePerPixelDETY[k] * v->VRatio[k] + SwathWidthC[k] * BytePerPixelDETC[k] * v->VRatioChroma[k])
+						/ (v->HTotal[k] / v->PixelClock[k]);
+	}
+
+	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
+		double EffectiveDETBufferSizeY = DETBufferSizeY[k];
+
+		v->LBLatencyHidingSourceLinesY = dml_min(
+				(double) v->MaxLineBufferLines,
+				dml_floor(v->LineBufferSize / v->LBBitPerPixel[k] / (SwathWidthY[k] / dml_max(v->HRatio[k], 1.0)), 1)) - (v->vtaps[k] - 1);
+
+		v->LBLatencyHidingSourceLinesC = dml_min(
+				(double) v->MaxLineBufferLines,
+				dml_floor(v->LineBufferSize / v->LBBitPerPixel[k] / (SwathWidthC[k] / dml_max(v->HRatioChroma[k], 1.0)), 1)) - (v->VTAPsChroma[k] - 1);
+
+		EffectiveLBLatencyHidingY = v->LBLatencyHidingSourceLinesY / v->VRatio[k] * (v->HTotal[k] / v->PixelClock[k]);
+
+		EffectiveLBLatencyHidingC = v->LBLatencyHidingSourceLinesC / v->VRatioChroma[k] * (v->HTotal[k] / v->PixelClock[k]);
+
+		if (UnboundedRequestEnabled) {
+			EffectiveDETBufferSizeY = EffectiveDETBufferSizeY
+					+ CompressedBufferSizeInkByte * 1024 * SwathWidthY[k] * BytePerPixelDETY[k] * v->VRatio[k] / (v->HTotal[k] / v->PixelClock[k]) / TotalPixelBW;
+=======
 		*WritebackUrgentWatermark = WritebackLatency;
 	} else {
 		*WritebackUrgentWatermark = WritebackLatency + WritebackChunkSize * 1024.0 / 32.0 / SOCCLK;
@@ -5814,45 +6083,77 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		if (UnboundedRequestEnabled) {
 			EffectiveDETBufferSizeY = EffectiveDETBufferSizeY
 					+ CompressedBufferSizeInkByte * 1024 * SwathWidthY[k] * BytePerPixelDETY[k] * VRatio[k] / (HTotal[k] / PixelClock[k]) / TotalPixelBW;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		LinesInDETY[k] = (double) EffectiveDETBufferSizeY / BytePerPixelDETY[k] / SwathWidthY[k];
 		LinesInDETYRoundedDownToSwath[k] = dml_floor(LinesInDETY[k], SwathHeightY[k]);
+<<<<<<< HEAD
+		FullDETBufferingTimeY = LinesInDETYRoundedDownToSwath[k] * (v->HTotal[k] / v->PixelClock[k]) / v->VRatio[k];
+		if (BytePerPixelDETC[k] > 0) {
+			LinesInDETC = v->DETBufferSizeC[k] / BytePerPixelDETC[k] / SwathWidthC[k];
+			LinesInDETCRoundedDownToSwath = dml_floor(LinesInDETC, SwathHeightC[k]);
+			FullDETBufferingTimeC = LinesInDETCRoundedDownToSwath * (v->HTotal[k] / v->PixelClock[k]) / v->VRatioChroma[k];
+=======
 		FullDETBufferingTimeY = LinesInDETYRoundedDownToSwath[k] * (HTotal[k] / PixelClock[k]) / VRatio[k];
 		if (BytePerPixelDETC[k] > 0) {
 			LinesInDETC = v->DETBufferSizeC[k] / BytePerPixelDETC[k] / SwathWidthC[k];
 			LinesInDETCRoundedDownToSwath = dml_floor(LinesInDETC, SwathHeightC[k]);
 			FullDETBufferingTimeC = LinesInDETCRoundedDownToSwath * (HTotal[k] / PixelClock[k]) / VRatioChroma[k];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		} else {
 			LinesInDETC = 0;
 			FullDETBufferingTimeC = 999999;
 		}
 
 		ActiveDRAMClockChangeLatencyMarginY = EffectiveLBLatencyHidingY + FullDETBufferingTimeY
+<<<<<<< HEAD
+				- ((double) v->DSTXAfterScaler[k] / v->HTotal[k] + v->DSTYAfterScaler[k]) * v->HTotal[k] / v->PixelClock[k] - v->UrgentWatermark - v->DRAMClockChangeWatermark;
+
+		if (v->NumberOfActivePlanes > 1) {
+			ActiveDRAMClockChangeLatencyMarginY = ActiveDRAMClockChangeLatencyMarginY
+					- (1 - 1.0 / v->NumberOfActivePlanes) * SwathHeightY[k] * v->HTotal[k] / v->PixelClock[k] / v->VRatio[k];
+=======
 				- ((double) DSTXAfterScaler[k] / HTotal[k] + DSTYAfterScaler[k]) * HTotal[k] / PixelClock[k] - *UrgentWatermark - *DRAMClockChangeWatermark;
 
 		if (NumberOfActivePlanes > 1) {
 			ActiveDRAMClockChangeLatencyMarginY = ActiveDRAMClockChangeLatencyMarginY
 					- (1 - 1.0 / NumberOfActivePlanes) * SwathHeightY[k] * HTotal[k] / PixelClock[k] / VRatio[k];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 
 		if (BytePerPixelDETC[k] > 0) {
 			ActiveDRAMClockChangeLatencyMarginC = EffectiveLBLatencyHidingC + FullDETBufferingTimeC
+<<<<<<< HEAD
+					- ((double) v->DSTXAfterScaler[k] / v->HTotal[k] + v->DSTYAfterScaler[k]) * v->HTotal[k] / v->PixelClock[k] - v->UrgentWatermark - v->DRAMClockChangeWatermark;
+
+			if (v->NumberOfActivePlanes > 1) {
+				ActiveDRAMClockChangeLatencyMarginC = ActiveDRAMClockChangeLatencyMarginC
+						- (1 - 1.0 / v->NumberOfActivePlanes) * SwathHeightC[k] * v->HTotal[k] / v->PixelClock[k] / v->VRatioChroma[k];
+=======
 					- ((double) DSTXAfterScaler[k] / HTotal[k] + DSTYAfterScaler[k]) * HTotal[k] / PixelClock[k] - *UrgentWatermark - *DRAMClockChangeWatermark;
 
 			if (NumberOfActivePlanes > 1) {
 				ActiveDRAMClockChangeLatencyMarginC = ActiveDRAMClockChangeLatencyMarginC
 						- (1 - 1.0 / NumberOfActivePlanes) * SwathHeightC[k] * HTotal[k] / PixelClock[k] / VRatioChroma[k];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			}
 			v->ActiveDRAMClockChangeLatencyMargin[k] = dml_min(ActiveDRAMClockChangeLatencyMarginY, ActiveDRAMClockChangeLatencyMarginC);
 		} else {
 			v->ActiveDRAMClockChangeLatencyMargin[k] = ActiveDRAMClockChangeLatencyMarginY;
 		}
 
+<<<<<<< HEAD
+		if (v->WritebackEnable[k] == true) {
+			WritebackDRAMClockChangeLatencyHiding = v->WritebackInterfaceBufferSize * 1024
+					/ (v->WritebackDestinationWidth[k] * v->WritebackDestinationHeight[k] / (v->WritebackSourceHeight[k] * v->HTotal[k] / v->PixelClock[k]) * 4);
+			if (v->WritebackPixelFormat[k] == dm_444_64) {
+=======
 		if (WritebackEnable[k] == true) {
 			WritebackDRAMClockChangeLatencyHiding = WritebackInterfaceBufferSize * 1024
 					/ (WritebackDestinationWidth[k] * WritebackDestinationHeight[k] / (WritebackSourceHeight[k] * HTotal[k] / PixelClock[k]) * 4);
 			if (WritebackPixelFormat[k] == dm_444_64) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				WritebackDRAMClockChangeLatencyHiding = WritebackDRAMClockChangeLatencyHiding / 2;
 			}
 			WritebackDRAMClockChangeLatencyMargin = WritebackDRAMClockChangeLatencyHiding - v->WritebackDRAMClockChangeWatermark;
@@ -5862,6 +6163,16 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 
 	v->MinActiveDRAMClockChangeMargin = 999999;
 	PlaneWithMinActiveDRAMClockChangeMargin = 0;
+<<<<<<< HEAD
+	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
+		if (v->ActiveDRAMClockChangeLatencyMargin[k] < v->MinActiveDRAMClockChangeMargin) {
+			v->MinActiveDRAMClockChangeMargin = v->ActiveDRAMClockChangeLatencyMargin[k];
+			if (v->BlendingAndTiming[k] == k) {
+				PlaneWithMinActiveDRAMClockChangeMargin = k;
+			} else {
+				for (j = 0; j < v->NumberOfActivePlanes; ++j) {
+					if (v->BlendingAndTiming[k] == j) {
+=======
 	for (k = 0; k < NumberOfActivePlanes; ++k) {
 		if (v->ActiveDRAMClockChangeLatencyMargin[k] < v->MinActiveDRAMClockChangeMargin) {
 			v->MinActiveDRAMClockChangeMargin = v->ActiveDRAMClockChangeLatencyMargin[k];
@@ -5870,6 +6181,7 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 			} else {
 				for (j = 0; j < NumberOfActivePlanes; ++j) {
 					if (BlendingAndTiming[k] == j) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 						PlaneWithMinActiveDRAMClockChangeMargin = j;
 					}
 				}
@@ -5877,11 +6189,19 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 		}
 	}
 
+<<<<<<< HEAD
+	v->MinActiveDRAMClockChangeLatencySupported = v->MinActiveDRAMClockChangeMargin + v->DRAMClockChangeLatency ;
+
+	SecondMinActiveDRAMClockChangeMarginOneDisplayInVBLank = 999999;
+	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
+		if (!((k == PlaneWithMinActiveDRAMClockChangeMargin) && (v->BlendingAndTiming[k] == k)) && !(v->BlendingAndTiming[k] == PlaneWithMinActiveDRAMClockChangeMargin)
+=======
 	*MinActiveDRAMClockChangeLatencySupported = v->MinActiveDRAMClockChangeMargin + DRAMClockChangeLatency;
 
 	SecondMinActiveDRAMClockChangeMarginOneDisplayInVBLank = 999999;
 	for (k = 0; k < NumberOfActivePlanes; ++k) {
 		if (!((k == PlaneWithMinActiveDRAMClockChangeMargin) && (BlendingAndTiming[k] == k)) && !(BlendingAndTiming[k] == PlaneWithMinActiveDRAMClockChangeMargin)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				&& v->ActiveDRAMClockChangeLatencyMargin[k] < SecondMinActiveDRAMClockChangeMarginOneDisplayInVBLank) {
 			SecondMinActiveDRAMClockChangeMarginOneDisplayInVBLank = v->ActiveDRAMClockChangeLatencyMargin[k];
 		}
@@ -5889,25 +6209,41 @@ static void CalculateWatermarksAndDRAMSpeedChangeSupport(
 
 	v->TotalNumberOfActiveOTG = 0;
 
+<<<<<<< HEAD
+	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
+		if (v->BlendingAndTiming[k] == k) {
+=======
 	for (k = 0; k < NumberOfActivePlanes; ++k) {
 		if (BlendingAndTiming[k] == k) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			v->TotalNumberOfActiveOTG = v->TotalNumberOfActiveOTG + 1;
 		}
 	}
 
 	if (v->MinActiveDRAMClockChangeMargin > 0 && PrefetchMode == 0) {
 		*DRAMClockChangeSupport = dm_dram_clock_change_vactive;
+<<<<<<< HEAD
+	} else if ((v->SynchronizedVBlank == true || v->TotalNumberOfActiveOTG == 1
+=======
 	} else if ((SynchronizedVBlank == true || v->TotalNumberOfActiveOTG == 1
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			|| SecondMinActiveDRAMClockChangeMarginOneDisplayInVBLank > 0) && PrefetchMode == 0) {
 		*DRAMClockChangeSupport = dm_dram_clock_change_vblank;
 	} else {
 		*DRAMClockChangeSupport = dm_dram_clock_change_unsupported;
 	}
 
+<<<<<<< HEAD
+	*StutterExitWatermark = v->SRExitTime + ExtraLatency + 10 / DCFCLKDeepSleep;
+	*StutterEnterPlusExitWatermark = (v->SREnterPlusExitTime + ExtraLatency + 10 / DCFCLKDeepSleep);
+	*Z8StutterExitWatermark = v->SRExitZ8Time + ExtraLatency + 10 / DCFCLKDeepSleep;
+	*Z8StutterEnterPlusExitWatermark = v->SREnterPlusExitZ8Time + ExtraLatency + 10 / DCFCLKDeepSleep;
+=======
 	*StutterExitWatermark = SRExitTime + ExtraLatency + 10 / DCFCLKDeepSleep;
 	*StutterEnterPlusExitWatermark = (SREnterPlusExitTime + ExtraLatency + 10 / DCFCLKDeepSleep);
 	*Z8StutterExitWatermark = SRExitZ8Time + ExtraLatency + 10 / DCFCLKDeepSleep;
 	*Z8StutterEnterPlusExitWatermark = SREnterPlusExitZ8Time + ExtraLatency + 10 / DCFCLKDeepSleep;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef __DML_VBA_DEBUG__
 	dml_print("DML::%s: StutterExitWatermark = %f\n", __func__, *StutterExitWatermark);
@@ -7047,8 +7383,11 @@ static void CalculateSwathWidth(
 		{
 		int surface_width_ub_l = dml_ceil(SurfaceWidthY[k], Read256BytesBlockWidthY[k]);
 		int surface_height_ub_l = dml_ceil(SurfaceHeightY[k], Read256BytesBlockHeightY[k]);
+<<<<<<< HEAD
+=======
 		int surface_width_ub_c = dml_ceil(SurfaceWidthC[k], Read256BytesBlockWidthC[k]);
 		int surface_height_ub_c = dml_ceil(SurfaceHeightC[k], Read256BytesBlockHeightC[k]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef __DML_VBA_DEBUG__
 		dml_print("DML::%s: k=%d surface_width_ub_l=%0d\n", __func__, k, surface_width_ub_l);
@@ -7059,6 +7398,11 @@ static void CalculateSwathWidth(
 			MaximumSwathHeightC[k] = Read256BytesBlockHeightC[k];
 			swath_width_luma_ub[k] = dml_min(surface_width_ub_l, (int) dml_ceil(SwathWidthY[k] - 1, Read256BytesBlockWidthY[k]) + Read256BytesBlockWidthY[k]);
 			if (BytePerPixC[k] > 0) {
+<<<<<<< HEAD
+				int surface_width_ub_c = dml_ceil(SurfaceWidthC[k], Read256BytesBlockWidthC[k]);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				swath_width_chroma_ub[k] = dml_min(
 						surface_width_ub_c,
 						(int) dml_ceil(SwathWidthC[k] - 1, Read256BytesBlockWidthC[k]) + Read256BytesBlockWidthC[k]);
@@ -7070,6 +7414,11 @@ static void CalculateSwathWidth(
 			MaximumSwathHeightC[k] = Read256BytesBlockWidthC[k];
 			swath_width_luma_ub[k] = dml_min(surface_height_ub_l, (int) dml_ceil(SwathWidthY[k] - 1, Read256BytesBlockHeightY[k]) + Read256BytesBlockHeightY[k]);
 			if (BytePerPixC[k] > 0) {
+<<<<<<< HEAD
+				int surface_height_ub_c = dml_ceil(SurfaceHeightC[k], Read256BytesBlockHeightC[k]);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				swath_width_chroma_ub[k] = dml_min(
 						surface_height_ub_c,
 						(int) dml_ceil(SwathWidthC[k] - 1, Read256BytesBlockHeightC[k]) + Read256BytesBlockHeightC[k]);
@@ -7405,7 +7754,11 @@ static unsigned int CalculateMaxVStartup(
 	double line_time_us = HTotal / PixelClock;
 	unsigned int vblank_actual = VTotal - VActive;
 	unsigned int vblank_nom_default_in_line = dml_floor(VBlankNomDefaultUS / line_time_us, 1.0);
+<<<<<<< HEAD
+	unsigned int vblank_nom_input = VBlankNom; //dml_min(VBlankNom, vblank_nom_default_in_line);
+=======
 	unsigned int vblank_nom_input = dml_min(VBlankNom, vblank_nom_default_in_line);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	unsigned int vblank_avail = vblank_nom_input == 0 ? vblank_nom_default_in_line : vblank_nom_input;
 
 	vblank_size = (unsigned int) dml_min(vblank_actual, vblank_avail);

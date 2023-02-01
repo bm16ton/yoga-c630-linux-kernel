@@ -91,13 +91,45 @@ EXPORT_SYMBOL_NS_GPL(acp_machine_select, SND_SOC_ACP_COMMON);
 static irqreturn_t i2s_irq_handler(int irq, void *data)
 {
 	struct acp_dev_data *adata = data;
+<<<<<<< HEAD
+	struct acp_resource *rsrc = adata->rsrc;
+	struct acp_stream *stream;
+	u16 i2s_flag = 0;
+	u32 ext_intr_stat, ext_intr_stat1;
+=======
 	struct acp_stream *stream;
 	u16 i2s_flag = 0;
 	u32 val, i;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (!adata)
 		return IRQ_NONE;
 
+<<<<<<< HEAD
+	if (adata->rsrc->no_of_ctrls == 2)
+		ext_intr_stat1 = readl(ACP_EXTERNAL_INTR_STAT(adata, (rsrc->irqp_used - 1)));
+
+	ext_intr_stat = readl(ACP_EXTERNAL_INTR_STAT(adata, rsrc->irqp_used));
+
+	spin_lock(&adata->acp_lock);
+	list_for_each_entry(stream, &adata->stream_list, list) {
+		if (ext_intr_stat & stream->irq_bit) {
+			writel(stream->irq_bit,
+			       ACP_EXTERNAL_INTR_STAT(adata, rsrc->irqp_used));
+			snd_pcm_period_elapsed(stream->substream);
+			i2s_flag = 1;
+		}
+		if (adata->rsrc->no_of_ctrls == 2) {
+			if (ext_intr_stat1 & stream->irq_bit) {
+				writel(stream->irq_bit, ACP_EXTERNAL_INTR_STAT(adata,
+				       (rsrc->irqp_used - 1)));
+				snd_pcm_period_elapsed(stream->substream);
+				i2s_flag = 1;
+			}
+		}
+	}
+	spin_unlock(&adata->acp_lock);
+=======
 	val = readl(adata->acp_base + ACP_EXTERNAL_INTR_STAT);
 
 	for (i = 0; i < ACP_MAX_STREAM; i++) {
@@ -110,6 +142,7 @@ static irqreturn_t i2s_irq_handler(int irq, void *data)
 		}
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (i2s_flag)
 		return IRQ_HANDLED;
 
@@ -118,6 +151,10 @@ static irqreturn_t i2s_irq_handler(int irq, void *data)
 
 static void config_pte_for_stream(struct acp_dev_data *adata, struct acp_stream *stream)
 {
+<<<<<<< HEAD
+	struct acp_resource *rsrc = adata->rsrc;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 pte_reg, pte_size, reg_val;
 
 	/* Use ATU base Group5 */
@@ -126,6 +163,18 @@ static void config_pte_for_stream(struct acp_dev_data *adata, struct acp_stream 
 	stream->reg_offset = 0x02000000;
 
 	/* Group Enable */
+<<<<<<< HEAD
+	reg_val = rsrc->sram_pte_offset;
+	writel(reg_val | BIT(31), adata->acp_base + pte_reg);
+	writel(PAGE_SIZE_4K_ENABLE,  adata->acp_base + pte_size);
+	writel(0x01, adata->acp_base + ACPAXI2AXI_ATU_CTRL);
+}
+
+static void config_acp_dma(struct acp_dev_data *adata, struct acp_stream *stream, int size)
+{
+	struct snd_pcm_substream *substream = stream->substream;
+	struct acp_resource *rsrc = adata->rsrc;
+=======
 	reg_val = ACP_SRAM_PTE_OFFSET;
 	writel(reg_val | BIT(31), adata->acp_base + pte_reg);
 	writel(PAGE_SIZE_4K_ENABLE,  adata->acp_base + pte_size);
@@ -135,6 +184,7 @@ static void config_acp_dma(struct acp_dev_data *adata, int cpu_id, int size)
 {
 	struct acp_stream *stream = adata->stream[cpu_id];
 	struct snd_pcm_substream *substream = stream->substream;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	dma_addr_t addr = substream->dma_buffer.addr;
 	int num_pages = (PAGE_ALIGN(size) >> PAGE_SHIFT);
 	u32 low, high, val;
@@ -146,9 +196,15 @@ static void config_acp_dma(struct acp_dev_data *adata, int cpu_id, int size)
 		/* Load the low address of page int ACP SRAM through SRBM */
 		low = lower_32_bits(addr);
 		high = upper_32_bits(addr);
+<<<<<<< HEAD
+		writel(low, adata->acp_base + rsrc->scratch_reg_offset + val);
+		high |= BIT(31);
+		writel(high, adata->acp_base + rsrc->scratch_reg_offset + val + 4);
+=======
 		writel(low, adata->acp_base + ACP_SCRATCH_REG_0 + val);
 		high |= BIT(31);
 		writel(high, adata->acp_base + ACP_SCRATCH_REG_0 + val + 4);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		/* Move to next physically contiguous page */
 		val += 8;
@@ -158,13 +214,19 @@ static void config_acp_dma(struct acp_dev_data *adata, int cpu_id, int size)
 
 static int acp_dma_open(struct snd_soc_component *component, struct snd_pcm_substream *substream)
 {
+<<<<<<< HEAD
+=======
 	struct snd_soc_pcm_runtime *soc_runtime = asoc_substream_to_rtd(substream);
 	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(soc_runtime, 0);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct snd_pcm_runtime *runtime = substream->runtime;
 	struct device *dev = component->dev;
 	struct acp_dev_data *adata = dev_get_drvdata(dev);
 	struct acp_stream *stream;
+<<<<<<< HEAD
+=======
 	int stream_id = cpu_dai->driver->id * 2 + substream->stream;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int ret;
 
 	stream = kzalloc(sizeof(*stream), GFP_KERNEL);
@@ -172,7 +234,10 @@ static int acp_dma_open(struct snd_soc_component *component, struct snd_pcm_subs
 		return -ENOMEM;
 
 	stream->substream = substream;
+<<<<<<< HEAD
+=======
 	adata->stream[stream_id] = stream;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
 		runtime->hw = acp_pcm_hardware_playback;
@@ -187,7 +252,15 @@ static int acp_dma_open(struct snd_soc_component *component, struct snd_pcm_subs
 	}
 	runtime->private_data = stream;
 
+<<<<<<< HEAD
+	writel(1, ACP_EXTERNAL_INTR_ENB(adata));
+
+	spin_lock_irq(&adata->acp_lock);
+	list_add_tail(&stream->list, &adata->stream_list);
+	spin_unlock_irq(&adata->acp_lock);
+=======
 	writel(1, adata->acp_base + ACP_EXTERNAL_INTR_ENB);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return ret;
 }
@@ -196,16 +269,25 @@ static int acp_dma_hw_params(struct snd_soc_component *component,
 			     struct snd_pcm_substream *substream,
 			     struct snd_pcm_hw_params *params)
 {
+<<<<<<< HEAD
+	struct acp_dev_data *adata = snd_soc_component_get_drvdata(component);
+	struct acp_stream *stream = substream->runtime->private_data;
+=======
 	struct snd_soc_pcm_runtime *soc_runtime = asoc_substream_to_rtd(substream);
 	struct acp_dev_data *adata = snd_soc_component_get_drvdata(component);
 	struct snd_soc_dai *cpu_dai = asoc_rtd_to_cpu(soc_runtime, 0);
 	struct acp_stream *stream = substream->runtime->private_data;
 	int stream_id = cpu_dai->driver->id * 2 + substream->stream;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 size = params_buffer_bytes(params);
 
 	/* Configure ACP DMA block with params */
 	config_pte_for_stream(adata, stream);
+<<<<<<< HEAD
+	config_acp_dma(adata, stream, size);
+=======
 	config_acp_dma(adata, stream_id, size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -242,6 +324,20 @@ static int acp_dma_new(struct snd_soc_component *component,
 	return 0;
 }
 
+<<<<<<< HEAD
+static int acp_dma_close(struct snd_soc_component *component,
+			 struct snd_pcm_substream *substream)
+{
+	struct device *dev = component->dev;
+	struct acp_dev_data *adata = dev_get_drvdata(dev);
+	struct acp_stream *stream = substream->runtime->private_data;
+
+	/* Remove entry from list */
+	spin_lock_irq(&adata->acp_lock);
+	list_del(&stream->list);
+	spin_unlock_irq(&adata->acp_lock);
+	kfree(stream);
+=======
 static int acp_dma_mmap(struct snd_soc_component *component,
 			struct snd_pcm_substream *substream,
 			struct vm_area_struct *vma)
@@ -262,11 +358,21 @@ static int acp_dma_close(struct snd_soc_component *component,
 	stream = adata->stream[stream_id];
 	kfree(stream);
 	adata->stream[stream_id] = NULL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
 
 static const struct snd_soc_component_driver acp_pcm_component = {
+<<<<<<< HEAD
+	.name			= DRV_NAME,
+	.open			= acp_dma_open,
+	.close			= acp_dma_close,
+	.hw_params		= acp_dma_hw_params,
+	.pointer		= acp_dma_pointer,
+	.pcm_construct		= acp_dma_new,
+	.legacy_dai_naming	= 1,
+=======
 	.name		= DRV_NAME,
 	.open		= acp_dma_open,
 	.close		= acp_dma_close,
@@ -274,6 +380,7 @@ static const struct snd_soc_component_driver acp_pcm_component = {
 	.pointer	= acp_dma_pointer,
 	.mmap		= acp_dma_mmap,
 	.pcm_construct	= acp_dma_new,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 int acp_platform_register(struct device *dev)
@@ -296,6 +403,13 @@ int acp_platform_register(struct device *dev)
 		dev_err(dev, "Fail to register acp i2s component\n");
 		return status;
 	}
+<<<<<<< HEAD
+
+	INIT_LIST_HEAD(&adata->stream_list);
+	spin_lock_init(&adata->acp_lock);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 EXPORT_SYMBOL_NS_GPL(acp_platform_register, SND_SOC_ACP_COMMON);

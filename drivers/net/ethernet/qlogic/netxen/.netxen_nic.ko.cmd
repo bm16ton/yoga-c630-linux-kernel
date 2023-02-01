@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qlogic/netxen/netxen_nic.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/qlogic/netxen/netxen_nic.ko drivers/net/ethernet/qlogic/netxen/netxen_nic.o drivers/net/ethernet/qlogic/netxen/netxen_nic.mod.o;  true

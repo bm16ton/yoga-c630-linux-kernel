@@ -1,5 +1,14 @@
+<<<<<<< HEAD
+OKAY So havent updated much since 5.12 cuz of various graphic driver issues. The only remaining one is "dpu encoder timeout" If not running compiz it will just slow you down and spam your log files to rediculous sizes. Unfortunatly compiz freezes so anything your working on is lost wo extreme measures. The dpu encoder seems to have become slightly less often with newer kernels. Whats in here well the cpu turbo freq is now considered a reg freq cuz so many patches over so many kernel versions couldnt get it to work, like it simply wouldnt go into that freq ever. Now all is good. Using slightly older sound stack cuz of breaks in recent versions. FTDI mpsse drivers for i2c and spi look into the tools/16ton folder for support. Also an actual schematic for this laptop! Is in tools/16ton as well. As per usual the various wifi restrictions for ath10k have been removed no more no-ir/radar/tx-power limits from crda or from AP, all of 2.4ghz is open etc. I hardbake the regulatory.db file directly into the kernel but the crda/wireless-reg files I used are in tools/16ton. Some other various drivers for usb-to-i2c etc have been added and usb devices etc. Various little c630 fixes. I will mention altho it recovers from them fine the wifi driver has picked up some rather very common and intrusive issues as of late. Its unrelated to my wifi patches I always test seperatly. But dont be surprised if logs fill up with ATH errors. Oh and sound too no matter which sound stack they all have a ton of errors reported to logs. I was going thru and limiting the various log spammers, but I eventually got tired of keeping up with it. The information below is mostly legacy stuff tho sum may still apply. The supported hardware is old. Altho I havent personally tested the cellular modem has drivers and everything it needs, and I do believe the Displayport over usb-c has most, if not everything it needs. The DPort may need a out of tree patch or two I havent looked into it.
+
+kernel version 5.12.x apparently needs newer a630_sqe.fw I deleted my windows install so not sure
+if it came downin updates but i grabbed from here;
+https://anduin.linuxfromscratch.org/sources/linux-firmware/qcom/
+seems to work fine for me so far
+=======
 Linux kernel
 ============
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 There are several guides for kernel developers and users. These guides can
 be rendered in a number of formats, like HTML and PDF. Please read

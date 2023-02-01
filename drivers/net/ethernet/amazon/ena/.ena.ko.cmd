@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/amazon/ena/ena.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/amazon/ena/ena.ko drivers/net/ethernet/amazon/ena/ena.o drivers/net/ethernet/amazon/ena/ena.mod.o;  true

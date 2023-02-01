@@ -842,7 +842,12 @@ static int intel_pt_walk_next_insn(struct intel_pt_insn *intel_pt_insn,
 						    offset, buf,
 						    INTEL_PT_INSN_BUF_SZ);
 			if (len <= 0) {
+<<<<<<< HEAD
+				intel_pt_log("ERROR: failed to read at offset %#" PRIx64 " ",
+					     offset);
+=======
 				intel_pt_log("ERROR: failed to read at %" PRIu64 " ", offset);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				if (intel_pt_enable_logging)
 					dso__fprintf(al.map->dso, intel_pt_log_fp());
 				return -EINVAL;
@@ -2418,6 +2423,8 @@ static int intel_pt_synth_error(struct intel_pt *pt, int code, int cpu,
 				pid_t pid, pid_t tid, u64 ip, u64 timestamp,
 				pid_t machine_pid, int vcpu)
 {
+	bool dump_log_on_error = pt->synth_opts.log_plus_flags & AUXTRACE_LOG_FLG_ON_ERROR;
+	bool log_on_stdout = pt->synth_opts.log_plus_flags & AUXTRACE_LOG_FLG_USE_STDOUT;
 	union perf_event event;
 	char msg[MAX_AUXTRACE_ERROR_MSG];
 	int err;
@@ -2436,6 +2443,19 @@ static int intel_pt_synth_error(struct intel_pt *pt, int code, int cpu,
 	auxtrace_synth_guest_error(&event.auxtrace_error, PERF_AUXTRACE_ERROR_ITRACE,
 				   code, cpu, pid, tid, ip, msg, timestamp,
 				   machine_pid, vcpu);
+<<<<<<< HEAD
+
+	if (intel_pt_enable_logging && !log_on_stdout) {
+		FILE *fp = intel_pt_log_fp();
+
+		if (fp)
+			perf_event__fprintf_auxtrace_error(&event, fp);
+	}
+
+	if (code != INTEL_PT_ERR_LOST && dump_log_on_error)
+		intel_pt_log_dump_buf();
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	err = perf_session__deliver_synth_event(pt->session, &event, NULL);
 	if (err)
@@ -4276,8 +4296,17 @@ int intel_pt_process_auxtrace_info(union perf_event *event,
 		goto err_delete_thread;
 	}
 
+<<<<<<< HEAD
+	if (pt->synth_opts.log) {
+		bool log_on_error = pt->synth_opts.log_plus_flags & AUXTRACE_LOG_FLG_ON_ERROR;
+		unsigned int log_on_error_size = pt->synth_opts.log_on_error_size;
+
+		intel_pt_log_enable(log_on_error, log_on_error_size);
+	}
+=======
 	if (pt->synth_opts.log)
 		intel_pt_log_enable();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Maximum non-turbo ratio is TSC freq / 100 MHz */
 	if (pt->tc.time_mult) {

@@ -121,6 +121,8 @@
 #define PSE_FQFC_CFG1		0x100
 #define PSE_FQFC_CFG2		0x104
 #define PSE_DROP_CFG		0x108
+<<<<<<< HEAD
+#define PSE_PPE0_DROP		0x110
 
 /* PSE Input Queue Reservation Register*/
 #define PSE_IQ_REV(x)		(0x140 + (((x) - 1) << 2))
@@ -128,6 +130,15 @@
 /* PSE Output Queue Threshold Register*/
 #define PSE_OQ_TH(x)		(0x160 + (((x) - 1) << 2))
 
+=======
+
+/* PSE Input Queue Reservation Register*/
+#define PSE_IQ_REV(x)		(0x140 + (((x) - 1) << 2))
+
+/* PSE Output Queue Threshold Register*/
+#define PSE_OQ_TH(x)		(0x160 + (((x) - 1) << 2))
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* GDM and CDM Threshold */
 #define MTK_GDM2_THRES		0x1530
 #define MTK_CDMW0_THRES		0x164c
@@ -269,9 +280,12 @@
 #define TX_DMA_FPORT_MASK_V2	0xf
 #define TX_DMA_SWC_V2		BIT(30)
 
+<<<<<<< HEAD
+=======
 #define MTK_WDMA0_BASE		0x2800
 #define MTK_WDMA1_BASE		0x2c00
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* QDMA descriptor txd4 */
 #define TX_DMA_CHKSUM		(0x7 << 29)
 #define TX_DMA_TSO		BIT(28)
@@ -319,8 +333,13 @@
 #define MTK_RXD5_PPE_CPU_REASON	GENMASK(22, 18)
 #define MTK_RXD5_SRC_PORT	GENMASK(29, 26)
 
+<<<<<<< HEAD
+#define RX_DMA_GET_SPORT(x)	(((x) >> 19) & 0x7)
+#define RX_DMA_GET_SPORT_V2(x)	(((x) >> 26) & 0xf)
+=======
 #define RX_DMA_GET_SPORT(x)	(((x) >> 19) & 0xf)
 #define RX_DMA_GET_SPORT_V2(x)	(((x) >> 26) & 0x7)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* PDMA V2 descriptor rxd3 */
 #define RX_DMA_VTAG_V2		BIT(0)
@@ -451,17 +470,31 @@
 /* ethernet reset control register */
 #define ETHSYS_RSTCTRL			0x34
 #define RSTCTRL_FE			BIT(6)
+<<<<<<< HEAD
+#define RSTCTRL_PPE0			BIT(31)
+#define RSTCTRL_PPE0_V2			BIT(30)
+#define RSTCTRL_PPE1			BIT(31)
+=======
 #define RSTCTRL_PPE			BIT(31)
 #define RSTCTRL_PPE1			BIT(30)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define RSTCTRL_ETH			BIT(23)
 
 /* ethernet reset check idle register */
 #define ETHSYS_FE_RST_CHK_IDLE_EN	0x28
 
+<<<<<<< HEAD
+/* ethernet dma channel agent map */
+#define ETHSYS_DMA_AG_MAP	0x408
+#define ETHSYS_DMA_AG_MAP_PDMA	BIT(0)
+#define ETHSYS_DMA_AG_MAP_QDMA	BIT(1)
+#define ETHSYS_DMA_AG_MAP_PPE	BIT(2)
+=======
 /* ethernet reset control register */
 #define ETHSYS_RSTCTRL		0x34
 #define RSTCTRL_FE		BIT(6)
 #define RSTCTRL_PPE		BIT(31)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /* ethernet dma channel agent map */
 #define ETHSYS_DMA_AG_MAP	0x408
@@ -955,6 +988,12 @@ struct mtk_reg_map {
 		u32	fq_blen;	/* fq free page buffer length */
 	} qdma;
 	u32	gdm1_cnt;
+<<<<<<< HEAD
+	u32	gdma_to_ppe;
+	u32	ppe_base;
+	u32	wdma_base[2];
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /* struct mtk_eth_data -	This is the structure holding all differences
@@ -968,6 +1007,11 @@ struct mtk_reg_map {
  *				the target SoC
  * @required_pctl		A bool value to show whether the SoC requires
  *				the extra setup for those pins used by GMAC.
+<<<<<<< HEAD
+ * @hash_offset			Flow table hash offset.
+ * @foe_entry_size		Foe table entry size.
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @txd_size			Tx DMA descriptor size.
  * @rxd_size			Rx DMA descriptor size.
  * @rx_irq_done_mask		Rx irq done register mask.
@@ -982,6 +1026,11 @@ struct mtk_soc_data {
 	u32		required_clks;
 	bool		required_pctl;
 	u8		offload_version;
+<<<<<<< HEAD
+	u8		hash_offset;
+	u16		foe_entry_size;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	netdev_features_t hw_features;
 	struct {
 		u32	txd_size;
@@ -1111,7 +1160,11 @@ struct mtk_eth {
 
 	int				ip_align;
 
+<<<<<<< HEAD
+	struct mtk_ppe			*ppe[2];
+=======
 	struct mtk_ppe			*ppe;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct rhashtable		flow_table;
 
 	struct bpf_prog			__rcu *prog;
@@ -1141,6 +1194,86 @@ struct mtk_mac {
 
 /* the struct describing the SoC. these are declared in the soc_xyz.c files */
 extern const struct of_device_id of_mtk_match[];
+
+static inline struct mtk_foe_entry *
+mtk_foe_get_entry(struct mtk_ppe *ppe, u16 hash)
+{
+	const struct mtk_soc_data *soc = ppe->eth->soc;
+
+	return ppe->foe_table + hash * soc->foe_entry_size;
+}
+
+static inline u32 mtk_get_ib1_ts_mask(struct mtk_eth *eth)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return MTK_FOE_IB1_BIND_TIMESTAMP_V2;
+
+	return MTK_FOE_IB1_BIND_TIMESTAMP;
+}
+
+static inline u32 mtk_get_ib1_ppoe_mask(struct mtk_eth *eth)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return MTK_FOE_IB1_BIND_PPPOE_V2;
+
+	return MTK_FOE_IB1_BIND_PPPOE;
+}
+
+static inline u32 mtk_get_ib1_vlan_tag_mask(struct mtk_eth *eth)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return MTK_FOE_IB1_BIND_VLAN_TAG_V2;
+
+	return MTK_FOE_IB1_BIND_VLAN_TAG;
+}
+
+static inline u32 mtk_get_ib1_vlan_layer_mask(struct mtk_eth *eth)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return MTK_FOE_IB1_BIND_VLAN_LAYER_V2;
+
+	return MTK_FOE_IB1_BIND_VLAN_LAYER;
+}
+
+static inline u32 mtk_prep_ib1_vlan_layer(struct mtk_eth *eth, u32 val)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return FIELD_PREP(MTK_FOE_IB1_BIND_VLAN_LAYER_V2, val);
+
+	return FIELD_PREP(MTK_FOE_IB1_BIND_VLAN_LAYER, val);
+}
+
+static inline u32 mtk_get_ib1_vlan_layer(struct mtk_eth *eth, u32 val)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return FIELD_GET(MTK_FOE_IB1_BIND_VLAN_LAYER_V2, val);
+
+	return FIELD_GET(MTK_FOE_IB1_BIND_VLAN_LAYER, val);
+}
+
+static inline u32 mtk_get_ib1_pkt_type_mask(struct mtk_eth *eth)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return MTK_FOE_IB1_PACKET_TYPE_V2;
+
+	return MTK_FOE_IB1_PACKET_TYPE;
+}
+
+static inline u32 mtk_get_ib1_pkt_type(struct mtk_eth *eth, u32 val)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return FIELD_GET(MTK_FOE_IB1_PACKET_TYPE_V2, val);
+
+	return FIELD_GET(MTK_FOE_IB1_PACKET_TYPE, val);
+}
+
+static inline u32 mtk_get_ib2_multicast_mask(struct mtk_eth *eth)
+{
+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_NETSYS_V2))
+		return MTK_FOE_IB2_MULTICAST_V2;
+
+	return MTK_FOE_IB2_MULTICAST;
+}
 
 /* read the hardware status register */
 void mtk_stats_update_mac(struct mtk_mac *mac);

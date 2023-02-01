@@ -1,0 +1,1 @@
+cmd_drivers/media/radio/tea575x.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/radio/tea575x.ko drivers/media/radio/tea575x.o drivers/media/radio/tea575x.mod.o;  true

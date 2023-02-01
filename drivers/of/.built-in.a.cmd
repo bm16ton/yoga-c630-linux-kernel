@@ -1,0 +1,1 @@
+cmd_drivers/of/built-in.a := rm -f drivers/of/built-in.a;  printf "drivers/of/%s " base.o device.o platform.o property.o kobj.o dynamic.o fdt.o fdt_address.o address.o irq.o of_reserved_mem.o resolver.o overlay.o of_numa.o | xargs ar cDPrST drivers/of/built-in.a

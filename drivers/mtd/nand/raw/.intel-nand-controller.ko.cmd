@@ -1,0 +1,1 @@
+cmd_drivers/mtd/nand/raw/intel-nand-controller.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/nand/raw/intel-nand-controller.ko drivers/mtd/nand/raw/intel-nand-controller.o drivers/mtd/nand/raw/intel-nand-controller.mod.o;  true

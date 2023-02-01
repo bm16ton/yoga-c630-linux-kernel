@@ -15,7 +15,22 @@
 import sys
 import os
 import sphinx
+import shutil
 
+<<<<<<< HEAD
+# helper
+# ------
+
+def have_command(cmd):
+    """Search ``cmd`` in the ``PATH`` environment.
+
+    If found, return True.
+    If not found, return False.
+    """
+    return shutil.which(cmd) is not None
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 # Get Sphinx version
 major, minor, patch = sphinx.version_info[:3]
 
@@ -107,7 +122,32 @@ else:
 autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 2
 
-extensions.append("sphinx.ext.imgmath")
+# Load math renderer:
+# For html builder, load imgmath only when its dependencies are met.
+# mathjax is the default math renderer since Sphinx 1.8.
+have_latex =  have_command('latex')
+have_dvipng = have_command('dvipng')
+load_imgmath = have_latex and have_dvipng
+
+# Respect SPHINX_IMGMATH (for html docs only)
+if 'SPHINX_IMGMATH' in os.environ:
+    env_sphinx_imgmath = os.environ['SPHINX_IMGMATH']
+    if 'yes' in env_sphinx_imgmath:
+        load_imgmath = True
+    elif 'no' in env_sphinx_imgmath:
+        load_imgmath = False
+    else:
+        sys.stderr.write("Unknown env SPHINX_IMGMATH=%s ignored.\n" % env_sphinx_imgmath)
+
+# Always load imgmath for Sphinx <1.8 or for epub docs
+load_imgmath = (load_imgmath or (major == 1 and minor < 8)
+                or 'epub' in sys.argv)
+
+if load_imgmath:
+    extensions.append("sphinx.ext.imgmath")
+    math_renderer = 'imgmath'
+else:
+    math_renderer = 'mathjax'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -333,7 +373,8 @@ html_static_path = ['sphinx-static']
 html_use_smartypants = False
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+# Note that the RTD theme ignores this.
+html_sidebars = { '**': ['searchbox.html', 'localtoc.html', 'sourcelink.html']}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -390,6 +431,7 @@ latex_elements = {
 
     # The font size ('10pt', '11pt' or '12pt').
     'pointsize': '11pt',
+<<<<<<< HEAD
 
     # Latex figure (float) alignment
     #'figure_align': 'htbp',
@@ -408,6 +450,26 @@ latex_elements = {
     # For CJK One-half spacing, need to be in front of hyperref
     'extrapackages': r'\usepackage{setspace}',
 
+=======
+
+    # Latex figure (float) alignment
+    #'figure_align': 'htbp',
+
+    # Don't mangle with UTF-8 chars
+    'inputenc': '',
+    'utf8extra': '',
+
+    # Set document margins
+    'sphinxsetup': '''
+        hmargin=0.5in, vmargin=1in,
+        parsedliteralwraps=true,
+        verbatimhintsturnover=false,
+    ''',
+
+    # For CJK One-half spacing, need to be in front of hyperref
+    'extrapackages': r'\usepackage{setspace}',
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
     # Additional stuff for the LaTeX preamble.
     'preamble': '''
         % Use some font with UTF-8 support with XeLaTeX

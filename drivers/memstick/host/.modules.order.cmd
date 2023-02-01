@@ -1,0 +1,1 @@
+cmd_drivers/memstick/host/modules.order := {   echo drivers/memstick/host/tifm_ms.ko;   echo drivers/memstick/host/jmb38x_ms.ko;   echo drivers/memstick/host/r592.ko;   echo drivers/memstick/host/rtsx_pci_ms.ko;   echo drivers/memstick/host/rtsx_usb_ms.ko; :; } > drivers/memstick/host/modules.order

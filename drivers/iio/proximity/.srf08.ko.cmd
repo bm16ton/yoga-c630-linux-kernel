@@ -1,0 +1,1 @@
+cmd_drivers/iio/proximity/srf08.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/proximity/srf08.ko drivers/iio/proximity/srf08.o drivers/iio/proximity/srf08.mod.o;  true

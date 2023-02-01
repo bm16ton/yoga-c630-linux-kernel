@@ -606,7 +606,11 @@ void bmi088_accel_core_remove(struct device *dev)
 }
 EXPORT_SYMBOL_NS_GPL(bmi088_accel_core_remove, IIO_BMI088);
 
+<<<<<<< HEAD
+static int bmi088_accel_runtime_suspend(struct device *dev)
+=======
 static int __maybe_unused bmi088_accel_runtime_suspend(struct device *dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct iio_dev *indio_dev = dev_get_drvdata(dev);
 	struct bmi088_accel_data *data = iio_priv(indio_dev);
@@ -614,7 +618,11 @@ static int __maybe_unused bmi088_accel_runtime_suspend(struct device *dev)
 	return bmi088_accel_power_down(data);
 }
 
+<<<<<<< HEAD
+static int bmi088_accel_runtime_resume(struct device *dev)
+=======
 static int __maybe_unused bmi088_accel_runtime_resume(struct device *dev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct iio_dev *indio_dev = dev_get_drvdata(dev);
 	struct bmi088_accel_data *data = iio_priv(indio_dev);
@@ -622,6 +630,12 @@ static int __maybe_unused bmi088_accel_runtime_resume(struct device *dev)
 	return bmi088_accel_power_up(data);
 }
 
+<<<<<<< HEAD
+EXPORT_NS_GPL_RUNTIME_DEV_PM_OPS(bmi088_accel_pm_ops,
+				 bmi088_accel_runtime_suspend,
+				 bmi088_accel_runtime_resume, NULL,
+				 IIO_BMI088);
+=======
 const struct dev_pm_ops bmi088_accel_pm_ops = {
 	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
 				pm_runtime_force_resume)
@@ -629,6 +643,7 @@ const struct dev_pm_ops bmi088_accel_pm_ops = {
 			   bmi088_accel_runtime_resume, NULL)
 };
 EXPORT_SYMBOL_NS_GPL(bmi088_accel_pm_ops, IIO_BMI088);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 MODULE_AUTHOR("Niek van Agt <niek.van.agt@topicproducts.com>");
 MODULE_LICENSE("GPL v2");

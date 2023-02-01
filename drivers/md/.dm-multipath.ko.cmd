@@ -1,0 +1,1 @@
+cmd_drivers/md/dm-multipath.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/md/dm-multipath.ko drivers/md/dm-multipath.o drivers/md/dm-multipath.mod.o;  true

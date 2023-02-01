@@ -2,12 +2,65 @@
 //
 // Copyright (C) 2020 Pengutronix, Ulrich Oelmann <kernel@pengutronix.de>
 
+<<<<<<< HEAD
+/ {
+	touchscreen {
+		compatible = "resistive-adc-touch";
+		io-channels = <&adc_ts 1>, <&adc_ts 3>, <&adc_ts 4>, <&adc_ts 5>;
+		io-channel-names = "y", "z1", "z2", "x";
+		touchscreen-min-pressure = <65000>;
+		touchscreen-inverted-y;
+		touchscreen-swapped-x-y;
+		touchscreen-x-plate-ohms = <300>;
+		touchscreen-y-plate-ohms = <800>;
+	};
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 &ecspi4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi4>;
 	cs-gpios = <&gpio3 20 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
+<<<<<<< HEAD
+	adc_ts: adc@0 {
+		compatible = "ti,tsc2046e-adc";
+		reg = <0>;
+		pinctrl-0 = <&pinctrl_touch>;
+		pinctrl-names ="default";
+		spi-max-frequency = <1000000>;
+		interrupts-extended = <&gpio3 19 IRQ_TYPE_LEVEL_LOW>;
+		#io-channel-cells = <1>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		channel@1 {
+			reg = <1>;
+			settling-time-us = <700>;
+			oversampling-ratio = <5>;
+		};
+
+		channel@3 {
+			reg = <3>;
+			settling-time-us = <700>;
+			oversampling-ratio = <5>;
+		};
+
+		channel@4 {
+			reg = <4>;
+			settling-time-us = <700>;
+			oversampling-ratio = <5>;
+		};
+
+		channel@5 {
+			reg = <5>;
+			settling-time-us = <700>;
+			oversampling-ratio = <5>;
+		};
+=======
 	touchscreen@0 {
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_touch>;
@@ -31,6 +84,7 @@
 		touchscreen-swapped-x-y;
 		touchscreen-inverted-y;
 		wakeup-source;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 

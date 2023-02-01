@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/snd-soc-wcd-mbhc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o sound/soc/codecs/snd-soc-wcd-mbhc.ko sound/soc/codecs/snd-soc-wcd-mbhc.o sound/soc/codecs/snd-soc-wcd-mbhc.mod.o;  true

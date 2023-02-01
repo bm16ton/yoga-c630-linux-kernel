@@ -1,0 +1,1 @@
+cmd_drivers/iio/adc/ti-ads8688.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/adc/ti-ads8688.ko drivers/iio/adc/ti-ads8688.o drivers/iio/adc/ti-ads8688.mod.o;  true

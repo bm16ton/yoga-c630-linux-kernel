@@ -1,0 +1,1 @@
+cmd_drivers/media/pci/saa7164/saa7164.mod := printf '%s\n'   saa7164-cards.o saa7164-core.o saa7164-i2c.o saa7164-dvb.o saa7164-fw.o saa7164-bus.o saa7164-cmd.o saa7164-api.o saa7164-buffer.o saa7164-encoder.o saa7164-vbi.o | awk '!x[$$0]++ { print("drivers/media/pci/saa7164/"$$0) }' > drivers/media/pci/saa7164/saa7164.mod

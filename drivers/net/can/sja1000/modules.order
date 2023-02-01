@@ -1,0 +1,7 @@
+drivers/net/can/sja1000/ems_pci.ko
+drivers/net/can/sja1000/kvaser_pci.ko
+drivers/net/can/sja1000/peak_pci.ko
+drivers/net/can/sja1000/plx_pci.ko
+drivers/net/can/sja1000/sja1000.ko
+drivers/net/can/sja1000/sja1000_isa.ko
+drivers/net/can/sja1000/sja1000_platform.ko

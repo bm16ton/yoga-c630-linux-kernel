@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/stmicro/stmmac/stmmac-platform.mod := printf '%s\n'   stmmac_platform.o | awk '!x[$$0]++ { print("drivers/net/ethernet/stmicro/stmmac/"$$0) }' > drivers/net/ethernet/stmicro/stmmac/stmmac-platform.mod

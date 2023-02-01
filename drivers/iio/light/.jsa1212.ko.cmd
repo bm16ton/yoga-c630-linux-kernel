@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/jsa1212.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/jsa1212.ko drivers/iio/light/jsa1212.o drivers/iio/light/jsa1212.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/iio/magnetometer/bmc150_magn.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/magnetometer/bmc150_magn.ko drivers/iio/magnetometer/bmc150_magn.o drivers/iio/magnetometer/bmc150_magn.mod.o;  true

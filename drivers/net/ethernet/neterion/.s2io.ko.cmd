@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/neterion/s2io.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/neterion/s2io.ko drivers/net/ethernet/neterion/s2io.o drivers/net/ethernet/neterion/s2io.mod.o;  true

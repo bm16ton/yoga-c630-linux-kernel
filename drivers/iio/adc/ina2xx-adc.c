@@ -1034,7 +1034,7 @@ static int ina2xx_probe(struct i2c_client *client,
 	return iio_device_register(indio_dev);
 }
 
-static int ina2xx_remove(struct i2c_client *client)
+static void ina2xx_remove(struct i2c_client *client)
 {
 	struct iio_dev *indio_dev = i2c_get_clientdata(client);
 	struct ina2xx_chip_info *chip = iio_priv(indio_dev);
@@ -1048,8 +1048,11 @@ static int ina2xx_remove(struct i2c_client *client)
 	if (ret)
 		dev_warn(&client->dev, "Failed to power down device (%pe)\n",
 			 ERR_PTR(ret));
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id ina2xx_id[] = {

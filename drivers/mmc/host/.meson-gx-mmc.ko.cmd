@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/meson-gx-mmc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/meson-gx-mmc.ko drivers/mmc/host/meson-gx-mmc.o drivers/mmc/host/meson-gx-mmc.mod.o;  true

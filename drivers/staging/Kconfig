@@ -24,8 +24,6 @@ menuconfig STAGING
 
 if STAGING
 
-source "drivers/staging/irda/net/Kconfig"
-
 source "drivers/staging/wlan-ng/Kconfig"
 
 source "drivers/staging/olpc_dcon/Kconfig"
@@ -62,10 +60,13 @@ source "drivers/staging/board/Kconfig"
 
 source "drivers/staging/gdm724x/Kconfig"
 
+<<<<<<< HEAD
+=======
 source "drivers/staging/fwserial/Kconfig"
 
 source "drivers/staging/clocking-wizard/Kconfig"
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 source "drivers/staging/fbtft/Kconfig"
 
 source "drivers/staging/most/Kconfig"

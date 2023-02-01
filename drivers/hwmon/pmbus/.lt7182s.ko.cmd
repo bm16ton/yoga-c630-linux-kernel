@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/lt7182s.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/lt7182s.ko drivers/hwmon/pmbus/lt7182s.o drivers/hwmon/pmbus/lt7182s.mod.o;  true

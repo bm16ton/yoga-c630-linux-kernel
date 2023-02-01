@@ -17,7 +17,11 @@
 #define WORLDREADABLE 0x08000000
 #define SIGNEDUPDATE 0x01000000
 
+<<<<<<< HEAD
+#define PLPKS_VAR_LINUX	0x02
+=======
 #define PLPKS_VAR_LINUX	0x01
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #define PLPKS_VAR_COMMON	0x04
 
 struct plpks_var {

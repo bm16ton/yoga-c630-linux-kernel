@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/panel/panel-boe-bf060y8m-aj0.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/gpu/drm/panel/panel-boe-bf060y8m-aj0.ko drivers/gpu/drm/panel/panel-boe-bf060y8m-aj0.o drivers/gpu/drm/panel/panel-boe-bf060y8m-aj0.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/esas2r/esas2r.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/esas2r/esas2r.ko drivers/scsi/esas2r/esas2r.o drivers/scsi/esas2r/esas2r.mod.o;  true

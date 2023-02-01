@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/pli1209bc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/pli1209bc.ko drivers/hwmon/pmbus/pli1209bc.o drivers/hwmon/pmbus/pli1209bc.mod.o;  true

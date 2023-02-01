@@ -1,0 +1,1 @@
+cmd_drivers/iio/pressure/mpl115.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/pressure/mpl115.ko drivers/iio/pressure/mpl115.o drivers/iio/pressure/mpl115.mod.o;  true

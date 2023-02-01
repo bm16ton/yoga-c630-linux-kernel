@@ -17,6 +17,8 @@
 	#address-cells = <2>;
 	#size-cells = <2>;
 
+<<<<<<< HEAD
+=======
 	aliases {
 		i2c0 = &i2c0;
 		i2c1 = &i2c1;
@@ -28,6 +30,7 @@
 		i2c7 = &iic_pmic;
 	};
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * The external audio clocks are configured as 0 Hz fixed frequency
 	 * clocks by default.
@@ -2334,7 +2337,6 @@
 			reg-names = "regs", "dirmap", "wbuf";
 			interrupts = <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&cpg CPG_MOD 917>;
-			clock-names = "rpc";
 			power-domains = <&sysc R8A774A1_PD_ALWAYS_ON>;
 			resets = <&cpg 917>;
 			#address-cells = <1>;

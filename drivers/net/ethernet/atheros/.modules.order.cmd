@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/atheros/modules.order := {   cat drivers/net/ethernet/atheros/atlx/modules.order;   cat drivers/net/ethernet/atheros/atl1e/modules.order;   cat drivers/net/ethernet/atheros/atl1c/modules.order;   cat drivers/net/ethernet/atheros/alx/modules.order; :; } > drivers/net/ethernet/atheros/modules.order

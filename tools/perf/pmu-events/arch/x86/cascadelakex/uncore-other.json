@@ -1477,7 +1477,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x01",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1489,7 +1492,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x02",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1501,7 +1507,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x04",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1513,7 +1522,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x08",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x01",
         "Unit": "IIO"
     },
@@ -1584,7 +1596,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x01",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -1596,7 +1611,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x02",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -1608,7 +1626,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x04",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -1620,7 +1641,10 @@
         "FCMask": "0x07",
         "PerPkg": "1",
         "PortMask": "0x08",
+<<<<<<< HEAD
+=======
         "ScaleUnit": "4Bytes",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x04",
         "Unit": "IIO"
     },
@@ -2254,7 +2278,11 @@
         "Unit": "UPI LL"
     },
     {
+<<<<<<< HEAD
+        "BriefDescription": "FLITs received which bypassed the Slot0 Recieve Buffer",
+=======
         "BriefDescription": "FLITs received which bypassed the Slot0 Receive Buffer",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "Counter": "0,1,2,3",
         "EventCode": "0x31",
         "EventName": "UNC_UPI_RxL_BYPASSED.SLOT2",
@@ -22604,6 +22632,7 @@
         "Counter": "0,1,2",
         "EventCode": "0x21",
         "EventName": "UNC_M3UPI_UPI_PEER_BL_CREDITS_EMPTY.VNA",
+<<<<<<< HEAD
         "PerPkg": "1",
         "UMask": "0x01",
         "Unit": "M3UPI"
@@ -22614,6 +22643,18 @@
         "EventCode": "0x21",
         "EventName": "UNC_M3UPI_UPI_PEER_BL_CREDITS_EMPTY.VN0_RSP",
         "PerPkg": "1",
+=======
+        "PerPkg": "1",
+        "UMask": "0x01",
+        "Unit": "M3UPI"
+    },
+    {
+        "BriefDescription": "UPI0 BL Credits Empty; VN0 REQ Messages",
+        "Counter": "0,1,2",
+        "EventCode": "0x21",
+        "EventName": "UNC_M3UPI_UPI_PEER_BL_CREDITS_EMPTY.VN0_RSP",
+        "PerPkg": "1",
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         "UMask": "0x02",
         "Unit": "M3UPI"
     },

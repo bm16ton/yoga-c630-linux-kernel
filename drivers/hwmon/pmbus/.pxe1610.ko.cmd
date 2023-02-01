@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/pxe1610.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/pxe1610.ko drivers/hwmon/pmbus/pxe1610.o drivers/hwmon/pmbus/pxe1610.mod.o;  true

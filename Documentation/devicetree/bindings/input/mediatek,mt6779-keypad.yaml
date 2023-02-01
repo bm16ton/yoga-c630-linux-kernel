@@ -4,7 +4,11 @@
 $id: http://devicetree.org/schemas/input/mediatek,mt6779-keypad.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
+<<<<<<< HEAD
+title: Mediatek's Keypad Controller
+=======
 title: Mediatek's Keypad Controller device tree bindings
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 maintainers:
   - Mattijs Korpershoek <mkorpershoek@baylibre.com>
@@ -49,6 +53,15 @@ properties:
     maximum: 256
     default: 16
 
+<<<<<<< HEAD
+  mediatek,keys-per-group:
+    description: each (row, column) group has multiple keys
+    $ref: /schemas/types.yaml#/definitions/uint32
+    default: 1
+    maximum: 2
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 required:
   - compatible
   - reg
@@ -56,7 +69,11 @@ required:
   - clocks
   - clock-names
 
+<<<<<<< HEAD
+unevaluatedProperties: false
+=======
 additionalProperties: false
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 examples:
   - |

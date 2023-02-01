@@ -861,25 +861,6 @@ bool eqNByte(u8 *str1, u8 *str2, u32 num)
 
 /*  */
 /* 	Description: */
-/* 		Return true if chTmp is represent for hex digit and */
-/* 		false otherwise. */
-/*  */
-/*  */
-bool IsHexDigit(char chTmp)
-{
-	if (
-		(chTmp >= '0' && chTmp <= '9') ||
-		(chTmp >= 'a' && chTmp <= 'f') ||
-		(chTmp >= 'A' && chTmp <= 'F')
-	)
-		return true;
-	else
-		return false;
-}
-
-
-/*  */
-/* 	Description: */
 /* 		Translate a character to hex digit. */
 /*  */
 u32 MapCharToHexDigit(char chTmp)
@@ -894,6 +875,8 @@ u32 MapCharToHexDigit(char chTmp)
 		return 0;
 }
 
+<<<<<<< HEAD
+=======
 
 
 /* 	Description: */
@@ -994,6 +977,7 @@ bool IsCommentString(char *szStr)
 		return false;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 bool GetU1ByteIntegerFromStringInDecimal(char *Str, u8 *pInt)
 {
 	u16 i = 0;

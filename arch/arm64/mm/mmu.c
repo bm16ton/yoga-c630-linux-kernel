@@ -372,11 +372,11 @@ static void alloc_init_pud(pgd_t *pgdp, unsigned long addr, unsigned long end,
 		mutex_unlock(&fixmap_lock);
 }
 
-static void __create_pgd_mapping(pgd_t *pgdir, phys_addr_t phys,
-				 unsigned long virt, phys_addr_t size,
-				 pgprot_t prot,
-				 phys_addr_t (*pgtable_alloc)(int),
-				 int flags)
+static void __create_pgd_mapping_locked(pgd_t *pgdir, phys_addr_t phys,
+					unsigned long virt, phys_addr_t size,
+					pgprot_t prot,
+					phys_addr_t (*pgtable_alloc)(int),
+					int flags)
 {
 	unsigned long addr, end, next;
 	pgd_t *pgdp = pgd_offset_pgd(pgdir, virt);
@@ -400,8 +400,25 @@ static void __create_pgd_mapping(pgd_t *pgdir, phys_addr_t phys,
 	} while (pgdp++, addr = next, addr != end);
 }
 
+<<<<<<< HEAD
+static void __create_pgd_mapping(pgd_t *pgdir, phys_addr_t phys,
+				 unsigned long virt, phys_addr_t size,
+				 pgprot_t prot,
+				 phys_addr_t (*pgtable_alloc)(int),
+				 int flags)
+{
+	mutex_lock(&fixmap_lock);
+	__create_pgd_mapping_locked(pgdir, phys, virt, size, prot,
+				    pgtable_alloc, flags);
+	mutex_unlock(&fixmap_lock);
+}
+
+#ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+extern __alias(__create_pgd_mapping_locked)
+=======
 #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
 extern __alias(__create_pgd_mapping)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void create_kpti_ng_temp_pgd(pgd_t *pgdir, phys_addr_t phys, unsigned long virt,
 			     phys_addr_t size, pgprot_t prot,
 			     phys_addr_t (*pgtable_alloc)(int), int flags);
@@ -686,7 +703,7 @@ static bool arm64_early_this_cpu_has_bti(void)
 
 	pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
 	return cpuid_feature_extract_unsigned_field(pfr1,
-						    ID_AA64PFR1_BT_SHIFT);
+						    ID_AA64PFR1_EL1_BT_SHIFT);
 }
 
 /*
@@ -1180,6 +1197,8 @@ static void free_empty_tables(unsigned long addr, unsigned long end,
 }
 #endif
 
+<<<<<<< HEAD
+=======
 #if !ARM64_KERNEL_USES_PMD_MAPS
 int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 		struct vmem_altmap *altmap)
@@ -1188,6 +1207,7 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 	return vmemmap_populate_basepages(start, end, node, altmap);
 }
 #else	/* !ARM64_KERNEL_USES_PMD_MAPS */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 		struct vmem_altmap *altmap)
 {
@@ -1199,6 +1219,10 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 	pmd_t *pmdp;
 
 	WARN_ON((start < VMEMMAP_START) || (end > VMEMMAP_END));
+
+	if (!ARM64_KERNEL_USES_PMD_MAPS)
+		return vmemmap_populate_basepages(start, end, node, altmap);
+
 	do {
 		next = pmd_addr_end(addr, end);
 
@@ -1232,7 +1256,10 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 
 	return 0;
 }
+<<<<<<< HEAD
+=======
 #endif	/* !ARM64_KERNEL_USES_PMD_MAPS */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #ifdef CONFIG_MEMORY_HOTPLUG
 void vmemmap_free(unsigned long start, unsigned long end,

@@ -1,0 +1,1 @@
+cmd_drivers/devfreq/built-in.a := rm -f drivers/devfreq/built-in.a;  printf "drivers/devfreq/%s " devfreq.o devfreq-event.o governor_simpleondemand.o event/built-in.a | xargs ar cDPrST drivers/devfreq/built-in.a

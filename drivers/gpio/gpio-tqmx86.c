@@ -307,6 +307,8 @@ static int tqmx86_gpio_probe(struct platform_device *pdev)
 		girq->default_type = IRQ_TYPE_NONE;
 		girq->handler = handle_simple_irq;
 		girq->init_valid_mask = tqmx86_init_irq_valid_mask;
+
+		irq_domain_set_pm_device(girq->domain, dev);
 	}
 
 	ret = devm_gpiochip_add_data(dev, chip, gpio);

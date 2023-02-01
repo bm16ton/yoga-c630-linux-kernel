@@ -1,0 +1,1 @@
+cmd_drivers/thermal/qcom/qcom-spmi-adc-tm5.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/thermal/qcom/qcom-spmi-adc-tm5.ko drivers/thermal/qcom/qcom-spmi-adc-tm5.o drivers/thermal/qcom/qcom-spmi-adc-tm5.mod.o;  true

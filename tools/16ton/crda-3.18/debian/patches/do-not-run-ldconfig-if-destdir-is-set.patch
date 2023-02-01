@@ -1,0 +1,16 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 23 Aug 2014 11:13:44 -0700
+Subject: Do not run ldconfig if DESTDIR is set
+
+--- a/Makefile
++++ b/Makefile
+@@ -132,7 +132,9 @@ install-libreg:
+ 	$(NQ) '  INSTALL  libreg'
+ 	$(Q)mkdir -p $(DESTDIR)/$(LIBDIR)
+ 	$(Q)cp $(LIBREG) $(DESTDIR)/$(LIBDIR)/
++ifndef DESTDIR
+ 	$(Q)ldconfig
++endif
+ 
+ %.o: %.c regdb.h $(LIBREG)
+ 	$(NQ) '  CC  ' $@

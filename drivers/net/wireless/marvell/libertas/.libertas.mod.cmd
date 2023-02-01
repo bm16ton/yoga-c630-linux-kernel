@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/libertas/libertas.mod := printf '%s\n'   cfg.o cmd.o cmdresp.o debugfs.o ethtool.o main.o rx.o tx.o firmware.o mesh.o | awk '!x[$$0]++ { print("drivers/net/wireless/marvell/libertas/"$$0) }' > drivers/net/wireless/marvell/libertas/libertas.mod

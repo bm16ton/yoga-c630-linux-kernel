@@ -1,0 +1,6 @@
+drivers/pwm/pwm-cros-ec.ko
+drivers/pwm/pwm-meson.ko
+drivers/pwm/pwm-pca9685.ko
+drivers/pwm/pwm-rockchip.ko
+drivers/pwm/pwm-sun4i.ko
+drivers/pwm/pwm-tegra.ko

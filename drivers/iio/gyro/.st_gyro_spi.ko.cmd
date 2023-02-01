@@ -1,0 +1,1 @@
+cmd_drivers/iio/gyro/st_gyro_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/gyro/st_gyro_spi.ko drivers/iio/gyro/st_gyro_spi.o drivers/iio/gyro/st_gyro_spi.mod.o;  true

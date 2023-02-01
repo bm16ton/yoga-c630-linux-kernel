@@ -2500,6 +2500,10 @@ err_dsp_irq:
 	arizona_set_irq_wake(arizona, ARIZONA_IRQ_DSP_IRQ1, 0);
 	arizona_free_irq(arizona, ARIZONA_IRQ_DSP_IRQ1, wm5110);
 err_jack_codec_dev:
+<<<<<<< HEAD
+	pm_runtime_disable(&pdev->dev);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	arizona_jack_codec_dev_remove(&wm5110->core);
 
 	return ret;

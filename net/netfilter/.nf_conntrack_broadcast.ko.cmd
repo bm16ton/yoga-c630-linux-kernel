@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_conntrack_broadcast.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/nf_conntrack_broadcast.ko net/netfilter/nf_conntrack_broadcast.o net/netfilter/nf_conntrack_broadcast.mod.o;  true

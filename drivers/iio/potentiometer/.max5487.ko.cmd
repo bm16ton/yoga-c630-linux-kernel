@@ -1,0 +1,1 @@
+cmd_drivers/iio/potentiometer/max5487.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/potentiometer/max5487.ko drivers/iio/potentiometer/max5487.o drivers/iio/potentiometer/max5487.mod.o;  true

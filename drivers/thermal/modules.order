@@ -1,0 +1,8 @@
+drivers/thermal/qcom/qcom_tsens.ko
+drivers/thermal/qcom/qcom-spmi-adc-tm5.ko
+drivers/thermal/qcom/qcom-spmi-temp-alarm.ko
+drivers/thermal/sun8i_thermal.ko
+drivers/thermal/rockchip_thermal.ko
+drivers/thermal/armada_thermal.ko
+drivers/thermal/hisi_thermal.ko
+drivers/thermal/thermal-generic-adc.ko

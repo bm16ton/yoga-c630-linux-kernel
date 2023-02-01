@@ -1,0 +1,4 @@
+hip07-d05.o: arch/arm64/boot/dts/hisilicon/hip07-d05.dts \
+ arch/arm64/boot/dts/hisilicon/hip07.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

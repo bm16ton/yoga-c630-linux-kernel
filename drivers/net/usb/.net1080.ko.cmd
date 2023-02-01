@@ -1,0 +1,1 @@
+cmd_drivers/net/usb/net1080.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/usb/net1080.ko drivers/net/usb/net1080.o drivers/net/usb/net1080.mod.o;  true

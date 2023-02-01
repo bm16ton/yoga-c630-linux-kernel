@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/dvb-usb-v2/dvb_usb_v2.mod := printf '%s\n'   dvb_usb_core.o dvb_usb_urb.o usb_urb.o | awk '!x[$$0]++ { print("drivers/media/usb/dvb-usb-v2/"$$0) }' > drivers/media/usb/dvb-usb-v2/dvb_usb_v2.mod

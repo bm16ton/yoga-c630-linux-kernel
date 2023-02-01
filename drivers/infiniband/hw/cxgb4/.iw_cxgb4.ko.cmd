@@ -1,0 +1,1 @@
+cmd_drivers/infiniband/hw/cxgb4/iw_cxgb4.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/infiniband/hw/cxgb4/iw_cxgb4.ko drivers/infiniband/hw/cxgb4/iw_cxgb4.o drivers/infiniband/hw/cxgb4/iw_cxgb4.mod.o;  true

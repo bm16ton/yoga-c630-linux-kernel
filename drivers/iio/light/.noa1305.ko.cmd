@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/noa1305.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/noa1305.ko drivers/iio/light/noa1305.o drivers/iio/light/noa1305.mod.o;  true

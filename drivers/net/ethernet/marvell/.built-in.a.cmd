@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/marvell/built-in.a := rm -f drivers/net/ethernet/marvell/built-in.a;  printf "drivers/net/ethernet/marvell/%s " octeon_ep/built-in.a octeontx2/built-in.a prestera/built-in.a | xargs ar cDPrST drivers/net/ethernet/marvell/built-in.a

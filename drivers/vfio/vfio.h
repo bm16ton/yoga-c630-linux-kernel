@@ -3,6 +3,19 @@
  * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
  *     Author: Alex Williamson <alex.williamson@redhat.com>
  */
+<<<<<<< HEAD
+#ifndef __VFIO_VFIO_H__
+#define __VFIO_VFIO_H__
+
+#include <linux/device.h>
+#include <linux/cdev.h>
+#include <linux/module.h>
+
+struct iommu_group;
+struct vfio_device;
+struct vfio_container;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 enum vfio_group_type {
 	/*
@@ -28,6 +41,33 @@ enum vfio_group_type {
 	VFIO_NO_IOMMU,
 };
 
+<<<<<<< HEAD
+struct vfio_group {
+	struct device 			dev;
+	struct cdev			cdev;
+	/*
+	 * When drivers is non-zero a driver is attached to the struct device
+	 * that provided the iommu_group and thus the iommu_group is a valid
+	 * pointer. When drivers is 0 the driver is being detached. Once users
+	 * reaches 0 then the iommu_group is invalid.
+	 */
+	refcount_t			drivers;
+	unsigned int			container_users;
+	struct iommu_group		*iommu_group;
+	struct vfio_container		*container;
+	struct list_head		device_list;
+	struct mutex			device_lock;
+	struct list_head		vfio_next;
+	struct list_head		container_next;
+	enum vfio_group_type		type;
+	struct mutex			group_lock;
+	struct kvm			*kvm;
+	struct file			*opened_file;
+	struct blocking_notifier_head	notifier;
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /* events for the backend driver notify callback */
 enum vfio_iommu_notify_type {
 	VFIO_IOMMU_CONTAINER_CLOSE = 0,
@@ -67,5 +107,38 @@ struct vfio_iommu_driver_ops {
 				  enum vfio_iommu_notify_type event);
 };
 
+<<<<<<< HEAD
+struct vfio_iommu_driver {
+	const struct vfio_iommu_driver_ops	*ops;
+	struct list_head			vfio_next;
+};
+
 int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
 void vfio_unregister_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+
+bool vfio_assert_device_open(struct vfio_device *device);
+
+struct vfio_container *vfio_container_from_file(struct file *filep);
+int vfio_device_assign_container(struct vfio_device *device);
+void vfio_device_unassign_container(struct vfio_device *device);
+int vfio_container_attach_group(struct vfio_container *container,
+				struct vfio_group *group);
+void vfio_group_detach_container(struct vfio_group *group);
+void vfio_device_container_register(struct vfio_device *device);
+void vfio_device_container_unregister(struct vfio_device *device);
+long vfio_container_ioctl_check_extension(struct vfio_container *container,
+					  unsigned long arg);
+int __init vfio_container_init(void);
+void vfio_container_cleanup(void);
+
+#ifdef CONFIG_VFIO_NOIOMMU
+extern bool vfio_noiommu __read_mostly;
+#else
+enum { vfio_noiommu = false };
+#endif
+
+#endif
+=======
+int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+void vfio_unregister_iommu_driver(const struct vfio_iommu_driver_ops *ops);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

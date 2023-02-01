@@ -294,6 +294,7 @@ void mptcp_pm_mp_prio_received(struct sock *ssk, u8 bkup)
 
 	mptcp_event(MPTCP_EVENT_SUB_PRIORITY, msk, ssk, GFP_ATOMIC);
 }
+<<<<<<< HEAD
 
 void mptcp_pm_mp_fail_received(struct sock *sk, u64 fail_seq)
 {
@@ -302,6 +303,16 @@ void mptcp_pm_mp_fail_received(struct sock *sk, u64 fail_seq)
 
 	pr_debug("fail_seq=%llu", fail_seq);
 
+=======
+
+void mptcp_pm_mp_fail_received(struct sock *sk, u64 fail_seq)
+{
+	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(sk);
+	struct mptcp_sock *msk = mptcp_sk(subflow->conn);
+
+	pr_debug("fail_seq=%llu", fail_seq);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!READ_ONCE(msk->allow_infinite_fallback))
 		return;
 
@@ -420,11 +431,44 @@ void mptcp_pm_subflow_chk_stale(const struct mptcp_sock *msk, struct sock *ssk)
 	}
 }
 
+<<<<<<< HEAD
+/* if sk is ipv4 or ipv6_only allows only same-family local and remote addresses,
+ * otherwise allow any matching local/remote pair
+ */
+bool mptcp_pm_addr_families_match(const struct sock *sk,
+				  const struct mptcp_addr_info *loc,
+				  const struct mptcp_addr_info *rem)
+{
+	bool mptcp_is_v4 = sk->sk_family == AF_INET;
+
+#if IS_ENABLED(CONFIG_MPTCP_IPV6)
+	bool loc_is_v4 = loc->family == AF_INET || ipv6_addr_v4mapped(&loc->addr6);
+	bool rem_is_v4 = rem->family == AF_INET || ipv6_addr_v4mapped(&rem->addr6);
+
+	if (mptcp_is_v4)
+		return loc_is_v4 && rem_is_v4;
+
+	if (ipv6_only_sock(sk))
+		return !loc_is_v4 && !rem_is_v4;
+
+	return loc_is_v4 == rem_is_v4;
+#else
+	return mptcp_is_v4 && loc->family == AF_INET && rem->family == AF_INET;
+#endif
+}
+
 void mptcp_pm_data_reset(struct mptcp_sock *msk)
 {
 	u8 pm_type = mptcp_get_pm_type(sock_net((struct sock *)msk));
 	struct mptcp_pm_data *pm = &msk->pm;
 
+=======
+void mptcp_pm_data_reset(struct mptcp_sock *msk)
+{
+	u8 pm_type = mptcp_get_pm_type(sock_net((struct sock *)msk));
+	struct mptcp_pm_data *pm = &msk->pm;
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	pm->add_addr_signaled = 0;
 	pm->add_addr_accepted = 0;
 	pm->local_addr_used = 0;

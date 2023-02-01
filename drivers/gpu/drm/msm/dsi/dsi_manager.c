@@ -141,14 +141,20 @@ static int enable_phy(struct msm_dsi *msm_dsi,
 		      struct msm_dsi_phy_shared_timings *shared_timings)
 {
 	struct msm_dsi_phy_clk_request clk_req;
+<<<<<<< HEAD
+	bool is_bonded_dsi = IS_BONDED_DSI();
+
+	msm_dsi_host_get_phy_clk_req(msm_dsi->host, &clk_req, is_bonded_dsi);
+=======
 	int ret;
 	bool is_bonded_dsi = IS_BONDED_DSI();
 
 	msm_dsi_host_get_phy_clk_req(msm_dsi->host, &clk_req, is_bonded_dsi);
 
 	ret = msm_dsi_phy_enable(msm_dsi->phy, &clk_req, shared_timings);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return ret;
+	return msm_dsi_phy_enable(msm_dsi->phy, &clk_req, shared_timings);
 }
 
 static int
@@ -502,7 +508,7 @@ fail:
 	return ERR_PTR(ret);
 }
 
-struct drm_connector *msm_dsi_manager_ext_bridge_init(u8 id)
+int msm_dsi_manager_ext_bridge_init(u8 id)
 {
 	struct msm_dsi *msm_dsi = dsi_mgr_get_dsi(id);
 	struct drm_device *dev = msm_dsi->dev;
@@ -512,9 +518,16 @@ struct drm_connector *msm_dsi_manager_ext_bridge_init(u8 id)
 	int ret;
 
 	int_bridge = msm_dsi->bridge;
+<<<<<<< HEAD
+	ext_bridge = devm_drm_of_get_bridge(&msm_dsi->pdev->dev,
+					    msm_dsi->pdev->dev.of_node, 1, 0);
+	if (IS_ERR(ext_bridge))
+		return PTR_ERR(ext_bridge);
+=======
 	ext_bridge = devm_drm_of_get_bridge(&msm_dsi->pdev->dev, msm_dsi->pdev->dev.of_node, 1, 0);
 	if (IS_ERR(ext_bridge))
 		return ERR_CAST(ext_bridge);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	msm_dsi->external_bridge = ext_bridge;
 
@@ -528,6 +541,34 @@ struct drm_connector *msm_dsi_manager_ext_bridge_init(u8 id)
 	ret = drm_bridge_attach(encoder, ext_bridge, int_bridge,
 			DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret == -EINVAL) {
+<<<<<<< HEAD
+		/*
+		 * link the internal dsi bridge to the external bridge,
+		 * connector is created by the next bridge.
+		 */
+		ret = drm_bridge_attach(encoder, ext_bridge, int_bridge, 0);
+		if (ret < 0)
+			return ret;
+	} else {
+		struct drm_connector *connector;
+
+		/* We are in charge of the connector, create one now. */
+		connector = drm_bridge_connector_init(dev, encoder);
+		if (IS_ERR(connector)) {
+			DRM_ERROR("Unable to create bridge connector\n");
+			return PTR_ERR(connector);
+		}
+
+		ret = drm_connector_attach_encoder(connector, encoder);
+		if (ret < 0)
+			return ret;
+	}
+
+	/* The pipeline is ready, ping encoders if necessary */
+	msm_dsi_manager_set_split_display(id);
+
+	return 0;
+=======
 		/* link the internal dsi bridge to the external bridge */
 		ret = drm_bridge_attach(encoder, ext_bridge, int_bridge, 0);
 		if (ret < 0)
@@ -549,6 +590,7 @@ out:
 	msm_dsi_manager_set_split_display(id);
 
 	return connector;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void msm_dsi_manager_bridge_destroy(struct drm_bridge *bridge)

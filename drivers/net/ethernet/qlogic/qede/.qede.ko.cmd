@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/qlogic/qede/qede.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/qlogic/qede/qede.ko drivers/net/ethernet/qlogic/qede/qede.o drivers/net/ethernet/qlogic/qede/qede.mod.o;  true

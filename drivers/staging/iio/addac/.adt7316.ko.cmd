@@ -1,0 +1,1 @@
+cmd_drivers/staging/iio/addac/adt7316.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/iio/addac/adt7316.ko drivers/staging/iio/addac/adt7316.o drivers/staging/iio/addac/adt7316.mod.o;  true

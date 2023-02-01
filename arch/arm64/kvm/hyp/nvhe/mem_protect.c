@@ -516,7 +516,11 @@ static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
 	if (!kvm_pte_valid(pte))
 		return PKVM_NOPAGE;
 
+<<<<<<< HEAD
+	return pkvm_getstate(kvm_pgtable_hyp_pte_prot(pte));
+=======
 	return pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int __hyp_check_page_state_range(u64 addr, u64 size,

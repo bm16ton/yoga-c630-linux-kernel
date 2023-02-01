@@ -202,9 +202,15 @@ int radeon_bo_create(struct radeon_device *rdev,
 	radeon_ttm_placement_from_domain(bo, domain);
 	/* Kernel allocation are uninterruptible */
 	down_read(&rdev->pm.mclk_lock);
+<<<<<<< HEAD
+	r = ttm_bo_init_validate(&rdev->mman.bdev, &bo->tbo, type,
+				 &bo->placement, page_align, !kernel, sg, resv,
+				 &radeon_ttm_bo_destroy);
+=======
 	r = ttm_bo_init(&rdev->mman.bdev, &bo->tbo, size, type,
 			&bo->placement, page_align, !kernel, sg, resv,
 			&radeon_ttm_bo_destroy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	up_read(&rdev->pm.mclk_lock);
 	if (unlikely(r != 0)) {
 		return r;

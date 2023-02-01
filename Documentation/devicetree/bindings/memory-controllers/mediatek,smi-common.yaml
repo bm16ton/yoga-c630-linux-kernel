@@ -16,7 +16,11 @@ description: |
   MediaTek SMI have two generations of HW architecture, here is the list
   which generation the SoCs use:
   generation 1: mt2701 and mt7623.
+<<<<<<< HEAD
+  generation 2: mt2712, mt6779, mt8167, mt8173, mt8183, mt8186, mt8188, mt8192 and mt8195.
+=======
   generation 2: mt2712, mt6779, mt8167, mt8173, mt8183, mt8186, mt8192 and mt8195.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   There's slight differences between the two SMI, for generation 2, the
   register which control the iommu port is at each larb's register base. But
@@ -37,6 +41,11 @@ properties:
           - mediatek,mt8173-smi-common
           - mediatek,mt8183-smi-common
           - mediatek,mt8186-smi-common
+<<<<<<< HEAD
+          - mediatek,mt8188-smi-common-vdo
+          - mediatek,mt8188-smi-common-vpp
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - mediatek,mt8192-smi-common
           - mediatek,mt8195-smi-common-vdo
           - mediatek,mt8195-smi-common-vpp
@@ -144,8 +153,20 @@ allOf:
             - const: gals0
             - const: gals1
 
-    else:  # for gen2 HW that don't have gals
+  - if:  # for gen2 HW that don't have gals
       properties:
+<<<<<<< HEAD
+        compatible:
+          enum:
+            - mediatek,mt2712-smi-common
+            - mediatek,mt6795-smi-common
+            - mediatek,mt8167-smi-common
+            - mediatek,mt8173-smi-common
+
+    then:
+      properties:
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
         clocks:
           minItems: 2
           maxItems: 2

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/iwlwifi/iwlwifi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/intel/iwlwifi/iwlwifi.ko drivers/net/wireless/intel/iwlwifi/iwlwifi.o drivers/net/wireless/intel/iwlwifi/iwlwifi.mod.o;  true

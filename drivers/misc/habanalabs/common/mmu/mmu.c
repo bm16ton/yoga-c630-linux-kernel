@@ -9,6 +9,11 @@
 
 #include "../habanalabs.h"
 
+<<<<<<< HEAD
+#include <trace/events/habanalabs.h>
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * hl_mmu_get_funcs() - get MMU functions structure
  * @hdev: habanalabs device structure.
@@ -44,6 +49,8 @@ int hl_mmu_init(struct hl_device *hdev)
 
 	if (!hdev->mmu_enable)
 		return 0;
+
+	mutex_init(&hdev->mmu_lock);
 
 	if (hdev->mmu_func[MMU_DR_PGT].init != NULL) {
 		rc = hdev->mmu_func[MMU_DR_PGT].init(hdev);
@@ -86,6 +93,8 @@ void hl_mmu_fini(struct hl_device *hdev)
 
 	if (hdev->mmu_func[MMU_HR_PGT].fini != NULL)
 		hdev->mmu_func[MMU_HR_PGT].fini(hdev);
+
+	mutex_destroy(&hdev->mmu_lock);
 }
 
 /**
@@ -103,8 +112,6 @@ int hl_mmu_ctx_init(struct hl_ctx *ctx)
 
 	if (!hdev->mmu_enable)
 		return 0;
-
-	mutex_init(&ctx->mmu_lock);
 
 	if (hdev->mmu_func[MMU_DR_PGT].ctx_init != NULL) {
 		rc = hdev->mmu_func[MMU_DR_PGT].ctx_init(ctx);
@@ -149,8 +156,53 @@ void hl_mmu_ctx_fini(struct hl_ctx *ctx)
 
 	if (hdev->mmu_func[MMU_HR_PGT].ctx_fini != NULL)
 		hdev->mmu_func[MMU_HR_PGT].ctx_fini(ctx);
+}
 
-	mutex_destroy(&ctx->mmu_lock);
+/*
+ * hl_mmu_get_real_page_size - get real page size to use in map/unmap operation
+ *
+ * @hdev: pointer to device data.
+ * @mmu_prop: MMU properties.
+ * @page_size: page size
+ * @real_page_size: set here the actual page size to use for the operation
+ * @is_dram_addr: true if DRAM address, otherwise false.
+ *
+ * @return 0 on success, otherwise non 0 error code
+ *
+ * note that this is general implementation that can fit most MMU arch. but as this is used as an
+ * MMU function:
+ * 1. it shall not be called directly- only from mmu_func structure instance
+ * 2. each MMU may modify the implementation internally
+ */
+int hl_mmu_get_real_page_size(struct hl_device *hdev, struct hl_mmu_properties *mmu_prop,
+				u32 page_size, u32 *real_page_size, bool is_dram_addr)
+{
+	/*
+	 * The H/W handles mapping of specific page sizes. Hence if the page
+	 * size is bigger, we break it to sub-pages and map them separately.
+	 */
+	if ((page_size % mmu_prop->page_size) == 0) {
+		*real_page_size = mmu_prop->page_size;
+		return 0;
+	}
+
+	dev_err(hdev->dev, "page size of %u is not %uKB aligned, can't map\n",
+						page_size, mmu_prop->page_size >> 10);
+
+	return -EFAULT;
+}
+
+static struct hl_mmu_properties *hl_mmu_get_prop(struct hl_device *hdev, u32 page_size,
+							bool is_dram_addr)
+{
+	struct asic_fixed_properties *prop = &hdev->asic_prop;
+
+	if (is_dram_addr)
+		return &prop->dmmu;
+	else if ((page_size % prop->pmmu_huge.page_size) == 0)
+		return &prop->pmmu_huge;
+
+	return &prop->pmmu;
 }
 
 /*
@@ -258,6 +310,12 @@ int hl_mmu_unmap_page(struct hl_ctx *ctx, u64 virt_addr, u32 page_size, bool flu
 
 	if (flush_pte)
 		mmu_funcs->flush(ctx);
+<<<<<<< HEAD
+
+	if (trace_habanalabs_mmu_unmap_enabled() && !rc)
+		trace_habanalabs_mmu_unmap(hdev->dev, virt_addr, 0, page_size, flush_pte);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return rc;
 }
@@ -343,6 +401,11 @@ int hl_mmu_map_page(struct hl_ctx *ctx, u64 virt_addr, u64 phys_addr, u32 page_s
 
 	if (flush_pte)
 		mmu_funcs->flush(ctx);
+<<<<<<< HEAD
+
+	trace_habanalabs_mmu_map(hdev->dev, virt_addr, phys_addr, page_size, flush_pte);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 
@@ -403,6 +466,8 @@ int hl_mmu_map_contiguous(struct hl_ctx *ctx, u64 virt_addr,
 			dev_err(hdev->dev,
 				"Map failed for va 0x%llx to pa 0x%llx\n",
 				curr_va, curr_pa);
+			/* last mapping failed so don't try to unmap it - reduce off by page_size */
+			off -= page_size;
 			goto unmap;
 		}
 	}
@@ -600,9 +665,18 @@ int hl_mmu_get_tlb_info(struct hl_ctx *ctx, u64 virt_addr,
 	pgt_residency = mmu_prop->host_resident ? MMU_HR_PGT : MMU_DR_PGT;
 	mmu_funcs = hl_mmu_get_funcs(hdev, pgt_residency, is_dram_addr);
 
+<<<<<<< HEAD
+	mutex_lock(&hdev->mmu_lock);
+	rc = mmu_funcs->get_tlb_info(ctx, virt_addr, hops);
+	mutex_unlock(&hdev->mmu_lock);
+
+	if (rc)
+		return rc;
+=======
 	mutex_lock(&ctx->mmu_lock);
 	rc = mmu_funcs->get_tlb_info(ctx, virt_addr, hops);
 	mutex_unlock(&ctx->mmu_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (rc)
 		return rc;
@@ -692,6 +766,18 @@ static void hl_mmu_prefetch_work_function(struct work_struct *work)
 {
 	struct hl_prefetch_work *pfw = container_of(work, struct hl_prefetch_work, pf_work);
 	struct hl_ctx *ctx = pfw->ctx;
+<<<<<<< HEAD
+	struct hl_device *hdev = ctx->hdev;
+
+	if (!hl_device_operational(hdev, NULL))
+		goto put_ctx;
+
+	mutex_lock(&hdev->mmu_lock);
+
+	hdev->asic_funcs->mmu_prefetch_cache_range(ctx, pfw->flags, pfw->asid, pfw->va, pfw->size);
+
+	mutex_unlock(&hdev->mmu_lock);
+=======
 
 	if (!hl_device_operational(ctx->hdev, NULL))
 		goto put_ctx;
@@ -702,6 +788,7 @@ static void hl_mmu_prefetch_work_function(struct work_struct *work)
 								pfw->va, pfw->size);
 
 	mutex_unlock(&ctx->mmu_lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 put_ctx:
 	/*

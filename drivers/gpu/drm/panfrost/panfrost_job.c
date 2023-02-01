@@ -20,6 +20,7 @@
 #include "panfrost_regs.h"
 #include "panfrost_gpu.h"
 #include "panfrost_mmu.h"
+#include "panfrost_dump.h"
 
 #define JOB_TIMEOUT_MS 500
 
@@ -651,10 +652,17 @@ panfrost_reset(struct panfrost_device *pfdev,
 
 	if (ret)
 		dev_err(pfdev->dev, "Soft-stop failed\n");
+<<<<<<< HEAD
 
 	/* Handle the remaining interrupts before we reset. */
 	panfrost_job_handle_irqs(pfdev);
 
+=======
+
+	/* Handle the remaining interrupts before we reset. */
+	panfrost_job_handle_irqs(pfdev);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Remaining interrupts have been handled, but we might still have
 	 * stuck jobs. Let's make sure the PM counters stay balanced by
 	 * manually calling pm_runtime_put_noidle() and
@@ -727,6 +735,11 @@ static enum drm_gpu_sched_stat panfrost_job_timedout(struct drm_sched_job
 		job_read(pfdev, JS_TAIL_LO(js)),
 		sched_job);
 
+<<<<<<< HEAD
+	panfrost_core_dump(job);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	atomic_set(&pfdev->reset.pending, 1);
 	panfrost_reset(pfdev, sched_job);
 

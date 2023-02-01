@@ -1,0 +1,1 @@
+cmd_drivers/scsi/megaraid/megaraid_sas.mod := printf '%s\n'   megaraid_sas_base.o megaraid_sas_fusion.o megaraid_sas_fp.o megaraid_sas_debugfs.o | awk '!x[$$0]++ { print("drivers/scsi/megaraid/"$$0) }' > drivers/scsi/megaraid/megaraid_sas.mod

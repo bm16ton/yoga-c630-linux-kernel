@@ -97,7 +97,11 @@ static unsigned int wmfw_convert_flags(unsigned int in)
 	return out;
 }
 
+<<<<<<< HEAD
+static void hda_cs_dsp_add_kcontrol(struct hda_cs_dsp_coeff_ctl *ctl, const char *name)
+=======
 static int hda_cs_dsp_add_kcontrol(struct hda_cs_dsp_coeff_ctl *ctl, const char *name)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct cs_dsp_coeff_ctl *cs_ctl = ctl->cs_ctl;
 	struct snd_kcontrol_new kcontrol = {0};
@@ -107,7 +111,11 @@ static int hda_cs_dsp_add_kcontrol(struct hda_cs_dsp_coeff_ctl *ctl, const char 
 	if (cs_ctl->len > ADSP_MAX_STD_CTRL_SIZE) {
 		dev_err(cs_ctl->dsp->dev, "KControl %s: length %zu exceeds maximum %d\n", name,
 			cs_ctl->len, ADSP_MAX_STD_CTRL_SIZE);
+<<<<<<< HEAD
+		return;
+=======
 		return -EINVAL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	kcontrol.name = name;
@@ -120,24 +128,40 @@ static int hda_cs_dsp_add_kcontrol(struct hda_cs_dsp_coeff_ctl *ctl, const char 
 	/* Save ctl inside private_data, ctl is owned by cs_dsp,
 	 * and will be freed when cs_dsp removes the control */
 	kctl = snd_ctl_new1(&kcontrol, (void *)ctl);
+<<<<<<< HEAD
+	if (!kctl)
+		return;
+=======
 	if (!kctl) {
 		ret = -ENOMEM;
 		return ret;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ret = snd_ctl_add(ctl->card, kctl);
 	if (ret) {
 		dev_err(cs_ctl->dsp->dev, "Failed to add KControl %s = %d\n", kcontrol.name, ret);
+<<<<<<< HEAD
+		return;
+=======
 		return ret;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	dev_dbg(cs_ctl->dsp->dev, "Added KControl: %s\n", kcontrol.name);
 	ctl->kctl = kctl;
+<<<<<<< HEAD
+}
+
+static void hda_cs_dsp_control_add(struct cs_dsp_coeff_ctl *cs_ctl,
+				   const struct hda_cs_dsp_ctl_info *info)
+=======
 
 	return 0;
 }
 
 int hda_cs_dsp_control_add(struct cs_dsp_coeff_ctl *cs_ctl, struct hda_cs_dsp_ctl_info *info)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct cs_dsp *cs_dsp = cs_ctl->dsp;
 	char name[SNDRV_CTL_ELEM_ID_NAME_MAXLEN];
@@ -145,6 +169,12 @@ int hda_cs_dsp_control_add(struct cs_dsp_coeff_ctl *cs_ctl, struct hda_cs_dsp_ct
 	const char *region_name;
 	int ret;
 
+<<<<<<< HEAD
+	region_name = cs_dsp_mem_region_name(cs_ctl->alg_region.type);
+	if (!region_name) {
+		dev_warn(cs_dsp->dev, "Unknown region type: %d\n", cs_ctl->alg_region.type);
+		return;
+=======
 	if (cs_ctl->flags & WMFW_CTL_FLAG_SYS)
 		return 0;
 
@@ -152,6 +182,7 @@ int hda_cs_dsp_control_add(struct cs_dsp_coeff_ctl *cs_ctl, struct hda_cs_dsp_ct
 	if (!region_name) {
 		dev_err(cs_dsp->dev, "Unknown region type: %d\n", cs_ctl->alg_region.type);
 		return -EINVAL;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	ret = scnprintf(name, SNDRV_CTL_ELEM_ID_NAME_MAXLEN, "%s %s %.12s %x", info->device_name,
@@ -171,12 +202,45 @@ int hda_cs_dsp_control_add(struct cs_dsp_coeff_ctl *cs_ctl, struct hda_cs_dsp_ct
 
 	ctl = kzalloc(sizeof(*ctl), GFP_KERNEL);
 	if (!ctl)
+<<<<<<< HEAD
+		return;
+=======
 		return -ENOMEM;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	ctl->cs_ctl = cs_ctl;
 	ctl->card = info->card;
 	cs_ctl->priv = ctl;
 
+<<<<<<< HEAD
+	hda_cs_dsp_add_kcontrol(ctl, name);
+}
+
+void hda_cs_dsp_add_controls(struct cs_dsp *dsp, const struct hda_cs_dsp_ctl_info *info)
+{
+	struct cs_dsp_coeff_ctl *cs_ctl;
+
+	/*
+	 * pwr_lock would cause mutex inversion with ALSA control lock compared
+	 * to the get/put functions.
+	 * It is safe to walk the list without holding a mutex because entries
+	 * are persistent and only cs_dsp_power_up() or cs_dsp_remove() can
+	 * change the list.
+	 */
+	lockdep_assert_not_held(&dsp->pwr_lock);
+
+	list_for_each_entry(cs_ctl, &dsp->ctl_list, list) {
+		if (cs_ctl->flags & WMFW_CTL_FLAG_SYS)
+			continue;
+
+		if (cs_ctl->priv)
+			continue;
+
+		hda_cs_dsp_control_add(cs_ctl, info);
+	}
+}
+EXPORT_SYMBOL_NS_GPL(hda_cs_dsp_add_controls, SND_HDA_CS_DSP_CONTROLS);
+=======
 	ret = hda_cs_dsp_add_kcontrol(ctl, name);
 	if (ret) {
 		dev_err(cs_dsp->dev, "Error (%d) adding control %s\n", ret, name);
@@ -187,6 +251,7 @@ int hda_cs_dsp_control_add(struct cs_dsp_coeff_ctl *cs_ctl, struct hda_cs_dsp_ct
 	return 0;
 }
 EXPORT_SYMBOL_NS_GPL(hda_cs_dsp_control_add, SND_HDA_CS_DSP_CONTROLS);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 void hda_cs_dsp_control_remove(struct cs_dsp_coeff_ctl *cs_ctl)
 {
@@ -203,6 +268,12 @@ int hda_cs_dsp_write_ctl(struct cs_dsp *dsp, const char *name, int type,
 	struct hda_cs_dsp_coeff_ctl *ctl;
 	int ret;
 
+<<<<<<< HEAD
+	mutex_lock(&dsp->pwr_lock);
+	cs_ctl = cs_dsp_get_ctl(dsp, name, type, alg);
+	ret = cs_dsp_coeff_write_ctrl(cs_ctl, 0, buf, len);
+	mutex_unlock(&dsp->pwr_lock);
+=======
 	cs_ctl = cs_dsp_get_ctl(dsp, name, type, alg);
 	if (!cs_ctl)
 		return -EINVAL;
@@ -210,12 +281,18 @@ int hda_cs_dsp_write_ctl(struct cs_dsp *dsp, const char *name, int type,
 	ctl = cs_ctl->priv;
 
 	ret = cs_dsp_coeff_write_ctrl(cs_ctl, 0, buf, len);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (ret)
 		return ret;
 
 	if (cs_ctl->flags & WMFW_CTL_FLAG_SYS)
 		return 0;
 
+<<<<<<< HEAD
+	ctl = cs_ctl->priv;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	snd_ctl_notify(ctl->card, SNDRV_CTL_EVENT_MASK_VALUE, &ctl->kctl->id);
 
 	return 0;
@@ -225,6 +302,16 @@ EXPORT_SYMBOL_NS_GPL(hda_cs_dsp_write_ctl, SND_HDA_CS_DSP_CONTROLS);
 int hda_cs_dsp_read_ctl(struct cs_dsp *dsp, const char *name, int type,
 			unsigned int alg, void *buf, size_t len)
 {
+<<<<<<< HEAD
+	int ret;
+
+	mutex_lock(&dsp->pwr_lock);
+	ret = cs_dsp_coeff_read_ctrl(cs_dsp_get_ctl(dsp, name, type, alg), 0, buf, len);
+	mutex_unlock(&dsp->pwr_lock);
+
+	return ret;
+
+=======
 	struct cs_dsp_coeff_ctl *cs_ctl;
 
 	cs_ctl = cs_dsp_get_ctl(dsp, name, type, alg);
@@ -232,6 +319,7 @@ int hda_cs_dsp_read_ctl(struct cs_dsp *dsp, const char *name, int type,
 		return -EINVAL;
 
 	return cs_dsp_coeff_read_ctrl(cs_ctl, 0, buf, len);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 EXPORT_SYMBOL_NS_GPL(hda_cs_dsp_read_ctl, SND_HDA_CS_DSP_CONTROLS);
 

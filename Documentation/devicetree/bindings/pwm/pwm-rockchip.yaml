@@ -21,6 +21,10 @@ properties:
           - const: rockchip,rk2928-pwm
       - items:
           - enum:
+<<<<<<< HEAD
+              - rockchip,rk3128-pwm
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
               - rockchip,rk3368-pwm
               - rockchip,rk3399-pwm
               - rockchip,rv1108-pwm
@@ -30,6 +34,10 @@ properties:
               - rockchip,px30-pwm
               - rockchip,rk3308-pwm
               - rockchip,rk3568-pwm
+<<<<<<< HEAD
+              - rockchip,rk3588-pwm
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
           - const: rockchip,rk3328-pwm
 
   reg:

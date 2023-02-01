@@ -1,0 +1,1 @@
+cmd_drivers/iio/common/st_sensors/st_sensors.mod := printf '%s\n'   st_sensors_core.o st_sensors_buffer.o st_sensors_trigger.o | awk '!x[$$0]++ { print("drivers/iio/common/st_sensors/"$$0) }' > drivers/iio/common/st_sensors/st_sensors.mod

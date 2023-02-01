@@ -47,6 +47,10 @@ properties:
       - rockchip,rk3568-pinctrl
       - rockchip,rk3588-pinctrl
       - rockchip,rv1108-pinctrl
+<<<<<<< HEAD
+      - rockchip,rv1126-pinctrl
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
   rockchip,grf:
     $ref: "/schemas/types.yaml#/definitions/phandle"

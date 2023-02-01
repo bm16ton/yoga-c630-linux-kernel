@@ -31,7 +31,11 @@ struct dpu_hw_dsc_ops {
 	 * @initial_lines: amount of initial lines to be used
 	 */
 	void (*dsc_config)(struct dpu_hw_dsc *hw_dsc,
+<<<<<<< HEAD
+			   struct drm_dsc_config *dsc,
+=======
 			   struct msm_display_dsc_config *dsc,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			   u32 mode,
 			   u32 initial_lines);
 
@@ -41,7 +45,11 @@ struct dpu_hw_dsc_ops {
 	 * @dsc: panel dsc parameters
 	 */
 	void (*dsc_config_thresh)(struct dpu_hw_dsc *hw_dsc,
+<<<<<<< HEAD
+				  struct drm_dsc_config *dsc);
+=======
 				  struct msm_display_dsc_config *dsc);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct dpu_hw_dsc {

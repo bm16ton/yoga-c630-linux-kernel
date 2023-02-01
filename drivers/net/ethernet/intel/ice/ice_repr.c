@@ -377,10 +377,17 @@ static void ice_repr_rem(struct ice_vf *vf)
 	if (!vf->repr)
 		return;
 
+<<<<<<< HEAD
+	kfree(vf->repr->q_vector);
+	vf->repr->q_vector = NULL;
+	unregister_netdev(vf->repr->netdev);
+	ice_devlink_destroy_vf_port(vf);
+=======
 	ice_devlink_destroy_vf_port(vf);
 	kfree(vf->repr->q_vector);
 	vf->repr->q_vector = NULL;
 	unregister_netdev(vf->repr->netdev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	free_netdev(vf->repr->netdev);
 	vf->repr->netdev = NULL;
 #ifdef CONFIG_ICE_SWITCHDEV

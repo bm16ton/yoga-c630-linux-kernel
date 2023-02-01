@@ -1,0 +1,1 @@
+cmd_drivers/iio/temperature/ltc2983.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/temperature/ltc2983.ko drivers/iio/temperature/ltc2983.o drivers/iio/temperature/ltc2983.mod.o;  true

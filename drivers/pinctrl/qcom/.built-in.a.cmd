@@ -1,0 +1,1 @@
+cmd_drivers/pinctrl/qcom/built-in.a := rm -f drivers/pinctrl/qcom/built-in.a;  printf "drivers/pinctrl/qcom/%s " pinctrl-msm.o pinctrl-spmi-gpio.o pinctrl-spmi-mpp.o pinctrl-ssbi-gpio.o pinctrl-ssbi-mpp.o pinctrl-sc8180x.o pinctrl-sdm845.o | xargs ar cDPrST drivers/pinctrl/qcom/built-in.a

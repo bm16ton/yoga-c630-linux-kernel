@@ -1,0 +1,1 @@
+cmd_drivers/i2c/muxes/i2c-demux-pinctrl.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/muxes/i2c-demux-pinctrl.ko drivers/i2c/muxes/i2c-demux-pinctrl.o drivers/i2c/muxes/i2c-demux-pinctrl.mod.o;  true

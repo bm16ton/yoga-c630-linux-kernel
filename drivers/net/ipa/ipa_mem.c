@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+<<<<<<< HEAD
+ * Copyright (C) 2019-2022 Linaro Ltd.
+=======
  * Copyright (C) 2019-2021 Linaro Ltd.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 
 #include <linux/types.h>
@@ -75,6 +79,10 @@ ipa_mem_zero_region_add(struct gsi_trans *trans, enum ipa_mem_id mem_id)
 int ipa_mem_setup(struct ipa *ipa)
 {
 	dma_addr_t addr = ipa->zero_addr;
+<<<<<<< HEAD
+	const struct ipa_reg *reg;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct ipa_mem *mem;
 	struct gsi_trans *trans;
 	u32 offset;
@@ -112,8 +120,15 @@ int ipa_mem_setup(struct ipa *ipa)
 	/* Tell the hardware where the processing context area is located */
 	mem = ipa_mem_find(ipa, IPA_MEM_MODEM_PROC_CTX);
 	offset = ipa->mem_offset + mem->offset;
+<<<<<<< HEAD
+
+	reg = ipa_reg(ipa, LOCAL_PKT_PROC_CNTXT);
+	val = ipa_reg_encode(reg, IPA_BASE_ADDR, offset);
+	iowrite32(val, ipa->reg_virt + ipa_reg_offset(reg));
+=======
 	val = proc_cntxt_base_addr_encoded(ipa->version, offset);
 	iowrite32(val, ipa->reg_virt + IPA_REG_LOCAL_PKT_PROC_CNTXT_OFFSET);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -306,6 +321,10 @@ static bool ipa_mem_size_valid(struct ipa *ipa)
 int ipa_mem_config(struct ipa *ipa)
 {
 	struct device *dev = &ipa->pdev->dev;
+<<<<<<< HEAD
+	const struct ipa_reg *reg;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	const struct ipa_mem *mem;
 	dma_addr_t addr;
 	u32 mem_size;
@@ -314,12 +333,14 @@ int ipa_mem_config(struct ipa *ipa)
 	u32 i;
 
 	/* Check the advertised location and size of the shared memory area */
-	val = ioread32(ipa->reg_virt + IPA_REG_SHARED_MEM_SIZE_OFFSET);
+	reg = ipa_reg(ipa, SHARED_MEM_SIZE);
+	val = ioread32(ipa->reg_virt + ipa_reg_offset(reg));
 
 	/* The fields in the register are in 8 byte units */
-	ipa->mem_offset = 8 * u32_get_bits(val, SHARED_MEM_BADDR_FMASK);
+	ipa->mem_offset = 8 * ipa_reg_decode(reg, MEM_BADDR, val);
+
 	/* Make sure the end is within the region's mapped space */
-	mem_size = 8 * u32_get_bits(val, SHARED_MEM_SIZE_FMASK);
+	mem_size = 8 * ipa_reg_decode(reg, MEM_SIZE, val);
 
 	/* If the sizes don't match, issue a warning */
 	if (ipa->mem_offset + mem_size < ipa->mem_size) {

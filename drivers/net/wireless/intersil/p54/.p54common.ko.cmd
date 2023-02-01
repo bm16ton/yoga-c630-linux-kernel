@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intersil/p54/p54common.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/intersil/p54/p54common.ko drivers/net/wireless/intersil/p54/p54common.o drivers/net/wireless/intersil/p54/p54common.mod.o;  true

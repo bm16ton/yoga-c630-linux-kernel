@@ -1,0 +1,5 @@
+drivers/pci/pcie/aer_inject.ko
+drivers/pci/hotplug/acpiphp_ibm.ko
+drivers/pci/controller/dwc/pci-meson.ko
+drivers/pci/pci-stub.ko
+drivers/pci/pci-pf-stub.ko

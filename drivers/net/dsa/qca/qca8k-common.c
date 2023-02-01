@@ -1017,7 +1017,12 @@ int qca8k_port_vlan_del(struct dsa_switch *ds, int port,
 
 static bool qca8k_lag_can_offload(struct dsa_switch *ds,
 				  struct dsa_lag lag,
+<<<<<<< HEAD
+				  struct netdev_lag_upper_info *info,
+				  struct netlink_ext_ack *extack)
+=======
 				  struct netdev_lag_upper_info *info)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct dsa_port *dp;
 	int members = 0;
@@ -1029,6 +1034,26 @@ static bool qca8k_lag_can_offload(struct dsa_switch *ds,
 		/* Includes the port joining the LAG */
 		members++;
 
+<<<<<<< HEAD
+	if (members > QCA8K_NUM_PORTS_FOR_LAG) {
+		NL_SET_ERR_MSG_MOD(extack,
+				   "Cannot offload more than 4 LAG ports");
+		return false;
+	}
+
+	if (info->tx_type != NETDEV_LAG_TX_TYPE_HASH) {
+		NL_SET_ERR_MSG_MOD(extack,
+				   "Can only offload LAG using hash TX type");
+		return false;
+	}
+
+	if (info->hash_type != NETDEV_LAG_HASH_L2 &&
+	    info->hash_type != NETDEV_LAG_HASH_L23) {
+		NL_SET_ERR_MSG_MOD(extack,
+				   "Can only offload L2 or L2+L3 TX hash");
+		return false;
+	}
+=======
 	if (members > QCA8K_NUM_PORTS_FOR_LAG)
 		return false;
 
@@ -1038,6 +1063,7 @@ static bool qca8k_lag_can_offload(struct dsa_switch *ds,
 	if (info->hash_type != NETDEV_LAG_HASH_L2 &&
 	    info->hash_type != NETDEV_LAG_HASH_L23)
 		return false;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return true;
 }
@@ -1160,11 +1186,20 @@ static int qca8k_lag_refresh_portmap(struct dsa_switch *ds, int port,
 }
 
 int qca8k_port_lag_join(struct dsa_switch *ds, int port, struct dsa_lag lag,
+<<<<<<< HEAD
+			struct netdev_lag_upper_info *info,
+			struct netlink_ext_ack *extack)
+{
+	int ret;
+
+	if (!qca8k_lag_can_offload(ds, lag, info, extack))
+=======
 			struct netdev_lag_upper_info *info)
 {
 	int ret;
 
 	if (!qca8k_lag_can_offload(ds, lag, info))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EOPNOTSUPP;
 
 	ret = qca8k_lag_setup_hash(ds, lag, info);

@@ -21,8 +21,11 @@
 #define TSNEP_RING_ENTRIES_PER_PAGE (PAGE_SIZE / TSNEP_DESC_SIZE)
 #define TSNEP_RING_PAGE_COUNT (TSNEP_RING_SIZE / TSNEP_RING_ENTRIES_PER_PAGE)
 
+<<<<<<< HEAD
+=======
 #define TSNEP_QUEUES 1
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct tsnep_gcl {
 	void __iomem *addr;
 
@@ -39,6 +42,27 @@ struct tsnep_gcl {
 	bool change;
 };
 
+<<<<<<< HEAD
+enum tsnep_rxnfc_filter_type {
+	TSNEP_RXNFC_ETHER_TYPE,
+};
+
+struct tsnep_rxnfc_filter {
+	enum tsnep_rxnfc_filter_type type;
+	union {
+		u16 ether_type;
+	};
+};
+
+struct tsnep_rxnfc_rule {
+	struct list_head list;
+	struct tsnep_rxnfc_filter filter;
+	int queue_index;
+	int location;
+};
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct tsnep_tx_entry {
 	struct tsnep_tx_desc *desc;
 	struct tsnep_tx_desc_wb *desc_wb;
@@ -55,6 +79,10 @@ struct tsnep_tx_entry {
 struct tsnep_tx {
 	struct tsnep_adapter *adapter;
 	void __iomem *addr;
+<<<<<<< HEAD
+	int queue_index;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	void *page[TSNEP_RING_PAGE_COUNT];
 	dma_addr_t page_dma[TSNEP_RING_PAGE_COUNT];
@@ -79,14 +107,24 @@ struct tsnep_rx_entry {
 
 	u32 properties;
 
+<<<<<<< HEAD
+	struct page *page;
+	size_t len;
+	dma_addr_t dma;
+=======
 	struct sk_buff *skb;
 	size_t len;
 	DEFINE_DMA_UNMAP_ADDR(dma);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 struct tsnep_rx {
 	struct tsnep_adapter *adapter;
 	void __iomem *addr;
+<<<<<<< HEAD
+	int queue_index;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	void *page[TSNEP_RING_PAGE_COUNT];
 	dma_addr_t page_dma[TSNEP_RING_PAGE_COUNT];
@@ -95,6 +133,10 @@ struct tsnep_rx {
 	int read;
 	u32 owner_counter;
 	int increment_owner_counter;
+<<<<<<< HEAD
+	struct page_pool *page_pool;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	u32 packets;
 	u32 bytes;
@@ -104,12 +146,20 @@ struct tsnep_rx {
 
 struct tsnep_queue {
 	struct tsnep_adapter *adapter;
+<<<<<<< HEAD
+	char name[IFNAMSIZ + 9];
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	struct tsnep_tx *tx;
 	struct tsnep_rx *rx;
 
 	struct napi_struct napi;
 
+<<<<<<< HEAD
+	int irq;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 irq_mask;
 };
 
@@ -125,7 +175,10 @@ struct tsnep_adapter {
 	struct platform_device *pdev;
 	struct device *dmadev;
 	void __iomem *addr;
+<<<<<<< HEAD
+=======
 	int irq;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	bool gate_control;
 	/* gate control lock */
@@ -140,6 +193,15 @@ struct tsnep_adapter {
 	/* ptp clock lock */
 	spinlock_t ptp_lock;
 
+<<<<<<< HEAD
+	/* RX flow classification rules lock */
+	struct mutex rxnfc_lock;
+	struct list_head rxnfc_rules;
+	int rxnfc_count;
+	int rxnfc_max;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	int num_tx_queues;
 	struct tsnep_tx tx[TSNEP_MAX_QUEUES];
 	int num_rx_queues;
@@ -160,6 +222,21 @@ void tsnep_tc_cleanup(struct tsnep_adapter *adapter);
 int tsnep_tc_setup(struct net_device *netdev, enum tc_setup_type type,
 		   void *type_data);
 
+<<<<<<< HEAD
+int tsnep_rxnfc_init(struct tsnep_adapter *adapter);
+void tsnep_rxnfc_cleanup(struct tsnep_adapter *adapter);
+int tsnep_rxnfc_get_rule(struct tsnep_adapter *adapter,
+			 struct ethtool_rxnfc *cmd);
+int tsnep_rxnfc_get_all(struct tsnep_adapter *adapter,
+			struct ethtool_rxnfc *cmd,
+			u32 *rule_locs);
+int tsnep_rxnfc_add_rule(struct tsnep_adapter *adapter,
+			 struct ethtool_rxnfc *cmd);
+int tsnep_rxnfc_del_rule(struct tsnep_adapter *adapter,
+			 struct ethtool_rxnfc *cmd);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #if IS_ENABLED(CONFIG_TSNEP_SELFTESTS)
 int tsnep_ethtool_get_test_count(void);
 void tsnep_ethtool_get_test_strings(u8 *data);

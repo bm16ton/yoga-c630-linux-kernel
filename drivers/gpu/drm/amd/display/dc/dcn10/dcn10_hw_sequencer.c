@@ -867,6 +867,32 @@ static void false_optc_underflow_wa(
 		tg->funcs->clear_optc_underflow(tg);
 }
 
+static int calculate_vready_offset_for_group(struct pipe_ctx *pipe)
+{
+	struct pipe_ctx *other_pipe;
+	int vready_offset = pipe->pipe_dlg_param.vready_offset;
+
+	/* Always use the largest vready_offset of all connected pipes */
+	for (other_pipe = pipe->bottom_pipe; other_pipe != NULL; other_pipe = other_pipe->bottom_pipe) {
+		if (other_pipe->pipe_dlg_param.vready_offset > vready_offset)
+			vready_offset = other_pipe->pipe_dlg_param.vready_offset;
+	}
+	for (other_pipe = pipe->top_pipe; other_pipe != NULL; other_pipe = other_pipe->top_pipe) {
+		if (other_pipe->pipe_dlg_param.vready_offset > vready_offset)
+			vready_offset = other_pipe->pipe_dlg_param.vready_offset;
+	}
+	for (other_pipe = pipe->next_odm_pipe; other_pipe != NULL; other_pipe = other_pipe->next_odm_pipe) {
+		if (other_pipe->pipe_dlg_param.vready_offset > vready_offset)
+			vready_offset = other_pipe->pipe_dlg_param.vready_offset;
+	}
+	for (other_pipe = pipe->prev_odm_pipe; other_pipe != NULL; other_pipe = other_pipe->prev_odm_pipe) {
+		if (other_pipe->pipe_dlg_param.vready_offset > vready_offset)
+			vready_offset = other_pipe->pipe_dlg_param.vready_offset;
+	}
+
+	return vready_offset;
+}
+
 enum dc_status dcn10_enable_stream_timing(
 		struct pipe_ctx *pipe_ctx,
 		struct dc_state *context,
@@ -899,10 +925,18 @@ enum dc_status dcn10_enable_stream_timing(
 		return DC_ERROR_UNEXPECTED;
 	}
 
+	if (dc_is_hdmi_tmds_signal(stream->signal)) {
+		stream->link->phy_state.symclk_ref_cnts.otg = 1;
+		if (stream->link->phy_state.symclk_state == SYMCLK_OFF_TX_OFF)
+			stream->link->phy_state.symclk_state = SYMCLK_ON_TX_OFF;
+		else
+			stream->link->phy_state.symclk_state = SYMCLK_ON_TX_ON;
+	}
+
 	pipe_ctx->stream_res.tg->funcs->program_timing(
 			pipe_ctx->stream_res.tg,
 			&stream->timing,
-			pipe_ctx->pipe_dlg_param.vready_offset,
+			calculate_vready_offset_for_group(pipe_ctx),
 			pipe_ctx->pipe_dlg_param.vstartup_start,
 			pipe_ctx->pipe_dlg_param.vupdate_offset,
 			pipe_ctx->pipe_dlg_param.vupdate_width,
@@ -1017,6 +1051,7 @@ static void dcn10_reset_back_end_for_pipe(
 		if (pipe_ctx->stream_res.tg->funcs->set_drr)
 			pipe_ctx->stream_res.tg->funcs->set_drr(
 					pipe_ctx->stream_res.tg, NULL);
+		pipe_ctx->stream->link->phy_state.symclk_ref_cnts.otg = 0;
 	}
 
 	for (i = 0; i < dc->res_pool->pipe_count; i++)
@@ -2151,8 +2186,13 @@ static int dcn10_align_pixel_clocks(struct dc *dc, int group_size,
 				dc->res_pool->dp_clock_source->funcs->get_pixel_clk_frequency_100hz(
 					dc->res_pool->dp_clock_source,
 					grouped_pipes[i]->stream_res.tg->inst, &pclk);
+<<<<<<< HEAD
+				grouped_pipes[i]->stream->timing.pix_clk_100hz =
+					pclk*get_clock_divider(grouped_pipes[i], false);
+=======
 					grouped_pipes[i]->stream->timing.pix_clk_100hz =
 						pclk*get_clock_divider(grouped_pipes[i], false);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				if (master == -1)
 					master = i;
 			}
@@ -2199,6 +2239,16 @@ void dcn10_enable_vblanks_synchronization(
 	if (master >= 0) {
 		for (i = 0; i < group_size; i++) {
 			if (i != master && !grouped_pipes[i]->stream->has_non_synchronizable_pclk)
+<<<<<<< HEAD
+				grouped_pipes[i]->stream_res.tg->funcs->align_vblanks(
+					grouped_pipes[master]->stream_res.tg,
+					grouped_pipes[i]->stream_res.tg,
+					grouped_pipes[master]->stream->timing.pix_clk_100hz,
+					grouped_pipes[i]->stream->timing.pix_clk_100hz,
+					get_clock_divider(grouped_pipes[master], false),
+					get_clock_divider(grouped_pipes[i], false));
+			grouped_pipes[i]->stream->vblank_synchronized = true;
+=======
 			grouped_pipes[i]->stream_res.tg->funcs->align_vblanks(
 				grouped_pipes[master]->stream_res.tg,
 				grouped_pipes[i]->stream_res.tg,
@@ -2207,6 +2257,7 @@ void dcn10_enable_vblanks_synchronization(
 				get_clock_divider(grouped_pipes[master], false),
 				get_clock_divider(grouped_pipes[i], false));
 				grouped_pipes[i]->stream->vblank_synchronized = true;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 		grouped_pipes[master]->stream->vblank_synchronized = true;
 		DC_SYNC_INFO("Sync complete\n");
@@ -2235,6 +2286,9 @@ void dcn10_enable_timing_synchronization(
 	DC_SYNC_INFO("Setting up OTG reset trigger\n");
 
 	for (i = 1; i < group_size; i++) {
+		if (grouped_pipes[i]->stream && grouped_pipes[i]->stream->mall_stream_config.type == SUBVP_PHANTOM)
+			continue;
+
 		opp = grouped_pipes[i]->stream_res.opp;
 		tg = grouped_pipes[i]->stream_res.tg;
 		tg->funcs->get_otg_active_size(tg, &width, &height);
@@ -2245,13 +2299,28 @@ void dcn10_enable_timing_synchronization(
 	for (i = 0; i < group_size; i++) {
 		if (grouped_pipes[i]->stream == NULL)
 			continue;
+<<<<<<< HEAD
+
+		if (grouped_pipes[i]->stream && grouped_pipes[i]->stream->mall_stream_config.type == SUBVP_PHANTOM)
+			continue;
+
+		grouped_pipes[i]->stream->vblank_synchronized = false;
+	}
+
+	for (i = 1; i < group_size; i++) {
+		if (grouped_pipes[i]->stream && grouped_pipes[i]->stream->mall_stream_config.type == SUBVP_PHANTOM)
+			continue;
+
+=======
 		grouped_pipes[i]->stream->vblank_synchronized = false;
 	}
 
 	for (i = 1; i < group_size; i++)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		grouped_pipes[i]->stream_res.tg->funcs->enable_reset_trigger(
 				grouped_pipes[i]->stream_res.tg,
 				grouped_pipes[0]->stream_res.tg->inst);
+	}
 
 	DC_SYNC_INFO("Waiting for trigger\n");
 
@@ -2259,12 +2328,21 @@ void dcn10_enable_timing_synchronization(
 	 * synchronized. Look at last pipe programmed to reset.
 	 */
 
-	wait_for_reset_trigger_to_occur(dc_ctx, grouped_pipes[1]->stream_res.tg);
-	for (i = 1; i < group_size; i++)
-		grouped_pipes[i]->stream_res.tg->funcs->disable_reset_trigger(
-				grouped_pipes[i]->stream_res.tg);
+	if (grouped_pipes[1]->stream && grouped_pipes[1]->stream->mall_stream_config.type != SUBVP_PHANTOM)
+		wait_for_reset_trigger_to_occur(dc_ctx, grouped_pipes[1]->stream_res.tg);
 
 	for (i = 1; i < group_size; i++) {
+		if (grouped_pipes[i]->stream && grouped_pipes[i]->stream->mall_stream_config.type == SUBVP_PHANTOM)
+			continue;
+
+		grouped_pipes[i]->stream_res.tg->funcs->disable_reset_trigger(
+				grouped_pipes[i]->stream_res.tg);
+	}
+
+	for (i = 1; i < group_size; i++) {
+		if (grouped_pipes[i]->stream && grouped_pipes[i]->stream->mall_stream_config.type == SUBVP_PHANTOM)
+			continue;
+
 		opp = grouped_pipes[i]->stream_res.opp;
 		tg = grouped_pipes[i]->stream_res.tg;
 		tg->funcs->get_otg_active_size(tg, &width, &height);
@@ -2539,8 +2617,15 @@ void dcn10_update_visual_confirm_color(struct dc *dc, struct pipe_ctx *pipe_ctx,
 		color_space_to_black_color(
 				dc, pipe_ctx->stream->output_color_space, color);
 
+<<<<<<< HEAD
+	if (mpc->funcs->set_bg_color) {
+		memcpy(&pipe_ctx->plane_state->visual_confirm_color, color, sizeof(struct tg_color));
+		mpc->funcs->set_bg_color(mpc, color, mpcc_id);
+	}
+=======
 	if (mpc->funcs->set_bg_color)
 		mpc->funcs->set_bg_color(mpc, color, mpcc_id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void dcn10_update_mpcc(struct dc *dc, struct pipe_ctx *pipe_ctx)
@@ -2869,7 +2954,7 @@ void dcn10_program_pipe(
 
 		pipe_ctx->stream_res.tg->funcs->program_global_sync(
 				pipe_ctx->stream_res.tg,
-				pipe_ctx->pipe_dlg_param.vready_offset,
+				calculate_vready_offset_for_group(pipe_ctx),
 				pipe_ctx->pipe_dlg_param.vstartup_start,
 				pipe_ctx->pipe_dlg_param.vupdate_offset,
 				pipe_ctx->pipe_dlg_param.vupdate_width);
@@ -2994,6 +3079,7 @@ void dcn10_prepare_bandwidth(
 {
 	struct dce_hwseq *hws = dc->hwseq;
 	struct hubbub *hubbub = dc->res_pool->hubbub;
+	int min_fclk_khz, min_dcfclk_khz, socclk_khz;
 
 	if (dc->debug.sanity_checks)
 		hws->funcs.verify_allow_pstate_change_high(dc);
@@ -3016,8 +3102,16 @@ void dcn10_prepare_bandwidth(
 
 	if (dc->debug.pplib_wm_report_mode == WM_REPORT_OVERRIDE) {
 		DC_FP_START();
+<<<<<<< HEAD
+		dcn_get_soc_clks(
+			dc, &min_fclk_khz, &min_dcfclk_khz, &socclk_khz);
+		DC_FP_END();
+		dcn_bw_notify_pplib_of_wm_ranges(
+			dc, min_fclk_khz, min_dcfclk_khz, socclk_khz);
+=======
 		dcn_bw_notify_pplib_of_wm_ranges(dc);
 		DC_FP_END();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (dc->debug.sanity_checks)
@@ -3030,6 +3124,7 @@ void dcn10_optimize_bandwidth(
 {
 	struct dce_hwseq *hws = dc->hwseq;
 	struct hubbub *hubbub = dc->res_pool->hubbub;
+	int min_fclk_khz, min_dcfclk_khz, socclk_khz;
 
 	if (dc->debug.sanity_checks)
 		hws->funcs.verify_allow_pstate_change_high(dc);
@@ -3053,8 +3148,16 @@ void dcn10_optimize_bandwidth(
 
 	if (dc->debug.pplib_wm_report_mode == WM_REPORT_OVERRIDE) {
 		DC_FP_START();
+<<<<<<< HEAD
+		dcn_get_soc_clks(
+			dc, &min_fclk_khz, &min_dcfclk_khz, &socclk_khz);
+		DC_FP_END();
+		dcn_bw_notify_pplib_of_wm_ranges(
+			dc, min_fclk_khz, min_dcfclk_khz, socclk_khz);
+=======
 		dcn_bw_notify_pplib_of_wm_ranges(dc);
 		DC_FP_END();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	if (dc->debug.sanity_checks)
@@ -3311,6 +3414,7 @@ static bool dcn10_can_pipe_disable_cursor(struct pipe_ctx *pipe_ctx)
 		r2_r = r2.x + r2.width;
 		r2_b = r2.y + r2.height;
 		split_pipe = test_pipe;
+<<<<<<< HEAD
 
 		/**
 		 * There is another half plane on same layer because of
@@ -3326,6 +3430,23 @@ static bool dcn10_can_pipe_disable_cursor(struct pipe_ctx *pipe_ctx)
 				break;
 			}
 
+=======
+
+		/**
+		 * There is another half plane on same layer because of
+		 * pipe-split, merge together per same height.
+		 */
+		for (split_pipe = pipe_ctx->top_pipe; split_pipe;
+		     split_pipe = split_pipe->top_pipe)
+			if (split_pipe->plane_state->layer_index == test_pipe->plane_state->layer_index) {
+				r2_half = split_pipe->plane_res.scl_data.recout;
+				r2.x = (r2_half.x < r2.x) ? r2_half.x : r2.x;
+				r2.width = r2.width + r2_half.width;
+				r2_r = r2.x + r2.width;
+				break;
+			}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (r1.x >= r2.x && r1.y >= r2.y && r1_r <= r2_r && r1_b <= r2_b)
 			return true;
 	}
@@ -3468,8 +3589,7 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 		.rotation = pipe_ctx->plane_state->rotation,
 		.mirror = pipe_ctx->plane_state->horizontal_mirror
 	};
-	bool pipe_split_on = (pipe_ctx->top_pipe != NULL) ||
-		(pipe_ctx->bottom_pipe != NULL);
+	bool pipe_split_on = false;
 	bool odm_combine_on = (pipe_ctx->next_odm_pipe != NULL) ||
 		(pipe_ctx->prev_odm_pipe != NULL);
 
@@ -3477,6 +3597,13 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 	int y_plane = pipe_ctx->plane_state->dst_rect.y;
 	int x_pos = pos_cpy.x;
 	int y_pos = pos_cpy.y;
+
+	if ((pipe_ctx->top_pipe != NULL) || (pipe_ctx->bottom_pipe != NULL)) {
+		if ((pipe_ctx->plane_state->src_rect.width != pipe_ctx->plane_res.scl_data.viewport.width) ||
+			(pipe_ctx->plane_state->src_rect.height != pipe_ctx->plane_res.scl_data.viewport.height)) {
+			pipe_split_on = true;
+		}
+	}
 
 	/**
 	 * DC cursor is stream space, HW cursor is plane space and drawn
@@ -3549,8 +3676,36 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 	if (pos_cpy.enable && dcn10_can_pipe_disable_cursor(pipe_ctx))
 		pos_cpy.enable = false;
 
+
+	if (param.rotation == ROTATION_ANGLE_0) {
+		int viewport_width =
+			pipe_ctx->plane_res.scl_data.viewport.width;
+		int viewport_x =
+			pipe_ctx->plane_res.scl_data.viewport.x;
+
+		if (param.mirror) {
+			if (pipe_split_on || odm_combine_on) {
+				if (pos_cpy.x >= viewport_width + viewport_x) {
+					pos_cpy.x = 2 * viewport_width
+							- pos_cpy.x + 2 * viewport_x;
+				} else {
+					uint32_t temp_x = pos_cpy.x;
+
+					pos_cpy.x = 2 * viewport_x - pos_cpy.x;
+					if (temp_x >= viewport_x +
+						(int)hubp->curs_attr.width || pos_cpy.x
+						<= (int)hubp->curs_attr.width +
+						pipe_ctx->plane_state->src_rect.x) {
+						pos_cpy.x = temp_x + viewport_width;
+					}
+				}
+			} else {
+				pos_cpy.x = viewport_width - pos_cpy.x + 2 * viewport_x;
+			}
+		}
+	}
 	// Swap axis and mirror horizontally
-	if (param.rotation == ROTATION_ANGLE_90) {
+	else if (param.rotation == ROTATION_ANGLE_90) {
 		uint32_t temp_x = pos_cpy.x;
 
 		pos_cpy.x = pipe_ctx->plane_res.scl_data.viewport.width -
@@ -3621,23 +3776,25 @@ void dcn10_set_cursor_position(struct pipe_ctx *pipe_ctx)
 		int viewport_x =
 			pipe_ctx->plane_res.scl_data.viewport.x;
 
-		if (pipe_split_on || odm_combine_on) {
-			if (pos_cpy.x >= viewport_width + viewport_x) {
-				pos_cpy.x = 2 * viewport_width
-						- pos_cpy.x + 2 * viewport_x;
-			} else {
-				uint32_t temp_x = pos_cpy.x;
+		if (!param.mirror) {
+			if (pipe_split_on || odm_combine_on) {
+				if (pos_cpy.x >= viewport_width + viewport_x) {
+					pos_cpy.x = 2 * viewport_width
+							- pos_cpy.x + 2 * viewport_x;
+				} else {
+					uint32_t temp_x = pos_cpy.x;
 
-				pos_cpy.x = 2 * viewport_x - pos_cpy.x;
-				if (temp_x >= viewport_x +
-					(int)hubp->curs_attr.width || pos_cpy.x
-					<= (int)hubp->curs_attr.width +
-					pipe_ctx->plane_state->src_rect.x) {
-					pos_cpy.x = temp_x + viewport_width;
+					pos_cpy.x = 2 * viewport_x - pos_cpy.x;
+					if (temp_x >= viewport_x +
+						(int)hubp->curs_attr.width || pos_cpy.x
+						<= (int)hubp->curs_attr.width +
+						pipe_ctx->plane_state->src_rect.x) {
+						pos_cpy.x = temp_x + viewport_width;
+					}
 				}
+			} else {
+				pos_cpy.x = viewport_width - pos_cpy.x + 2 * viewport_x;
 			}
-		} else {
-			pos_cpy.x = viewport_width - pos_cpy.x + 2 * viewport_x;
 		}
 
 		/**
@@ -3738,7 +3895,6 @@ int dcn10_get_vupdate_offset_from_vsync(struct pipe_ctx *pipe_ctx)
 	int vesa_sync_start;
 	int asic_blank_end;
 	int interlace_factor;
-	int vertical_line_start;
 
 	patched_crtc_timing = *dc_crtc_timing;
 	apply_front_porch_workaround(&patched_crtc_timing);
@@ -3754,10 +3910,8 @@ int dcn10_get_vupdate_offset_from_vsync(struct pipe_ctx *pipe_ctx)
 			patched_crtc_timing.v_border_top)
 			* interlace_factor;
 
-	vertical_line_start = asic_blank_end -
+	return asic_blank_end -
 			pipe_ctx->pipe_dlg_param.vstartup_start + 1;
-
-	return vertical_line_start;
 }
 
 void dcn10_calc_vupdate_position(
@@ -3766,28 +3920,22 @@ void dcn10_calc_vupdate_position(
 		uint32_t *start_line,
 		uint32_t *end_line)
 {
+<<<<<<< HEAD
+	const struct dc_crtc_timing *timing = &pipe_ctx->stream->timing;
+	int vupdate_pos = dc->hwss.get_vupdate_offset_from_vsync(pipe_ctx);
+=======
 	const struct dc_crtc_timing *dc_crtc_timing = &pipe_ctx->stream->timing;
 	int vline_int_offset_from_vupdate =
 			pipe_ctx->stream->periodic_interrupt.lines_offset;
 	int vupdate_offset_from_vsync = dc->hwss.get_vupdate_offset_from_vsync(pipe_ctx);
 	int start_position;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	if (vline_int_offset_from_vupdate > 0)
-		vline_int_offset_from_vupdate--;
-	else if (vline_int_offset_from_vupdate < 0)
-		vline_int_offset_from_vupdate++;
-
-	start_position = vline_int_offset_from_vupdate + vupdate_offset_from_vsync;
-
-	if (start_position >= 0)
-		*start_line = start_position;
+	if (vupdate_pos >= 0)
+		*start_line = vupdate_pos - ((vupdate_pos / timing->v_total) * timing->v_total);
 	else
-		*start_line = dc_crtc_timing->v_total + start_position - 1;
-
-	*end_line = *start_line + 2;
-
-	if (*end_line >= dc_crtc_timing->v_total)
-		*end_line = 2;
+		*start_line = vupdate_pos + ((-vupdate_pos / timing->v_total) + 1) * timing->v_total - 1;
+	*end_line = (*start_line + 2) % timing->v_total;
 }
 
 static void dcn10_cal_vline_position(
@@ -3796,6 +3944,28 @@ static void dcn10_cal_vline_position(
 		uint32_t *start_line,
 		uint32_t *end_line)
 {
+<<<<<<< HEAD
+	const struct dc_crtc_timing *timing = &pipe_ctx->stream->timing;
+	int vline_pos = pipe_ctx->stream->periodic_interrupt.lines_offset;
+
+	if (pipe_ctx->stream->periodic_interrupt.ref_point == START_V_UPDATE) {
+		if (vline_pos > 0)
+			vline_pos--;
+		else if (vline_pos < 0)
+			vline_pos++;
+
+		vline_pos += dc->hwss.get_vupdate_offset_from_vsync(pipe_ctx);
+		if (vline_pos >= 0)
+			*start_line = vline_pos - ((vline_pos / timing->v_total) * timing->v_total);
+		else
+			*start_line = vline_pos + ((-vline_pos / timing->v_total) + 1) * timing->v_total - 1;
+		*end_line = (*start_line + 2) % timing->v_total;
+	} else if (pipe_ctx->stream->periodic_interrupt.ref_point == START_V_SYNC) {
+		// vsync is line 0 so start_line is just the requested line offset
+		*start_line = vline_pos;
+		*end_line = (*start_line + 2) % timing->v_total;
+	} else
+=======
 	switch (pipe_ctx->stream->periodic_interrupt.ref_point) {
 	case START_V_UPDATE:
 		dcn10_calc_vupdate_position(
@@ -3810,9 +3980,8 @@ static void dcn10_cal_vline_position(
 		*end_line = *start_line + 2;
 		break;
 	default:
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ASSERT(0);
-		break;
-	}
 }
 
 void dcn10_setup_periodic_interrupt(

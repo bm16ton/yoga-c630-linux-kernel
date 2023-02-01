@@ -1,0 +1,1 @@
+cmd_drivers/media/dvb-frontends/drx39xyj/drx39xyj.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/dvb-frontends/drx39xyj/drx39xyj.ko drivers/media/dvb-frontends/drx39xyj/drx39xyj.o drivers/media/dvb-frontends/drx39xyj/drx39xyj.mod.o;  true

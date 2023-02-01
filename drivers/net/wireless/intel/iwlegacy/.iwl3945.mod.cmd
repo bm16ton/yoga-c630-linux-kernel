@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intel/iwlegacy/iwl3945.mod := printf '%s\n'   3945-mac.o 3945.o 3945-rs.o | awk '!x[$$0]++ { print("drivers/net/wireless/intel/iwlegacy/"$$0) }' > drivers/net/wireless/intel/iwlegacy/iwl3945.mod

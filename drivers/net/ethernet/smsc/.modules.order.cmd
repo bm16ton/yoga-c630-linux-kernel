@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/smsc/modules.order := {   echo drivers/net/ethernet/smsc/smc91x.ko;   echo drivers/net/ethernet/smsc/epic100.ko;   echo drivers/net/ethernet/smsc/smsc9420.ko;   echo drivers/net/ethernet/smsc/smsc911x.ko; :; } > drivers/net/ethernet/smsc/modules.order

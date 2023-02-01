@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intersil/hostap/hostap_plx.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/intersil/hostap/hostap_plx.ko drivers/net/wireless/intersil/hostap/hostap_plx.o drivers/net/wireless/intersil/hostap/hostap_plx.mod.o;  true

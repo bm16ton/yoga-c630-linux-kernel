@@ -1,0 +1,1 @@
+cmd_drivers/iio/amplifiers/ada4250.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/amplifiers/ada4250.ko drivers/iio/amplifiers/ada4250.o drivers/iio/amplifiers/ada4250.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/bnx2fc/bnx2fc.mod := printf '%s\n'   bnx2fc_els.o bnx2fc_fcoe.o bnx2fc_hwi.o bnx2fc_io.o bnx2fc_tgt.o bnx2fc_debug.o | awk '!x[$$0]++ { print("drivers/scsi/bnx2fc/"$$0) }' > drivers/scsi/bnx2fc/bnx2fc.mod

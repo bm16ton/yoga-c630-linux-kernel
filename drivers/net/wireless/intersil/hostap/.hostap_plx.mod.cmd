@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/intersil/hostap/hostap_plx.mod := printf '%s\n'   hostap_plx.o | awk '!x[$$0]++ { print("drivers/net/wireless/intersil/hostap/"$$0) }' > drivers/net/wireless/intersil/hostap/hostap_plx.mod

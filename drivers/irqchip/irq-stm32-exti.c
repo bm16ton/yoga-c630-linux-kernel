@@ -716,7 +716,11 @@ static int stm32_exti_h_domain_alloc(struct irq_domain *dm,
 
 	irq_domain_set_hwirq_and_chip(dm, virq, hwirq, chip, chip_data);
 
+<<<<<<< HEAD
+	if (!host_data->drv_data->desc_irqs)
+=======
 	if (!host_data->drv_data || !host_data->drv_data->desc_irqs)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	desc_irq = host_data->drv_data->desc_irqs[hwirq];

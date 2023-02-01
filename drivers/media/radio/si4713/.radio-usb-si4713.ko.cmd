@@ -1,0 +1,1 @@
+cmd_drivers/media/radio/si4713/radio-usb-si4713.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/radio/si4713/radio-usb-si4713.ko drivers/media/radio/si4713/radio-usb-si4713.o drivers/media/radio/si4713/radio-usb-si4713.mod.o;  true

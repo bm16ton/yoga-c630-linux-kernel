@@ -1,0 +1,1 @@
+cmd_drivers/usb/usbip/usbip-vudc.mod := printf '%s\n'   vudc_dev.o vudc_sysfs.o vudc_tx.o vudc_rx.o vudc_transfer.o vudc_main.o | awk '!x[$$0]++ { print("drivers/usb/usbip/"$$0) }' > drivers/usb/usbip/usbip-vudc.mod

@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/et1011c.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/et1011c.ko drivers/net/phy/et1011c.o drivers/net/phy/et1011c.mod.o;  true

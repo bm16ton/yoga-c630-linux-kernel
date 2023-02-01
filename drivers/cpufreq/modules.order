@@ -1,0 +1,8 @@
+drivers/cpufreq/cpufreq_powersave.ko
+drivers/cpufreq/cpufreq_userspace.ko
+drivers/cpufreq/cpufreq_ondemand.ko
+drivers/cpufreq/cpufreq_conservative.ko
+drivers/cpufreq/cpufreq-dt.ko
+drivers/cpufreq/armada-37xx-cpufreq.ko
+drivers/cpufreq/cppc_cpufreq.ko
+drivers/cpufreq/tegra20-cpufreq.ko

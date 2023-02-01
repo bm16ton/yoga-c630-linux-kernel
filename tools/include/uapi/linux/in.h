@@ -20,6 +20,7 @@
 #define _UAPI_LINUX_IN_H
 
 #include <linux/types.h>
+#include <linux/stddef.h>
 #include <linux/libc-compat.h>
 #include <linux/socket.h>
 
@@ -68,6 +69,8 @@ enum {
 #define IPPROTO_PIM		IPPROTO_PIM
   IPPROTO_COMP = 108,		/* Compression Header Protocol		*/
 #define IPPROTO_COMP		IPPROTO_COMP
+  IPPROTO_L2TP = 115,		/* Layer 2 Tunnelling Protocol		*/
+#define IPPROTO_L2TP		IPPROTO_L2TP
   IPPROTO_SCTP = 132,		/* Stream Control Transport Protocol	*/
 #define IPPROTO_SCTP		IPPROTO_SCTP
   IPPROTO_UDPLITE = 136,	/* UDP-Lite (RFC 3828)			*/
@@ -188,6 +191,15 @@ struct ip_mreq_source {
 };
 
 struct ip_msfilter {
+<<<<<<< HEAD
+	__be32		imsf_multiaddr;
+	__be32		imsf_interface;
+	__u32		imsf_fmode;
+	__u32		imsf_numsrc;
+	union {
+		__be32		imsf_slist[1];
+		__DECLARE_FLEX_ARRAY(__be32, imsf_slist_flex);
+=======
 	union {
 		struct {
 			__be32		imsf_multiaddr_aux;
@@ -203,6 +215,7 @@ struct ip_msfilter {
 			__u32		imsf_numsrc;
 			__be32		imsf_slist_flex[];
 		};
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	};
 };
 

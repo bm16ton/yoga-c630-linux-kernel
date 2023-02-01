@@ -87,10 +87,13 @@ static struct ctl_table user_table[] = {
 	UCOUNT_ENTRY("max_fanotify_groups"),
 	UCOUNT_ENTRY("max_fanotify_marks"),
 #endif
+<<<<<<< HEAD
+=======
 	{ },
 	{ },
 	{ },
 	{ },
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	{ }
 };
 #endif /* CONFIG_SYSCTL */
@@ -263,29 +266,49 @@ void dec_ucount(struct ucounts *ucounts, enum ucount_type type)
 	put_ucounts(ucounts);
 }
 
+<<<<<<< HEAD
+long inc_rlimit_ucounts(struct ucounts *ucounts, enum rlimit_type type, long v)
+=======
 long inc_rlimit_ucounts(struct ucounts *ucounts, enum ucount_type type, long v)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ucounts *iter;
 	long max = LONG_MAX;
 	long ret = 0;
 
 	for (iter = ucounts; iter; iter = iter->ns->ucounts) {
+<<<<<<< HEAD
+		long new = atomic_long_add_return(v, &iter->rlimit[type]);
+=======
 		long new = atomic_long_add_return(v, &iter->ucount[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (new < 0 || new > max)
 			ret = LONG_MAX;
 		else if (iter == ucounts)
 			ret = new;
+<<<<<<< HEAD
+		max = get_userns_rlimit_max(iter->ns, type);
+=======
 		max = READ_ONCE(iter->ns->ucount_max[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return ret;
 }
 
+<<<<<<< HEAD
+bool dec_rlimit_ucounts(struct ucounts *ucounts, enum rlimit_type type, long v)
+=======
 bool dec_rlimit_ucounts(struct ucounts *ucounts, enum ucount_type type, long v)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ucounts *iter;
 	long new = -1; /* Silence compiler warning */
 	for (iter = ucounts; iter; iter = iter->ns->ucounts) {
+<<<<<<< HEAD
+		long dec = atomic_long_sub_return(v, &iter->rlimit[type]);
+=======
 		long dec = atomic_long_sub_return(v, &iter->ucount[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		WARN_ON_ONCE(dec < 0);
 		if (iter == ucounts)
 			new = dec;
@@ -294,11 +317,19 @@ bool dec_rlimit_ucounts(struct ucounts *ucounts, enum ucount_type type, long v)
 }
 
 static void do_dec_rlimit_put_ucounts(struct ucounts *ucounts,
+<<<<<<< HEAD
+				struct ucounts *last, enum rlimit_type type)
+{
+	struct ucounts *iter, *next;
+	for (iter = ucounts; iter != last; iter = next) {
+		long dec = atomic_long_sub_return(1, &iter->rlimit[type]);
+=======
 				struct ucounts *last, enum ucount_type type)
 {
 	struct ucounts *iter, *next;
 	for (iter = ucounts; iter != last; iter = next) {
 		long dec = atomic_long_sub_return(1, &iter->ucount[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		WARN_ON_ONCE(dec < 0);
 		next = iter->ns->ucounts;
 		if (dec == 0)
@@ -306,12 +337,20 @@ static void do_dec_rlimit_put_ucounts(struct ucounts *ucounts,
 	}
 }
 
+<<<<<<< HEAD
+void dec_rlimit_put_ucounts(struct ucounts *ucounts, enum rlimit_type type)
+=======
 void dec_rlimit_put_ucounts(struct ucounts *ucounts, enum ucount_type type)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	do_dec_rlimit_put_ucounts(ucounts, NULL, type);
 }
 
+<<<<<<< HEAD
+long inc_rlimit_get_ucounts(struct ucounts *ucounts, enum rlimit_type type)
+=======
 long inc_rlimit_get_ucounts(struct ucounts *ucounts, enum ucount_type type)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/* Caller must hold a reference to ucounts */
 	struct ucounts *iter;
@@ -319,12 +358,20 @@ long inc_rlimit_get_ucounts(struct ucounts *ucounts, enum ucount_type type)
 	long dec, ret = 0;
 
 	for (iter = ucounts; iter; iter = iter->ns->ucounts) {
+<<<<<<< HEAD
+		long new = atomic_long_add_return(1, &iter->rlimit[type]);
+=======
 		long new = atomic_long_add_return(1, &iter->ucount[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (new < 0 || new > max)
 			goto unwind;
 		if (iter == ucounts)
 			ret = new;
+<<<<<<< HEAD
+		max = get_userns_rlimit_max(iter->ns, type);
+=======
 		max = READ_ONCE(iter->ns->ucount_max[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		/*
 		 * Grab an extra ucount reference for the caller when
 		 * the rlimit count was previously 0.
@@ -336,24 +383,39 @@ long inc_rlimit_get_ucounts(struct ucounts *ucounts, enum ucount_type type)
 	}
 	return ret;
 dec_unwind:
+<<<<<<< HEAD
+	dec = atomic_long_sub_return(1, &iter->rlimit[type]);
+=======
 	dec = atomic_long_sub_return(1, &iter->ucount[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	WARN_ON_ONCE(dec < 0);
 unwind:
 	do_dec_rlimit_put_ucounts(ucounts, iter, type);
 	return 0;
 }
 
+<<<<<<< HEAD
+bool is_rlimit_overlimit(struct ucounts *ucounts, enum rlimit_type type, unsigned long rlimit)
+=======
 bool is_ucounts_overlimit(struct ucounts *ucounts, enum ucount_type type, unsigned long rlimit)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ucounts *iter;
 	long max = rlimit;
 	if (rlimit > LONG_MAX)
 		max = LONG_MAX;
 	for (iter = ucounts; iter; iter = iter->ns->ucounts) {
+<<<<<<< HEAD
+		long val = get_rlimit_value(iter, type);
+		if (val < 0 || val > max)
+			return true;
+		max = get_userns_rlimit_max(iter->ns, type);
+=======
 		long val = get_ucounts_value(iter, type);
 		if (val < 0 || val > max)
 			return true;
 		max = READ_ONCE(iter->ns->ucount_max[type]);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return false;
 }

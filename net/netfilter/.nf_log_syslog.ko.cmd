@@ -1,0 +1,1 @@
+cmd_net/netfilter/nf_log_syslog.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/nf_log_syslog.ko net/netfilter/nf_log_syslog.o net/netfilter/nf_log_syslog.mod.o;  true

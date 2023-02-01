@@ -1,0 +1,2 @@
+drivers/net/ethernet/sfc/sfc.ko
+drivers/net/ethernet/sfc/falcon/sfc-falcon.ko

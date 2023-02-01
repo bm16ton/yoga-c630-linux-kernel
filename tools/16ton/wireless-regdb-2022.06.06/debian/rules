@@ -1,0 +1,50 @@
+#!/usr/bin/make -f
+
+export CRDA_PATH     = /lib/crda
+export REGDB_AUTHOR  = ubuntu-devel-discuss@lists.ubuntu.com
+export V             = 1
+# prevent the build system from calling lsb_release
+export LSB_ID        = Debian/Ubuntu
+
+define copy_source
+test -d .pc
+set +e; QUILT_PC=.pc quilt unapplied --quiltrc - >/dev/null && echo 'Patch series not fully applied'; test $$? -eq 1
+mkdir -p '$(1)'
+cp -a $(filter-out debian .pc .git %.bin %.db %.p7s sha1sum.txt, $(wildcard * .[^.]*)) '$(1)'
+endef
+
+%:
+	dh ${@}
+
+debian/stamps/configure:
+	rm -rf debian/build
+	$(call copy_source,debian/build)
+	mkdir -p debian/stamps
+	touch $@
+
+override_dh_auto_configure: debian/stamps/configure
+
+override_dh_auto_build:
+	# Generate keys in source dir, everything else in build dir
+	$(MAKE) .wireless-regdb-$(REGDB_AUTHOR).key.priv.pem
+	$(MAKE) $(REGDB_AUTHOR).key.pub.pem $(REGDB_AUTHOR).x509.pem
+	$(MAKE) -C debian/build all
+
+	# Verify that our binaries match upstream
+	diff regulatory.db debian/build/regulatory.db
+	size="$$(dd if=regulatory.bin status=none bs=4 skip=2 count=1 | od -td4 --endian=big -An | sed 's/^\s*//')" \
+	&& dd if=regulatory.bin status=none iflag=skip_bytes,count_bytes skip=12 count=$$size of=debian/build/regulatory.bin.unsigned-upstream \
+	&& dd if=debian/build/regulatory.bin status=none iflag=skip_bytes,count_bytes skip=12 count=$$size of=debian/build/regulatory.bin.unsigned \
+	&& diff debian/build/regulatory.bin.unsigned-upstream debian/build/regulatory.bin.unsigned
+	rm debian/build/regulatory.bin.unsigned-upstream debian/build/regulatory.bin.unsigned
+
+override_dh_install: DIR=debian/wireless-regdb
+override_dh_install:
+	# Install from source dir to ship upstream binaries
+	$(MAKE) DESTDIR=$(CURDIR)/$(DIR) install
+	# crda will install public keys
+	rm -r $(DIR)/lib/crda/pubkeys
+
+override_dh_auto_clean:
+	rm -rf .wireless-regdb-$(REGDB_AUTHOR).key.priv.pem $(REGDB_AUTHOR).key.pub.pem $(REGDB_AUTHOR).x509.pem
+	rm -rf debian/build debian/stamps

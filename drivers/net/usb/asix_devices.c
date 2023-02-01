@@ -303,6 +303,27 @@ static int ax88772_ethtool_get_sset_count(struct net_device *ndev, int sset)
 	}
 }
 
+<<<<<<< HEAD
+static void ax88772_ethtool_get_pauseparam(struct net_device *ndev,
+					  struct ethtool_pauseparam *pause)
+{
+	struct usbnet *dev = netdev_priv(ndev);
+	struct asix_common_private *priv = dev->driver_priv;
+
+	phylink_ethtool_get_pauseparam(priv->phylink, pause);
+}
+
+static int ax88772_ethtool_set_pauseparam(struct net_device *ndev,
+					 struct ethtool_pauseparam *pause)
+{
+	struct usbnet *dev = netdev_priv(ndev);
+	struct asix_common_private *priv = dev->driver_priv;
+
+	return phylink_ethtool_set_pauseparam(priv->phylink, pause);
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct ethtool_ops ax88772_ethtool_ops = {
 	.get_drvinfo		= asix_get_drvinfo,
 	.get_link		= usbnet_get_link,
@@ -319,6 +340,11 @@ static const struct ethtool_ops ax88772_ethtool_ops = {
 	.self_test		= net_selftest,
 	.get_strings		= ax88772_ethtool_get_strings,
 	.get_sset_count		= ax88772_ethtool_get_sset_count,
+<<<<<<< HEAD
+	.get_pauseparam		= ax88772_ethtool_get_pauseparam,
+	.set_pauseparam		= ax88772_ethtool_set_pauseparam,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 static int ax88772_reset(struct usbnet *dev)
@@ -343,7 +369,11 @@ static int ax88772_reset(struct usbnet *dev)
 	if (ret < 0)
 		goto out;
 
+<<<<<<< HEAD
+	phylink_start(priv->phylink);
+=======
 	phy_start(priv->phydev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 
@@ -590,8 +620,16 @@ static void ax88772_suspend(struct usbnet *dev)
 	struct asix_common_private *priv = dev->driver_priv;
 	u16 medium;
 
+<<<<<<< HEAD
+	if (netif_running(dev->net)) {
+		rtnl_lock();
+		phylink_suspend(priv->phylink, false);
+		rtnl_unlock();
+	}
+=======
 	if (netif_running(dev->net))
 		phy_stop(priv->phydev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* Stop MAC operation */
 	medium = asix_read_medium_status(dev, 1);
@@ -621,6 +659,170 @@ static void ax88772_resume(struct usbnet *dev)
 	for (i = 0; i < 3; i++)
 		if (!priv->reset(dev, 1))
 			break;
+<<<<<<< HEAD
+
+	if (netif_running(dev->net)) {
+		rtnl_lock();
+		phylink_resume(priv->phylink);
+		rtnl_unlock();
+	}
+}
+
+static int asix_resume(struct usb_interface *intf)
+{
+	struct usbnet *dev = usb_get_intfdata(intf);
+	struct asix_common_private *priv = dev->driver_priv;
+
+	if (priv && priv->resume)
+		priv->resume(dev);
+
+	return usbnet_resume(intf);
+}
+
+static int ax88772_init_mdio(struct usbnet *dev)
+{
+	struct asix_common_private *priv = dev->driver_priv;
+
+	priv->mdio = devm_mdiobus_alloc(&dev->udev->dev);
+	if (!priv->mdio)
+		return -ENOMEM;
+
+	priv->mdio->priv = dev;
+	priv->mdio->read = &asix_mdio_bus_read;
+	priv->mdio->write = &asix_mdio_bus_write;
+	priv->mdio->name = "Asix MDIO Bus";
+	/* mii bus name is usb-<usb bus number>-<usb device number> */
+	snprintf(priv->mdio->id, MII_BUS_ID_SIZE, "usb-%03d:%03d",
+		 dev->udev->bus->busnum, dev->udev->devnum);
+
+	return devm_mdiobus_register(&dev->udev->dev, priv->mdio);
+}
+
+static int ax88772_init_phy(struct usbnet *dev)
+{
+	struct asix_common_private *priv = dev->driver_priv;
+	int ret;
+
+	priv->phydev = mdiobus_get_phy(priv->mdio, priv->phy_addr);
+	if (!priv->phydev) {
+		netdev_err(dev->net, "Could not find PHY\n");
+		return -ENODEV;
+	}
+
+	ret = phylink_connect_phy(priv->phylink, priv->phydev);
+	if (ret) {
+		netdev_err(dev->net, "Could not connect PHY\n");
+		return ret;
+	}
+
+	phy_suspend(priv->phydev);
+	priv->phydev->mac_managed_pm = 1;
+
+	phy_attached_info(priv->phydev);
+
+	if (priv->embd_phy)
+		return 0;
+
+	/* In case main PHY is not the embedded PHY and MAC is RMII clock
+	 * provider, we need to suspend embedded PHY by keeping PLL enabled
+	 * (AX_SWRESET_IPPD == 0).
+	 */
+	priv->phydev_int = mdiobus_get_phy(priv->mdio, AX_EMBD_PHY_ADDR);
+	if (!priv->phydev_int) {
+		rtnl_lock();
+		phylink_disconnect_phy(priv->phylink);
+		rtnl_unlock();
+		netdev_err(dev->net, "Could not find internal PHY\n");
+		return -ENODEV;
+	}
+
+	priv->phydev_int->mac_managed_pm = 1;
+	phy_suspend(priv->phydev_int);
+
+	return 0;
+}
+
+static void ax88772_mac_config(struct phylink_config *config, unsigned int mode,
+			      const struct phylink_link_state *state)
+{
+	/* Nothing to do */
+}
+
+static void ax88772_mac_link_down(struct phylink_config *config,
+				 unsigned int mode, phy_interface_t interface)
+{
+	struct usbnet *dev = netdev_priv(to_net_dev(config->dev));
+
+	asix_write_medium_mode(dev, 0, 0);
+	usbnet_link_change(dev, false, false);
+}
+
+static void ax88772_mac_link_up(struct phylink_config *config,
+			       struct phy_device *phy,
+			       unsigned int mode, phy_interface_t interface,
+			       int speed, int duplex,
+			       bool tx_pause, bool rx_pause)
+{
+	struct usbnet *dev = netdev_priv(to_net_dev(config->dev));
+	u16 m = AX_MEDIUM_AC | AX_MEDIUM_RE;
+
+	m |= duplex ? AX_MEDIUM_FD : 0;
+
+	switch (speed) {
+	case SPEED_100:
+		m |= AX_MEDIUM_PS;
+		break;
+	case SPEED_10:
+		break;
+	default:
+		return;
+	}
+
+	if (tx_pause)
+		m |= AX_MEDIUM_TFC;
+
+	if (rx_pause)
+		m |= AX_MEDIUM_RFC;
+
+	asix_write_medium_mode(dev, m, 0);
+	usbnet_link_change(dev, true, false);
+}
+
+static const struct phylink_mac_ops ax88772_phylink_mac_ops = {
+	.validate = phylink_generic_validate,
+	.mac_config = ax88772_mac_config,
+	.mac_link_down = ax88772_mac_link_down,
+	.mac_link_up = ax88772_mac_link_up,
+};
+
+static int ax88772_phylink_setup(struct usbnet *dev)
+{
+	struct asix_common_private *priv = dev->driver_priv;
+	phy_interface_t phy_if_mode;
+	struct phylink *phylink;
+
+	priv->phylink_config.dev = &dev->net->dev;
+	priv->phylink_config.type = PHYLINK_NETDEV;
+	priv->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
+		MAC_10 | MAC_100;
+
+	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
+		  priv->phylink_config.supported_interfaces);
+	__set_bit(PHY_INTERFACE_MODE_RMII,
+		  priv->phylink_config.supported_interfaces);
+
+	if (priv->embd_phy)
+		phy_if_mode = PHY_INTERFACE_MODE_INTERNAL;
+	else
+		phy_if_mode = PHY_INTERFACE_MODE_RMII;
+
+	phylink = phylink_create(&priv->phylink_config, dev->net->dev.fwnode,
+				 phy_if_mode, &ax88772_phylink_mac_ops);
+	if (IS_ERR(phylink))
+		return PTR_ERR(phylink);
+
+	priv->phylink = phylink;
+=======
 
 	if (netif_running(dev->net))
 		phy_start(priv->phydev);
@@ -695,6 +897,7 @@ static int ax88772_init_phy(struct usbnet *dev)
 	priv->phydev_int->mac_managed_pm = 1;
 	phy_suspend(priv->phydev_int);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return 0;
 }
 
@@ -788,14 +991,30 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
 	if (ret)
 		return ret;
 
+<<<<<<< HEAD
+	ret = ax88772_phylink_setup(dev);
+	if (ret)
+		return ret;
+
+	ret = ax88772_init_phy(dev);
+	if (ret)
+		phylink_destroy(priv->phylink);
+
+	return ret;
+=======
 	return ax88772_init_phy(dev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int ax88772_stop(struct usbnet *dev)
 {
 	struct asix_common_private *priv = dev->driver_priv;
 
+<<<<<<< HEAD
+	phylink_stop(priv->phylink);
+=======
 	phy_stop(priv->phydev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -804,7 +1023,14 @@ static void ax88772_unbind(struct usbnet *dev, struct usb_interface *intf)
 {
 	struct asix_common_private *priv = dev->driver_priv;
 
+<<<<<<< HEAD
+	rtnl_lock();
+	phylink_disconnect_phy(priv->phylink);
+	rtnl_unlock();
+	phylink_destroy(priv->phylink);
+=======
 	phy_disconnect(priv->phydev);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	asix_rx_fixup_common_free(dev->driver_priv);
 }
 

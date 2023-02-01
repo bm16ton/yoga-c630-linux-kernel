@@ -657,15 +657,28 @@ static inline unsigned long mm_total_size(struct mm_struct *mm)
 {
 	struct vm_area_struct *vma;
 	unsigned long usize = 0;
+	VMA_ITERATOR(vmi, mm, 0);
 
+<<<<<<< HEAD
+	for_each_vma(vmi, vma) {
+		if (usize >= parisc_cache_flush_threshold)
+			break;
+		usize += vma->vm_end - vma->vm_start;
+	}
+=======
 	for (vma = mm->mmap; vma && usize < parisc_cache_flush_threshold; vma = vma->vm_next)
 		usize += vma->vm_end - vma->vm_start;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return usize;
 }
 
 void flush_cache_mm(struct mm_struct *mm)
 {
 	struct vm_area_struct *vma;
+<<<<<<< HEAD
+	VMA_ITERATOR(vmi, mm, 0);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Flushing the whole cache on each cpu takes forever on
@@ -685,7 +698,11 @@ void flush_cache_mm(struct mm_struct *mm)
 	}
 
 	/* Flush mm */
+<<<<<<< HEAD
+	for_each_vma(vmi, vma)
+=======
 	for (vma = mm->mmap; vma; vma = vma->vm_next)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		flush_cache_pages(vma, vma->vm_start, vma->vm_end);
 }
 

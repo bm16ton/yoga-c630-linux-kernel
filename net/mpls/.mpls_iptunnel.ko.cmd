@@ -1,0 +1,1 @@
+cmd_net/mpls/mpls_iptunnel.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/mpls/mpls_iptunnel.ko net/mpls/mpls_iptunnel.o net/mpls/mpls_iptunnel.mod.o;  true

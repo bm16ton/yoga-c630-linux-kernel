@@ -607,6 +607,7 @@ static inline void vcpu_xcrs_set(struct kvm_vcpu *vcpu, struct kvm_xcrs *xcrs)
 const struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
 const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void);
 const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu);
+<<<<<<< HEAD
 
 bool kvm_cpuid_has(const struct kvm_cpuid2 *cpuid,
 		   struct kvm_x86_cpu_feature feature);
@@ -728,6 +729,129 @@ static inline uint32_t kvm_get_cpuid_max_basic(void)
 	return kvm_get_supported_cpuid_entry(0)->eax;
 }
 
+=======
+
+bool kvm_cpuid_has(const struct kvm_cpuid2 *cpuid,
+		   struct kvm_x86_cpu_feature feature);
+
+static inline bool kvm_cpu_has(struct kvm_x86_cpu_feature feature)
+{
+	return kvm_cpuid_has(kvm_get_supported_cpuid(), feature);
+}
+
+static inline size_t kvm_cpuid2_size(int nr_entries)
+{
+	return sizeof(struct kvm_cpuid2) +
+	       sizeof(struct kvm_cpuid_entry2) * nr_entries;
+}
+
+/*
+ * Allocate a "struct kvm_cpuid2* instance, with the 0-length arrary of
+ * entries sized to hold @nr_entries.  The caller is responsible for freeing
+ * the struct.
+ */
+static inline struct kvm_cpuid2 *allocate_kvm_cpuid2(int nr_entries)
+{
+	struct kvm_cpuid2 *cpuid;
+
+	cpuid = malloc(kvm_cpuid2_size(nr_entries));
+	TEST_ASSERT(cpuid, "-ENOMEM when allocating kvm_cpuid2");
+
+	cpuid->nent = nr_entries;
+
+	return cpuid;
+}
+
+const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
+					       uint32_t function, uint32_t index);
+void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid);
+void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu);
+
+static inline struct kvm_cpuid_entry2 *__vcpu_get_cpuid_entry(struct kvm_vcpu *vcpu,
+							      uint32_t function,
+							      uint32_t index)
+{
+	return (struct kvm_cpuid_entry2 *)get_cpuid_entry(vcpu->cpuid,
+							  function, index);
+}
+
+static inline struct kvm_cpuid_entry2 *vcpu_get_cpuid_entry(struct kvm_vcpu *vcpu,
+							    uint32_t function)
+{
+	return __vcpu_get_cpuid_entry(vcpu, function, 0);
+}
+
+static inline int __vcpu_set_cpuid(struct kvm_vcpu *vcpu)
+{
+	int r;
+
+	TEST_ASSERT(vcpu->cpuid, "Must do vcpu_init_cpuid() first");
+	r = __vcpu_ioctl(vcpu, KVM_SET_CPUID2, vcpu->cpuid);
+	if (r)
+		return r;
+
+	/* On success, refresh the cache to pick up adjustments made by KVM. */
+	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
+	return 0;
+}
+
+static inline void vcpu_set_cpuid(struct kvm_vcpu *vcpu)
+{
+	TEST_ASSERT(vcpu->cpuid, "Must do vcpu_init_cpuid() first");
+	vcpu_ioctl(vcpu, KVM_SET_CPUID2, vcpu->cpuid);
+
+	/* Refresh the cache to pick up adjustments made by KVM. */
+	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
+}
+
+void vcpu_set_cpuid_maxphyaddr(struct kvm_vcpu *vcpu, uint8_t maxphyaddr);
+
+void vcpu_clear_cpuid_entry(struct kvm_vcpu *vcpu, uint32_t function);
+void vcpu_set_or_clear_cpuid_feature(struct kvm_vcpu *vcpu,
+				     struct kvm_x86_cpu_feature feature,
+				     bool set);
+
+static inline void vcpu_set_cpuid_feature(struct kvm_vcpu *vcpu,
+					  struct kvm_x86_cpu_feature feature)
+{
+	vcpu_set_or_clear_cpuid_feature(vcpu, feature, true);
+
+}
+
+static inline void vcpu_clear_cpuid_feature(struct kvm_vcpu *vcpu,
+					    struct kvm_x86_cpu_feature feature)
+{
+	vcpu_set_or_clear_cpuid_feature(vcpu, feature, false);
+}
+
+static inline const struct kvm_cpuid_entry2 *__kvm_get_supported_cpuid_entry(uint32_t function,
+									     uint32_t index)
+{
+	return get_cpuid_entry(kvm_get_supported_cpuid(), function, index);
+}
+
+static inline const struct kvm_cpuid_entry2 *kvm_get_supported_cpuid_entry(uint32_t function)
+{
+	return __kvm_get_supported_cpuid_entry(function, 0);
+}
+
+uint64_t vcpu_get_msr(struct kvm_vcpu *vcpu, uint64_t msr_index);
+int _vcpu_set_msr(struct kvm_vcpu *vcpu, uint64_t msr_index, uint64_t msr_value);
+
+static inline void vcpu_set_msr(struct kvm_vcpu *vcpu, uint64_t msr_index,
+				uint64_t msr_value)
+{
+	int r = _vcpu_set_msr(vcpu, msr_index, msr_value);
+
+	TEST_ASSERT(r == 1, KVM_IOCTL_ERROR(KVM_SET_MSRS, r));
+}
+
+static inline uint32_t kvm_get_cpuid_max_basic(void)
+{
+	return kvm_get_supported_cpuid_entry(0)->eax;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static inline uint32_t kvm_get_cpuid_max_extended(void)
 {
 	return kvm_get_supported_cpuid_entry(0x80000000)->eax;
@@ -746,6 +870,19 @@ struct ex_regs {
 	uint64_t rip;
 	uint64_t cs;
 	uint64_t rflags;
+};
+
+struct idt_entry {
+	uint16_t offset0;
+	uint16_t selector;
+	uint16_t ist : 3;
+	uint16_t : 5;
+	uint16_t type : 4;
+	uint16_t : 1;
+	uint16_t dpl : 2;
+	uint16_t p : 1;
+	uint16_t offset1;
+	uint32_t offset2; uint32_t reserved;
 };
 
 void vm_init_descriptor_tables(struct kvm_vm *vm);
@@ -825,6 +962,11 @@ static inline uint8_t wrmsr_safe(uint32_t msr, uint64_t val)
 	return kvm_asm_safe("wrmsr", "a"(val & -1u), "d"(val >> 32), "c"(msr));
 }
 
+<<<<<<< HEAD
+bool kvm_is_tdp_enabled(void);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 uint64_t vm_get_page_table_entry(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
 				 uint64_t vaddr);
 void vm_set_page_table_entry(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
@@ -855,6 +997,11 @@ enum pg_level {
 #define PG_SIZE_1G PG_LEVEL_SIZE(PG_LEVEL_1G)
 
 void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level);
+<<<<<<< HEAD
+void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+		    uint64_t nr_bytes, int level);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /*
  * Basic CPU control in CR0

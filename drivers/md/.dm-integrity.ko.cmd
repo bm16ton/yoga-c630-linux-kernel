@@ -1,0 +1,1 @@
+cmd_drivers/md/dm-integrity.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/md/dm-integrity.ko drivers/md/dm-integrity.o drivers/md/dm-integrity.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/realtek/rtlwifi/rtl8192c/rtl8192c-common.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/realtek/rtlwifi/rtl8192c/rtl8192c-common.ko drivers/net/wireless/realtek/rtlwifi/rtl8192c/rtl8192c-common.o drivers/net/wireless/realtek/rtlwifi/rtl8192c/rtl8192c-common.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/net/phy/micrel.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/phy/micrel.ko drivers/net/phy/micrel.o drivers/net/phy/micrel.mod.o;  true

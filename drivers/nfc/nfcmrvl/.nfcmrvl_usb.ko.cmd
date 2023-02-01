@@ -1,0 +1,1 @@
+cmd_drivers/nfc/nfcmrvl/nfcmrvl_usb.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nfc/nfcmrvl/nfcmrvl_usb.ko drivers/nfc/nfcmrvl/nfcmrvl_usb.o drivers/nfc/nfcmrvl/nfcmrvl_usb.mod.o;  true

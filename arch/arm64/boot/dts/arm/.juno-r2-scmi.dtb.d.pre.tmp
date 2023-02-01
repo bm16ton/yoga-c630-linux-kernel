@@ -1,0 +1,10 @@
+juno-r2-scmi.o: arch/arm64/boot/dts/arm/juno-r2-scmi.dts \
+ arch/arm64/boot/dts/arm/juno-r2.dts \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/arm/coresight-cti-dt.h \
+ arch/arm64/boot/dts/arm/juno-base.dtsi \
+ arch/arm64/boot/dts/arm/juno-clocks.dtsi \
+ arch/arm64/boot/dts/arm/juno-motherboard.dtsi \
+ arch/arm64/boot/dts/arm/juno-cs-r1r2.dtsi \
+ arch/arm64/boot/dts/arm/juno-scmi.dtsi

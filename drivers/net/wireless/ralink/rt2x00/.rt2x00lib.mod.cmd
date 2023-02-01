@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ralink/rt2x00/rt2x00lib.mod := printf '%s\n'   rt2x00dev.o rt2x00mac.o rt2x00config.o rt2x00queue.o rt2x00link.o rt2x00debug.o rt2x00crypto.o rt2x00firmware.o rt2x00leds.o | awk '!x[$$0]++ { print("drivers/net/wireless/ralink/rt2x00/"$$0) }' > drivers/net/wireless/ralink/rt2x00/rt2x00lib.mod

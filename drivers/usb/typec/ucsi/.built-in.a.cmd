@@ -1,0 +1,1 @@
+cmd_drivers/usb/typec/ucsi/built-in.a := rm -f drivers/usb/typec/ucsi/built-in.a;  printf "drivers/usb/typec/ucsi/%s " ucsi.o trace.o psy.o displayport.o | xargs ar cDPrST drivers/usb/typec/ucsi/built-in.a

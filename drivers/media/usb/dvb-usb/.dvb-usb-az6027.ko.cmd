@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/dvb-usb/dvb-usb-az6027.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/dvb-usb/dvb-usb-az6027.ko drivers/media/usb/dvb-usb/dvb-usb-az6027.o drivers/media/usb/dvb-usb/dvb-usb-az6027.mod.o;  true

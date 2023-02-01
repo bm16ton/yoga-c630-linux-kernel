@@ -297,8 +297,12 @@ void __init setup_arch(char **cmdline_p)
 	setup_smp();
 #endif
 
-	riscv_fill_hwcap();
 	riscv_init_cbom_blocksize();
+	riscv_fill_hwcap();
+<<<<<<< HEAD
+=======
+	riscv_init_cbom_blocksize();
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	apply_boot_alternatives();
 }
 

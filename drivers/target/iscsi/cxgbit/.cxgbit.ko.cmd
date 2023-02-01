@@ -1,0 +1,1 @@
+cmd_drivers/target/iscsi/cxgbit/cxgbit.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/target/iscsi/cxgbit/cxgbit.ko drivers/target/iscsi/cxgbit/cxgbit.o drivers/target/iscsi/cxgbit/cxgbit.mod.o;  true

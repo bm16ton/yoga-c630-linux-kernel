@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns3/hclge.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/hisilicon/hns3/hclge.ko drivers/net/ethernet/hisilicon/hns3/hclge.o drivers/net/ethernet/hisilicon/hns3/hclge.mod.o;  true

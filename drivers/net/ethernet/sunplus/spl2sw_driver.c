@@ -62,7 +62,12 @@ static int spl2sw_ethernet_stop(struct net_device *ndev)
 	return 0;
 }
 
+<<<<<<< HEAD
+static netdev_tx_t spl2sw_ethernet_start_xmit(struct sk_buff *skb,
+					      struct net_device *ndev)
+=======
 static int spl2sw_ethernet_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct spl2sw_mac *mac = netdev_priv(ndev);
 	struct spl2sw_common *comm = mac->comm;
@@ -491,7 +496,11 @@ static int spl2sw_probe(struct platform_device *pdev)
 	}
 
 	/* Add and enable napi. */
+<<<<<<< HEAD
+	netif_napi_add(ndev, &comm->rx_napi, spl2sw_rx_poll);
+=======
 	netif_napi_add(ndev, &comm->rx_napi, spl2sw_rx_poll, NAPI_POLL_WEIGHT);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	napi_enable(&comm->rx_napi);
 	netif_napi_add_tx(ndev, &comm->tx_napi, spl2sw_tx_poll);
 	napi_enable(&comm->tx_napi);

@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath10k/ath10k_snoc.mod := printf '%s\n'   qmi.o qmi_wlfw_v01.o snoc.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath10k/"$$0) }' > drivers/net/wireless/ath/ath10k/ath10k_snoc.mod

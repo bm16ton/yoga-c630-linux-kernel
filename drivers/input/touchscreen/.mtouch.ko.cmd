@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/mtouch.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/mtouch.ko drivers/input/touchscreen/mtouch.o drivers/input/touchscreen/mtouch.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_net/ieee802154/6lowpan/ieee802154_6lowpan.mod := printf '%s\n'   core.o rx.o reassembly.o tx.o | awk '!x[$$0]++ { print("net/ieee802154/6lowpan/"$$0) }' > net/ieee802154/6lowpan/ieee802154_6lowpan.mod

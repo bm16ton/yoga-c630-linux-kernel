@@ -1,0 +1,1 @@
+cmd_drivers/acpi/apei/einj.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/acpi/apei/einj.ko drivers/acpi/apei/einj.o drivers/acpi/apei/einj.mod.o;  true

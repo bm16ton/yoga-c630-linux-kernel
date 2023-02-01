@@ -1,0 +1,1 @@
+cmd_drivers/block/xen-blkfront.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/block/xen-blkfront.ko drivers/block/xen-blkfront.o drivers/block/xen-blkfront.mod.o;  true

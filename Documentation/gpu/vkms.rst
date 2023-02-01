@@ -118,6 +118,12 @@ Add Plane Features
 
 There's lots of plane features we could add support for:
 
+<<<<<<< HEAD
+- ARGB format on primary plane: blend the primary plane into background with
+  translucent alpha.
+
+- Add background color KMS property[Good to get started].
+=======
 - Clearing primary plane: clear primary plane before plane composition (at the
   start) for correctness of pixel blend ops. It also guarantees alpha channel
   is cleared in the target buffer for stable crc. [Good to get started]
@@ -127,6 +133,7 @@ There's lots of plane features we could add support for:
 
 - Support when the primary plane isn't exactly matching the output size: blend
   the primary plane into the black background.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 - Full alpha blending on all planes.
 

@@ -92,5 +92,9 @@
 #define HWCAP2_SME_FA64		(1 << 30)
 #define HWCAP2_WFXT		(1UL << 31)
 #define HWCAP2_EBF16		(1UL << 32)
+<<<<<<< HEAD
+#define HWCAP2_SVE_EBF16	(1UL << 33)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #endif /* _UAPI__ASM_HWCAP_H */

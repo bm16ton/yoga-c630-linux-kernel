@@ -916,6 +916,9 @@ int goya_late_init(struct hl_device *hdev)
  */
 void goya_late_fini(struct hl_device *hdev)
 {
+<<<<<<< HEAD
+	struct goya_device *goya = hdev->asic_specific;
+=======
 	const struct hwmon_channel_info **channel_info_arr;
 	struct goya_device *goya = hdev->asic_specific;
 	int i = 0;
@@ -926,16 +929,44 @@ void goya_late_fini(struct hl_device *hdev)
 		return;
 
 	channel_info_arr = hdev->hl_chip_info->info;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	while (channel_info_arr[i]) {
-		kfree(channel_info_arr[i]->config);
-		kfree(channel_info_arr[i]);
-		i++;
-	}
+	cancel_delayed_work_sync(&goya->goya_work->work_freq);
 
-	kfree(channel_info_arr);
+	hl_hwmon_release_resources(hdev);
+}
 
-	hdev->hl_chip_info->info = NULL;
+static void goya_set_pci_memory_regions(struct hl_device *hdev)
+{
+	struct asic_fixed_properties *prop = &hdev->asic_prop;
+	struct pci_mem_region *region;
+
+	/* CFG */
+	region = &hdev->pci_mem_region[PCI_REGION_CFG];
+	region->region_base = CFG_BASE;
+	region->region_size = CFG_SIZE;
+	region->offset_in_bar = CFG_BASE - SRAM_BASE_ADDR;
+	region->bar_size = CFG_BAR_SIZE;
+	region->bar_id = SRAM_CFG_BAR_ID;
+	region->used = 1;
+
+	/* SRAM */
+	region = &hdev->pci_mem_region[PCI_REGION_SRAM];
+	region->region_base = SRAM_BASE_ADDR;
+	region->region_size = SRAM_SIZE;
+	region->offset_in_bar = 0;
+	region->bar_size = CFG_BAR_SIZE;
+	region->bar_id = SRAM_CFG_BAR_ID;
+	region->used = 1;
+
+	/* DRAM */
+	region = &hdev->pci_mem_region[PCI_REGION_DRAM];
+	region->region_base = DRAM_PHYS_BASE;
+	region->region_size = hdev->asic_prop.dram_size;
+	region->offset_in_bar = 0;
+	region->bar_size = prop->dram_pci_bar_size;
+	region->bar_id = DDR_BAR_ID;
+	region->used = 1;
 }
 
 static void goya_set_pci_memory_regions(struct hl_device *hdev)
@@ -1040,6 +1071,10 @@ static int goya_sw_init(struct hl_device *hdev)
 	hdev->asic_prop.supports_compute_reset = true;
 	hdev->asic_prop.allow_inference_soft_reset = true;
 	hdev->supports_wait_for_multi_cs = false;
+<<<<<<< HEAD
+	hdev->supports_ctx_switch = true;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	hdev->asic_funcs->set_pci_memory_regions(hdev);
 
@@ -4559,7 +4594,11 @@ static int goya_unmask_irq_arr(struct hl_device *hdev, u32 *irq_arr,
 	return rc;
 }
 
+<<<<<<< HEAD
+static int goya_compute_reset_late_init(struct hl_device *hdev)
+=======
 static int goya_non_hard_reset_late_init(struct hl_device *hdev)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	/*
 	 * Unmask all IRQs since some could have been received
@@ -5137,8 +5176,13 @@ int goya_cpucp_info_get(struct hl_device *hdev)
 	return 0;
 }
 
+<<<<<<< HEAD
+static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr, u8 mask_len,
+				struct engines_data *e)
+=======
 static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr,
 					u8 mask_len, struct seq_file *s)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	const char *fmt = "%-5d%-9s%#-14x%#-16x%#x\n";
 	const char *dma_fmt = "%-5d%-9s%#-14x%#x\n";
@@ -5149,9 +5193,9 @@ static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr,
 	u64 offset;
 	int i;
 
-	if (s)
-		seq_puts(s, "\nDMA  is_idle  QM_GLBL_STS0  DMA_CORE_STS0\n"
-				"---  -------  ------------  -------------\n");
+	if (e)
+		hl_engine_data_sprintf(e, "\nDMA  is_idle  QM_GLBL_STS0  DMA_CORE_STS0\n"
+					"---  -------  ------------  -------------\n");
 
 	offset = mmDMA_QM_1_GLBL_STS0 - mmDMA_QM_0_GLBL_STS0;
 
@@ -5164,13 +5208,13 @@ static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr,
 
 		if (mask && !is_eng_idle)
 			set_bit(GOYA_ENGINE_ID_DMA_0 + i, mask);
-		if (s)
-			seq_printf(s, dma_fmt, i, is_eng_idle ? "Y" : "N",
+		if (e)
+			hl_engine_data_sprintf(e, dma_fmt, i, is_eng_idle ? "Y" : "N",
 					qm_glbl_sts0, dma_core_sts0);
 	}
 
-	if (s)
-		seq_puts(s,
+	if (e)
+		hl_engine_data_sprintf(e,
 			"\nTPC  is_idle  QM_GLBL_STS0  CMDQ_GLBL_STS0  CFG_STATUS\n"
 			"---  -------  ------------  --------------  ----------\n");
 
@@ -5187,13 +5231,13 @@ static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr,
 
 		if (mask && !is_eng_idle)
 			set_bit(GOYA_ENGINE_ID_TPC_0 + i, mask);
-		if (s)
-			seq_printf(s, fmt, i, is_eng_idle ? "Y" : "N",
+		if (e)
+			hl_engine_data_sprintf(e, fmt, i, is_eng_idle ? "Y" : "N",
 				qm_glbl_sts0, cmdq_glbl_sts0, tpc_cfg_sts);
 	}
 
-	if (s)
-		seq_puts(s,
+	if (e)
+		hl_engine_data_sprintf(e,
 			"\nMME  is_idle  QM_GLBL_STS0  CMDQ_GLBL_STS0  ARCH_STATUS\n"
 			"---  -------  ------------  --------------  -----------\n");
 
@@ -5207,10 +5251,10 @@ static bool goya_is_device_idle(struct hl_device *hdev, u64 *mask_arr,
 
 	if (mask && !is_eng_idle)
 		set_bit(GOYA_ENGINE_ID_MME_0, mask);
-	if (s) {
-		seq_printf(s, fmt, 0, is_eng_idle ? "Y" : "N", qm_glbl_sts0,
+	if (e) {
+		hl_engine_data_sprintf(e, fmt, 0, is_eng_idle ? "Y" : "N", qm_glbl_sts0,
 				cmdq_glbl_sts0, mme_arch_sts);
-		seq_puts(s, "\n");
+		hl_engine_data_sprintf(e, "\n");
 	}
 
 	return is_idle;
@@ -5434,6 +5478,14 @@ static int goya_scrub_device_dram(struct hl_device *hdev, u64 val)
 	return -EOPNOTSUPP;
 }
 
+<<<<<<< HEAD
+static int goya_send_device_activity(struct hl_device *hdev, bool open)
+{
+	return 0;
+}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct hl_asic_funcs goya_funcs = {
 	.early_init = goya_early_init,
 	.early_fini = goya_early_fini,
@@ -5478,7 +5530,11 @@ static const struct hl_asic_funcs goya_funcs = {
 	.send_heartbeat = goya_send_heartbeat,
 	.debug_coresight = goya_debug_coresight,
 	.is_device_idle = goya_is_device_idle,
+<<<<<<< HEAD
+	.compute_reset_late_init = goya_compute_reset_late_init,
+=======
 	.non_hard_reset_late_init = goya_non_hard_reset_late_init,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.hw_queues_lock = goya_hw_queues_lock,
 	.hw_queues_unlock = goya_hw_queues_unlock,
 	.kdma_lock = NULL,
@@ -5528,6 +5584,10 @@ static const struct hl_asic_funcs goya_funcs = {
 	.mmu_get_real_page_size = hl_mmu_get_real_page_size,
 	.access_dev_mem = hl_access_dev_mem,
 	.set_dram_bar_base = goya_set_ddr_bar_base,
+<<<<<<< HEAD
+	.send_device_activity = goya_send_device_activity,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*

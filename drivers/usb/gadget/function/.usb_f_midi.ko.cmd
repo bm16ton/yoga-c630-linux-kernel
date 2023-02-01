@@ -1,0 +1,1 @@
+cmd_drivers/usb/gadget/function/usb_f_midi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/gadget/function/usb_f_midi.ko drivers/usb/gadget/function/usb_f_midi.o drivers/usb/gadget/function/usb_f_midi.mod.o;  true

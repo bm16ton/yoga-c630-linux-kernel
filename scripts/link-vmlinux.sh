@@ -3,17 +3,15 @@
 #
 # link vmlinux
 #
-# vmlinux is linked from the objects selected by $(KBUILD_VMLINUX_OBJS) and
-# $(KBUILD_VMLINUX_LIBS). Most are built-in.a files from top-level directories
-# in the kernel tree, others are specified in arch/$(ARCH)/Makefile.
+# vmlinux is linked from the objects in vmlinux.a and $(KBUILD_VMLINUX_LIBS).
+# vmlinux.a contains objects that are linked unconditionally.
 # $(KBUILD_VMLINUX_LIBS) are archives which are linked conditionally
 # (not within --whole-archive), and do not require symbol indexes added.
 #
 # vmlinux
 #   ^
 #   |
-#   +--< $(KBUILD_VMLINUX_OBJS)
-#   |    +--< init/built-in.a drivers/built-in.a mm/built-in.a + more
+#   +--< vmlinux.a
 #   |
 #   +--< $(KBUILD_VMLINUX_LIBS)
 #   |    +--< lib/lib.a + more
@@ -44,6 +42,7 @@ info()
 {
 	printf "  %-7s %s\n" "${1}" "${2}"
 }
+<<<<<<< HEAD
 
 # Link of vmlinux
 # ${1} - output file
@@ -61,6 +60,54 @@ vmlinux_link()
 
 	# skip output file argument
 	shift
+
+	if is_enabled CONFIG_LTO_CLANG || is_enabled CONFIG_X86_KERNEL_IBT; then
+		# Use vmlinux.o instead of performing the slow LTO link again.
+		objs=vmlinux.o
+		libs=
+	else
+		objs=vmlinux.a
+		libs="${KBUILD_VMLINUX_LIBS}"
+	fi
+
+	if is_enabled CONFIG_MODULES; then
+		objs="${objs} .vmlinux.export.o"
+	fi
+
+	objs="${objs} init/version-timestamp.o"
+
+	if [ "${SRCARCH}" = "um" ]; then
+		wl=-Wl,
+		ld="${CC}"
+		ldflags="${CFLAGS_vmlinux}"
+		ldlibs="-lutil -lrt -lpthread"
+	else
+		wl=
+		ld="${LD}"
+		ldflags="${KBUILD_LDFLAGS} ${LDFLAGS_vmlinux}"
+		ldlibs=
+	fi
+
+	ldflags="${ldflags} ${wl}--script=${objtree}/${KBUILD_LDS}"
+=======
+
+# Link of vmlinux
+# ${1} - output file
+# ${2}, ${3}, ... - optional extra .o files
+vmlinux_link()
+{
+	local output=${1}
+	local objs
+	local libs
+	local ld
+	local ldflags
+	local ldlibs
+
+	info LD ${output}
+
+	# skip output file argument
+	shift
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if is_enabled CONFIG_LTO_CLANG || is_enabled CONFIG_X86_KERNEL_IBT; then
 		# Use vmlinux.o instead of performing the slow LTO link again.
@@ -157,7 +204,7 @@ kallsyms()
 	fi
 
 	info KSYMS ${2}
-	${NM} -n ${1} | scripts/kallsyms ${kallsymopt} > ${2}
+	scripts/kallsyms ${kallsymopt} ${1} > ${2}
 }
 
 # Perform one step in kallsyms generation, including temporary linking of
@@ -170,7 +217,8 @@ kallsyms_step()
 	kallsyms_S=${kallsyms_vmlinux}.S
 
 	vmlinux_link ${kallsyms_vmlinux} "${kallsymso_prev}" ${btf_vmlinux_bin_o}
-	kallsyms ${kallsyms_vmlinux} ${kallsyms_S}
+	mksysmap ${kallsyms_vmlinux} ${kallsyms_vmlinux}.syms
+	kallsyms ${kallsyms_vmlinux}.syms ${kallsyms_S}
 
 	info AS ${kallsyms_S}
 	${CC} ${NOSTDINC_FLAGS} ${LINUXINCLUDE} ${KBUILD_CPPFLAGS} \
@@ -182,6 +230,7 @@ kallsyms_step()
 # See mksymap for additional details
 mksysmap()
 {
+	info NM ${2}
 	${CONFIG_SHELL} "${srctree}/scripts/mksysmap" ${1} ${2}
 }
 
@@ -197,8 +246,11 @@ cleanup()
 	rm -f System.map
 	rm -f vmlinux
 	rm -f vmlinux.map
+<<<<<<< HEAD
+=======
 	rm -f .vmlinux.objs
 	rm -f .vmlinux.export.c
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 # Use "make V=1" to debug this script
@@ -213,6 +265,9 @@ if [ "$1" = "clean" ]; then
 	exit 0
 fi
 
+<<<<<<< HEAD
+${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init init/version-timestamp.o
+=======
 # Update version
 info GEN .version
 if [ -r .version ]; then
@@ -255,6 +310,7 @@ info GEN modules.builtin
 # The second line aids cases where multiple modules share the same object.
 tr '\0' '\n' < modules.builtin.modinfo | sed -n 's/^[[:alnum:]:_]*\.file=//p' |
 	tr ' ' '\n' | uniq | sed -e 's:^:kernel/:' -e 's/$/.ko/' > modules.builtin
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 if is_enabled CONFIG_MODULES; then
 	${MAKE} -f "${srctree}/scripts/Makefile.vmlinux" .vmlinux.export.o
@@ -318,7 +374,10 @@ if is_enabled CONFIG_DEBUG_INFO_BTF && is_enabled CONFIG_BPF; then
 	${RESOLVE_BTFIDS} vmlinux
 fi
 
+<<<<<<< HEAD
+=======
 info SYSMAP System.map
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 mksysmap vmlinux System.map
 
 if is_enabled CONFIG_BUILDTIME_TABLE_SORT; then
@@ -331,9 +390,13 @@ fi
 
 # step a (see comment above)
 if is_enabled CONFIG_KALLSYMS; then
+<<<<<<< HEAD
+	if ! cmp -s System.map ${kallsyms_vmlinux}.syms; then
+=======
 	mksysmap ${kallsyms_vmlinux} .tmp_System.map
 
 	if ! cmp -s System.map .tmp_System.map; then
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		echo >&2 Inconsistent kallsyms data
 		echo >&2 Try "make KALLSYMS_EXTRA_PASS=1" as a workaround
 		exit 1

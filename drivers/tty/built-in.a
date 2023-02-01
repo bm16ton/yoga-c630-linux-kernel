@@ -1,0 +1,106 @@
+!<thin>
+//                                              978       `
+tty_io.o/
+n_tty.o/
+tty_ioctl.o/
+tty_ldisc.o/
+tty_buffer.o/
+tty_port.o/
+tty_mutex.o/
+tty_ldsem.o/
+tty_baudrate.o/
+tty_jobctrl.o/
+n_null.o/
+pty.o/
+tty_audit.o/
+sysrq.o/
+vt/vt_ioctl.o/
+vt/vc_screen.o/
+vt/selection.o/
+vt/keyboard.o/
+vt/consolemap.o/
+vt/consolemap_deftbl.o/
+vt/vt.o/
+vt/defkeymap.o/
+hvc/hvc_console.o/
+hvc/hvc_irq.o/
+hvc/hvc_xen.o/
+serial/serial_core.o/
+serial/earlycon.o/
+serial/8250/8250_core.o/
+serial/8250/8250_pnp.o/
+serial/8250/8250_port.o/
+serial/8250/8250_dma.o/
+serial/8250/8250_dwlib.o/
+serial/8250/8250_fintek.o/
+serial/8250/8250_pci.o/
+serial/8250/8250_early.o/
+serial/8250/8250_fsl.o/
+serial/8250/8250_dw.o/
+serial/8250/8250_pericom.o/
+serial/8250/8250_tegra.o/
+serial/8250/8250_of.o/
+serial/amba-pl010.o/
+serial/amba-pl011.o/
+serial/meson_uart.o/
+serial/msm_serial.o/
+serial/qcom_geni_serial.o/
+serial/xilinx_uartps.o/
+serial/serial-tegra.o/
+serial/fsl_lpuart.o/
+serial/mvebu-uart.o/
+serial/serial_mctrl_gpio.o/
+serdev/core.o/
+serdev/serdev-ttyport.o/
+/0              0           0     0     644     81368     `
+/10             0           0     0     644     32624     `
+/19             0           0     0     644     21296     `
+/32             0           0     0     644     21448     `
+/45             0           0     0     644     17440     `
+/59             0           0     0     644     35688     `
+/71             0           0     0     644     4760      `
+/84             0           0     0     644     9744      `
+/97             0           0     0     644     5792      `
+/113            0           0     0     644     20624     `
+/128            0           0     0     644     4856      `
+/138            0           0     0     644     22064     `
+/145            0           0     0     644     6680      `
+/158            0           0     0     644     35792     `
+/167            0           0     0     644     25008     `
+/182            0           0     0     644     14248     `
+/198            0           0     0     644     9896      `
+/214            0           0     0     644     67920     `
+/229            0           0     0     644     16184     `
+/246            0           0     0     644     2080      `
+/270            0           0     0     644     96216     `
+/279            0           0     0     644     13576     `
+/295            0           0     0     644     29360     `
+/314            0           0     0     644     2472      `
+/329            0           0     0     644     23888     `
+/344            0           0     0     644     88392     `
+/366            0           0     0     644     9272      `
+/385            0           0     0     644     30224     `
+/410            0           0     0     644     9048      `
+/434            0           0     0     644     72832     `
+/459            0           0     0     644     10336     `
+/483            0           0     0     644     7456      `
+/509            0           0     0     644     6792      `
+/536            0           0     0     644     65424     `
+/560            0           0     0     644     5616      `
+/586            0           0     0     644     8320      `
+/610            0           0     0     644     23400     `
+/633            0           0     0     644     7840      `
+/661            0           0     0     644     9048      `
+/687            0           0     0     644     16104     `
+/710            0           0     0     644     20488     `
+/731            0           0     0     644     51296     `
+/752            0           0     0     644     21720     `
+/773            0           0     0     644     40184     `
+/794            0           0     0     644     34464     `
+/821            0           0     0     644     38624     `
+/845            0           0     0     644     37248     `
+/868            0           0     0     644     65984     `
+/889            0           0     0     644     38080     `
+/910            0           0     0     644     15184     `
+/938            0           0     0     644     31648     `
+/953            0           0     0     644     8840      `

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/hisilicon/hns3/hclgevf.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/hisilicon/hns3/hclgevf.ko drivers/net/ethernet/hisilicon/hns3/hclgevf.o drivers/net/ethernet/hisilicon/hns3/hclgevf.mod.o;  true

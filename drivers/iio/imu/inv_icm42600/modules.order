@@ -1,0 +1,3 @@
+drivers/iio/imu/inv_icm42600/inv-icm42600.ko
+drivers/iio/imu/inv_icm42600/inv-icm42600-i2c.ko
+drivers/iio/imu/inv_icm42600/inv-icm42600-spi.ko

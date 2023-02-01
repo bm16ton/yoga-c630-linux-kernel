@@ -1,0 +1,1 @@
+cmd_drivers/input/mouse/modules.order := {   echo drivers/input/mouse/elan_i2c.ko;   echo drivers/input/mouse/synaptics_i2c.ko;   echo drivers/input/mouse/synaptics_usb.ko; :; } > drivers/input/mouse/modules.order

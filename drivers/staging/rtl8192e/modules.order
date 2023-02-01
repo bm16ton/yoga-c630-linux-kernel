@@ -1,0 +1,5 @@
+drivers/staging/rtl8192e/rtllib.ko
+drivers/staging/rtl8192e/rtllib_crypt_ccmp.ko
+drivers/staging/rtl8192e/rtllib_crypt_tkip.ko
+drivers/staging/rtl8192e/rtllib_crypt_wep.ko
+drivers/staging/rtl8192e/rtl8192e/r8192e_pci.ko

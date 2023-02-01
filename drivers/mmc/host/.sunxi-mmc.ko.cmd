@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/sunxi-mmc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/sunxi-mmc.ko drivers/mmc/host/sunxi-mmc.o drivers/mmc/host/sunxi-mmc.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/keymaps/rc-dntv-live-dvbt-pro.mod := printf '%s\n'   rc-dntv-live-dvbt-pro.o | awk '!x[$$0]++ { print("drivers/media/rc/keymaps/"$$0) }' > drivers/media/rc/keymaps/rc-dntv-live-dvbt-pro.mod

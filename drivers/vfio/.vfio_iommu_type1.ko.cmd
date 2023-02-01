@@ -1,0 +1,1 @@
+cmd_drivers/vfio/vfio_iommu_type1.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/vfio/vfio_iommu_type1.ko drivers/vfio/vfio_iommu_type1.o drivers/vfio/vfio_iommu_type1.mod.o;  true

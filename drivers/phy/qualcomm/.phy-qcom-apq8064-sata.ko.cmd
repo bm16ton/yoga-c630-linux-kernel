@@ -1,0 +1,1 @@
+cmd_drivers/phy/qualcomm/phy-qcom-apq8064-sata.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/phy/qualcomm/phy-qcom-apq8064-sata.ko drivers/phy/qualcomm/phy-qcom-apq8064-sata.o drivers/phy/qualcomm/phy-qcom-apq8064-sata.mod.o;  true

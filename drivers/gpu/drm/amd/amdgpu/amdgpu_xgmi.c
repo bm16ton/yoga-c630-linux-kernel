@@ -386,22 +386,51 @@ struct amdgpu_hive_info *amdgpu_get_xgmi_hive(struct amdgpu_device *adev)
 	if (ret) {
 		dev_err(adev->dev, "XGMI: failed initializing kobject for xgmi hive\n");
 		kobject_put(&hive->kobj);
+<<<<<<< HEAD
+=======
 		kfree(hive);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hive = NULL;
 		goto pro_end;
 	}
 
 	/**
+<<<<<<< HEAD
+	 * Only init hive->reset_domain for none SRIOV configuration. For SRIOV,
+	 * Host driver decide how to reset the GPU either through FLR or chain reset.
+	 * Guest side will get individual notifications from the host for the FLR
+	 * if necessary.
+	 */
+	if (!amdgpu_sriov_vf(adev)) {
+	/**
+	 * Avoid recreating reset domain when hive is reconstructed for the case
+	 * of reset the devices in the XGMI hive during probe for passthrough GPU
+	 * See https://www.spinics.net/lists/amd-gfx/msg58836.html
+	 */
+		if (adev->reset_domain->type != XGMI_HIVE) {
+			hive->reset_domain =
+				amdgpu_reset_create_reset_domain(XGMI_HIVE, "amdgpu-reset-hive");
+=======
 	 * Avoid recreating reset domain when hive is reconstructed for the case
 	 * of reset the devices in the XGMI hive during probe for SRIOV
 	 * See https://www.spinics.net/lists/amd-gfx/msg58836.html
 	 */
 	if (adev->reset_domain->type != XGMI_HIVE) {
 		hive->reset_domain = amdgpu_reset_create_reset_domain(XGMI_HIVE, "amdgpu-reset-hive");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (!hive->reset_domain) {
 				dev_err(adev->dev, "XGMI: failed initializing reset domain for xgmi hive\n");
 				ret = -ENOMEM;
 				kobject_put(&hive->kobj);
+<<<<<<< HEAD
+				hive = NULL;
+				goto pro_end;
+			}
+		} else {
+			amdgpu_reset_get_reset_domain(adev->reset_domain);
+			hive->reset_domain = adev->reset_domain;
+		}
+=======
 				kfree(hive);
 				hive = NULL;
 				goto pro_end;
@@ -409,6 +438,7 @@ struct amdgpu_hive_info *amdgpu_get_xgmi_hive(struct amdgpu_device *adev)
 	} else {
 		amdgpu_reset_get_reset_domain(adev->reset_domain);
 		hive->reset_domain = adev->reset_domain;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	hive->hive_id = adev->gmc.xgmi.hive_id;
@@ -503,6 +533,9 @@ out:
 int amdgpu_xgmi_update_topology(struct amdgpu_hive_info *hive, struct amdgpu_device *adev)
 {
 	int ret;
+
+	if (amdgpu_sriov_vf(adev))
+		return 0;
 
 	/* Each psp need to set the latest topology */
 	ret = psp_xgmi_set_topology_info(&adev->psp,

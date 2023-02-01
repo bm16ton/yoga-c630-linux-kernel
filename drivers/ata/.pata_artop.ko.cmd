@@ -1,0 +1,1 @@
+cmd_drivers/ata/pata_artop.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/ata/pata_artop.ko drivers/ata/pata_artop.o drivers/ata/pata_artop.mod.o;  true

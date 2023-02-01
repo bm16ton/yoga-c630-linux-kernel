@@ -11,6 +11,10 @@
 #include <linux/idr.h>
 #include <linux/pci.h>
 #include <linux/ioasid.h>
+<<<<<<< HEAD
+#include <linux/bitmap.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/perf_event.h>
 #include <uapi/linux/idxd.h>
 #include "registers.h"
@@ -95,6 +99,33 @@ struct idxd_group {
 	u8 rdbufs_reserved;
 	int tc_a;
 	int tc_b;
+	int desc_progress_limit;
+	int batch_progress_limit;
+};
+
+struct idxd_pmu {
+	struct idxd_device *idxd;
+
+	struct perf_event *event_list[IDXD_PMU_EVENT_MAX];
+	int n_events;
+
+	DECLARE_BITMAP(used_mask, IDXD_PMU_EVENT_MAX);
+
+	struct pmu pmu;
+	char name[IDXD_NAME_SIZE];
+	int cpu;
+
+	int n_counters;
+	int counter_width;
+	int n_event_categories;
+
+	bool per_counter_caps_supported;
+	unsigned long supported_event_categories;
+
+	unsigned long supported_filters;
+	int n_filters;
+
+	struct hlist_node cpuhp_node;
 };
 
 struct idxd_pmu {
@@ -132,6 +163,7 @@ enum idxd_wq_state {
 enum idxd_wq_flag {
 	WQ_FLAG_DEDICATED = 0,
 	WQ_FLAG_BLOCK_ON_FAULT,
+	WQ_FLAG_ATS_DISABLE,
 };
 
 enum idxd_wq_type {
@@ -194,6 +226,11 @@ struct idxd_wq {
 	enum idxd_wq_state state;
 	unsigned long flags;
 	union wqcfg *wqcfg;
+<<<<<<< HEAD
+	unsigned long *opcap_bmap;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct dsa_hw_desc **hw_descs;
 	int num_descs;
 	union {
@@ -208,7 +245,6 @@ struct idxd_wq {
 	char name[WQ_NAME_SIZE + 1];
 	u64 max_xfer_bytes;
 	u32 max_batch_size;
-	bool ats_dis;
 };
 
 struct idxd_engine {
@@ -299,6 +335,10 @@ struct idxd_device {
 	int rdbuf_limit;
 	int nr_rdbufs;		/* non-reserved read buffers */
 	unsigned int wqcfg_size;
+<<<<<<< HEAD
+	unsigned long *wq_enable_map;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	union sw_err_reg sw_err;
 	wait_queue_head_t cmd_waitq;

@@ -13,6 +13,79 @@
 #include "../include/usb_osintf.h"
 #include "../include/HalPwrSeqCmd.h"
 
+<<<<<<< HEAD
+static void one_out_pipe(struct adapter *adapter)
+{
+	struct dvobj_priv *pdvobjpriv = adapter_to_dvobj(adapter);
+
+	pdvobjpriv->Queue2Pipe[0] = pdvobjpriv->RtOutPipe[0];/* VO */
+	pdvobjpriv->Queue2Pipe[1] = pdvobjpriv->RtOutPipe[0];/* VI */
+	pdvobjpriv->Queue2Pipe[2] = pdvobjpriv->RtOutPipe[0];/* BE */
+	pdvobjpriv->Queue2Pipe[3] = pdvobjpriv->RtOutPipe[0];/* BK */
+}
+
+static void two_out_pipe(struct adapter *adapter, bool wifi_cfg)
+{
+	struct dvobj_priv *pdvobjpriv = adapter_to_dvobj(adapter);
+
+	/* 0:H, 1:L */
+
+	pdvobjpriv->Queue2Pipe[1] = pdvobjpriv->RtOutPipe[0];/* VI */
+	pdvobjpriv->Queue2Pipe[2] = pdvobjpriv->RtOutPipe[1];/* BE */
+
+	if (wifi_cfg) {
+		pdvobjpriv->Queue2Pipe[0] = pdvobjpriv->RtOutPipe[1];/* VO */
+		pdvobjpriv->Queue2Pipe[3] = pdvobjpriv->RtOutPipe[0];/* BK */
+	} else {
+		pdvobjpriv->Queue2Pipe[0] = pdvobjpriv->RtOutPipe[0];/* VO */
+		pdvobjpriv->Queue2Pipe[3] = pdvobjpriv->RtOutPipe[1];/* BK */
+	}
+}
+
+static void three_out_pipe(struct adapter *adapter, bool wifi_cfg)
+{
+	struct dvobj_priv *pdvobjpriv = adapter_to_dvobj(adapter);
+
+	/* 0:H, 1:N, 2:L */
+
+	pdvobjpriv->Queue2Pipe[0] = pdvobjpriv->RtOutPipe[0];/* VO */
+	pdvobjpriv->Queue2Pipe[1] = pdvobjpriv->RtOutPipe[1];/* VI */
+	pdvobjpriv->Queue2Pipe[2] = pdvobjpriv->RtOutPipe[2];/* BE */
+
+	pdvobjpriv->Queue2Pipe[3] = wifi_cfg ?
+		pdvobjpriv->RtOutPipe[1] : pdvobjpriv->RtOutPipe[2];/* BK */
+}
+
+int rtl8188eu_interface_configure(struct adapter *adapt)
+{
+	struct registry_priv *pregistrypriv = &adapt->registrypriv;
+	struct dvobj_priv *pdvobjpriv = adapter_to_dvobj(adapt);
+	struct hal_data_8188e *haldata = &adapt->haldata;
+	bool wifi_cfg = pregistrypriv->wifi_spec;
+
+	pdvobjpriv->Queue2Pipe[4] = pdvobjpriv->RtOutPipe[0];/* BCN */
+	pdvobjpriv->Queue2Pipe[5] = pdvobjpriv->RtOutPipe[0];/* MGT */
+	pdvobjpriv->Queue2Pipe[6] = pdvobjpriv->RtOutPipe[0];/* HIGH */
+	pdvobjpriv->Queue2Pipe[7] = pdvobjpriv->RtOutPipe[0];/* TXCMD */
+
+	switch (pdvobjpriv->RtNumOutPipes) {
+	case 3:
+		haldata->out_ep_extra_queues = TX_SELE_LQ | TX_SELE_NQ;
+		three_out_pipe(adapt, wifi_cfg);
+		break;
+	case 2:
+		haldata->out_ep_extra_queues = TX_SELE_NQ;
+		two_out_pipe(adapt, wifi_cfg);
+		break;
+	case 1:
+		one_out_pipe(adapt);
+		break;
+	default:
+		return -ENXIO;
+	}
+
+	return 0;
+=======
 static void _ConfigNormalChipOutEP_8188E(struct adapter *adapt, u8 NumOutPipe)
 {
 	struct hal_data_8188e *haldata = &adapt->haldata;
@@ -47,6 +120,7 @@ void rtl8188eu_interface_configure(struct adapter *adapt)
 	struct dvobj_priv *pdvobjpriv = adapter_to_dvobj(adapt);
 
 	HalUsbSetQueuePipeMapping8188EUsb(adapt, pdvobjpriv->RtNumOutPipes);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 u32 rtl8188eu_InitPowerOn(struct adapter *adapt)
@@ -116,6 +190,26 @@ static void _InitQueueReservedPage(struct adapter *Adapter)
 {
 	struct hal_data_8188e *haldata = &Adapter->haldata;
 	struct registry_priv	*pregistrypriv = &Adapter->registrypriv;
+<<<<<<< HEAD
+	u8 numLQ = 0;
+	u8 numNQ = 0;
+	u8 numPubQ;
+
+	if (pregistrypriv->wifi_spec) {
+		if (haldata->out_ep_extra_queues & TX_SELE_LQ)
+			numLQ = 0x1C;
+
+		/*  NOTE: This step shall be proceed before writing REG_RQPN. */
+		if (haldata->out_ep_extra_queues & TX_SELE_NQ)
+			numNQ = 0x1C;
+
+		rtw_write8(Adapter, REG_RQPN_NPQ, numNQ);
+
+		numPubQ = 0xA8 - NUM_HQ - numLQ - numNQ;
+
+		/*  TX DMA */
+		rtw_write32(Adapter, REG_RQPN, LD_RQPN | numPubQ << 16 | numLQ << 8 | NUM_HQ);
+=======
 	u32 numHQ	= 0;
 	u32 numLQ	= 0;
 	u32 numNQ	= 0;
@@ -142,6 +236,7 @@ static void _InitQueueReservedPage(struct adapter *Adapter)
 		/*  TX DMA */
 		value32 = _HPQ(numHQ) | _LPQ(numLQ) | _PUBQ(numPubQ) | LD_RQPN;
 		rtw_write32(Adapter, REG_RQPN, value32);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	} else {
 		rtw_write16(Adapter, REG_RQPN_NPQ, 0x0000);/* Just follow MP Team,??? Georgia 03/28 */
 		rtw_write16(Adapter, REG_RQPN_NPQ, 0x0d);
@@ -187,6 +282,22 @@ static void _InitNormalChipRegPriority(struct adapter *Adapter, u16 beQ,
 	rtw_write16(Adapter, REG_TRXDMA_CTRL, value16);
 }
 
+<<<<<<< HEAD
+static void _InitNormalChipTwoOutEpPriority(struct adapter *Adapter)
+{
+	struct registry_priv *pregistrypriv = &Adapter->registrypriv;
+	u16 bkQ, voQ;
+
+	if (!pregistrypriv->wifi_spec) {
+		bkQ	= QUEUE_NORMAL;
+		voQ	= QUEUE_HIGH;
+	} else {/* for WMM ,CONFIG_OUT_EP_WIFI_MODE */
+		bkQ	= QUEUE_HIGH;
+		voQ	= QUEUE_NORMAL;
+	}
+	_InitNormalChipRegPriority(Adapter, QUEUE_NORMAL, bkQ, QUEUE_HIGH,
+				   voQ, QUEUE_HIGH, QUEUE_HIGH);
+=======
 static void _InitNormalChipOneOutEpPriority(struct adapter *Adapter)
 {
 	struct hal_data_8188e *haldata = &Adapter->haldata;
@@ -250,6 +361,7 @@ static void _InitNormalChipTwoOutEpPriority(struct adapter *Adapter)
 		hiQ	= valueHi;
 	}
 	_InitNormalChipRegPriority(Adapter, beQ, bkQ, viQ, voQ, mgtQ, hiQ);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void _InitNormalChipThreeOutEpPriority(struct adapter *Adapter)
@@ -277,11 +389,20 @@ static void _InitNormalChipThreeOutEpPriority(struct adapter *Adapter)
 
 static void _InitQueuePriority(struct adapter *Adapter)
 {
+<<<<<<< HEAD
+	struct dvobj_priv *pdvobjpriv = adapter_to_dvobj(Adapter);
+
+	switch (pdvobjpriv->RtNumOutPipes) {
+	case 1:
+		_InitNormalChipRegPriority(Adapter, QUEUE_HIGH, QUEUE_HIGH, QUEUE_HIGH,
+					   QUEUE_HIGH, QUEUE_HIGH, QUEUE_HIGH);
+=======
 	struct hal_data_8188e *haldata = &Adapter->haldata;
 
 	switch (haldata->OutEpNumber) {
 	case 1:
 		_InitNormalChipOneOutEpPriority(Adapter);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case 2:
 		_InitNormalChipTwoOutEpPriority(Adapter);
@@ -515,8 +636,12 @@ static int _InitBeaconParameters(struct adapter *Adapter)
 	return 0;
 }
 
+<<<<<<< HEAD
+static void _BeaconFunctionEnable(struct adapter *Adapter)
+=======
 static void _BeaconFunctionEnable(struct adapter *Adapter,
 				  bool Enable, bool Linked)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	rtw_write8(Adapter, REG_BCN_CTRL, (BIT(4) | BIT(3) | BIT(1)));
 
@@ -567,7 +692,10 @@ u32 rtl8188eu_hal_init(struct adapter *Adapter)
 {
 	u8 value8 = 0;
 	u16  value16;
+<<<<<<< HEAD
+=======
 	u8 txpktbuf_bndy;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u32 status = _SUCCESS;
 	int res;
 	struct hal_data_8188e *haldata = &Adapter->haldata;
@@ -600,6 +728,8 @@ u32 rtl8188eu_hal_init(struct adapter *Adapter)
 	/*  HW GPIO pin. Before PHY_RFConfig8192C. */
 	/*  2010/08/26 MH If Efuse does not support sective suspend then disable the function. */
 
+<<<<<<< HEAD
+=======
 	if (!pregistrypriv->wifi_spec) {
 		txpktbuf_bndy = TX_PAGE_BOUNDARY_88E;
 	} else {
@@ -607,6 +737,7 @@ u32 rtl8188eu_hal_init(struct adapter *Adapter)
 		txpktbuf_bndy = WMM_NORMAL_TX_PAGE_BOUNDARY_88E;
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	_InitQueueReservedPage(Adapter);
 	_InitQueuePriority(Adapter);
 	_InitPageBoundary(Adapter);
@@ -639,7 +770,11 @@ u32 rtl8188eu_hal_init(struct adapter *Adapter)
 	if (status == _FAIL)
 		goto exit;
 
+<<<<<<< HEAD
+	status = phy_RF6052_Config_ParaFile(Adapter);
+=======
 	status = PHY_RFConfig8188E(Adapter);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (status == _FAIL)
 		goto exit;
 
@@ -647,9 +782,15 @@ u32 rtl8188eu_hal_init(struct adapter *Adapter)
 	if (status == _FAIL)
 		goto exit;
 
+<<<<<<< HEAD
+	_InitTxBufferBoundary(Adapter, TX_PAGE_BOUNDARY_88E);
+
+	status =  InitLLTTable(Adapter, TX_PAGE_BOUNDARY_88E);
+=======
 	_InitTxBufferBoundary(Adapter, txpktbuf_bndy);
 
 	status =  InitLLTTable(Adapter, txpktbuf_bndy);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (status == _FAIL)
 		goto exit;
 
@@ -922,7 +1063,11 @@ static void Hal_EfuseParseMACAddr_8188EU(struct adapter *adapt, u8 *hwinfo, bool
 	}
 }
 
+<<<<<<< HEAD
+int ReadAdapterInfo8188EU(struct adapter *Adapter)
+=======
 void ReadAdapterInfo8188EU(struct adapter *Adapter)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct eeprom_priv *eeprom = &Adapter->eeprompriv;
 	struct led_priv *ledpriv = &Adapter->ledpriv;
@@ -933,13 +1078,21 @@ void ReadAdapterInfo8188EU(struct adapter *Adapter)
 	/* check system boot selection */
 	res = rtw_read8(Adapter, REG_9346CR, &eeValue);
 	if (res)
+<<<<<<< HEAD
+		return res;
+=======
 		return;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	eeprom->bautoload_fail_flag	= !(eeValue & EEPROM_EN);
 
 	efuse_buf = kmalloc(EFUSE_MAP_LEN_88E, GFP_KERNEL);
 	if (!efuse_buf)
+<<<<<<< HEAD
+		return -ENOMEM;
+=======
 		return;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	memset(efuse_buf, 0xFF, EFUSE_MAP_LEN_88E);
 
 	if (!(eeValue & BOOT_FROM_EEPROM) && !eeprom->bautoload_fail_flag) {
@@ -961,6 +1114,10 @@ void ReadAdapterInfo8188EU(struct adapter *Adapter)
 
 	ledpriv->bRegUseLed = true;
 	kfree(efuse_buf);
+<<<<<<< HEAD
+	return 0;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void UpdateHalRAMask8188EUsb(struct adapter *adapt, u32 mac_id, u8 rssi_level)
@@ -1069,7 +1226,11 @@ void SetBeaconRelatedRegisters8188EUsb(struct adapter *adapt)
 	rtw_write8(adapt,  REG_RXTSF_OFFSET_CCK, 0x50);
 	rtw_write8(adapt, REG_RXTSF_OFFSET_OFDM, 0x50);
 
+<<<<<<< HEAD
+	_BeaconFunctionEnable(adapt);
+=======
 	_BeaconFunctionEnable(adapt, true, true);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	rtw_resume_tx_beacon(adapt);
 

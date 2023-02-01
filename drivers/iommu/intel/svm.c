@@ -37,6 +37,17 @@ static int pasid_private_add(ioasid_t pasid, void *priv)
 	return xa_alloc(&pasid_private_array, &pasid, priv,
 			XA_LIMIT(pasid, pasid), GFP_ATOMIC);
 }
+<<<<<<< HEAD
+
+static void pasid_private_remove(ioasid_t pasid)
+{
+	xa_erase(&pasid_private_array, pasid);
+}
+
+static void *pasid_private_find(ioasid_t pasid)
+{
+	return xa_load(&pasid_private_array, pasid);
+=======
 
 static void pasid_private_remove(ioasid_t pasid)
 {
@@ -63,6 +74,7 @@ svm_lookup_device_by_sid(struct intel_svm *svm, u16 sid)
 	rcu_read_unlock();
 
 	return sdev;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static struct intel_svm_dev *
@@ -181,7 +193,7 @@ void intel_svm_check(struct intel_iommu *iommu)
 	}
 
 	if (cpu_feature_enabled(X86_FEATURE_LA57) &&
-	    !cap_5lp_support(iommu->cap)) {
+	    !cap_fl5lp_support(iommu->cap)) {
 		pr_err("%s SVM disabled, incompatible paging mode\n",
 		       iommu->name);
 		return;
@@ -201,10 +213,13 @@ static void __flush_svm_range_dev(struct intel_svm *svm,
 		return;
 
 	qi_flush_piotlb(sdev->iommu, sdev->did, svm->pasid, address, pages, ih);
-	if (info->ats_enabled)
+	if (info->ats_enabled) {
 		qi_flush_dev_iotlb_pasid(sdev->iommu, sdev->sid, info->pfsid,
 					 svm->pasid, sdev->qdep, address,
 					 order_base_2(pages));
+		quirk_extra_dev_tlb_flush(info, address, order_base_2(pages),
+					  svm->pasid, sdev->qdep);
+	}
 }
 
 static void intel_flush_svm_range_dev(struct intel_svm *svm,
@@ -706,11 +721,16 @@ static void handle_bad_prq_event(struct intel_iommu *iommu,
 
 static irqreturn_t prq_event_thread(int irq, void *d)
 {
-	struct intel_svm_dev *sdev = NULL;
 	struct intel_iommu *iommu = d;
+<<<<<<< HEAD
+	struct page_req_dsc *req;
+	int head, tail, handled;
+	struct pci_dev *pdev;
+=======
 	struct intel_svm *svm = NULL;
 	struct page_req_dsc *req;
 	int head, tail, handled;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u64 address;
 
 	/*
@@ -725,6 +745,34 @@ static irqreturn_t prq_event_thread(int irq, void *d)
 	while (head != tail) {
 		req = &iommu->prq[head / sizeof(*req)];
 		address = (u64)req->addr << VTD_PAGE_SHIFT;
+<<<<<<< HEAD
+
+		if (unlikely(!req->pasid_present)) {
+			pr_err("IOMMU: %s: Page request without PASID\n",
+			       iommu->name);
+bad_req:
+			handle_bad_prq_event(iommu, req, QI_RESP_INVALID);
+			goto prq_advance;
+		}
+
+		if (unlikely(!is_canonical_address(address))) {
+			pr_err("IOMMU: %s: Address is not canonical\n",
+			       iommu->name);
+			goto bad_req;
+		}
+
+		if (unlikely(req->pm_req && (req->rd_req | req->wr_req))) {
+			pr_err("IOMMU: %s: Page request in Privilege Mode\n",
+			       iommu->name);
+			goto bad_req;
+		}
+
+		if (unlikely(req->exe_req && req->rd_req)) {
+			pr_err("IOMMU: %s: Execution request not supported\n",
+			       iommu->name);
+			goto bad_req;
+		}
+=======
 
 		if (unlikely(!req->pasid_present)) {
 			pr_err("IOMMU: %s: Page request without PASID\n",
@@ -775,17 +823,38 @@ bad_req:
 		}
 
 		sdev->prq_seq_number++;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
+		/* Drop Stop Marker message. No need for a response. */
+		if (unlikely(req->lpig && !req->rd_req && !req->wr_req))
+			goto prq_advance;
+
+		pdev = pci_get_domain_bus_and_slot(iommu->segment,
+						   PCI_BUS_NUM(req->rid),
+						   req->rid & 0xff);
 		/*
 		 * If prq is to be handled outside iommu driver via receiver of
 		 * the fault notifiers, we skip the page response here.
 		 */
+<<<<<<< HEAD
+		if (!pdev)
+			goto bad_req;
+
+		if (intel_svm_prq_report(iommu, &pdev->dev, req))
+			handle_bad_prq_event(iommu, req, QI_RESP_INVALID);
+		else
+			trace_prq_report(iommu, &pdev->dev, req->qw_0, req->qw_1,
+					 req->priv_data[0], req->priv_data[1],
+					 iommu->prq_seq_number++);
+		pci_dev_put(pdev);
+=======
 		if (intel_svm_prq_report(iommu, sdev->dev, req))
 			handle_bad_prq_event(iommu, req, QI_RESP_INVALID);
 
 		trace_prq_report(iommu, sdev->dev, req->qw_0, req->qw_1,
 				 req->priv_data[0], req->priv_data[1],
 				 sdev->prq_seq_number);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 prq_advance:
 		head = (head + sizeof(*req)) & PRQ_RING_MASK;
 	}
@@ -881,8 +950,6 @@ int intel_svm_page_response(struct device *dev,
 			    struct iommu_page_response *msg)
 {
 	struct iommu_fault_page_request *prm;
-	struct intel_svm_dev *sdev = NULL;
-	struct intel_svm *svm = NULL;
 	struct intel_iommu *iommu;
 	bool private_present;
 	bool pasid_present;
@@ -901,8 +968,6 @@ int intel_svm_page_response(struct device *dev,
 	if (!msg || !evt)
 		return -EINVAL;
 
-	mutex_lock(&pasid_mutex);
-
 	prm = &evt->fault.prm;
 	sid = PCI_DEVID(bus, devfn);
 	pasid_present = prm->flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID;
@@ -919,12 +984,15 @@ int intel_svm_page_response(struct device *dev,
 		goto out;
 	}
 
+<<<<<<< HEAD
+=======
 	ret = pasid_to_svm_sdev(dev, prm->pasid, &svm, &sdev);
 	if (ret || !sdev) {
 		ret = -ENODEV;
 		goto out;
 	}
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * Per VT-d spec. v3.0 ch7.7, system software must respond
 	 * with page group response if private data is present (PDP)
@@ -954,6 +1022,5 @@ int intel_svm_page_response(struct device *dev,
 		qi_submit_sync(iommu, &desc, 1, 0);
 	}
 out:
-	mutex_unlock(&pasid_mutex);
 	return ret;
 }

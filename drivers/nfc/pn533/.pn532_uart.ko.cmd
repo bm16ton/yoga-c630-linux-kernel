@@ -1,0 +1,1 @@
+cmd_drivers/nfc/pn533/pn532_uart.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/nfc/pn533/pn532_uart.ko drivers/nfc/pn533/pn532_uart.o drivers/nfc/pn533/pn532_uart.mod.o;  true

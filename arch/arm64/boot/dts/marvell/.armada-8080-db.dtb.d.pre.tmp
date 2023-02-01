@@ -1,0 +1,6 @@
+armada-8080-db.o: arch/arm64/boot/dts/marvell/armada-8080-db.dts \
+ arch/arm64/boot/dts/marvell/armada-8080.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap810-ap0-octa-core.dtsi \
+ arch/arm64/boot/dts/marvell/armada-ap810-ap0.dtsi \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h

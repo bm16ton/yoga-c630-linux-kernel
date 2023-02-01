@@ -1,0 +1,1 @@
+cmd_drivers/input/touchscreen/mk712.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/input/touchscreen/mk712.ko drivers/input/touchscreen/mk712.o drivers/input/touchscreen/mk712.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_drivers/iio/potentiometer/ad5272.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/potentiometer/ad5272.ko drivers/iio/potentiometer/ad5272.o drivers/iio/potentiometer/ad5272.mod.o;  true

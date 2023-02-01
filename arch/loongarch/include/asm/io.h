@@ -27,15 +27,47 @@ extern void __init early_iounmap(void __iomem *addr, unsigned long size);
 #define early_memremap early_ioremap
 #define early_memunmap early_iounmap
 
+<<<<<<< HEAD
+#ifdef CONFIG_ARCH_IOREMAP
+
+static inline void __iomem *ioremap_prot(phys_addr_t offset, unsigned long size,
+					 unsigned long prot_val)
+{
+	if (prot_val & _CACHE_CC)
+=======
 static inline void __iomem *ioremap_prot(phys_addr_t offset, unsigned long size,
 					 unsigned long prot_val)
 {
 	if (prot_val == _CACHE_CC)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return (void __iomem *)(unsigned long)(CACHE_BASE + offset);
 	else
 		return (void __iomem *)(unsigned long)(UNCACHE_BASE + offset);
 }
 
+<<<<<<< HEAD
+#define ioremap(offset, size)		\
+	ioremap_prot((offset), (size), pgprot_val(PAGE_KERNEL_SUC))
+
+#define iounmap(addr) 			((void)(addr))
+
+#endif
+
+/*
+ * On LoongArch, ioremap() has two variants, ioremap_wc() and ioremap_cache().
+ * They map bus memory into CPU space, the mapped memory is marked uncachable
+ * (_CACHE_SUC), uncachable but accelerated by write-combine (_CACHE_WUC) and
+ * cachable (_CACHE_CC) respectively for CPU access.
+ *
+ * @offset:    bus address of the memory
+ * @size:      size of the resource to map
+ */
+#define ioremap_wc(offset, size)	\
+	ioremap_prot((offset), (size), pgprot_val(PAGE_KERNEL_WUC))
+
+#define ioremap_cache(offset, size)	\
+	ioremap_prot((offset), (size), pgprot_val(PAGE_KERNEL))
+=======
 /*
  * ioremap -   map bus memory into CPU space
  * @offset:    bus address of the memory
@@ -92,6 +124,7 @@ static inline void __iomem *ioremap_prot(phys_addr_t offset, unsigned long size,
 static inline void iounmap(const volatile void __iomem *addr)
 {
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define mmiowb() asm volatile ("dbar 0" ::: "memory")
 
@@ -107,4 +140,11 @@ extern void __memcpy_fromio(void *to, const volatile void __iomem *from, size_t 
 
 #include <asm-generic/io.h>
 
+<<<<<<< HEAD
+#define ARCH_HAS_VALID_PHYS_ADDR_RANGE
+extern int valid_phys_addr_range(phys_addr_t addr, size_t size);
+extern int valid_mmap_phys_addr_range(unsigned long pfn, size_t size);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #endif /* _ASM_IO_H */

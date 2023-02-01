@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/ath/ath9k/ath9k_common.mod := printf '%s\n'   common.o common-init.o common-beacon.o | awk '!x[$$0]++ { print("drivers/net/wireless/ath/ath9k/"$$0) }' > drivers/net/wireless/ath/ath9k/ath9k_common.mod

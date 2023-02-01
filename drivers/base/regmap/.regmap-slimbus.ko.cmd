@@ -1,0 +1,1 @@
+cmd_drivers/base/regmap/regmap-slimbus.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/base/regmap/regmap-slimbus.ko drivers/base/regmap/regmap-slimbus.o drivers/base/regmap/regmap-slimbus.mod.o;  true

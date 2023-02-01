@@ -10,7 +10,11 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include <assert.h>
+<<<<<<< HEAD
+#include <mm/gup_test.h>
+=======
 #include "../../../../mm/gup_test.h"
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include "../kselftest.h"
 
 #include "util.h"

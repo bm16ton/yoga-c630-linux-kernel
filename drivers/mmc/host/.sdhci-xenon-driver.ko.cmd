@@ -1,0 +1,1 @@
+cmd_drivers/mmc/host/sdhci-xenon-driver.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mmc/host/sdhci-xenon-driver.ko drivers/mmc/host/sdhci-xenon-driver.o drivers/mmc/host/sdhci-xenon-driver.mod.o;  true

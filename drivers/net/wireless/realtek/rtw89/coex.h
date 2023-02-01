@@ -162,17 +162,30 @@ void rtw89_coex_act1_work(struct work_struct *work);
 void rtw89_coex_bt_devinfo_work(struct work_struct *work);
 void rtw89_coex_rfk_chk_work(struct work_struct *work);
 void rtw89_coex_power_on(struct rtw89_dev *rtwdev);
+<<<<<<< HEAD
+void rtw89_btc_set_policy(struct rtw89_dev *rtwdev, u16 policy_type);
+void rtw89_btc_set_policy_v1(struct rtw89_dev *rtwdev, u16 policy_type);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 static inline u8 rtw89_btc_phymap(struct rtw89_dev *rtwdev,
 				  enum rtw89_phy_idx phy_idx,
 				  enum rtw89_rf_path_bit paths)
 {
+<<<<<<< HEAD
+	const struct rtw89_chan *chan = rtw89_chan_get(rtwdev, RTW89_SUB_ENTITY_0);
+=======
 	struct rtw89_hal *hal = &rtwdev->hal;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	u8 phy_map;
 
 	phy_map = FIELD_PREP(BTC_RFK_PATH_MAP, paths) |
 		  FIELD_PREP(BTC_RFK_PHY_MAP, BIT(phy_idx)) |
+<<<<<<< HEAD
+		  FIELD_PREP(BTC_RFK_BAND_MAP, chan->band_type);
+=======
 		  FIELD_PREP(BTC_RFK_BAND_MAP, hal->current_band_type);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return phy_map;
 }

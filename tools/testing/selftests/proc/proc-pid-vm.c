@@ -213,14 +213,26 @@ static int make_exe(const uint8_t *payload, size_t len)
 
 /*
  * 0: vsyscall VMA doesn't exist	vsyscall=none
+<<<<<<< HEAD
+ * 1: vsyscall VMA is --xp		vsyscall=xonly
+ * 2: vsyscall VMA is r-xp		vsyscall=emulate
+ */
+static volatile int g_vsyscall;
+=======
  * 1: vsyscall VMA is r-xp		vsyscall=emulate
  * 2: vsyscall VMA is --xp		vsyscall=xonly
  */
 static int g_vsyscall;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const char *str_vsyscall;
 
 static const char str_vsyscall_0[] = "";
 static const char str_vsyscall_1[] =
+<<<<<<< HEAD
+"ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]\n";
+static const char str_vsyscall_2[] =
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 "ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]\n";
 static const char str_vsyscall_2[] =
 "ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]\n";
@@ -228,7 +240,7 @@ static const char str_vsyscall_2[] =
 #ifdef __x86_64__
 static void sigaction_SIGSEGV(int _, siginfo_t *__, void *___)
 {
-	_exit(1);
+	_exit(g_vsyscall);
 }
 
 /*
@@ -255,6 +267,19 @@ static void vsyscall(void)
 		act.sa_sigaction = sigaction_SIGSEGV;
 		(void)sigaction(SIGSEGV, &act, NULL);
 
+<<<<<<< HEAD
+		g_vsyscall = 0;
+		/* gettimeofday(NULL, NULL); */
+		uint64_t rax = 0xffffffffff600000;
+		asm volatile (
+			"call *%[rax]"
+			: [rax] "+a" (rax)
+			: "D" (NULL), "S" (NULL)
+			: "rcx", "r11"
+		);
+
+		g_vsyscall = 1;
+=======
 		/* gettimeofday(NULL, NULL); */
 		asm volatile (
 			"call %P0"
@@ -289,14 +314,25 @@ static void vsyscall(void)
 		act.sa_sigaction = sigaction_SIGSEGV;
 		(void)sigaction(SIGSEGV, &act, NULL);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		*(volatile int *)0xffffffffff600000UL;
-		exit(0);
+
+		g_vsyscall = 2;
+		exit(g_vsyscall);
 	}
 	waitpid(pid, &wstatus, 0);
+<<<<<<< HEAD
+	if (WIFEXITED(wstatus)) {
+		g_vsyscall = WEXITSTATUS(wstatus);
+	} else {
+		fprintf(stderr, "error: wstatus %08x\n", wstatus);
+		exit(1);
+=======
 	if (WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == 0) {
 		/* vsyscall page is readable and executable. */
 		g_vsyscall = 1;
 		return;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	/* vsyscall page is executable but unreadable. */

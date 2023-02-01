@@ -1,0 +1,1 @@
+cmd_drivers/net/can/usb/etas_es58x/etas_es58x.mod := printf '%s\n'   es58x_core.o es581_4.o es58x_fd.o | awk '!x[$$0]++ { print("drivers/net/can/usb/etas_es58x/"$$0) }' > drivers/net/can/usb/etas_es58x/etas_es58x.mod

@@ -1,0 +1,1 @@
+cmd_drivers/scsi/libsas/libsas.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/libsas/libsas.ko drivers/scsi/libsas/libsas.o drivers/scsi/libsas/libsas.mod.o;  true

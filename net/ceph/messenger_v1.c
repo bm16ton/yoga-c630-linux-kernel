@@ -495,7 +495,7 @@ static int write_partial_message_data(struct ceph_connection *con)
 			continue;
 		}
 
-		page = ceph_msg_data_next(cursor, &page_offset, &length, NULL);
+		page = ceph_msg_data_next(cursor, &page_offset, &length);
 		if (length == cursor->total_resid)
 			more = MSG_MORE;
 		ret = ceph_tcp_sendpage(con->sock, page, page_offset, length,
@@ -1008,7 +1008,7 @@ static int read_partial_msg_data(struct ceph_connection *con)
 			continue;
 		}
 
-		page = ceph_msg_data_next(cursor, &page_offset, &length, NULL);
+		page = ceph_msg_data_next(cursor, &page_offset, &length);
 		ret = ceph_tcp_recvpage(con->sock, page, page_offset, length);
 		if (ret <= 0) {
 			if (do_datacrc)
@@ -1050,7 +1050,11 @@ static int read_partial_msg_data_bounce(struct ceph_connection *con)
 			continue;
 		}
 
+<<<<<<< HEAD
+		page = ceph_msg_data_next(cursor, &off, &len);
+=======
 		page = ceph_msg_data_next(cursor, &off, &len, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		ret = ceph_tcp_recvpage(con->sock, con->bounce_page, 0, len);
 		if (ret <= 0) {
 			con->in_data_crc = crc;

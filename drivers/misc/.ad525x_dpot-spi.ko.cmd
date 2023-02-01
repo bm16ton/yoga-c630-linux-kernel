@@ -1,0 +1,1 @@
+cmd_drivers/misc/ad525x_dpot-spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/misc/ad525x_dpot-spi.ko drivers/misc/ad525x_dpot-spi.o drivers/misc/ad525x_dpot-spi.mod.o;  true

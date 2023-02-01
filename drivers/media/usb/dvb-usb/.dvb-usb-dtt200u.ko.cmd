@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/dvb-usb/dvb-usb-dtt200u.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/dvb-usb/dvb-usb-dtt200u.ko drivers/media/usb/dvb-usb/dvb-usb-dtt200u.o drivers/media/usb/dvb-usb/dvb-usb-dtt200u.mod.o;  true

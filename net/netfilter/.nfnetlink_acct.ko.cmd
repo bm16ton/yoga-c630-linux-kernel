@@ -1,0 +1,1 @@
+cmd_net/netfilter/nfnetlink_acct.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/nfnetlink_acct.ko net/netfilter/nfnetlink_acct.o net/netfilter/nfnetlink_acct.mod.o;  true

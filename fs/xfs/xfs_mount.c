@@ -300,26 +300,31 @@ xfs_validate_new_dalign(
 	"alignment check failed: sunit/swidth vs. blocksize(%d)",
 			mp->m_sb.sb_blocksize);
 		return -EINVAL;
-	} else {
-		/*
-		 * Convert the stripe unit and width to FSBs.
-		 */
-		mp->m_dalign = XFS_BB_TO_FSBT(mp, mp->m_dalign);
-		if (mp->m_dalign && (mp->m_sb.sb_agblocks % mp->m_dalign)) {
-			xfs_warn(mp,
-		"alignment check failed: sunit/swidth vs. agsize(%d)",
-				 mp->m_sb.sb_agblocks);
-			return -EINVAL;
-		} else if (mp->m_dalign) {
-			mp->m_swidth = XFS_BB_TO_FSBT(mp, mp->m_swidth);
-		} else {
-			xfs_warn(mp,
-		"alignment check failed: sunit(%d) less than bsize(%d)",
-				 mp->m_dalign, mp->m_sb.sb_blocksize);
-			return -EINVAL;
-		}
 	}
 
+<<<<<<< HEAD
+	/*
+	 * Convert the stripe unit and width to FSBs.
+	 */
+	mp->m_dalign = XFS_BB_TO_FSBT(mp, mp->m_dalign);
+	if (mp->m_dalign && (mp->m_sb.sb_agblocks % mp->m_dalign)) {
+		xfs_warn(mp,
+	"alignment check failed: sunit/swidth vs. agsize(%d)",
+			mp->m_sb.sb_agblocks);
+		return -EINVAL;
+	}
+
+	if (!mp->m_dalign) {
+		xfs_warn(mp,
+	"alignment check failed: sunit(%d) less than bsize(%d)",
+			mp->m_dalign, mp->m_sb.sb_blocksize);
+		return -EINVAL;
+	}
+
+	mp->m_swidth = XFS_BB_TO_FSBT(mp, mp->m_swidth);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (!xfs_has_dalign(mp)) {
 		xfs_warn(mp,
 "cannot change alignment: superblock does not support data alignment");

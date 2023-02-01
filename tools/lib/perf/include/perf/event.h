@@ -97,7 +97,7 @@ struct perf_record_throttle {
 };
 
 #ifndef KSYM_NAME_LEN
-#define KSYM_NAME_LEN 256
+#define KSYM_NAME_LEN 512
 #endif
 
 struct perf_record_ksymbol {
@@ -153,6 +153,7 @@ struct perf_record_header_attr {
 enum {
 	PERF_CPU_MAP__CPUS = 0,
 	PERF_CPU_MAP__MASK = 1,
+	PERF_CPU_MAP__RANGE_CPUS = 2,
 };
 
 /*
@@ -184,6 +185,29 @@ struct perf_record_mask_cpu_map64 {
 	char                     __pad[4];
 	/* Bitmap data. */
 	__u64			 mask[];
+<<<<<<< HEAD
+};
+
+/*
+ * 'struct perf_record_cpu_map_data' is packed as unfortunately an earlier
+ * version had unaligned data and we wish to retain file format compatibility.
+ * -irogers
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpacked"
+#pragma GCC diagnostic ignored "-Wattributes"
+
+/*
+ * An encoding of a CPU map for a range starting at start_cpu through to
+ * end_cpu. If any_cpu is 1, an any CPU (-1) value (aka dummy value) is present.
+ */
+struct perf_record_range_cpu_map {
+	__u8 any_cpu;
+	__u8 __pad;
+	__u16 start_cpu;
+	__u16 end_cpu;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 };
 
 /*
@@ -204,8 +228,17 @@ struct __packed perf_record_cpu_map_data {
 		struct perf_record_mask_cpu_map32 mask32_data;
 		/* Used when type == PERF_CPU_MAP__MASK and long_size == 8. */
 		struct perf_record_mask_cpu_map64 mask64_data;
+<<<<<<< HEAD
+		/* Used when type == PERF_CPU_MAP__RANGE_CPUS. */
+		struct perf_record_range_cpu_map range_cpu_data;
+	};
+} __attribute__((packed));
+
+#pragma GCC diagnostic pop
+=======
 	};
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #pragma GCC diagnostic pop
 
@@ -233,7 +266,16 @@ struct perf_record_event_update {
 	struct perf_event_header header;
 	__u64			 type;
 	__u64			 id;
-	char			 data[];
+	union {
+		/* Used when type == PERF_EVENT_UPDATE__SCALE. */
+		struct perf_record_event_update_scale scale;
+		/* Used when type == PERF_EVENT_UPDATE__UNIT. */
+		char unit[0];
+		/* Used when type == PERF_EVENT_UPDATE__NAME. */
+		char name[0];
+		/* Used when type == PERF_EVENT_UPDATE__CPUS. */
+		struct perf_record_event_update_cpus cpus;
+	};
 };
 
 #define MAX_EVENT_NAME 64

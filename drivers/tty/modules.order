@@ -1,0 +1,4 @@
+drivers/tty/serial/8250/8250_exar.ko
+drivers/tty/serial/rp2.ko
+drivers/tty/n_gsm.ko
+drivers/tty/nozomi.ko

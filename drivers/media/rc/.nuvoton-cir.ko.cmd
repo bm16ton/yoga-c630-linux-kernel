@@ -1,0 +1,1 @@
+cmd_drivers/media/rc/nuvoton-cir.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/rc/nuvoton-cir.ko drivers/media/rc/nuvoton-cir.o drivers/media/rc/nuvoton-cir.mod.o;  true

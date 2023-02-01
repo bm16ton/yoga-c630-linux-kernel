@@ -1,0 +1,2 @@
+drivers/tee/tee.ko
+drivers/tee/optee/optee.ko

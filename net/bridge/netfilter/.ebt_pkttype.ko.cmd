@@ -1,0 +1,1 @@
+cmd_net/bridge/netfilter/ebt_pkttype.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/bridge/netfilter/ebt_pkttype.ko net/bridge/netfilter/ebt_pkttype.o net/bridge/netfilter/ebt_pkttype.mod.o;  true

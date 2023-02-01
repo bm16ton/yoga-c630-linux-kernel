@@ -132,6 +132,10 @@
 #include "dcore0_mme_ctrl_lo_arch_tensor_a_regs.h"
 #include "dcore0_mme_ctrl_lo_arch_tensor_b_regs.h"
 #include "dcore0_mme_ctrl_lo_arch_tensor_cout_regs.h"
+<<<<<<< HEAD
+#include "pcie_wrap_special_regs.h"
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #include "pdma0_qm_masks.h"
 #include "pdma0_core_masks.h"
@@ -239,6 +243,10 @@
 #define SFT_IF_RTR_OFFSET	(mmSFT0_HBW_RTR_IF1_RTR_H3_BASE - mmSFT0_HBW_RTR_IF0_RTR_H3_BASE)
 
 #define ARC_HALT_REQ_OFFSET	(mmARC_FARM_ARC0_AUX_RUN_HALT_REQ - mmARC_FARM_ARC0_AUX_BASE)
+<<<<<<< HEAD
+#define ARC_HALT_ACK_OFFSET	(mmARC_FARM_ARC0_AUX_RUN_HALT_ACK - mmARC_FARM_ARC0_AUX_BASE)
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 #define ARC_REGION_CFG_OFFSET(region) \
 	(mmARC_FARM_ARC0_AUX_ARC_REGION_CFG_0 + (region * 4) - mmARC_FARM_ARC0_AUX_BASE)

@@ -56,7 +56,11 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 	unsigned long pc;
 	u32 new;
 
+<<<<<<< HEAD
+	pc = (unsigned long)ftrace_call;
+=======
 	pc = (unsigned long)function_nocfi(ftrace_call);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	new = aarch64_insn_gen_branch_imm(pc, (unsigned long)func,
 					  AARCH64_INSN_BRANCH_LINK);
 

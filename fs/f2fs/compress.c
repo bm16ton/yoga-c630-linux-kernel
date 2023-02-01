@@ -346,7 +346,11 @@ static int zstd_init_compress_ctx(struct compress_ctx *cc)
 	if (!level)
 		level = F2FS_ZSTD_DEFAULT_CLEVEL;
 
+<<<<<<< HEAD
+	params = zstd_get_params(level, cc->rlen);
+=======
 	params = zstd_get_params(F2FS_ZSTD_DEFAULT_CLEVEL, cc->rlen);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	workspace_size = zstd_cstream_workspace_bound(&params.cParams);
 
 	workspace = f2fs_kvmalloc(F2FS_I_SB(cc->inode),
@@ -762,6 +766,10 @@ void f2fs_decompress_cluster(struct decompress_io_ctx *dic, bool in_task)
 
 	if (dic->clen > PAGE_SIZE * dic->nr_cpages - COMPRESS_HEADER_SIZE) {
 		ret = -EFSCORRUPTED;
+<<<<<<< HEAD
+		f2fs_handle_error(sbi, ERROR_FAIL_DECOMPRESSION);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto out_release;
 	}
 
@@ -912,6 +920,17 @@ bool f2fs_sanity_check_cluster(struct dnode_of_data *dn)
 			reason = "[C|*|C|*]";
 			goto out;
 		}
+<<<<<<< HEAD
+		if (!__is_valid_data_blkaddr(blkaddr)) {
+			if (!cluster_end)
+				cluster_end = i;
+			continue;
+		}
+		/* [COMPR_ADDR, NULL_ADDR or NEW_ADDR, valid_blkaddr] */
+		if (cluster_end) {
+			reason = "[C|N|N|V]";
+			goto out;
+=======
 		if (compressed) {
 			if (!__is_valid_data_blkaddr(blkaddr)) {
 				if (!cluster_end)
@@ -923,6 +942,7 @@ bool f2fs_sanity_check_cluster(struct dnode_of_data *dn)
 				reason = "[C|N|N|V]";
 				goto out;
 			}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		}
 	}
 	return false;
@@ -952,6 +972,10 @@ static int __f2fs_cluster_blocks(struct inode *inode,
 
 	if (f2fs_sanity_check_cluster(&dn)) {
 		ret = -EFSCORRUPTED;
+<<<<<<< HEAD
+		f2fs_handle_error(F2FS_I_SB(inode), ERROR_CORRUPTED_CLUSTER);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		goto fail;
 	}
 
@@ -1568,12 +1592,17 @@ static int f2fs_prepare_decomp_mem(struct decompress_io_ctx *dic,
 	if (!dic->cbuf)
 		return -ENOMEM;
 
+<<<<<<< HEAD
+	if (cops->init_decompress_ctx)
+		return cops->init_decompress_ctx(dic);
+=======
 	if (cops->init_decompress_ctx) {
 		int ret = cops->init_decompress_ctx(dic);
 
 		if (ret)
 			return ret;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -1695,6 +1724,7 @@ static void f2fs_free_dic(struct decompress_io_ctx *dic,
 }
 
 static void f2fs_late_free_dic(struct work_struct *work)
+<<<<<<< HEAD
 {
 	struct decompress_io_ctx *dic =
 		container_of(work, struct decompress_io_ctx, free_work);
@@ -1704,6 +1734,17 @@ static void f2fs_late_free_dic(struct work_struct *work)
 
 static void f2fs_put_dic(struct decompress_io_ctx *dic, bool in_task)
 {
+=======
+{
+	struct decompress_io_ctx *dic =
+		container_of(work, struct decompress_io_ctx, free_work);
+
+	f2fs_free_dic(dic, false);
+}
+
+static void f2fs_put_dic(struct decompress_io_ctx *dic, bool in_task)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	if (refcount_dec_and_test(&dic->refcnt)) {
 		if (in_task) {
 			f2fs_free_dic(dic, false);
@@ -1905,7 +1946,11 @@ bool f2fs_load_compressed_page(struct f2fs_sb_info *sbi, struct page *page,
 
 void f2fs_invalidate_compress_pages(struct f2fs_sb_info *sbi, nid_t ino)
 {
+<<<<<<< HEAD
+	struct address_space *mapping = COMPRESS_MAPPING(sbi);
+=======
 	struct address_space *mapping = sbi->compress_inode->i_mapping;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct folio_batch fbatch;
 	pgoff_t index = 0;
 	pgoff_t end = MAX_BLKADDR(sbi);

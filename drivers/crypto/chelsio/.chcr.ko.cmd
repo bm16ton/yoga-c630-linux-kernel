@@ -1,0 +1,1 @@
+cmd_drivers/crypto/chelsio/chcr.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/crypto/chelsio/chcr.ko drivers/crypto/chelsio/chcr.o drivers/crypto/chelsio/chcr.mod.o;  true

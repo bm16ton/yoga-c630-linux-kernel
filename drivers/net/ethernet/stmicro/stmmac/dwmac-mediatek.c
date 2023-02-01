@@ -443,6 +443,11 @@ static int mt8195_set_delay(struct mediatek_dwmac_plat_data *plat)
 	return 0;
 }
 
+<<<<<<< HEAD
+static const struct mediatek_dwmac_variant mt8195_gmac_variant = {
+	.dwmac_set_phy_interface = mt8195_set_interface,
+	.dwmac_set_delay = mt8195_set_delay,
+=======
 static void mt8195_fix_mac_speed(void *priv, unsigned int speed)
 {
 	struct mediatek_dwmac_plat_data *priv_plat = priv;
@@ -469,6 +474,7 @@ static const struct mediatek_dwmac_variant mt8195_gmac_variant = {
 	.dwmac_set_phy_interface = mt8195_set_interface,
 	.dwmac_set_delay = mt8195_set_delay,
 	.dwmac_fix_mac_speed = mt8195_fix_mac_speed,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	.clk_list = mt8195_dwmac_clk_l,
 	.num_clks = ARRAY_SIZE(mt8195_dwmac_clk_l),
 	.dma_bit_mask = 35,
@@ -584,6 +590,7 @@ static int mediatek_dwmac_clks_config(void *priv, bool enabled)
 	struct mediatek_dwmac_plat_data *plat = priv;
 	const struct mediatek_dwmac_variant *variant = plat->variant;
 	int ret = 0;
+<<<<<<< HEAD
 
 	if (enabled) {
 		ret = clk_bulk_prepare_enable(variant->num_clks, plat->clks);
@@ -602,6 +609,26 @@ static int mediatek_dwmac_clks_config(void *priv, bool enabled)
 		clk_bulk_disable_unprepare(variant->num_clks, plat->clks);
 	}
 
+=======
+
+	if (enabled) {
+		ret = clk_bulk_prepare_enable(variant->num_clks, plat->clks);
+		if (ret) {
+			dev_err(plat->dev, "failed to enable clks, err = %d\n", ret);
+			return ret;
+		}
+
+		ret = clk_prepare_enable(plat->rmii_internal_clk);
+		if (ret) {
+			dev_err(plat->dev, "failed to enable rmii internal clk, err = %d\n", ret);
+			return ret;
+		}
+	} else {
+		clk_disable_unprepare(plat->rmii_internal_clk);
+		clk_bulk_disable_unprepare(variant->num_clks, plat->clks);
+	}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 
@@ -619,8 +646,11 @@ static int mediatek_dwmac_common_data(struct platform_device *pdev,
 	plat->bsp_priv = priv_plat;
 	plat->init = mediatek_dwmac_init;
 	plat->clks_config = mediatek_dwmac_clks_config;
+<<<<<<< HEAD
+=======
 	if (priv_plat->variant->dwmac_fix_mac_speed)
 		plat->fix_mac_speed = priv_plat->variant->dwmac_fix_mac_speed;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	plat->safety_feat_cfg = devm_kzalloc(&pdev->dev,
 					     sizeof(*plat->safety_feat_cfg),

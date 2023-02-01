@@ -421,7 +421,11 @@ static inline void coda9_jpeg_write_huff_values(struct coda_dev *dev, u8 *bits,
 		coda_write(dev, (s32)values[i], CODA9_REG_JPEG_HUFF_DATA);
 }
 
+<<<<<<< HEAD
+static void coda9_jpeg_dec_huff_setup(struct coda_ctx *ctx)
+=======
 static int coda9_jpeg_dec_huff_setup(struct coda_ctx *ctx)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct coda_huff_tab *huff_tab = ctx->params.jpeg_huff_tab;
 	struct coda_dev *dev = ctx->dev;
@@ -455,7 +459,10 @@ static int coda9_jpeg_dec_huff_setup(struct coda_ctx *ctx)
 	coda9_jpeg_write_huff_values(dev, huff_tab->luma_ac, 162);
 	coda9_jpeg_write_huff_values(dev, huff_tab->chroma_ac, 162);
 	coda_write(dev, 0x000, CODA9_REG_JPEG_HUFF_CTRL);
+<<<<<<< HEAD
+=======
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static inline void coda9_jpeg_write_qmat_tab(struct coda_dev *dev,
@@ -1053,10 +1060,23 @@ static int coda9_jpeg_start_encoding(struct coda_ctx *ctx)
 		v4l2_err(&dev->v4l2_dev, "error loading Huffman tables\n");
 		return ret;
 	}
+<<<<<<< HEAD
+	if (!ctx->params.jpeg_qmat_tab[0]) {
+		ctx->params.jpeg_qmat_tab[0] = kmalloc(64, GFP_KERNEL);
+		if (!ctx->params.jpeg_qmat_tab[0])
+			return -ENOMEM;
+	}
+	if (!ctx->params.jpeg_qmat_tab[1]) {
+		ctx->params.jpeg_qmat_tab[1] = kmalloc(64, GFP_KERNEL);
+		if (!ctx->params.jpeg_qmat_tab[1])
+			return -ENOMEM;
+	}
+=======
 	if (!ctx->params.jpeg_qmat_tab[0])
 		ctx->params.jpeg_qmat_tab[0] = kmalloc(64, GFP_KERNEL);
 	if (!ctx->params.jpeg_qmat_tab[1])
 		ctx->params.jpeg_qmat_tab[1] = kmalloc(64, GFP_KERNEL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	coda_set_jpeg_compression_quality(ctx, ctx->params.jpeg_quality);
 
 	return 0;
@@ -1394,6 +1414,10 @@ static int coda9_jpeg_prepare_decode(struct coda_ctx *ctx)
 	coda_write(dev, ctx->params.jpeg_restart_interval,
 			CODA9_REG_JPEG_RST_INTVAL);
 
+<<<<<<< HEAD
+	if (ctx->params.jpeg_huff_tab)
+		coda9_jpeg_dec_huff_setup(ctx);
+=======
 	if (ctx->params.jpeg_huff_tab) {
 		ret = coda9_jpeg_dec_huff_setup(ctx);
 		if (ret < 0) {
@@ -1402,6 +1426,7 @@ static int coda9_jpeg_prepare_decode(struct coda_ctx *ctx)
 			return ret;
 		}
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	coda9_jpeg_qmat_setup(ctx);
 

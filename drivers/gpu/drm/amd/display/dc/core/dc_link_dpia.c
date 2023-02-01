@@ -115,12 +115,21 @@ static enum link_training_result dpia_configure_link(
 	DC_LOG_HW_LINK_TRAINING("%s\n DPIA(%d) configuring\n - LTTPR mode(%d)\n",
 				__func__,
 				link->link_id.enum_id - ENUM_ID_1,
+<<<<<<< HEAD
+				lt_settings->lttpr_mode);
+=======
 				link->lttpr_mode);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	dp_decide_training_settings(link,
 		link_setting,
 		lt_settings);
 
+<<<<<<< HEAD
+	dp_get_lttpr_mode_override(link, &lt_settings->lttpr_mode);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	status = dpcd_configure_channel_coding(link, lt_settings);
 	if (status != DC_OK && link->is_hpd_pending)
 		return LINK_TRAINING_ABORT;
@@ -178,7 +187,11 @@ static uint8_t dpia_build_set_config_data(enum dpia_set_config_type type,
 
 	switch (type) {
 	case DPIA_SET_CFG_SET_LINK:
+<<<<<<< HEAD
+		data.set_link.mode = lt_settings->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT ? 1 : 0;
+=======
 		data.set_link.mode = link->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT ? 1 : 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		break;
 	case DPIA_SET_CFG_SET_PHY_TEST_MODE:
 		break;
@@ -553,7 +566,11 @@ static enum link_training_result dpia_training_cr_phase(
 {
 	enum link_training_result result = LINK_TRAINING_CR_FAIL_LANE0;
 
+<<<<<<< HEAD
+	if (lt_settings->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT)
+=======
 	if (link->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		result = dpia_training_cr_non_transparent(link, link_res, lt_settings, hop);
 	else
 		result = dpia_training_cr_transparent(link, link_res, lt_settings);
@@ -830,7 +847,11 @@ static enum link_training_result dpia_training_eq_phase(
 {
 	enum link_training_result result;
 
+<<<<<<< HEAD
+	if (lt_settings->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT)
+=======
 	if (link->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		result = dpia_training_eq_non_transparent(link, link_res, lt_settings, hop);
 	else
 		result = dpia_training_eq_transparent(link, link_res, lt_settings);
@@ -870,13 +891,21 @@ static enum dc_status dpcd_clear_lt_pattern(struct dc_link *link, uint32_t hop)
  * @param hop The Hop in display path. DPRX = 0.
  */
 static enum link_training_result dpia_training_end(struct dc_link *link,
+<<<<<<< HEAD
+		struct link_training_settings *lt_settings,
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		uint32_t hop)
 {
 	enum link_training_result result = LINK_TRAINING_SUCCESS;
 	uint8_t repeater_cnt = 0; /* Number of hops/repeaters in display path. */
 	enum dc_status status;
 
+<<<<<<< HEAD
+	if (lt_settings->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT) {
+=======
 	if (link->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		repeater_cnt = dp_convert_to_count(link->dpcd_caps.lttpr_caps.phy_repeater_cnt);
 
 		if (hop == repeater_cnt) { /* DPTX-to-DPIA */
@@ -916,7 +945,11 @@ static enum link_training_result dpia_training_end(struct dc_link *link,
 				link->link_id.enum_id - ENUM_ID_1,
 				hop,
 				result,
+<<<<<<< HEAD
+				lt_settings->lttpr_mode);
+=======
 				link->lttpr_mode);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return result;
 }
@@ -928,7 +961,13 @@ static enum link_training_result dpia_training_end(struct dc_link *link,
  * @param link DPIA link being trained.
  * @param hop The Hop in display path. DPRX = 0.
  */
+<<<<<<< HEAD
+static void dpia_training_abort(struct dc_link *link,
+	struct link_training_settings *lt_settings,
+	uint32_t hop)
+=======
 static void dpia_training_abort(struct dc_link *link, uint32_t hop)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	uint8_t data = 0;
 	uint32_t dpcd_tps_offset = DP_TRAINING_PATTERN_SET;
@@ -936,7 +975,11 @@ static void dpia_training_abort(struct dc_link *link, uint32_t hop)
 	DC_LOG_HW_LINK_TRAINING("%s\n DPIA(%d) aborting\n - LTTPR mode(%d)\n - HPD(%d)\n",
 				__func__,
 				link->link_id.enum_id - ENUM_ID_1,
+<<<<<<< HEAD
+				lt_settings->lttpr_mode,
+=======
 				link->lttpr_mode,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 				link->is_hpd_pending);
 
 	/* Abandon clean-up if sink unplugged. */
@@ -964,12 +1007,23 @@ enum link_training_result dc_link_dpia_perform_link_training(
 	uint8_t repeater_cnt = 0; /* Number of hops/repeaters in display path. */
 	int8_t repeater_id; /* Current hop. */
 
+<<<<<<< HEAD
+	struct dc_link_settings link_settings = *link_setting; // non-const copy to pass in
+
+	lt_settings.lttpr_mode = dp_decide_lttpr_mode(link, &link_settings);
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/* Configure link as prescribed in link_setting and set LTTPR mode. */
 	result = dpia_configure_link(link, link_res, link_setting, &lt_settings);
 	if (result != LINK_TRAINING_SUCCESS)
 		return result;
 
+<<<<<<< HEAD
+	if (lt_settings.lttpr_mode == LTTPR_MODE_NON_TRANSPARENT)
+=======
 	if (link->lttpr_mode == LTTPR_MODE_NON_TRANSPARENT)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		repeater_cnt = dp_convert_to_count(link->dpcd_caps.lttpr_caps.phy_repeater_cnt);
 
 	/* Train each hop in turn starting with the one closest to DPTX.
@@ -987,7 +1041,11 @@ enum link_training_result dc_link_dpia_perform_link_training(
 			break;
 
 		/* Stop training hop. */
+<<<<<<< HEAD
+		result = dpia_training_end(link, &lt_settings, repeater_id);
+=======
 		result = dpia_training_end(link, repeater_id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (result != LINK_TRAINING_SUCCESS)
 			break;
 	}
@@ -1001,9 +1059,15 @@ enum link_training_result dc_link_dpia_perform_link_training(
 		msleep(5);
 		result = dp_check_link_loss_status(link, &lt_settings);
 	} else if (result == LINK_TRAINING_ABORT) {
+<<<<<<< HEAD
+		dpia_training_abort(link, &lt_settings, repeater_id);
+	} else {
+		dpia_training_end(link, &lt_settings, repeater_id);
+=======
 		dpia_training_abort(link, repeater_id);
 	} else {
 		dpia_training_end(link, repeater_id);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 	return result;
 }

@@ -1,0 +1,4 @@
+drivers/usb/host/ehci-platform.ko
+drivers/usb/host/ehci-orion.ko
+drivers/usb/host/xhci-tegra.ko
+drivers/usb/host/u132-hcd.ko

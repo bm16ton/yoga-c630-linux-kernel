@@ -1,0 +1,1 @@
+cmd_drivers/i2c/busses/i2c-ocores.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/i2c/busses/i2c-ocores.ko drivers/i2c/busses/i2c-ocores.o drivers/i2c/busses/i2c-ocores.mod.o;  true

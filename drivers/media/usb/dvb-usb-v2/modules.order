@@ -1,0 +1,16 @@
+drivers/media/usb/dvb-usb-v2/dvb_usb_v2.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-af9015.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-af9035.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-anysee.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-au6610.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-az6007.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-ce6230.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-ec168.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-lmedm04.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-gl861.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-mxl111sf.ko
+drivers/media/usb/dvb-usb-v2/mxl111sf-demod.ko
+drivers/media/usb/dvb-usb-v2/mxl111sf-tuner.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-rtl28xxu.ko
+drivers/media/usb/dvb-usb-v2/dvb-usb-dvbsky.ko
+drivers/media/usb/dvb-usb-v2/zd1301.ko

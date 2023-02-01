@@ -1,0 +1,14 @@
+drivers/watchdog/pretimeout_panic.ko
+drivers/watchdog/sp805_wdt.ko
+drivers/watchdog/sbsa_gwdt.ko
+drivers/watchdog/armada_37xx_wdt.ko
+drivers/watchdog/dw_wdt.ko
+drivers/watchdog/sunxi_wdt.ko
+drivers/watchdog/qcom-wdt.ko
+drivers/watchdog/tegra_wdt.ko
+drivers/watchdog/meson_gxbb_wdt.ko
+drivers/watchdog/meson_wdt.ko
+drivers/watchdog/xen_wdt.ko
+drivers/watchdog/gpio_wdt.ko
+drivers/watchdog/wdat_wdt.ko
+drivers/watchdog/softdog.ko

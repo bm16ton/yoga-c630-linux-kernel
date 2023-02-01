@@ -542,8 +542,18 @@ static int __ima_inode_hash(struct inode *inode, struct file *file, char *buf,
 
 		rc = ima_collect_measurement(&tmp_iint, file, NULL, 0,
 					     ima_hash_algo, NULL);
+<<<<<<< HEAD
+		if (rc < 0) {
+			/* ima_hash could be allocated in case of failure. */
+			if (rc != -ENOMEM)
+				kfree(tmp_iint.ima_hash);
+
+			return -EOPNOTSUPP;
+		}
+=======
 		if (rc < 0)
 			return -EOPNOTSUPP;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		iint = &tmp_iint;
 		mutex_lock(&iint->mutex);

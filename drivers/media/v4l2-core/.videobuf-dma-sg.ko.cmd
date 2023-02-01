@@ -1,0 +1,1 @@
+cmd_drivers/media/v4l2-core/videobuf-dma-sg.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/v4l2-core/videobuf-dma-sg.ko drivers/media/v4l2-core/videobuf-dma-sg.o drivers/media/v4l2-core/videobuf-dma-sg.mod.o;  true

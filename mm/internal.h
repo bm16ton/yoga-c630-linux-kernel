@@ -58,6 +58,7 @@ static inline void *folio_raw_mapping(struct folio *folio)
 
 	return (void *)(mapping & ~PAGE_MAPPING_FLAGS);
 }
+<<<<<<< HEAD
 
 void __acct_reclaim_writeback(pg_data_t *pgdat, struct folio *folio,
 						int nr_throttled);
@@ -72,6 +73,22 @@ static inline void acct_reclaim_writeback(struct folio *folio)
 
 static inline void wake_throttle_isolated(pg_data_t *pgdat)
 {
+=======
+
+void __acct_reclaim_writeback(pg_data_t *pgdat, struct folio *folio,
+						int nr_throttled);
+static inline void acct_reclaim_writeback(struct folio *folio)
+{
+	pg_data_t *pgdat = folio_pgdat(folio);
+	int nr_throttled = atomic_read(&pgdat->nr_writeback_throttled);
+
+	if (nr_throttled)
+		__acct_reclaim_writeback(pgdat, folio, nr_throttled);
+}
+
+static inline void wake_throttle_isolated(pg_data_t *pgdat)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	wait_queue_head_t *wqh;
 
 	wqh = &pgdat->reclaim_wait[VMSCAN_THROTTLE_ISOLATED];
@@ -83,9 +100,17 @@ vm_fault_t do_swap_page(struct vm_fault *vmf);
 void folio_rotate_reclaimable(struct folio *folio);
 bool __folio_end_writeback(struct folio *folio);
 void deactivate_file_folio(struct folio *folio);
+<<<<<<< HEAD
+void folio_activate(struct folio *folio);
+
+void free_pgtables(struct mmu_gather *tlb, struct maple_tree *mt,
+		   struct vm_area_struct *start_vma, unsigned long floor,
+		   unsigned long ceiling);
+=======
 
 void free_pgtables(struct mmu_gather *tlb, struct vm_area_struct *start_vma,
 		unsigned long floor, unsigned long ceiling);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 void pmd_install(struct mm_struct *mm, pmd_t *pmd, pgtable_t *pte);
 
 struct zap_details;
@@ -187,7 +212,7 @@ extern void reclaim_throttle(pg_data_t *pgdat, enum vmscan_throttle_state reason
 /*
  * in mm/rmap.c:
  */
-extern pmd_t *mm_find_pmd(struct mm_struct *mm, unsigned long address);
+pmd_t *mm_find_pmd(struct mm_struct *mm, unsigned long address);
 
 /*
  * in mm/page_alloc.c
@@ -365,7 +390,10 @@ extern int user_min_free_kbytes;
 extern void free_unref_page(struct page *page, unsigned int order);
 extern void free_unref_page_list(struct list_head *list);
 
+<<<<<<< HEAD
+=======
 extern void zone_pcp_update(struct zone *zone, int cpu_online);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern void zone_pcp_reset(struct zone *zone);
 extern void zone_pcp_disable(struct zone *zone);
 extern void zone_pcp_enable(struct zone *zone);
@@ -479,9 +507,12 @@ static inline bool is_data_mapping(vm_flags_t flags)
 }
 
 /* mm/util.c */
+<<<<<<< HEAD
+=======
 void __vma_link_list(struct mm_struct *mm, struct vm_area_struct *vma,
 		struct vm_area_struct *prev);
 void __vma_unlink_list(struct mm_struct *mm, struct vm_area_struct *vma);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct anon_vma *folio_anon_vma(struct folio *folio);
 
 #ifdef CONFIG_MMU
@@ -497,12 +528,21 @@ extern int mlock_future_check(struct mm_struct *mm, unsigned long flags,
  * mlock_vma_page() and munlock_vma_page():
  * should be called with vma's mmap_lock held for read or write,
  * under page table lock for the pte/pmd being added or removed.
+<<<<<<< HEAD
  *
  * mlock is usually called at the end of page_add_*_rmap(),
  * munlock at the end of page_remove_rmap(); but new anon
  * pages are managed by lru_cache_add_inactive_or_unevictable()
  * calling mlock_new_page().
  *
+=======
+ *
+ * mlock is usually called at the end of page_add_*_rmap(),
+ * munlock at the end of page_remove_rmap(); but new anon
+ * pages are managed by lru_cache_add_inactive_or_unevictable()
+ * calling mlock_new_page().
+ *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @compound is used to include pmd mappings of THPs, but filter out
  * pte mappings of THPs, which cannot be consistently counted: a pte
  * mapping of the THP head cannot be distinguished by the page alone.
@@ -577,6 +617,7 @@ vma_pgoff_address(pgoff_t pgoff, unsigned long nr_pages,
  */
 static inline unsigned long
 vma_address(struct page *page, struct vm_area_struct *vma)
+<<<<<<< HEAD
 {
 	VM_BUG_ON_PAGE(PageKsm(page), page);	/* KSM page->index unusable */
 	return vma_pgoff_address(page_to_pgoff(page), compound_nr(page), vma);
@@ -588,6 +629,19 @@ vma_address(struct page *page, struct vm_area_struct *vma)
  */
 static inline unsigned long vma_address_end(struct page_vma_mapped_walk *pvmw)
 {
+=======
+{
+	VM_BUG_ON_PAGE(PageKsm(page), page);	/* KSM page->index unusable */
+	return vma_pgoff_address(page_to_pgoff(page), compound_nr(page), vma);
+}
+
+/*
+ * Then at what user virtual address will none of the range be found in vma?
+ * Assumes that vma_address() already returned a good starting address.
+ */
+static inline unsigned long vma_address_end(struct page_vma_mapped_walk *pvmw)
+{
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	struct vm_area_struct *vma = pvmw->vma;
 	pgoff_t pgoff;
 	unsigned long address;
@@ -635,6 +689,8 @@ static inline bool need_mlock_page_drain(int cpu) { return false; }
 static inline void mlock_page_drain_local(void) { }
 static inline void mlock_page_drain_remote(int cpu) { }
 static inline void vunmap_range_noflush(unsigned long start, unsigned long end)
+<<<<<<< HEAD
+=======
 {
 }
 #endif /* !CONFIG_MMU */
@@ -645,27 +701,10 @@ static inline void vunmap_range_noflush(unsigned long start, unsigned long end)
  * in the mem_map at MAX_ORDER_NR_PAGES boundaries.
  */
 static inline struct page *mem_map_offset(struct page *base, int offset)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
-	if (unlikely(offset >= MAX_ORDER_NR_PAGES))
-		return nth_page(base, offset);
-	return base + offset;
 }
-
-/*
- * Iterator over all subpages within the maximally aligned gigantic
- * page 'base'.  Handle any discontiguity in the mem_map.
- */
-static inline struct page *mem_map_next(struct page *iter,
-						struct page *base, int offset)
-{
-	if (unlikely((offset & (MAX_ORDER_NR_PAGES - 1)) == 0)) {
-		unsigned long pfn = page_to_pfn(base) + offset;
-		if (!pfn_valid(pfn))
-			return NULL;
-		return pfn_to_page(pfn);
-	}
-	return iter + 1;
-}
+#endif /* !CONFIG_MMU */
 
 /* Memory initialisation debug and verification */
 enum mminit_level {
@@ -847,8 +886,19 @@ int vmap_pages_range_noflush(unsigned long addr, unsigned long end,
 }
 #endif
 
+<<<<<<< HEAD
+int __vmap_pages_range_noflush(unsigned long addr, unsigned long end,
+			       pgprot_t prot, struct page **pages,
+			       unsigned int page_shift);
+
 void vunmap_range_noflush(unsigned long start, unsigned long end);
 
+void __vunmap_range_noflush(unsigned long start, unsigned long end);
+
+=======
+void vunmap_range_noflush(unsigned long start, unsigned long end);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int numa_migrate_prep(struct page *page, struct vm_area_struct *vma,
 		      unsigned long addr, int page_nid, int *flags);
 
@@ -860,8 +910,11 @@ int migrate_device_coherent_page(struct page *page);
  */
 struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags);
 
+<<<<<<< HEAD
+=======
 DECLARE_PER_CPU(struct per_cpu_nodestat, boot_nodestats);
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 extern bool mirrored_kernelcore;
 
 static inline bool vma_soft_dirty_enabled(struct vm_area_struct *vma)

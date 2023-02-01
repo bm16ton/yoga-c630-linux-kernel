@@ -1,0 +1,1 @@
+cmd_drivers/cpufreq/cpufreq_ondemand.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/cpufreq/cpufreq_ondemand.ko drivers/cpufreq/cpufreq_ondemand.o drivers/cpufreq/cpufreq_ondemand.mod.o;  true

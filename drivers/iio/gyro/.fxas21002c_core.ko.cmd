@@ -1,0 +1,1 @@
+cmd_drivers/iio/gyro/fxas21002c_core.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/gyro/fxas21002c_core.ko drivers/iio/gyro/fxas21002c_core.o drivers/iio/gyro/fxas21002c_core.mod.o;  true

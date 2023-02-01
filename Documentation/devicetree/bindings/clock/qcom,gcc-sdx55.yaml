@@ -34,6 +34,8 @@ properties:
       - const: sleep_clk
       - const: core_bi_pll_test_se # Optional clock
     minItems: 2
+<<<<<<< HEAD
+=======
 
   '#clock-cells':
     const: 1
@@ -46,17 +48,17 @@ properties:
 
   reg:
     maxItems: 1
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 required:
   - compatible
   - clocks
   - clock-names
-  - reg
-  - '#clock-cells'
-  - '#reset-cells'
-  - '#power-domain-cells'
 
-additionalProperties: false
+allOf:
+  - $ref: qcom,gcc.yaml#
+
+unevaluatedProperties: false
 
 examples:
   - |

@@ -30,6 +30,9 @@ static const char *dpu_vbif_name(enum dpu_vbif idx)
 		return "??";
 	}
 }
+<<<<<<< HEAD
+
+=======
 /*
 static struct dpu_hw_vbif *dpu_get_vbif(struct dpu_kms *dpu_kms, enum dpu_vbif vbif_idx)
 {
@@ -39,6 +42,7 @@ static struct dpu_hw_vbif *dpu_get_vbif(struct dpu_kms *dpu_kms, enum dpu_vbif v
 	return NULL;
 }
 */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * _dpu_vbif_wait_for_xin_halt - wait for the xin to halt
  * @vbif:	Pointer to hardware vbif driver

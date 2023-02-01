@@ -97,6 +97,8 @@
 		};
 	};
 
+<<<<<<< HEAD
+=======
 	gpio-keys {
 		compatible = "gpio-keys";
 
@@ -192,6 +194,7 @@
 
 	};
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	gpioA0mux: mux-controller {
 		compatible = "gpio-mux";
 		#mux-control-cells = <0>;

@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/sun/niu.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/sun/niu.ko drivers/net/ethernet/sun/niu.o drivers/net/ethernet/sun/niu.mod.o;  true

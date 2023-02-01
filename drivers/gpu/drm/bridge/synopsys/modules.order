@@ -1,0 +1,2 @@
+drivers/gpu/drm/bridge/synopsys/dw-hdmi.ko
+drivers/gpu/drm/bridge/synopsys/dw-hdmi-i2s-audio.ko

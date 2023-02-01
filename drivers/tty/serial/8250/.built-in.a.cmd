@@ -1,0 +1,1 @@
+cmd_drivers/tty/serial/8250/built-in.a := rm -f drivers/tty/serial/8250/built-in.a;  printf "drivers/tty/serial/8250/%s " 8250_core.o 8250_pnp.o 8250_port.o 8250_dma.o 8250_dwlib.o 8250_fintek.o 8250_pci.o 8250_early.o 8250_fsl.o 8250_dw.o 8250_pericom.o 8250_tegra.o 8250_of.o | xargs ar cDPrST drivers/tty/serial/8250/built-in.a

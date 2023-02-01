@@ -1,0 +1,9 @@
+drivers/auxdisplay/charlcd.ko
+drivers/auxdisplay/hd44780_common.ko
+drivers/auxdisplay/img-ascii-lcd.ko
+drivers/auxdisplay/hd44780.ko
+drivers/auxdisplay/hd44780-i2c.ko
+drivers/auxdisplay/ht16k33.ko
+drivers/auxdisplay/panel.ko
+drivers/auxdisplay/lcd2s.ko
+drivers/auxdisplay/line-display.ko

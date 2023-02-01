@@ -1,0 +1,1 @@
+cmd_drivers/mtd/chips/jedec_probe.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/chips/jedec_probe.ko drivers/mtd/chips/jedec_probe.o drivers/mtd/chips/jedec_probe.mod.o;  true

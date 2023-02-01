@@ -1,0 +1,1 @@
+cmd_drivers/media/usb/dvb-usb-v2/dvb-usb-au6610.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/usb/dvb-usb-v2/dvb-usb-au6610.ko drivers/media/usb/dvb-usb-v2/dvb-usb-au6610.o drivers/media/usb/dvb-usb-v2/dvb-usb-au6610.mod.o;  true

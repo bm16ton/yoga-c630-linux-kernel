@@ -1294,6 +1294,8 @@ struct mlx5dr_cmd_gid_attr {
 	u32 roce_ver;
 };
 
+<<<<<<< HEAD
+=======
 struct mlx5dr_cmd_qp_create_attr {
 	u32 page_id;
 	u32 pdn;
@@ -1308,6 +1310,7 @@ struct mlx5dr_cmd_qp_create_attr {
 	u8 isolate_vl_tc:1;
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 int mlx5dr_cmd_query_gid(struct mlx5_core_dev *mdev, u8 vhca_port_num,
 			 u16 index, struct mlx5dr_cmd_gid_attr *attr);
 

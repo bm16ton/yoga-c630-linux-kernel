@@ -1,0 +1,1 @@
+cmd_drivers/base/power/built-in.a := rm -f drivers/base/power/built-in.a;  printf "drivers/base/power/%s " sysfs.o generic_ops.o common.o qos.o runtime.o wakeirq.o main.o wakeup.o wakeup_stats.o domain.o domain_governor.o clock_ops.o | xargs ar cDPrST drivers/base/power/built-in.a

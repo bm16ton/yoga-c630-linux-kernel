@@ -1,0 +1,1 @@
+cmd_drivers/mailbox/built-in.a := rm -f drivers/mailbox/built-in.a;  printf "drivers/mailbox/%s " mailbox.o pcc.o hi3660-mailbox.o hi6220-mailbox.o qcom-apcs-ipc-mailbox.o zynqmp-ipi-mailbox.o sun6i-msgbox.o qcom-ipcc.o | xargs ar cDPrST drivers/mailbox/built-in.a

@@ -1,0 +1,1 @@
+cmd_net/netfilter/xt_length.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/xt_length.ko net/netfilter/xt_length.o net/netfilter/xt_length.mod.o;  true

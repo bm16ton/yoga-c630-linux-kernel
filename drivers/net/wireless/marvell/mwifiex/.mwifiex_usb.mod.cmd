@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/marvell/mwifiex/mwifiex_usb.mod := printf '%s\n'   usb.o | awk '!x[$$0]++ { print("drivers/net/wireless/marvell/mwifiex/"$$0) }' > drivers/net/wireless/marvell/mwifiex/mwifiex_usb.mod

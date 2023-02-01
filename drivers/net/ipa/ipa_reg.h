@@ -1,12 +1,17 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
+<<<<<<< HEAD
+ * Copyright (C) 2018-2022 Linaro Ltd.
+=======
  * Copyright (C) 2018-2021 Linaro Ltd.
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  */
 #ifndef _IPA_REG_H_
 #define _IPA_REG_H_
 
 #include <linux/bitfield.h>
+#include <linux/bug.h>
 
 #include "ipa_version.h"
 
@@ -16,22 +21,96 @@ struct ipa;
  * DOC: IPA Registers
  *
  * IPA registers are located within the "ipa-reg" address space defined by
- * Device Tree.  The offset of each register within that space is specified
- * by symbols defined below.  The address space is mapped to virtual memory
- * space in ipa_mem_init().  All IPA registers are 32 bits wide.
+ * Device Tree.  Each register has a specified offset within that space,
+ * which is mapped into virtual memory space in ipa_mem_init().  Each
+ * has a unique identifer, taken from the ipa_reg_id enumerated type.
+ * All IPA registers are 32 bits wide.
  *
- * Certain register types are duplicated for a number of instances of
- * something.  For example, each IPA endpoint has an set of registers
- * defining its configuration.  The offset to an endpoint's set of registers
- * is computed based on an "base" offset, plus an endpoint's ID multiplied
- * and a "stride" value for the register.  For such registers, the offset is
- * computed by a function-like macro that takes a parameter used in the
- * computation.
+ * Certain "parameterized" register types are duplicated for a number of
+ * instances of something.  For example, each IPA endpoint has an set of
+ * registers defining its configuration.  The offset to an endpoint's set
+ * of registers is computed based on an "base" offset, plus an endpoint's
+ * ID multiplied and a "stride" value for the register.  Similarly, some
+ * registers have an offset that depends on execution environment.  In
+ * this case, the stride is multiplied by a member of the gsi_ee_id
+ * enumerated type.
  *
- * Some register offsets depend on execution environment.  For these an "ee"
- * parameter is supplied to the offset macro.  The "ee" value is a member of
- * the gsi_ee enumerated type.
+ * Each version of IPA implements an array of ipa_reg structures indexed
+ * by register ID.  Each entry in the array specifies the base offset and
+ * (for parameterized registers) a non-zero stride value.  Not all versions
+ * of IPA define all registers.  The offset for a register is returned by
+ * ipa_reg_offset() when the register's ipa_reg structure is supplied;
+ * zero is returned for an undefined register (this should never happen).
  *
+<<<<<<< HEAD
+ * Some registers encode multiple fields within them.  Each field in
+ * such a register has a unique identifier (from an enumerated type).
+ * The position and width of the fields in a register are defined by
+ * an array of field masks, indexed by field ID.  Two functions are
+ * used to access register fields; both take an ipa_reg structure as
+ * argument.  To encode a value to be represented in a register field,
+ * the value and field ID are passed to ipa_reg_encode().  To extract
+ * a value encoded in a register field, the field ID is passed to
+ * ipa_reg_decode().  In addition, for single-bit fields, ipa_reg_bit()
+ * can be used to either encode the bit value, or to generate a mask
+ * used to extract the bit value.
+ */
+
+/* enum ipa_reg_id - IPA register IDs */
+enum ipa_reg_id {
+	COMP_CFG,
+	CLKON_CFG,
+	ROUTE,
+	SHARED_MEM_SIZE,
+	QSB_MAX_WRITES,
+	QSB_MAX_READS,
+	FILT_ROUT_HASH_EN,
+	FILT_ROUT_HASH_FLUSH,
+	STATE_AGGR_ACTIVE,
+	IPA_BCR,					/* Not IPA v4.5+ */
+	LOCAL_PKT_PROC_CNTXT,
+	AGGR_FORCE_CLOSE,
+	COUNTER_CFG,					/* Not IPA v4.5+ */
+	IPA_TX_CFG,					/* IPA v3.5+ */
+	FLAVOR_0,					/* IPA v3.5+ */
+	IDLE_INDICATION_CFG,				/* IPA v3.5+ */
+	QTIME_TIMESTAMP_CFG,				/* IPA v4.5+ */
+	TIMERS_XO_CLK_DIV_CFG,				/* IPA v4.5+ */
+	TIMERS_PULSE_GRAN_CFG,				/* IPA v4.5+ */
+	SRC_RSRC_GRP_01_RSRC_TYPE,
+	SRC_RSRC_GRP_23_RSRC_TYPE,
+	SRC_RSRC_GRP_45_RSRC_TYPE,		/* Not IPA v3.5+, IPA v4.5 */
+	SRC_RSRC_GRP_67_RSRC_TYPE,			/* Not IPA v3.5+ */
+	DST_RSRC_GRP_01_RSRC_TYPE,
+	DST_RSRC_GRP_23_RSRC_TYPE,
+	DST_RSRC_GRP_45_RSRC_TYPE,		/* Not IPA v3.5+, IPA v4.5 */
+	DST_RSRC_GRP_67_RSRC_TYPE,			/* Not IPA v3.5+ */
+	ENDP_INIT_CTRL,		/* Not IPA v4.2+ for TX, not IPA v4.0+ for RX */
+	ENDP_INIT_CFG,
+	ENDP_INIT_NAT,			/* TX only */
+	ENDP_INIT_HDR,
+	ENDP_INIT_HDR_EXT,
+	ENDP_INIT_HDR_METADATA_MASK,	/* RX only */
+	ENDP_INIT_MODE,			/* TX only */
+	ENDP_INIT_AGGR,
+	ENDP_INIT_HOL_BLOCK_EN,		/* RX only */
+	ENDP_INIT_HOL_BLOCK_TIMER,	/* RX only */
+	ENDP_INIT_DEAGGR,		/* TX only */
+	ENDP_INIT_RSRC_GRP,
+	ENDP_INIT_SEQ,			/* TX only */
+	ENDP_STATUS,
+	ENDP_FILTER_ROUTER_HSH_CFG,			/* Not IPA v4.2 */
+	/* The IRQ registers are only used for GSI_EE_AP */
+	IPA_IRQ_STTS,
+	IPA_IRQ_EN,
+	IPA_IRQ_CLR,
+	IPA_IRQ_UC,
+	IRQ_SUSPEND_INFO,
+	IRQ_SUSPEND_EN,					/* IPA v3.1+ */
+	IRQ_SUSPEND_CLR,				/* IPA v3.1+ */
+	IPA_REG_ID_COUNT,				/* Last; not an ID */
+};
+=======
  * The offset of a register dependent on endpoint ID is computed by a macro
  * that is supplied a parameter "ep", "txep", or "rxep".  A register with an
  * "ep" parameter is valid for any endpoint; a register with a "txep" or
@@ -191,33 +270,139 @@ static inline u32 ipa_reg_filt_rout_hash_en_offset(enum ipa_version version)
 {
 	if (version < IPA_VERSION_4_0)
 		return 0x000008c;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return 0x0000148;
-}
+/**
+ * struct ipa_reg - An IPA register descriptor
+ * @offset:	Register offset relative to base of the "ipa-reg" memory
+ * @stride:	Distance between two instances, if parameterized
+ * @fcount:	Number of entries in the @fmask array
+ * @fmask:	Array of mask values defining position and width of fields
+ * @name:	Upper-case name of the IPA register
+ */
+struct ipa_reg {
+	u32 offset;
+	u32 stride;
+	u32 fcount;
+	const u32 *fmask;			/* BIT(nr) or GENMASK(h, l) */
+	const char *name;
+};
 
+<<<<<<< HEAD
+/* Helper macro for defining "simple" (non-parameterized) registers */
+#define IPA_REG(__NAME, __reg_id, __offset)				\
+	IPA_REG_STRIDE(__NAME, __reg_id, __offset, 0)
+=======
 static inline u32 ipa_reg_filt_rout_hash_flush_offset(enum ipa_version version)
 {
 	if (version < IPA_VERSION_4_0)
 		return 0x0000090;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return 0x000014c;
-}
+/* Helper macro for defining parameterized registers, specifying stride */
+#define IPA_REG_STRIDE(__NAME, __reg_id, __offset, __stride)		\
+	static const struct ipa_reg ipa_reg_ ## __reg_id = {		\
+		.name	= #__NAME,					\
+		.offset	= __offset,					\
+		.stride	= __stride,					\
+	}
 
-/* The next four fields are used for the hash enable and flush registers */
-#define IPV6_ROUTER_HASH_FMASK			GENMASK(0, 0)
-#define IPV6_FILTER_HASH_FMASK			GENMASK(4, 4)
-#define IPV4_ROUTER_HASH_FMASK			GENMASK(8, 8)
-#define IPV4_FILTER_HASH_FMASK			GENMASK(12, 12)
+#define IPA_REG_FIELDS(__NAME, __name, __offset)			\
+	IPA_REG_STRIDE_FIELDS(__NAME, __name, __offset, 0)
 
+<<<<<<< HEAD
+#define IPA_REG_STRIDE_FIELDS(__NAME, __name, __offset, __stride)	\
+	static const struct ipa_reg ipa_reg_ ## __name = {		\
+		.name   = #__NAME,					\
+		.offset = __offset,					\
+		.stride = __stride,					\
+		.fcount = ARRAY_SIZE(ipa_reg_ ## __name ## _fmask),	\
+		.fmask  = ipa_reg_ ## __name ## _fmask,			\
+	}
+=======
 /* ipa->available defines the valid bits in the STATE_AGGR_ACTIVE register */
 static inline u32 ipa_reg_state_aggr_active_offset(enum ipa_version version)
 {
 	if (version < IPA_VERSION_4_0)
 		return 0x0000010c;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return 0x000000b4;
-}
+/**
+ * struct ipa_regs - Description of registers supported by hardware
+ * @reg_count:	Number of registers in the @reg[] array
+ * @reg:		Array of register descriptors
+ */
+struct ipa_regs {
+	u32 reg_count;
+	const struct ipa_reg **reg;
+};
 
+<<<<<<< HEAD
+/* COMP_CFG register */
+enum ipa_reg_comp_cfg_field_id {
+	COMP_CFG_ENABLE,				/* Not IPA v4.0+ */
+	RAM_ARB_PRI_CLIENT_SAMP_FIX_DIS,		/* IPA v4.7+ */
+	GSI_SNOC_BYPASS_DIS,
+	GEN_QMB_0_SNOC_BYPASS_DIS,
+	GEN_QMB_1_SNOC_BYPASS_DIS,
+	IPA_DCMP_FAST_CLK_EN,				/* Not IPA v4.5+ */
+	IPA_QMB_SELECT_CONS_EN,				/* IPA v4.0+ */
+	IPA_QMB_SELECT_PROD_EN,				/* IPA v4.0+ */
+	GSI_MULTI_INORDER_RD_DIS,			/* IPA v4.0+ */
+	GSI_MULTI_INORDER_WR_DIS,			/* IPA v4.0+ */
+	GEN_QMB_0_MULTI_INORDER_RD_DIS,			/* IPA v4.0+ */
+	GEN_QMB_1_MULTI_INORDER_RD_DIS,			/* IPA v4.0+ */
+	GEN_QMB_0_MULTI_INORDER_WR_DIS,			/* IPA v4.0+ */
+	GEN_QMB_1_MULTI_INORDER_WR_DIS,			/* IPA v4.0+ */
+	GEN_QMB_0_SNOC_CNOC_LOOP_PROT_DIS,		/* IPA v4.0+ */
+	GSI_SNOC_CNOC_LOOP_PROT_DISABLE,		/* IPA v4.0+ */
+	GSI_MULTI_AXI_MASTERS_DIS,			/* IPA v4.0+ */
+	IPA_QMB_SELECT_GLOBAL_EN,			/* IPA v4.0+ */
+	QMB_RAM_RD_CACHE_DISABLE,			/* IPA v4.9+ */
+	GENQMB_AOOOWR,					/* IPA v4.9+ */
+	IF_OUT_OF_BUF_STOP_RESET_MASK_EN,		/* IPA v4.9+ */
+	GEN_QMB_1_DYNAMIC_ASIZE,			/* IPA v4.9+ */
+	GEN_QMB_0_DYNAMIC_ASIZE,			/* IPA v4.9+ */
+	ATOMIC_FETCHER_ARB_LOCK_DIS,			/* IPA v4.0+ */
+	FULL_FLUSH_WAIT_RS_CLOSURE_EN,			/* IPA v4.5+ */
+};
+
+/* CLKON_CFG register */
+enum ipa_reg_clkon_cfg_field_id {
+	CLKON_RX,
+	CLKON_PROC,
+	TX_WRAPPER,
+	CLKON_MISC,
+	RAM_ARB,
+	FTCH_HPS,
+	FTCH_DPS,
+	CLKON_HPS,
+	CLKON_DPS,
+	RX_HPS_CMDQS,
+	HPS_DPS_CMDQS,
+	DPS_TX_CMDQS,
+	RSRC_MNGR,
+	CTX_HANDLER,
+	ACK_MNGR,
+	D_DCPH,
+	H_DCPH,
+	CLKON_DCMP,					/* IPA v4.5+ */
+	NTF_TX_CMDQS,					/* IPA v3.5+ */
+	CLKON_TX_0,					/* IPA v3.5+ */
+	CLKON_TX_1,					/* IPA v3.5+ */
+	CLKON_FNR,					/* IPA v3.5.1+ */
+	QSB2AXI_CMDQ_L,					/* IPA v4.0+ */
+	AGGR_WRAPPER,					/* IPA v4.0+ */
+	RAM_SLAVEWAY,					/* IPA v4.0+ */
+	CLKON_QMB,					/* IPA v4.0+ */
+	WEIGHT_ARB,					/* IPA v4.0+ */
+	GSI_IF,						/* IPA v4.0+ */
+	CLKON_GLOBAL,					/* IPA v4.0+ */
+	GLOBAL_2X_CLK,					/* IPA v4.0+ */
+	DPL_FIFO,					/* IPA v4.5+ */
+	DRBIP,						/* IPA v4.7+ */
+};
+=======
 /* The next register is not present for IPA v4.5+ */
 #define IPA_REG_BCR_OFFSET				0x000001d0
 /* The next two fields are not present for IPA v4.2+ */
@@ -247,10 +432,47 @@ static inline u32 proc_cntxt_base_addr_encoded(enum ipa_version version,
 
 	return u32_encode_bits(addr, GENMASK(17, 0));
 }
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-/* ipa->available defines the valid bits in the AGGR_FORCE_CLOSE register */
-#define IPA_REG_AGGR_FORCE_CLOSE_OFFSET			0x000001ec
+/* ROUTE register */
+enum ipa_reg_route_field_id {
+	ROUTE_DIS,
+	ROUTE_DEF_PIPE,
+	ROUTE_DEF_HDR_TABLE,
+	ROUTE_DEF_HDR_OFST,
+	ROUTE_FRAG_DEF_PIPE,
+	ROUTE_DEF_RETAIN_HDR,
+};
 
+<<<<<<< HEAD
+/* SHARED_MEM_SIZE register */
+enum ipa_reg_shared_mem_size_field_id {
+	MEM_SIZE,
+	MEM_BADDR,
+};
+
+/* QSB_MAX_WRITES register */
+enum ipa_reg_qsb_max_writes_field_id {
+	GEN_QMB_0_MAX_WRITES,
+	GEN_QMB_1_MAX_WRITES,
+};
+
+/* QSB_MAX_READS register */
+enum ipa_reg_qsb_max_reads_field_id {
+	GEN_QMB_0_MAX_READS,
+	GEN_QMB_1_MAX_READS,
+	GEN_QMB_0_MAX_READS_BEATS,			/* IPA v4.0+ */
+	GEN_QMB_1_MAX_READS_BEATS,			/* IPA v4.0+ */
+};
+
+/* FILT_ROUT_HASH_EN and FILT_ROUT_HASH_FLUSH registers */
+enum ipa_reg_rout_hash_field_id {
+	IPV6_ROUTER_HASH,
+	IPV6_FILTER_HASH,
+	IPV4_ROUTER_HASH,
+	IPV4_FILTER_HASH,
+};
+=======
 /* The next register is not present for IPA v4.5+ */
 #define IPA_REG_COUNTER_CFG_OFFSET			0x000001f0
 /* The next field is not present for IPA v3.5+ */
@@ -289,10 +511,87 @@ static inline u32 ipa_reg_idle_indication_cfg_offset(enum ipa_version version)
 {
 	if (version >= IPA_VERSION_4_2)
 		return 0x00000240;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return 0x00000220;
-}
+/* BCR register */
+enum ipa_bcr_compat {
+	BCR_CMDQ_L_LACK_ONE_ENTRY		= 0x0,	/* Not IPA v4.2+ */
+	BCR_TX_NOT_USING_BRESP			= 0x1,	/* Not IPA v4.2+ */
+	BCR_TX_SUSPEND_IRQ_ASSERT_ONCE		= 0x2,	/* Not IPA v4.0+ */
+	BCR_SUSPEND_L2_IRQ			= 0x3,	/* Not IPA v4.2+ */
+	BCR_HOLB_DROP_L2_IRQ			= 0x4,	/* Not IPA v4.2+ */
+	BCR_DUAL_TX				= 0x5,	/* IPA v3.5+ */
+	BCR_ENABLE_FILTER_DATA_CACHE		= 0x6,	/* IPA v3.5+ */
+	BCR_NOTIF_PRIORITY_OVER_ZLT		= 0x7,	/* IPA v3.5+ */
+	BCR_FILTER_PREFETCH_EN			= 0x8,	/* IPA v3.5+ */
+	BCR_ROUTER_PREFETCH_EN			= 0x9,	/* IPA v3.5+ */
+};
 
+/* LOCAL_PKT_PROC_CNTXT register */
+enum ipa_reg_local_pkt_proc_cntxt_field_id {
+	IPA_BASE_ADDR,
+};
+
+/* COUNTER_CFG register */
+enum ipa_reg_counter_cfg_field_id {
+	EOT_COAL_GRANULARITY,				/* Not v3.5+ */
+	AGGR_GRANULARITY,
+};
+
+/* IPA_TX_CFG register */
+enum ipa_reg_ipa_tx_cfg_field_id {
+	TX0_PREFETCH_DISABLE,				/* Not v4.0+ */
+	TX1_PREFETCH_DISABLE,				/* Not v4.0+ */
+	PREFETCH_ALMOST_EMPTY_SIZE,			/* Not v4.0+ */
+	PREFETCH_ALMOST_EMPTY_SIZE_TX0,			/* v4.0+ */
+	DMAW_SCND_OUTSD_PRED_THRESHOLD,			/* v4.0+ */
+	DMAW_SCND_OUTSD_PRED_EN,			/* v4.0+ */
+	DMAW_MAX_BEATS_256_DIS,				/* v4.0+ */
+	PA_MASK_EN,					/* v4.0+ */
+	PREFETCH_ALMOST_EMPTY_SIZE_TX1,			/* v4.0+ */
+	DUAL_TX_ENABLE,					/* v4.5+ */
+	SSPND_PA_NO_START_STATE,			/* v4,2+, not v4.5 */
+	SSPND_PA_NO_BQ_STATE,				/* v4.2 only */
+};
+
+<<<<<<< HEAD
+/* FLAVOR_0 register */
+enum ipa_reg_flavor_0_field_id {
+	MAX_PIPES,
+	MAX_CONS_PIPES,
+	MAX_PROD_PIPES,
+	PROD_LOWEST,
+};
+
+/* IDLE_INDICATION_CFG register */
+enum ipa_reg_idle_indication_cfg_field_id {
+	ENTER_IDLE_DEBOUNCE_THRESH,
+	CONST_NON_IDLE_ENABLE,
+};
+
+/* QTIME_TIMESTAMP_CFG register */
+enum ipa_reg_qtime_timestamp_cfg_field_id {
+	DPL_TIMESTAMP_LSB,
+	DPL_TIMESTAMP_SEL,
+	TAG_TIMESTAMP_LSB,
+	NAT_TIMESTAMP_LSB,
+};
+
+/* TIMERS_XO_CLK_DIV_CFG register */
+enum ipa_reg_timers_xo_clk_div_cfg_field_id {
+	DIV_VALUE,
+	DIV_ENABLE,
+};
+
+/* TIMERS_PULSE_GRAN_CFG register */
+enum ipa_reg_timers_pulse_gran_cfg_field_id {
+	PULSE_GRAN_0,
+	PULSE_GRAN_1,
+	PULSE_GRAN_2,
+};
+
+/* Values for IPA_GRAN_x fields of TIMERS_PULSE_GRAN_CFG */
+=======
 #define ENTER_IDLE_DEBOUNCE_THRESH_FMASK	GENMASK(15, 0)
 #define CONST_NON_IDLE_ENABLE_FMASK		GENMASK(16, 16)
 
@@ -314,6 +613,7 @@ static inline u32 ipa_reg_idle_indication_cfg_offset(enum ipa_version version)
 #define GRAN_1_FMASK				GENMASK(5, 3)
 #define GRAN_2_FMASK				GENMASK(8, 6)
 /* Values for GRAN_x fields of TIMERS_PULSE_GRAN_CFG */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 enum ipa_pulse_gran {
 	IPA_GRAN_10_US				= 0x0,
 	IPA_GRAN_20_US				= 0x1,
@@ -325,6 +625,37 @@ enum ipa_pulse_gran {
 	IPA_GRAN_655350_US			= 0x7,
 };
 
+<<<<<<< HEAD
+/* {SRC,DST}_RSRC_GRP_{01,23,45,67}_RSRC_TYPE registers */
+enum ipa_reg_rsrc_grp_rsrc_type_field_id {
+	X_MIN_LIM,
+	X_MAX_LIM,
+	Y_MIN_LIM,
+	Y_MAX_LIM,
+};
+
+/* ENDP_INIT_CTRL register */
+enum ipa_reg_endp_init_ctrl_field_id {
+	ENDP_SUSPEND,					/* Not v4.0+ */
+	ENDP_DELAY,					/* Not v4.2+ */
+};
+
+/* ENDP_INIT_CFG register */
+enum ipa_reg_endp_init_cfg_field_id {
+	FRAG_OFFLOAD_EN,
+	CS_OFFLOAD_EN,
+	CS_METADATA_HDR_OFFSET,
+	CS_GEN_QMB_MASTER_SEL,
+};
+
+/** enum ipa_cs_offload_en - ENDP_INIT_CFG register CS_OFFLOAD_EN field value */
+enum ipa_cs_offload_en {
+	IPA_CS_OFFLOAD_NONE			= 0x0,
+	IPA_CS_OFFLOAD_UL	/* TX */	= 0x1,	/* Not IPA v4.5+ */
+	IPA_CS_OFFLOAD_DL	/* RX */	= 0x2,	/* Not IPA v4.5+ */
+	IPA_CS_OFFLOAD_INLINE	/* TX and RX */	= 0x1,	/* IPA v4.5+ */
+};
+=======
 /* Not all of the following are present (depends on IPA version) */
 #define IPA_REG_SRC_RSRC_GRP_01_RSRC_TYPE_N_OFFSET(rt) \
 					(0x00000400 + 0x0020 * (rt))
@@ -416,30 +747,70 @@ static inline u32 ipa_header_size_encoded(enum ipa_version version,
 	/* IPA v4.5 adds a few more most-significant bits */
 	size = header_size >> hweight32(HDR_LEN_FMASK);
 	val |= u32_encode_bits(size, HDR_LEN_MSB_FMASK);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return val;
-}
+/* ENDP_INIT_NAT register */
+enum ipa_reg_endp_init_nat_field_id {
+	NAT_EN,
+};
 
-/* Encoded value for ENDP_INIT_HDR register OFST_METADATA* field(s) */
-static inline u32 ipa_metadata_offset_encoded(enum ipa_version version,
-					      u32 offset)
-{
-	u32 off = offset & field_mask(HDR_OFST_METADATA_FMASK);
-	u32 val;
+/** enum ipa_nat_en - ENDP_INIT_NAT register NAT_EN field value */
+enum ipa_nat_en {
+	IPA_NAT_BYPASS				= 0x0,
+	IPA_NAT_SRC				= 0x1,
+	IPA_NAT_DST				= 0x2,
+};
 
+<<<<<<< HEAD
+/* ENDP_INIT_HDR register */
+enum ipa_reg_endp_init_hdr_field_id {
+	HDR_LEN,
+	HDR_OFST_METADATA_VALID,
+	HDR_OFST_METADATA,
+	HDR_ADDITIONAL_CONST_LEN,
+	HDR_OFST_PKT_SIZE_VALID,
+	HDR_OFST_PKT_SIZE,
+	HDR_A5_MUX,					/* Not v4.9+ */
+	HDR_LEN_INC_DEAGG_HDR,
+	HDR_METADATA_REG_VALID,				/* Not v4.5+ */
+	HDR_LEN_MSB,					/* v4.5+ */
+	HDR_OFST_METADATA_MSB,				/* v4.5+ */
+};
+=======
 	val = u32_encode_bits(off, HDR_OFST_METADATA_FMASK);
 	if (version < IPA_VERSION_4_5) {
 		WARN_ON(offset != off);
 		return val;
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	/* IPA v4.5 adds a few more most-significant bits */
-	off = offset >> hweight32(HDR_OFST_METADATA_FMASK);
-	val |= u32_encode_bits(off, HDR_OFST_METADATA_MSB_FMASK);
+/* ENDP_INIT_HDR_EXT register */
+enum ipa_reg_endp_init_hdr_ext_field_id {
+	HDR_ENDIANNESS,
+	HDR_TOTAL_LEN_OR_PAD_VALID,
+	HDR_TOTAL_LEN_OR_PAD,
+	HDR_PAYLOAD_LEN_INC_PADDING,
+	HDR_TOTAL_LEN_OR_PAD_OFFSET,
+	HDR_PAD_TO_ALIGNMENT,
+	HDR_TOTAL_LEN_OR_PAD_OFFSET_MSB,		/* v4.5+ */
+	HDR_OFST_PKT_SIZE_MSB,				/* v4.5+ */
+	HDR_ADDITIONAL_CONST_LEN_MSB,			/* v4.5+ */
+};
 
-	return val;
-}
+/* ENDP_INIT_MODE register */
+enum ipa_reg_endp_init_mode_field_id {
+	ENDP_MODE,
+	DCPH_ENABLE,					/* v4.5+ */
+	DEST_PIPE_INDEX,
+	BYTE_THRESHOLD,
+	PIPE_REPLICATION_EN,
+	PAD_EN,
+	HDR_FTCH_DISABLE,				/* v4.5+ */
+	DRBIP_ACL_ENABLE,				/* v4.9+ */
+};
 
+<<<<<<< HEAD
+=======
 #define IPA_REG_ENDP_INIT_HDR_EXT_N_OFFSET(ep) \
 					(0x00000814 + 0x0070 * (ep))
 #define HDR_ENDIANNESS_FMASK			GENMASK(0, 0)
@@ -472,14 +843,81 @@ static inline u32 ipa_metadata_offset_encoded(enum ipa_version version,
 /* The next field is present for IPA v4.9+ */
 #define DRBIP_ACL_ENABLE			GENMASK(30, 30)
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /** enum ipa_mode - ENDP_INIT_MODE register MODE field value */
 enum ipa_mode {
-	IPA_BASIC			= 0x0,
-	IPA_ENABLE_FRAMING_HDLC		= 0x1,
-	IPA_ENABLE_DEFRAMING_HDLC	= 0x2,
-	IPA_DMA				= 0x3,
+	IPA_BASIC				= 0x0,
+	IPA_ENABLE_FRAMING_HDLC			= 0x1,
+	IPA_ENABLE_DEFRAMING_HDLC		= 0x2,
+	IPA_DMA					= 0x3,
 };
 
+<<<<<<< HEAD
+/* ENDP_INIT_AGGR register */
+enum ipa_reg_endp_init_aggr_field_id {
+	AGGR_EN,
+	AGGR_TYPE,
+	BYTE_LIMIT,
+	TIME_LIMIT,
+	PKT_LIMIT,
+	SW_EOF_ACTIVE,
+	FORCE_CLOSE,
+	HARD_BYTE_LIMIT_EN,
+	AGGR_GRAN_SEL,
+};
+
+/** enum ipa_aggr_en - ENDP_INIT_AGGR register AGGR_EN field value */
+enum ipa_aggr_en {
+	IPA_BYPASS_AGGR		/* TX and RX */	= 0x0,
+	IPA_ENABLE_AGGR		/* RX */	= 0x1,
+	IPA_ENABLE_DEAGGR	/* TX */	= 0x2,
+};
+
+/** enum ipa_aggr_type - ENDP_INIT_AGGR register AGGR_TYPE field value */
+enum ipa_aggr_type {
+	IPA_MBIM_16				= 0x0,
+	IPA_HDLC				= 0x1,
+	IPA_TLP					= 0x2,
+	IPA_RNDIS				= 0x3,
+	IPA_GENERIC				= 0x4,
+	IPA_COALESCE				= 0x5,
+	IPA_QCMAP				= 0x6,
+};
+
+/* ENDP_INIT_HOL_BLOCK_EN register */
+enum ipa_reg_endp_init_hol_block_en_field_id {
+	HOL_BLOCK_EN,
+};
+
+/* ENDP_INIT_HOL_BLOCK_TIMER register */
+enum ipa_reg_endp_init_hol_block_timer_field_id {
+	TIMER_BASE_VALUE,				/* Not v4.5+ */
+	TIMER_SCALE,					/* v4.2 only */
+	TIMER_LIMIT,					/* v4.5+ */
+	TIMER_GRAN_SEL,					/* v4.5+ */
+};
+
+/* ENDP_INIT_DEAGGR register */
+enum ipa_reg_endp_deaggr_field_id {
+	DEAGGR_HDR_LEN,
+	SYSPIPE_ERR_DETECTION,
+	PACKET_OFFSET_VALID,
+	PACKET_OFFSET_LOCATION,
+	IGNORE_MIN_PKT_ERR,
+	MAX_PACKET_LEN,
+};
+
+/* ENDP_INIT_RSRC_GRP register */
+enum ipa_reg_endp_init_rsrc_grp_field_id {
+	ENDP_RSRC_GRP,
+};
+
+/* ENDP_INIT_SEQ register */
+enum ipa_reg_endp_init_seq_field_id {
+	SEQ_TYPE,
+	SEQ_REP_TYPE,					/* Not v4.5+ */
+};
+=======
 #define IPA_REG_ENDP_INIT_AGGR_N_OFFSET(ep) \
 					(0x00000824 +  0x0070 * (ep))
 #define AGGR_EN_FMASK				GENMASK(1, 0)
@@ -586,6 +1024,7 @@ static inline u32 rsrc_grp_encoded(enum ipa_version version, u32 rsrc_grp)
 					(0x0000083c + 0x0070 * (txep))
 #define SEQ_TYPE_FMASK				GENMASK(7, 0)
 #define SEQ_REP_TYPE_FMASK			GENMASK(15, 8)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 /**
  * enum ipa_seq_type - HPS and DPS sequencer type
@@ -629,6 +1068,38 @@ enum ipa_seq_rep_type {
 	IPA_SEQ_REP_DMA_PARSER			= 0x08,
 };
 
+<<<<<<< HEAD
+/* ENDP_STATUS register */
+enum ipa_reg_endp_status_field_id {
+	STATUS_EN,
+	STATUS_ENDP,
+	STATUS_LOCATION,				/* Not v4.5+ */
+	STATUS_PKT_SUPPRESS,				/* v4.0+ */
+};
+
+/* ENDP_FILTER_ROUTER_HSH_CFG register */
+enum ipa_reg_endp_filter_router_hsh_cfg_field_id {
+	FILTER_HASH_MSK_SRC_ID,
+	FILTER_HASH_MSK_SRC_IP,
+	FILTER_HASH_MSK_DST_IP,
+	FILTER_HASH_MSK_SRC_PORT,
+	FILTER_HASH_MSK_DST_PORT,
+	FILTER_HASH_MSK_PROTOCOL,
+	FILTER_HASH_MSK_METADATA,
+	FILTER_HASH_MSK_ALL,		/* Bitwise OR of the above 6 fields */
+
+	ROUTER_HASH_MSK_SRC_ID,
+	ROUTER_HASH_MSK_SRC_IP,
+	ROUTER_HASH_MSK_DST_IP,
+	ROUTER_HASH_MSK_SRC_PORT,
+	ROUTER_HASH_MSK_DST_PORT,
+	ROUTER_HASH_MSK_PROTOCOL,
+	ROUTER_HASH_MSK_METADATA,
+	ROUTER_HASH_MSK_ALL,		/* Bitwise OR of the above 6 fields */
+};
+
+/* IPA_IRQ_STTS, IPA_IRQ_EN, and IPA_IRQ_CLR registers */
+=======
 #define IPA_REG_ENDP_STATUS_N_OFFSET(ep) \
 					(0x00000840 + 0x0070 * (ep))
 #define STATUS_EN_FMASK				GENMASK(0, 0)
@@ -699,6 +1170,7 @@ static inline u32 ipa_reg_irq_clr_offset(enum ipa_version version)
 	return ipa_reg_irq_clr_ee_n_offset(version, GSI_EE_AP);
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * enum ipa_irq_id - Bit positions representing type of IPA IRQ
  * @IPA_IRQ_UC_0:	Microcontroller event interrupt
@@ -774,6 +1246,84 @@ enum ipa_irq_id {
 	IPA_IRQ_COUNT,				/* Last; not an id */
 };
 
+<<<<<<< HEAD
+/* IPA_IRQ_UC register */
+enum ipa_reg_ipa_irq_uc_field_id {
+	UC_INTR,
+};
+
+extern const struct ipa_regs ipa_regs_v3_1;
+extern const struct ipa_regs ipa_regs_v3_5_1;
+extern const struct ipa_regs ipa_regs_v4_2;
+extern const struct ipa_regs ipa_regs_v4_5;
+extern const struct ipa_regs ipa_regs_v4_9;
+extern const struct ipa_regs ipa_regs_v4_11;
+
+/* Return the field mask for a field in a register */
+static inline u32 ipa_reg_fmask(const struct ipa_reg *reg, u32 field_id)
+{
+	if (!reg || WARN_ON(field_id >= reg->fcount))
+		return 0;
+
+	return reg->fmask[field_id];
+}
+
+/* Return the mask for a single-bit field in a register */
+static inline u32 ipa_reg_bit(const struct ipa_reg *reg, u32 field_id)
+{
+	u32 fmask = ipa_reg_fmask(reg, field_id);
+
+	WARN_ON(!is_power_of_2(fmask));
+
+	return fmask;
+}
+
+/* Encode a value into the given field of a register */
+static inline u32
+ipa_reg_encode(const struct ipa_reg *reg, u32 field_id, u32 val)
+{
+	u32 fmask = ipa_reg_fmask(reg, field_id);
+
+	if (!fmask)
+		return 0;
+
+	val <<= __ffs(fmask);
+	if (WARN_ON(val & ~fmask))
+		return 0;
+
+	return val;
+}
+
+/* Given a register value, decode (extract) the value in the given field */
+static inline u32
+ipa_reg_decode(const struct ipa_reg *reg, u32 field_id, u32 val)
+{
+	u32 fmask = ipa_reg_fmask(reg, field_id);
+
+	return fmask ? (val & fmask) >> __ffs(fmask) : 0;
+}
+
+/* Return the maximum value representable by the given field; always 2^n - 1 */
+static inline u32 ipa_reg_field_max(const struct ipa_reg *reg, u32 field_id)
+{
+	u32 fmask = ipa_reg_fmask(reg, field_id);
+
+	return fmask ? fmask >> __ffs(fmask) : 0;
+}
+
+const struct ipa_reg *ipa_reg(struct ipa *ipa, enum ipa_reg_id reg_id);
+
+/* Returns 0 for NULL reg; warning will have already been issued */
+static inline u32 ipa_reg_offset(const struct ipa_reg *reg)
+{
+	return reg ? reg->offset : 0;
+}
+
+/* Returns 0 for NULL reg; warning will have already been issued */
+static inline u32 ipa_reg_n_offset(const struct ipa_reg *reg, u32 n)
+{
+	return reg ? reg->offset + n * reg->stride : 0;
+=======
 static inline u32 ipa_reg_irq_uc_ee_n_offset(enum ipa_version version, u32 ee)
 {
 	if (version < IPA_VERSION_4_9)
@@ -842,6 +1392,7 @@ static inline u32
 ipa_reg_irq_suspend_clr_offset(enum ipa_version version)
 {
 	return ipa_reg_irq_suspend_clr_ee_n_offset(version, GSI_EE_AP);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 int ipa_reg_init(struct ipa *ipa);

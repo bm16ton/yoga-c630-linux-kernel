@@ -129,7 +129,11 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	unsigned long clone_flags = args->flags;
 	struct pt_regs *childregs, *regs = current_pt_regs();
 
+<<<<<<< HEAD
+	childksp = (unsigned long)task_stack_page(p) + THREAD_SIZE;
+=======
 	childksp = (unsigned long)task_stack_page(p) + THREAD_SIZE - 32;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/* set up new TSS. */
 	childregs = (struct pt_regs *) childksp - 1;
@@ -237,7 +241,11 @@ bool in_task_stack(unsigned long stack, struct task_struct *task,
 			struct stack_info *info)
 {
 	unsigned long begin = (unsigned long)task_stack_page(task);
+<<<<<<< HEAD
+	unsigned long end = begin + THREAD_SIZE;
+=======
 	unsigned long end = begin + THREAD_SIZE - 32;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (stack < begin || stack >= end)
 		return false;
@@ -294,7 +302,11 @@ unsigned long stack_top(void)
 unsigned long arch_align_stack(unsigned long sp)
 {
 	if (!(current->personality & ADDR_NO_RANDOMIZE) && randomize_va_space)
+<<<<<<< HEAD
+		sp -= prandom_u32_max(PAGE_SIZE);
+=======
 		sp -= get_random_int() & ~PAGE_MASK;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return sp & STACK_ALIGN;
 }

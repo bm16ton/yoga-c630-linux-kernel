@@ -263,8 +263,11 @@
 	status = "okay";
 	timeout-sec = <60>;
 };
+<<<<<<< HEAD
+=======
 
 &wdt2 {
 	status = "okay";
 	timeout-sec = <60>;
 };
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2

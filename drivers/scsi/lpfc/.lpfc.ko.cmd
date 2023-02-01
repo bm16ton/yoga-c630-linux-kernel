@@ -1,0 +1,1 @@
+cmd_drivers/scsi/lpfc/lpfc.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/scsi/lpfc/lpfc.ko drivers/scsi/lpfc/lpfc.o drivers/scsi/lpfc/lpfc.mod.o;  true

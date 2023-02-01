@@ -26,4 +26,13 @@ config PCS_RZN1_MIIC
 	  on RZ/N1 SoCs. This PCS converts MII to RMII/RGMII or can be set in
 	  pass-through mode for MII.
 
+<<<<<<< HEAD
+config PCS_ALTERA_TSE
+	tristate
+	help
+	  This module provides helper functions for the Altera Triple Speed
+	  Ethernet SGMII PCS, that can be found on the Intel Socfpga family.
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 endmenu

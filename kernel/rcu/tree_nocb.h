@@ -1111,7 +1111,11 @@ int rcu_nocb_cpu_deoffload(int cpu)
 			if (!ret)
 				cpumask_clear_cpu(cpu, rcu_nocb_mask);
 		} else {
+<<<<<<< HEAD
+			pr_info("NOCB: Cannot CB-deoffload offline CPU %d\n", rdp->cpu);
+=======
 			pr_info("NOCB: Can't CB-deoffload an offline CPU\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = -EINVAL;
 		}
 	}
@@ -1196,7 +1200,11 @@ int rcu_nocb_cpu_offload(int cpu)
 			if (!ret)
 				cpumask_set_cpu(cpu, rcu_nocb_mask);
 		} else {
+<<<<<<< HEAD
+			pr_info("NOCB: Cannot CB-offload offline CPU %d\n", rdp->cpu);
+=======
 			pr_info("NOCB: Can't CB-offload an offline CPU\n");
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			ret = -EINVAL;
 		}
 	}
@@ -1452,8 +1460,13 @@ static void show_rcu_nocb_gp_state(struct rcu_data *rdp)
 		(long)rdp->nocb_gp_seq,
 		rnp->grplo, rnp->grphi, READ_ONCE(rdp->nocb_gp_loops),
 		rdp->nocb_gp_kthread ? task_state_to_char(rdp->nocb_gp_kthread) : '.',
+<<<<<<< HEAD
+		rdp->nocb_gp_kthread ? (int)task_cpu(rdp->nocb_gp_kthread) : -1,
+		show_rcu_should_be_on_cpu(rdp->nocb_gp_kthread));
+=======
 		rdp->nocb_cb_kthread ? (int)task_cpu(rdp->nocb_gp_kthread) : -1,
 		show_rcu_should_be_on_cpu(rdp->nocb_cb_kthread));
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 /* Dump out nocb kthread state for the specified rcu_data structure. */
@@ -1497,7 +1510,11 @@ static void show_rcu_nocb_state(struct rcu_data *rdp)
 		".B"[!!rcu_cblist_n_cbs(&rdp->nocb_bypass)],
 		rcu_segcblist_n_cbs(&rdp->cblist),
 		rdp->nocb_cb_kthread ? task_state_to_char(rdp->nocb_cb_kthread) : '.',
+<<<<<<< HEAD
+		rdp->nocb_cb_kthread ? (int)task_cpu(rdp->nocb_cb_kthread) : -1,
+=======
 		rdp->nocb_cb_kthread ? (int)task_cpu(rdp->nocb_gp_kthread) : -1,
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		show_rcu_should_be_on_cpu(rdp->nocb_cb_kthread));
 
 	/* It is OK for GP kthreads to have GP state. */

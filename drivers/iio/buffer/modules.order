@@ -1,0 +1,6 @@
+drivers/iio/buffer/industrialio-buffer-cb.ko
+drivers/iio/buffer/industrialio-buffer-dma.ko
+drivers/iio/buffer/industrialio-buffer-dmaengine.ko
+drivers/iio/buffer/industrialio-hw-consumer.ko
+drivers/iio/buffer/industrialio-triggered-buffer.ko
+drivers/iio/buffer/kfifo_buf.ko

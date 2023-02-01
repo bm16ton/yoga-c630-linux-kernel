@@ -1,0 +1,29 @@
+Source: linux-upstream
+Section: kernel
+Priority: optional
+Maintainer: maddocks <maddocks@YOGA-C630>
+Rules-Requires-Root: no
+Build-Depends: bc, rsync, kmod, cpio, bison, flex | flex:native , , libssl-dev:native
+Homepage: https://www.kernel.org/
+
+Package: linux-image-6.1.8-16ton
+Architecture: arm64
+Description: Linux kernel, version 6.1.8-16ton
+ This package contains the Linux kernel, modules and corresponding other
+ files, version: 6.1.8-16ton.
+
+Package: linux-libc-dev
+Section: devel
+Provides: linux-kernel-headers
+Architecture: arm64
+Description: Linux support headers for userspace development
+ This package provides userspaces headers from the Linux kernel.  These headers
+ are used by the installed headers for GNU glibc and other system libraries.
+Multi-Arch: same
+
+Package: linux-headers-6.1.8-16ton
+Architecture: arm64
+Description: Linux kernel headers for 6.1.8-16ton on arm64
+ This package provides kernel header files for 6.1.8-16ton on arm64
+ .
+ This is useful for people who need to build external modules

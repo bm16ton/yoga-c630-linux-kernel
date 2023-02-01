@@ -1,0 +1,1 @@
+cmd_drivers/iio/light/cm36651.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/light/cm36651.ko drivers/iio/light/cm36651.o drivers/iio/light/cm36651.mod.o;  true

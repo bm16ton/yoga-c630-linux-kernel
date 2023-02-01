@@ -65,7 +65,11 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
+<<<<<<< HEAD
+		pm660l_lpg: pwm {
+=======
 		pm660l_lpg: lpg@b100 {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,pm660l-lpg";
 
 			status = "disabled";
@@ -81,7 +85,11 @@
 			status = "disabled";
 		};
 
+<<<<<<< HEAD
+		pm660l_spmi_regulators: regulators {
+=======
 		pm660l_spmi_regulators: pm660l-regulators {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			compatible = "qcom,pm660l-regulators";
 		};
 	};

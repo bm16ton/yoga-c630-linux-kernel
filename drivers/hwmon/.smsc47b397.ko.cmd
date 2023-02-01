@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/smsc47b397.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/smsc47b397.ko drivers/hwmon/smsc47b397.o drivers/hwmon/smsc47b397.mod.o;  true

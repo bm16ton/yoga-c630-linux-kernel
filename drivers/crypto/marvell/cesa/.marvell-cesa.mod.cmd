@@ -1,0 +1,1 @@
+cmd_drivers/crypto/marvell/cesa/marvell-cesa.mod := printf '%s\n'   cesa.o cipher.o hash.o tdma.o | awk '!x[$$0]++ { print("drivers/crypto/marvell/cesa/"$$0) }' > drivers/crypto/marvell/cesa/marvell-cesa.mod

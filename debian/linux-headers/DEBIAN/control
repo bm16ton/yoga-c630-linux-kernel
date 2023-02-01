@@ -1,0 +1,13 @@
+Package: linux-headers-6.1.8-16ton
+Source: linux-upstream
+Version: 6.1.8-16ton-57
+Architecture: arm64
+Maintainer: maddocks <maddocks@YOGA-C630>
+Installed-Size: 50874
+Section: kernel
+Priority: optional
+Homepage: https://www.kernel.org/
+Description: Linux kernel headers for 6.1.8-16ton on arm64
+ This package provides kernel header files for 6.1.8-16ton on arm64
+ .
+ This is useful for people who need to build external modules

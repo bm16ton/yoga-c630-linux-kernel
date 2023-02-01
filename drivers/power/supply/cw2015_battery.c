@@ -21,6 +21,7 @@
 #include <linux/regmap.h>
 #include <linux/time.h>
 #include <linux/workqueue.h>
+#include <linux/devm-helpers.h>
 
 #define CW2015_SIZE_BATINFO		64
 
@@ -698,7 +699,11 @@ static int cw_bat_probe(struct i2c_client *client)
 	}
 
 	cw_bat->battery_workqueue = create_singlethread_workqueue("rk_battery");
-	INIT_DELAYED_WORK(&cw_bat->battery_delay_work, cw_bat_work);
+	if (!cw_bat->battery_workqueue)
+		return -ENOMEM;
+
+	devm_delayed_work_autocancel(&client->dev,
+							  &cw_bat->battery_delay_work, cw_bat_work);
 	queue_delayed_work(cw_bat->battery_workqueue,
 			   &cw_bat->battery_delay_work, msecs_to_jiffies(10));
 	return 0;
@@ -725,6 +730,8 @@ static int __maybe_unused cw_bat_resume(struct device *dev)
 
 static SIMPLE_DEV_PM_OPS(cw_bat_pm_ops, cw_bat_suspend, cw_bat_resume);
 
+<<<<<<< HEAD
+=======
 static int cw_bat_remove(struct i2c_client *client)
 {
 	struct cw_battery *cw_bat = i2c_get_clientdata(client);
@@ -734,6 +741,7 @@ static int cw_bat_remove(struct i2c_client *client)
 	return 0;
 }
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct i2c_device_id cw_bat_id_table[] = {
 	{ "cw2015", 0 },
 	{ }
@@ -752,7 +760,6 @@ static struct i2c_driver cw_bat_driver = {
 		.pm = &cw_bat_pm_ops,
 	},
 	.probe_new = cw_bat_probe,
-	.remove = cw_bat_remove,
 	.id_table = cw_bat_id_table,
 };
 

@@ -580,7 +580,7 @@ disable_reg:
 	return ret;
 }
 
-static int afe4404_remove(struct i2c_client *client)
+static void afe4404_remove(struct i2c_client *client)
 {
 	struct iio_dev *indio_dev = i2c_get_clientdata(client);
 	struct afe4404_data *afe = iio_priv(indio_dev);
@@ -596,8 +596,11 @@ static int afe4404_remove(struct i2c_client *client)
 	ret = regulator_disable(afe->regulator);
 	if (ret)
 		dev_err(afe->dev, "Unable to disable regulator\n");
+<<<<<<< HEAD
+=======
 
 	return 0;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static const struct i2c_device_id afe4404_ids[] = {

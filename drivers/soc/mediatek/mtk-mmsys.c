@@ -129,6 +129,7 @@ static const struct mtk_mmsys_driver_data mt8192_mmsys_driver_data = {
 	.num_routes = ARRAY_SIZE(mmsys_mt8192_routing_table),
 	.sw0_rst_offset = MT8186_MMSYS_SW0_RST_B,
 };
+<<<<<<< HEAD
 
 static const struct mtk_mmsys_match_data mt8192_mmsys_match_data = {
 	.num_drv_data = 1,
@@ -137,6 +138,16 @@ static const struct mtk_mmsys_match_data mt8192_mmsys_match_data = {
 	},
 };
 
+=======
+
+static const struct mtk_mmsys_match_data mt8192_mmsys_match_data = {
+	.num_drv_data = 1,
+	.drv_data = {
+		&mt8192_mmsys_driver_data,
+	},
+};
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static const struct mtk_mmsys_driver_data mt8195_vdosys0_driver_data = {
 	.io_start = 0x1c01a000,
 	.clk_driver = "clk-mt8195-vdo0",
@@ -227,6 +238,27 @@ void mtk_mmsys_ddp_disconnect(struct device *dev,
 }
 EXPORT_SYMBOL_GPL(mtk_mmsys_ddp_disconnect);
 
+<<<<<<< HEAD
+static void mtk_mmsys_update_bits(struct mtk_mmsys *mmsys, u32 offset, u32 mask, u32 val)
+{
+	u32 tmp;
+
+	tmp = readl_relaxed(mmsys->regs + offset);
+	tmp = (tmp & ~mask) | val;
+	writel_relaxed(tmp, mmsys->regs + offset);
+}
+
+void mtk_mmsys_ddp_dpi_fmt_config(struct device *dev, u32 val)
+{
+	if (val)
+		mtk_mmsys_update_bits(dev_get_drvdata(dev), MT8186_MMSYS_DPI_OUTPUT_FORMAT,
+				      DPI_RGB888_DDR_CON, DPI_FORMAT_MASK);
+	else
+		mtk_mmsys_update_bits(dev_get_drvdata(dev), MT8186_MMSYS_DPI_OUTPUT_FORMAT,
+				      DPI_RGB565_SDR_CON, DPI_FORMAT_MASK);
+}
+EXPORT_SYMBOL_GPL(mtk_mmsys_ddp_dpi_fmt_config);
+
 static int mtk_mmsys_reset_update(struct reset_controller_dev *rcdev, unsigned long id,
 				  bool assert)
 {
@@ -250,6 +282,31 @@ static int mtk_mmsys_reset_update(struct reset_controller_dev *rcdev, unsigned l
 	return 0;
 }
 
+=======
+static int mtk_mmsys_reset_update(struct reset_controller_dev *rcdev, unsigned long id,
+				  bool assert)
+{
+	struct mtk_mmsys *mmsys = container_of(rcdev, struct mtk_mmsys, rcdev);
+	unsigned long flags;
+	u32 reg;
+
+	spin_lock_irqsave(&mmsys->lock, flags);
+
+	reg = readl_relaxed(mmsys->regs + mmsys->data->sw0_rst_offset);
+
+	if (assert)
+		reg &= ~BIT(id);
+	else
+		reg |= BIT(id);
+
+	writel_relaxed(reg, mmsys->regs + mmsys->data->sw0_rst_offset);
+
+	spin_unlock_irqrestore(&mmsys->lock, flags);
+
+	return 0;
+}
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 static int mtk_mmsys_reset_assert(struct reset_controller_dev *rcdev, unsigned long id)
 {
 	return mtk_mmsys_reset_update(rcdev, id, true);
@@ -301,6 +358,7 @@ static int mtk_mmsys_probe(struct platform_device *pdev)
 	}
 
 	spin_lock_init(&mmsys->lock);
+<<<<<<< HEAD
 
 	mmsys->rcdev.owner = THIS_MODULE;
 	mmsys->rcdev.nr_resets = 32;
@@ -335,6 +393,42 @@ static int mtk_mmsys_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, mmsys);
 
+=======
+
+	mmsys->rcdev.owner = THIS_MODULE;
+	mmsys->rcdev.nr_resets = 32;
+	mmsys->rcdev.ops = &mtk_mmsys_reset_ops;
+	mmsys->rcdev.of_node = pdev->dev.of_node;
+	ret = devm_reset_controller_register(&pdev->dev, &mmsys->rcdev);
+	if (ret) {
+		dev_err(&pdev->dev, "Couldn't register mmsys reset controller: %d\n", ret);
+		return ret;
+	}
+
+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+	if (!res) {
+		dev_err(dev, "Couldn't get mmsys resource\n");
+		return -EINVAL;
+	}
+	mmsys->io_start = res->start;
+
+	match_data = of_device_get_match_data(dev);
+	if (match_data->num_drv_data > 1) {
+		/* This SoC has multiple mmsys channels */
+		ret = mtk_mmsys_find_match_drvdata(mmsys, match_data);
+		if (ret < 0) {
+			dev_err(dev, "Couldn't get match driver data\n");
+			return ret;
+		}
+		mmsys->data = match_data->drv_data[ret];
+	} else {
+		dev_dbg(dev, "Using single mmsys channel\n");
+		mmsys->data = match_data->drv_data[0];
+	}
+
+	platform_set_drvdata(pdev, mmsys);
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	clks = platform_device_register_data(&pdev->dev, mmsys->data->clk_driver,
 					     PLATFORM_DEVID_AUTO, NULL, 0);
 	if (IS_ERR(clks))

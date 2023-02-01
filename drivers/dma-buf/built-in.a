@@ -1,0 +1,31 @@
+!<thin>
+//                                              218       `
+dma-buf.o/
+dma-fence.o/
+dma-fence-array.o/
+dma-fence-chain.o/
+dma-fence-unwrap.o/
+dma-resv.o/
+dma-heap.o/
+heaps/system_heap.o/
+heaps/cma_heap.o/
+sync_file.o/
+sw_sync.o/
+sync_debug.o/
+udmabuf.o/
+dma-buf-sysfs-stats.o/
+
+/0              0           0     0     644     40016     `
+/11             0           0     0     644     49312     `
+/24             0           0     0     644     11184     `
+/43             0           0     0     644     14336     `
+/62             0           0     0     644     7232      `
+/82             0           0     0     644     23232     `
+/94             0           0     0     644     9256      `
+/106            0           0     0     644     12064     `
+/127            0           0     0     644     10976     `
+/145            0           0     0     644     11696     `
+/158            0           0     0     644     18440     `
+/169            0           0     0     644     14048     `
+/183            0           0     0     644     14560     `
+/194            0           0     0     644     5888      `

@@ -35,7 +35,6 @@
 #include "arch/common.h"
 #include "namespaces.h"
 #include <regex.h>
-#include <pthread.h>
 #include <linux/bitops.h>
 #include <linux/kernel.h>
 #include <linux/string.h>
@@ -821,7 +820,7 @@ void symbol__annotate_zero_histograms(struct symbol *sym)
 {
 	struct annotation *notes = symbol__annotation(sym);
 
-	pthread_mutex_lock(&notes->lock);
+	mutex_lock(&notes->lock);
 	if (notes->src != NULL) {
 		memset(notes->src->histograms, 0,
 		       notes->src->nr_histograms * notes->src->sizeof_sym_hist);
@@ -829,7 +828,7 @@ void symbol__annotate_zero_histograms(struct symbol *sym)
 			memset(notes->src->cycles_hist, 0,
 				symbol__size(sym) * sizeof(struct cyc_hist));
 	}
-	pthread_mutex_unlock(&notes->lock);
+	mutex_unlock(&notes->lock);
 }
 
 static int __symbol__account_cycles(struct cyc_hist *ch,
@@ -1086,7 +1085,7 @@ void annotation__compute_ipc(struct annotation *notes, size_t size)
 	notes->hit_insn = 0;
 	notes->cover_insn = 0;
 
-	pthread_mutex_lock(&notes->lock);
+	mutex_lock(&notes->lock);
 	for (offset = size - 1; offset >= 0; --offset) {
 		struct cyc_hist *ch;
 
@@ -1105,7 +1104,7 @@ void annotation__compute_ipc(struct annotation *notes, size_t size)
 			notes->have_cycles = true;
 		}
 	}
-	pthread_mutex_unlock(&notes->lock);
+	mutex_unlock(&notes->lock);
 }
 
 int addr_map_symbol__inc_samples(struct addr_map_symbol *ams, struct perf_sample *sample,
@@ -1258,13 +1257,21 @@ int disasm_line__scnprintf(struct disasm_line *dl, char *bf, size_t size, bool r
 
 void annotation__init(struct annotation *notes)
 {
+<<<<<<< HEAD
+	mutex_init(&notes->lock);
+=======
 	pthread_mutex_init(&notes->lock, NULL);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 void annotation__exit(struct annotation *notes)
 {
 	annotated_source__delete(notes->src);
+<<<<<<< HEAD
+	mutex_destroy(&notes->lock);
+=======
 	pthread_mutex_destroy(&notes->lock);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void annotation_line__add(struct annotation_line *al, struct list_head *head)
@@ -1698,6 +1705,10 @@ fallback:
 		 */
 		__symbol__join_symfs(filename, filename_size, dso->long_name);
 
+<<<<<<< HEAD
+		mutex_lock(&dso->lock);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (access(filename, R_OK) && errno == ENOENT && dso->nsinfo) {
 			char *new_name = filename_with_chroot(dso->nsinfo->pid,
 							      filename);
@@ -1706,6 +1717,10 @@ fallback:
 				free(new_name);
 			}
 		}
+<<<<<<< HEAD
+		mutex_unlock(&dso->lock);
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	}
 
 	free(build_id_path);
@@ -2238,7 +2253,10 @@ int symbol__annotate(struct map_symbol *ms, struct evsel *evsel,
 	}
 
 	args.ms = *ms;
-	notes->start = map__rip_2objdump(ms->map, sym->start);
+	if (notes->options && notes->options->full_addr)
+		notes->start = map__objdump_2mem(ms->map, ms->sym->start);
+	else
+		notes->start = map__rip_2objdump(ms->map, ms->sym->start);
 
 	return symbol__disassemble(sym, &args);
 }
@@ -2761,6 +2779,8 @@ void annotation__update_column_widths(struct annotation *notes)
 {
 	if (notes->options->use_offset)
 		notes->widths.target = notes->widths.min_addr;
+	else if (notes->options->full_addr)
+		notes->widths.target = BITS_PER_LONG / 4;
 	else
 		notes->widths.target = notes->widths.max_addr;
 
@@ -2768,6 +2788,18 @@ void annotation__update_column_widths(struct annotation *notes)
 
 	if (notes->options->show_nr_jumps)
 		notes->widths.addr += notes->widths.jumps + 1;
+}
+
+void annotation__toggle_full_addr(struct annotation *notes, struct map_symbol *ms)
+{
+	notes->options->full_addr = !notes->options->full_addr;
+
+	if (notes->options->full_addr)
+		notes->start = map__objdump_2mem(ms->map, ms->sym->start);
+	else
+		notes->start = map__rip_2objdump(ms->map, ms->sym->start);
+
+	annotation__update_column_widths(notes);
 }
 
 static void annotation__calc_lines(struct annotation *notes, struct map *map,
@@ -2819,11 +2851,19 @@ int symbol__tty_annotate2(struct map_symbol *ms, struct evsel *evsel,
 	struct hists *hists = evsel__hists(evsel);
 	char buf[1024];
 	int err;
+<<<<<<< HEAD
 
 	err = symbol__annotate2(ms, evsel, opts, NULL);
 	if (err) {
 		char msg[BUFSIZ];
 
+=======
+
+	err = symbol__annotate2(ms, evsel, opts, NULL);
+	if (err) {
+		char msg[BUFSIZ];
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dso->annotate_warned = true;
 		symbol__strerror_disassemble(ms, err, msg, sizeof(msg));
 		ui__error("Couldn't annotate %s:\n%s", sym->name, msg);
@@ -2853,11 +2893,19 @@ int symbol__tty_annotate(struct map_symbol *ms, struct evsel *evsel,
 	struct symbol *sym = ms->sym;
 	struct rb_root source_line = RB_ROOT;
 	int err;
+<<<<<<< HEAD
 
 	err = symbol__annotate(ms, evsel, opts, NULL);
 	if (err) {
 		char msg[BUFSIZ];
 
+=======
+
+	err = symbol__annotate(ms, evsel, opts, NULL);
+	if (err) {
+		char msg[BUFSIZ];
+
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		dso->annotate_warned = true;
 		symbol__strerror_disassemble(ms, err, msg, sizeof(msg));
 		ui__error("Couldn't annotate %s:\n%s", sym->name, msg);

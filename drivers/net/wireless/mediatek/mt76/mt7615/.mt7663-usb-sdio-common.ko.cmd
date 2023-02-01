@@ -1,0 +1,1 @@
+cmd_drivers/net/wireless/mediatek/mt76/mt7615/mt7663-usb-sdio-common.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/wireless/mediatek/mt76/mt7615/mt7663-usb-sdio-common.ko drivers/net/wireless/mediatek/mt76/mt7615/mt7663-usb-sdio-common.o drivers/net/wireless/mediatek/mt76/mt7615/mt7663-usb-sdio-common.mod.o;  true

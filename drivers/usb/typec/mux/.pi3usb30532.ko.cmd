@@ -1,0 +1,1 @@
+cmd_drivers/usb/typec/mux/pi3usb30532.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/typec/mux/pi3usb30532.ko drivers/usb/typec/mux/pi3usb30532.o drivers/usb/typec/mux/pi3usb30532.mod.o;  true

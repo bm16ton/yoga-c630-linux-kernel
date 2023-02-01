@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/panel/panel-boe-bf060y8m-aj0.mod := printf '%s\n'   panel-boe-bf060y8m-aj0.o | awk '!x[$$0]++ { print("drivers/gpu/drm/panel/"$$0) }' > drivers/gpu/drm/panel/panel-boe-bf060y8m-aj0.mod

@@ -1,0 +1,1 @@
+cmd_drivers/iio/accel/mma7455_spi.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/accel/mma7455_spi.ko drivers/iio/accel/mma7455_spi.o drivers/iio/accel/mma7455_spi.mod.o;  true

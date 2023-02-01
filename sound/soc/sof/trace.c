@@ -1,16 +1,10 @@
-// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
+// SPDX-License-Identifier: GPL-2.0-only
 //
-// This file is provided under a dual BSD/GPLv2 license.  When using or
-// redistributing this file, you may do so under either license.
-//
-// Copyright(c) 2018 Intel Corporation. All rights reserved.
-//
-// Author: Liam Girdwood <liam.r.girdwood@linux.intel.com>
-//
+// Copyright(c) 2022 Intel Corporation. All rights reserved.
 
-#include <linux/debugfs.h>
-#include <linux/sched/signal.h>
 #include "sof-priv.h"
+<<<<<<< HEAD
+=======
 #include "ops.h"
 #include "sof-utils.h"
 
@@ -245,50 +239,26 @@ static size_t sof_trace_avail(struct snd_sof_dev *sdev,
 	 */
 	if (host_offset < pos)
 		return buffer_size - pos;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	/* If there is available trace data now, it is unnecessary to wait. */
-	if (host_offset > pos)
-		return host_offset - pos;
-
-	return 0;
-}
-
-static size_t sof_wait_trace_avail(struct snd_sof_dev *sdev,
-				   loff_t pos, size_t buffer_size)
+int sof_fw_trace_init(struct snd_sof_dev *sdev)
 {
-	wait_queue_entry_t wait;
-	size_t ret = sof_trace_avail(sdev, pos, buffer_size);
+	if (!sdev->ipc->ops->fw_tracing) {
+		dev_info(sdev->dev, "Firmware tracing is not available\n");
+		sdev->fw_trace_is_supported = false;
 
-	/* data immediately available */
-	if (ret)
-		return ret;
-
-	if (!sdev->dtrace_is_enabled && sdev->dtrace_draining) {
-		/*
-		 * tracing has ended and all traces have been
-		 * read by client, return EOF
-		 */
-		sdev->dtrace_draining = false;
 		return 0;
 	}
 
-	/* wait for available trace data from FW */
-	init_waitqueue_entry(&wait, current);
-	set_current_state(TASK_INTERRUPTIBLE);
-	add_wait_queue(&sdev->trace_sleep, &wait);
-
-	if (!signal_pending(current)) {
-		/* set timeout to max value, no error code */
-		schedule_timeout(MAX_SCHEDULE_TIMEOUT);
-	}
-	remove_wait_queue(&sdev->trace_sleep, &wait);
-
-	return sof_trace_avail(sdev, pos, buffer_size);
+	return sdev->ipc->ops->fw_tracing->init(sdev);
 }
 
-static ssize_t sof_dfsentry_trace_read(struct file *file, char __user *buffer,
-				       size_t count, loff_t *ppos)
+void sof_fw_trace_free(struct snd_sof_dev *sdev)
 {
+<<<<<<< HEAD
+	if (!sdev->fw_trace_is_supported || !sdev->ipc->ops->fw_tracing)
+		return;
+=======
 	struct snd_sof_dfsentry *dfse = file->private_data;
 	struct snd_sof_dev *sdev = dfse->sdev;
 	unsigned long rem;
@@ -527,25 +497,36 @@ int snd_sof_trace_update_pos(struct snd_sof_dev *sdev,
 		dev_err(sdev->dev,
 			"error: DSP trace buffer overflow %u bytes. Total messages %d\n",
 			posn->overflow, posn->messages);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
-	return 0;
+	if (sdev->ipc->ops->fw_tracing->free)
+		sdev->ipc->ops->fw_tracing->free(sdev);
 }
 
-/* an error has occurred within the DSP that prevents further trace */
-void snd_sof_trace_notify_for_error(struct snd_sof_dev *sdev)
+void sof_fw_trace_fw_crashed(struct snd_sof_dev *sdev)
 {
-	if (!sdev->dtrace_is_supported)
+	if (!sdev->fw_trace_is_supported)
 		return;
 
+<<<<<<< HEAD
+	if (sdev->ipc->ops->fw_tracing->fw_crashed)
+		sdev->ipc->ops->fw_tracing->fw_crashed(sdev);
+=======
 	if (sdev->dtrace_is_enabled) {
 		sdev->dtrace_error = true;
 		wake_up(&sdev->trace_sleep);
 	}
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
-EXPORT_SYMBOL(snd_sof_trace_notify_for_error);
 
-void snd_sof_release_trace(struct snd_sof_dev *sdev)
+void sof_fw_trace_suspend(struct snd_sof_dev *sdev, pm_message_t pm_state)
 {
+<<<<<<< HEAD
+	if (!sdev->fw_trace_is_supported)
+		return;
+
+	sdev->ipc->ops->fw_tracing->suspend(sdev, pm_state);
+=======
 	struct sof_ipc_fw_ready *ready = &sdev->fw_ready;
 	struct sof_ipc_fw_version *v = &ready->version;
 	struct sof_ipc_cmd_hdr hdr;
@@ -582,20 +563,13 @@ void snd_sof_release_trace(struct snd_sof_dev *sdev)
 	sdev->dtrace_is_enabled = false;
 	sdev->dtrace_draining = true;
 	wake_up(&sdev->trace_sleep);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
-EXPORT_SYMBOL(snd_sof_release_trace);
 
-void snd_sof_free_trace(struct snd_sof_dev *sdev)
+int sof_fw_trace_resume(struct snd_sof_dev *sdev)
 {
-	if (!sdev->dtrace_is_supported)
-		return;
+	if (!sdev->fw_trace_is_supported)
+		return 0;
 
-	snd_sof_release_trace(sdev);
-
-	if (sdev->dma_trace_pages) {
-		snd_dma_free_pages(&sdev->dmatb);
-		snd_dma_free_pages(&sdev->dmatp);
-		sdev->dma_trace_pages = 0;
-	}
+	return sdev->ipc->ops->fw_tracing->resume(sdev);
 }
-EXPORT_SYMBOL(snd_sof_free_trace);

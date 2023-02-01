@@ -1,0 +1,1 @@
+cmd_drivers/net/ethernet/silan/sc92031.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/net/ethernet/silan/sc92031.ko drivers/net/ethernet/silan/sc92031.o drivers/net/ethernet/silan/sc92031.mod.o;  true

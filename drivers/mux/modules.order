@@ -1,0 +1,4 @@
+drivers/mux/mux-core.ko
+drivers/mux/mux-adg792a.ko
+drivers/mux/mux-adgs1408.ko
+drivers/mux/mux-gpio.ko

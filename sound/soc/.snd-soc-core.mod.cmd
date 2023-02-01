@@ -1,0 +1,1 @@
+cmd_sound/soc/snd-soc-core.mod := printf '%s\n'   soc-core.o soc-dapm.o soc-jack.o soc-utils.o soc-dai.o soc-component.o soc-pcm.o soc-devres.o soc-ops.o soc-link.o soc-card.o soc-topology.o soc-generic-dmaengine-pcm.o soc-compress.o | awk '!x[$$0]++ { print("sound/soc/"$$0) }' > sound/soc/snd-soc-core.mod

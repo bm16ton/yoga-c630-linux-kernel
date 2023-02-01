@@ -2,8 +2,6 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <linux/string.h>
-/* For the CLR_() macros */
-#include <pthread.h>
 
 #include <sched.h>
 #include <perf/mmap.h>
@@ -332,7 +330,11 @@ out_delete_evlist:
 out:
 	if (err == -EACCES)
 		return TEST_SKIP;
+<<<<<<< HEAD
+	if (err < 0 || errs != 0)
+=======
 	if (err < 0)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return TEST_FAIL;
 	return TEST_OK;
 }

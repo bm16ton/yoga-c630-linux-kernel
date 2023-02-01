@@ -1,0 +1,3 @@
+net/rds/rds.ko
+net/rds/rds_rdma.ko
+net/rds/rds_tcp.ko

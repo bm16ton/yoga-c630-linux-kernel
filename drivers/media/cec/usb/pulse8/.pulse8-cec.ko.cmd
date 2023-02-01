@@ -1,0 +1,1 @@
+cmd_drivers/media/cec/usb/pulse8/pulse8-cec.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/media/cec/usb/pulse8/pulse8-cec.ko drivers/media/cec/usb/pulse8/pulse8-cec.o drivers/media/cec/usb/pulse8/pulse8-cec.mod.o;  true

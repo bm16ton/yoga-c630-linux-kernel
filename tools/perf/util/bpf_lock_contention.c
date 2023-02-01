@@ -8,17 +8,24 @@
 #include "util/thread_map.h"
 #include "util/lock-contention.h"
 #include <linux/zalloc.h>
+<<<<<<< HEAD
+#include <linux/string.h>
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <bpf/bpf.h>
 
 #include "bpf_skel/lock_contention.skel.h"
 
 static struct lock_contention_bpf *skel;
 
+<<<<<<< HEAD
+=======
 /* should be same as bpf_skel/lock_contention.bpf.c */
 struct lock_contention_key {
 	s32 stack_id;
 };
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 struct lock_contention_data {
 	u64 total_time;
 	u64 min_time;
@@ -40,6 +47,10 @@ int lock_contention_prepare(struct lock_contention *con)
 		return -1;
 	}
 
+<<<<<<< HEAD
+	bpf_map__set_value_size(skel->maps.stacks, con->max_stack * sizeof(u64));
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	bpf_map__set_max_entries(skel->maps.stacks, con->map_nr_entries);
 	bpf_map__set_max_entries(skel->maps.lock_stat, con->map_nr_entries);
 
@@ -91,6 +102,11 @@ int lock_contention_prepare(struct lock_contention *con)
 		bpf_map_update_elem(fd, &pid, &val, BPF_ANY);
 	}
 
+<<<<<<< HEAD
+	skel->bss->stack_skip = con->stack_skip;
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	lock_contention_bpf__attach(skel);
 	return 0;
 }
@@ -114,7 +130,11 @@ int lock_contention_read(struct lock_contention *con)
 	struct lock_contention_data data;
 	struct lock_stat *st;
 	struct machine *machine = con->machine;
+<<<<<<< HEAD
+	u64 stack_trace[con->max_stack];
+=======
 	u64 stack_trace[CONTENTION_STACK_DEPTH];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	fd = bpf_map__fd(skel->maps.lock_stat);
 	stack = bpf_map__fd(skel->maps.stacks);
@@ -125,7 +145,11 @@ int lock_contention_read(struct lock_contention *con)
 	while (!bpf_map_get_next_key(fd, &prev_key, &key)) {
 		struct map *kmap;
 		struct symbol *sym;
+<<<<<<< HEAD
+		int idx = 0;
+=======
 		int idx;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 		bpf_map_lookup_elem(fd, &key, &data);
 		st = zalloc(sizeof(*st));
@@ -144,10 +168,16 @@ int lock_contention_read(struct lock_contention *con)
 
 		bpf_map_lookup_elem(stack, &key, stack_trace);
 
+<<<<<<< HEAD
+		/* skip lock internal functions */
+		while (is_lock_function(machine, stack_trace[idx]) &&
+		       idx < con->max_stack - 1)
+=======
 		/* skip BPF + lock internal functions */
 		idx = CONTENTION_STACK_SKIP;
 		while (is_lock_function(machine, stack_trace[idx]) &&
 		       idx < CONTENTION_STACK_DEPTH - 1)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			idx++;
 
 		st->addr = stack_trace[idx];
@@ -171,6 +201,17 @@ int lock_contention_read(struct lock_contention *con)
 			return -1;
 		}
 
+<<<<<<< HEAD
+		if (verbose) {
+			st->callstack = memdup(stack_trace, sizeof(stack_trace));
+			if (st->callstack == NULL) {
+				free(st);
+				return -1;
+			}
+		}
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		hlist_add_head(&st->hash_entry, con->result);
 		prev_key = key;
 	}

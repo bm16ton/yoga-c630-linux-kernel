@@ -506,7 +506,11 @@ ecryptfs_dentry_to_lower(struct dentry *dentry)
 	return ((struct ecryptfs_dentry_info *)dentry->d_fsdata)->lower_path.dentry;
 }
 
+<<<<<<< HEAD
+static inline const struct path *
+=======
 static inline struct path *
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 ecryptfs_dentry_to_lower_path(struct dentry *dentry)
 {
 	return &((struct ecryptfs_dentry_info *)dentry->d_fsdata)->lower_path;

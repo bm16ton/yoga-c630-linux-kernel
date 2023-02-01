@@ -1,0 +1,7 @@
+juno.o: arch/arm64/boot/dts/arm/juno.dts \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/arm-gic.h \
+ scripts/dtc/include-prefixes/dt-bindings/interrupt-controller/irq.h \
+ scripts/dtc/include-prefixes/dt-bindings/arm/coresight-cti-dt.h \
+ arch/arm64/boot/dts/arm/juno-base.dtsi \
+ arch/arm64/boot/dts/arm/juno-clocks.dtsi \
+ arch/arm64/boot/dts/arm/juno-motherboard.dtsi

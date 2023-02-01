@@ -1303,10 +1303,18 @@ static void mana_poll_rx_cq(struct mana_cq *cq)
 		xdp_do_flush();
 }
 
+<<<<<<< HEAD
+static int mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
+{
+	struct mana_cq *cq = context;
+	u8 arm_bit;
+	int w;
+=======
 static void mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
 {
 	struct mana_cq *cq = context;
 	u8 arm_bit;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	WARN_ON_ONCE(cq->gdma_cq != gdma_queue);
 
@@ -1315,26 +1323,48 @@ static void mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
 	else
 		mana_poll_tx_cq(cq);
 
+<<<<<<< HEAD
+	w = cq->work_done;
+
+	if (w < cq->budget &&
+	    napi_complete_done(&cq->napi, w)) {
+=======
 	if (cq->work_done < cq->budget &&
 	    napi_complete_done(&cq->napi, cq->work_done)) {
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		arm_bit = SET_ARM_BIT;
 	} else {
 		arm_bit = 0;
 	}
 
 	mana_gd_ring_cq(gdma_queue, arm_bit);
+<<<<<<< HEAD
+
+	return w;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static int mana_poll(struct napi_struct *napi, int budget)
 {
 	struct mana_cq *cq = container_of(napi, struct mana_cq, napi);
+<<<<<<< HEAD
+	int w;
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	cq->work_done = 0;
 	cq->budget = budget;
 
+<<<<<<< HEAD
+	w = mana_cq_handler(cq, cq->gdma_cq);
+
+	return min(w, budget);
+=======
 	mana_cq_handler(cq, cq->gdma_cq);
 
 	return min(cq->work_done, budget);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 }
 
 static void mana_schedule_napi(void *context, struct gdma_queue *gdma_queue)

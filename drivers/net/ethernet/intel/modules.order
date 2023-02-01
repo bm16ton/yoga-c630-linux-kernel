@@ -1,0 +1,12 @@
+drivers/net/ethernet/intel/e100.ko
+drivers/net/ethernet/intel/e1000/e1000.ko
+drivers/net/ethernet/intel/e1000e/e1000e.ko
+drivers/net/ethernet/intel/igb/igb.ko
+drivers/net/ethernet/intel/igc/igc.ko
+drivers/net/ethernet/intel/igbvf/igbvf.ko
+drivers/net/ethernet/intel/ixgbe/ixgbe.ko
+drivers/net/ethernet/intel/ixgbevf/ixgbevf.ko
+drivers/net/ethernet/intel/i40e/i40e.ko
+drivers/net/ethernet/intel/ixgb/ixgb.ko
+drivers/net/ethernet/intel/iavf/iavf.ko
+drivers/net/ethernet/intel/ice/ice.ko

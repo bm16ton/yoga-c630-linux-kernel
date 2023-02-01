@@ -1,0 +1,1 @@
+cmd_drivers/gpu/host1x/host1x.mod := printf '%s\n'   bus.o syncpt.o dev.o intr.o cdma.o channel.o job.o debug.o mipi.o fence.o hw/host1x01.o hw/host1x02.o hw/host1x04.o hw/host1x05.o hw/host1x06.o hw/host1x07.o hw/host1x08.o context.o | awk '!x[$$0]++ { print("drivers/gpu/host1x/"$$0) }' > drivers/gpu/host1x/host1x.mod

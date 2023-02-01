@@ -1,0 +1,17 @@
+drivers/w1/slaves/w1_therm.ko
+drivers/w1/slaves/w1_smem.ko
+drivers/w1/slaves/w1_ds2405.ko
+drivers/w1/slaves/w1_ds2408.ko
+drivers/w1/slaves/w1_ds2413.ko
+drivers/w1/slaves/w1_ds2406.ko
+drivers/w1/slaves/w1_ds2423.ko
+drivers/w1/slaves/w1_ds2430.ko
+drivers/w1/slaves/w1_ds2431.ko
+drivers/w1/slaves/w1_ds2805.ko
+drivers/w1/slaves/w1_ds2433.ko
+drivers/w1/slaves/w1_ds2438.ko
+drivers/w1/slaves/w1_ds250x.ko
+drivers/w1/slaves/w1_ds2780.ko
+drivers/w1/slaves/w1_ds2781.ko
+drivers/w1/slaves/w1_ds28e04.ko
+drivers/w1/slaves/w1_ds28e17.ko

@@ -215,7 +215,11 @@ struct fimc_addr {
 
 /**
  * struct fimc_vid_buffer - the driver's video buffer
+<<<<<<< HEAD
+ * @vb:    v4l vb2 buffer
+=======
  * @vb:    v4l videobuf buffer
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
  * @list:  linked list structure for buffer queue
  * @addr: precalculated DMA address set
  * @index: buffer index for the output DMA engine

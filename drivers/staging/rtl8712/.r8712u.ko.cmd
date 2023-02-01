@@ -1,0 +1,1 @@
+cmd_drivers/staging/rtl8712/r8712u.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/rtl8712/r8712u.ko drivers/staging/rtl8712/r8712u.o drivers/staging/rtl8712/r8712u.mod.o;  true

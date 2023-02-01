@@ -93,6 +93,12 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
 
 	/*
 	 * Because we write directly to the reserved memory region when loading
+<<<<<<< HEAD
+	 * crash kernels we need a serialization here to prevent multiple crash
+	 * kernels from attempting to load simultaneously.
+	 */
+	if (!kexec_trylock())
+=======
 	 * crash kernels we need a mutex here to prevent multiple crash kernels
 	 * from attempting to load simultaneously, and to prevent a crash kernel
 	 * from loading over the top of a in use crash kernel.
@@ -100,6 +106,7 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
 	 * KISS: always take the mutex.
 	 */
 	if (!mutex_trylock(&kexec_mutex))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EBUSY;
 
 	if (flags & KEXEC_ON_CRASH) {
@@ -165,7 +172,11 @@ out:
 
 	kimage_free(image);
 out_unlock:
+<<<<<<< HEAD
+	kexec_unlock();
+=======
 	mutex_unlock(&kexec_mutex);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	return ret;
 }
 

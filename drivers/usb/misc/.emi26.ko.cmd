@@ -1,0 +1,1 @@
+cmd_drivers/usb/misc/emi26.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/usb/misc/emi26.ko drivers/usb/misc/emi26.o drivers/usb/misc/emi26.mod.o;  true

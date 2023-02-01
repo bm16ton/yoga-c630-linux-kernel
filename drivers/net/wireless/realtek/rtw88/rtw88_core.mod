@@ -1,0 +1,17 @@
+drivers/net/wireless/realtek/rtw88/main.o
+drivers/net/wireless/realtek/rtw88/mac80211.o
+drivers/net/wireless/realtek/rtw88/util.o
+drivers/net/wireless/realtek/rtw88/debug.o
+drivers/net/wireless/realtek/rtw88/tx.o
+drivers/net/wireless/realtek/rtw88/rx.o
+drivers/net/wireless/realtek/rtw88/mac.o
+drivers/net/wireless/realtek/rtw88/phy.o
+drivers/net/wireless/realtek/rtw88/coex.o
+drivers/net/wireless/realtek/rtw88/efuse.o
+drivers/net/wireless/realtek/rtw88/fw.o
+drivers/net/wireless/realtek/rtw88/ps.o
+drivers/net/wireless/realtek/rtw88/sec.o
+drivers/net/wireless/realtek/rtw88/bf.o
+drivers/net/wireless/realtek/rtw88/sar.o
+drivers/net/wireless/realtek/rtw88/regd.o
+drivers/net/wireless/realtek/rtw88/wow.o

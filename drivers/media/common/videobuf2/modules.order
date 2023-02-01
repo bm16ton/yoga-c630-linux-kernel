@@ -1,0 +1,7 @@
+drivers/media/common/videobuf2/videobuf2-common.ko
+drivers/media/common/videobuf2/videobuf2-dma-contig.ko
+drivers/media/common/videobuf2/videobuf2-dma-sg.ko
+drivers/media/common/videobuf2/videobuf2-dvb.ko
+drivers/media/common/videobuf2/videobuf2-memops.ko
+drivers/media/common/videobuf2/videobuf2-v4l2.ko
+drivers/media/common/videobuf2/videobuf2-vmalloc.ko

@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/max16065.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/max16065.ko drivers/hwmon/max16065.o drivers/hwmon/max16065.mod.o;  true

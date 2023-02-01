@@ -1,0 +1,1 @@
+cmd_drivers/cpufreq/built-in.a := rm -f drivers/cpufreq/built-in.a;  printf "drivers/cpufreq/%s " cpufreq.o freq_table.o cpufreq_stats.o cpufreq_performance.o cpufreq_governor.o cpufreq_governor_attr_set.o cpufreq-dt-platdev.o qcom-cpufreq-hw.o tegra124-cpufreq.o | xargs ar cDPrST drivers/cpufreq/built-in.a

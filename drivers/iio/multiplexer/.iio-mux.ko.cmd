@@ -1,0 +1,1 @@
+cmd_drivers/iio/multiplexer/iio-mux.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/iio/multiplexer/iio-mux.ko drivers/iio/multiplexer/iio-mux.o drivers/iio/multiplexer/iio-mux.mod.o;  true

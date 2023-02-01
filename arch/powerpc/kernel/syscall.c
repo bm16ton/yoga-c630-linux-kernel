@@ -12,12 +12,17 @@
 #include <asm/unistd.h>
 
 
+<<<<<<< HEAD
+/* Has to run notrace because it is entered not completely "reconciled" */
+notrace long system_call_exception(struct pt_regs *regs, unsigned long r0)
+=======
 typedef long (*syscall_fn)(long, long, long, long, long, long);
 
 /* Has to run notrace because it is entered not completely "reconciled" */
 notrace long system_call_exception(long r3, long r4, long r5,
 				   long r6, long r7, long r8,
 				   unsigned long r0, struct pt_regs *regs)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	long ret;
 	syscall_fn f;
@@ -25,7 +30,10 @@ notrace long system_call_exception(long r3, long r4, long r5,
 	kuap_lock();
 
 	add_random_kstack_offset();
+<<<<<<< HEAD
+=======
 	regs->orig_gpr3 = r3;
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG))
 		BUG_ON(irq_soft_mask_return() != IRQS_ALL_DISABLED);
@@ -139,12 +147,15 @@ notrace long system_call_exception(long r3, long r4, long r5,
 		r0 = do_syscall_trace_enter(regs);
 		if (unlikely(r0 >= NR_syscalls))
 			return regs->gpr[3];
+<<<<<<< HEAD
+=======
 		r3 = regs->gpr[3];
 		r4 = regs->gpr[4];
 		r5 = regs->gpr[5];
 		r6 = regs->gpr[6];
 		r7 = regs->gpr[7];
 		r8 = regs->gpr[8];
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	} else if (unlikely(r0 >= NR_syscalls)) {
 		if (unlikely(trap_is_unsupported_scv(regs))) {
@@ -158,6 +169,33 @@ notrace long system_call_exception(long r3, long r4, long r5,
 	/* May be faster to do array_index_nospec? */
 	barrier_nospec();
 
+<<<<<<< HEAD
+#ifdef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
+	// No COMPAT if we have SYSCALL_WRAPPER, see Kconfig
+	f = (void *)sys_call_table[r0];
+	ret = f(regs);
+#else
+	if (unlikely(is_compat_task())) {
+		unsigned long r3, r4, r5, r6, r7, r8;
+
+		f = (void *)compat_sys_call_table[r0];
+
+		r3 = regs->gpr[3] & 0x00000000ffffffffULL;
+		r4 = regs->gpr[4] & 0x00000000ffffffffULL;
+		r5 = regs->gpr[5] & 0x00000000ffffffffULL;
+		r6 = regs->gpr[6] & 0x00000000ffffffffULL;
+		r7 = regs->gpr[7] & 0x00000000ffffffffULL;
+		r8 = regs->gpr[8] & 0x00000000ffffffffULL;
+
+		ret = f(r3, r4, r5, r6, r7, r8);
+	} else {
+		f = (void *)sys_call_table[r0];
+
+		ret = f(regs->gpr[3], regs->gpr[4], regs->gpr[5],
+			regs->gpr[6], regs->gpr[7], regs->gpr[8]);
+	}
+#endif
+=======
 	if (unlikely(is_compat_task())) {
 		f = (void *)compat_sys_call_table[r0];
 
@@ -173,6 +211,7 @@ notrace long system_call_exception(long r3, long r4, long r5,
 	}
 
 	ret = f(r3, r4, r5, r6, r7, r8);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	/*
 	 * Ultimately, this value will get limited by KSTACK_OFFSET_MAX(),

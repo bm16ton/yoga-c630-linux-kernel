@@ -1,0 +1,1 @@
+cmd_drivers/media/platform/st/modules.order := {   cat drivers/media/platform/st/sti/bdisp/modules.order;   cat drivers/media/platform/st/sti/c8sectpfe/modules.order;   cat drivers/media/platform/st/sti/delta/modules.order;   cat drivers/media/platform/st/sti/hva/modules.order;   cat drivers/media/platform/st/stm32/modules.order; :; } > drivers/media/platform/st/modules.order

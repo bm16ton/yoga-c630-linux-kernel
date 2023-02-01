@@ -2,7 +2,10 @@
 
 #include <linux/aperture.h>
 #include <linux/device.h>
+<<<<<<< HEAD
+=======
 #include <linux/fb.h> /* for old fbdev helpers */
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 #include <linux/list.h>
 #include <linux/mutex.h>
 #include <linux/pci.h>
@@ -12,6 +15,11 @@
 #include <linux/types.h>
 #include <linux/vgaarb.h>
 
+<<<<<<< HEAD
+#include <video/vga.h>
+
+=======
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 /**
  * DOC: overview
  *
@@ -284,11 +292,14 @@ static void aperture_detach_devices(resource_size_t base, resource_size_t size)
 int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t size,
 					bool primary, const char *name)
 {
+<<<<<<< HEAD
+=======
 #if IS_REACHABLE(CONFIG_FB)
 	struct apertures_struct *a;
 	int ret;
 #endif
 
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	/*
 	 * If a driver asked to unregister a platform device registered by
 	 * sysfb, then can be assumed that this is a driver for a display
@@ -300,6 +311,17 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 	 */
 	sysfb_disable();
 
+<<<<<<< HEAD
+	aperture_detach_devices(base, size);
+
+	/*
+	 * If this is the primary adapter, there could be a VGA device
+	 * that consumes the VGA framebuffer I/O range. Remove this device
+	 * as well.
+	 */
+	if (primary)
+		aperture_detach_devices(VGA_FB_PHYS_BASE, VGA_FB_PHYS_SIZE);
+=======
 #if IS_REACHABLE(CONFIG_FB)
 	a = alloc_apertures(1);
 	if (!a)
@@ -316,6 +338,7 @@ int aperture_remove_conflicting_devices(resource_size_t base, resource_size_t si
 #endif
 
 	aperture_detach_devices(base, size);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 
 	return 0;
 }
@@ -355,6 +378,8 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 	}
 
 	/*
+<<<<<<< HEAD
+=======
 	 * If a driver asked to unregister a platform device registered by
 	 * sysfb, then can be assumed that this is a driver for a display
 	 * that is set up by the system firmware and has a generic driver.
@@ -366,6 +391,7 @@ int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, const char *na
 	sysfb_disable();
 
 	/*
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	 * WARNING: Apparently we must kick fbdev drivers before vgacon,
 	 * otherwise the vga fbdev driver falls over.
 	 */

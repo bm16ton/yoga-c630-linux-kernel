@@ -1761,21 +1761,39 @@ static const struct amdgpu_ring_funcs vcn_v3_0_dec_sw_ring_vm_funcs = {
 	.emit_reg_write_reg_wait = amdgpu_ring_emit_reg_write_reg_wait_helper,
 };
 
+<<<<<<< HEAD
+static int vcn_v3_0_limit_sched(struct amdgpu_cs_parser *p,
+				struct amdgpu_job *job)
+=======
 static int vcn_v3_0_limit_sched(struct amdgpu_cs_parser *p)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct drm_gpu_scheduler **scheds;
 
 	/* The create msg must be in the first IB submitted */
+<<<<<<< HEAD
+	if (atomic_read(&job->base.entity->fence_seq))
+=======
 	if (atomic_read(&p->entity->fence_seq))
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		return -EINVAL;
 
 	scheds = p->adev->gpu_sched[AMDGPU_HW_IP_VCN_DEC]
 		[AMDGPU_RING_PRIO_DEFAULT].sched;
+<<<<<<< HEAD
+	drm_sched_entity_modify_sched(job->base.entity, scheds, 1);
+	return 0;
+}
+
+static int vcn_v3_0_dec_msg(struct amdgpu_cs_parser *p, struct amdgpu_job *job,
+			    uint64_t addr)
+=======
 	drm_sched_entity_modify_sched(p->entity, scheds, 1);
 	return 0;
 }
 
 static int vcn_v3_0_dec_msg(struct amdgpu_cs_parser *p, uint64_t addr)
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 {
 	struct ttm_operation_ctx ctx = { false, false };
 	struct amdgpu_bo_va_mapping *map;
@@ -1846,7 +1864,11 @@ static int vcn_v3_0_dec_msg(struct amdgpu_cs_parser *p, uint64_t addr)
 		if (create[0] == 0x7 || create[0] == 0x10 || create[0] == 0x11)
 			continue;
 
+<<<<<<< HEAD
+		r = vcn_v3_0_limit_sched(p, job);
+=======
 		r = vcn_v3_0_limit_sched(p);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 		if (r)
 			goto out;
 	}
@@ -1860,7 +1882,11 @@ static int vcn_v3_0_ring_patch_cs_in_place(struct amdgpu_cs_parser *p,
 					   struct amdgpu_job *job,
 					   struct amdgpu_ib *ib)
 {
+<<<<<<< HEAD
+	struct amdgpu_ring *ring = amdgpu_job_ring(job);
+=======
 	struct amdgpu_ring *ring = to_amdgpu_ring(p->entity->rq->sched);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 	uint32_t msg_lo = 0, msg_hi = 0;
 	unsigned i;
 	int r;
@@ -1879,7 +1905,12 @@ static int vcn_v3_0_ring_patch_cs_in_place(struct amdgpu_cs_parser *p,
 			msg_hi = val;
 		} else if (reg == PACKET0(p->adev->vcn.internal.cmd, 0) &&
 			   val == 0) {
+<<<<<<< HEAD
+			r = vcn_v3_0_dec_msg(p, job,
+					     ((u64)msg_hi) << 32 | msg_lo);
+=======
 			r = vcn_v3_0_dec_msg(p, ((u64)msg_hi) << 32 | msg_lo);
+>>>>>>> d161cce2b5c03920211ef59c968daf0e8fe12ce2
 			if (r)
 				return r;
 		}

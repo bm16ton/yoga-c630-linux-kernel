@@ -1,0 +1,1 @@
+cmd_drivers/staging/fbtft/fb_agm1264k-fl.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/staging/fbtft/fb_agm1264k-fl.ko drivers/staging/fbtft/fb_agm1264k-fl.o drivers/staging/fbtft/fb_agm1264k-fl.mod.o;  true

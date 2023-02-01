@@ -1,0 +1,1 @@
+cmd_drivers/mtd/devices/sst25l.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/mtd/devices/sst25l.ko drivers/mtd/devices/sst25l.o drivers/mtd/devices/sst25l.mod.o;  true

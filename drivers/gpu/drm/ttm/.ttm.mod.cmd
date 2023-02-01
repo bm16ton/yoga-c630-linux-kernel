@@ -1,0 +1,1 @@
+cmd_drivers/gpu/drm/ttm/ttm.mod := printf '%s\n'   ttm_tt.o ttm_bo.o ttm_bo_util.o ttm_bo_vm.o ttm_module.o ttm_execbuf_util.o ttm_range_manager.o ttm_resource.o ttm_pool.o ttm_device.o ttm_sys_manager.o | awk '!x[$$0]++ { print("drivers/gpu/drm/ttm/"$$0) }' > drivers/gpu/drm/ttm/ttm.mod

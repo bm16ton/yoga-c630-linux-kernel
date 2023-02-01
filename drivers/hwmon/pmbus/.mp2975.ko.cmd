@@ -1,0 +1,1 @@
+cmd_drivers/hwmon/pmbus/mp2975.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o drivers/hwmon/pmbus/mp2975.ko drivers/hwmon/pmbus/mp2975.o drivers/hwmon/pmbus/mp2975.mod.o;  true

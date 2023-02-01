@@ -156,6 +156,18 @@ static void xrs700x_mdio_shutdown(struct mdio_device *mdiodev)
 	dev_set_drvdata(&mdiodev->dev, NULL);
 }
 
+static void xrs700x_mdio_shutdown(struct mdio_device *mdiodev)
+{
+	struct xrs700x *priv = dev_get_drvdata(&mdiodev->dev);
+
+	if (!priv)
+		return;
+
+	xrs700x_switch_shutdown(priv);
+
+	dev_set_drvdata(&mdiodev->dev, NULL);
+}
+
 static const struct of_device_id __maybe_unused xrs700x_mdio_dt_ids[] = {
 	{ .compatible = "arrow,xrs7003e", .data = &xrs7003e_info },
 	{ .compatible = "arrow,xrs7003f", .data = &xrs7003f_info },

@@ -1,0 +1,1 @@
+cmd_net/netfilter/ipset/ip_set_bitmap_port.ko := ld -r  -EL  -maarch64elf -z noexecstack   --build-id=sha1  -T scripts/module.lds -o net/netfilter/ipset/ip_set_bitmap_port.ko net/netfilter/ipset/ip_set_bitmap_port.o net/netfilter/ipset/ip_set_bitmap_port.mod.o;  true
